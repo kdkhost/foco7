@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cliente/
+Disallow: /instalar/
+Disallow: /login
+
+Sitemap: https://foco7.com.br/sitemap.xml

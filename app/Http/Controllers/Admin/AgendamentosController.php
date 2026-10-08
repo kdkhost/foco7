@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Agendamento;
+
+class AgendamentosController extends Controller
+{
+    /**
+     * Exibe o calendário interativo do FullCalendar 6
+     */
+    public function index()
+    {
+        return view('admin.agendamentos.index');
+    }
+
+    /**
+     * Feed JSON formatado para o FullCalendar 6
+     */
+    public function apiEventos(Request $request)
+    {
+        $start = $request->input('start');
+        $end = $request->input('end');
+
+        $query = Agendamento::query();
+
+        if ($start && $end) {
+            $query->whereBetween('data_hora_inicio', [
+                date('Y-m-d 00:00:00', strtotime($start)),
+                date('Y-m-d 23:59:59', strtotime($end)),
+            ]);
+        }
+
+        $agendamentos = $query->get();
+
+        $eventos = $agendamentos->map(function ($ag) {
+            $cor = match ($ag->status) {
+                'confirmado' => '#28a745',
+                'concluido' => '#007bff',
+                'cancelado' => '#dc3545',
+                default => '#ffc107',
+            };
+
+            return [
+                'id' => $ag->id,
+                'title' => "{$ag->tipo_servico}: {$ag->cliente_nome} ({$ag->veiculo_modelo})",
+                'start' => $ag->data_hora_inicio->format('Y-m-d\TH:i:s'),
+                'end' => $ag->data_hora_fim ? $ag->data_hora_fim->format('Y-m-d\TH:i:s') : null,
+                'backgroundColor' => $cor,
+                'borderColor' => $cor,
+                'textColor' => $ag->status === 'pendente' ? '#000000' : '#ffffff',
+                'extendedProps' => [
+                    'cliente_nome' => $ag->cliente_nome,
+                    'cliente_telefone' => $ag->cliente_telefone,
+                    'tipo_servico' => $ag->tipo_servico,
+                    'veiculo_modelo' => $ag->veiculo_modelo,
+                    'veiculo_placa' => $ag->veiculo_placa,
+                    'endereco' => $ag->endereco_atendimento,
+                    'cidade' => $ag->cidade,
+                    'observacoes' => $ag->observacoes,
+                    'status' => $ag->status,
+                ],
+            ];
+        });
+
+        return response()->json($eventos);
+    }
+
+    /**
+     * Cria ou atualiza agendamento via modal AJAX
+     */
+    public function salvar(Request $request)
+    {
+        $validated = $request->validate([
+            'cliente_nome' => 'required|string|max:150',
+            'cliente_telefone' => 'required|string|max:30',
+            'cliente_email' => 'nullable|email|max:150',
+            'tipo_servico' => 'required|string',
+            'veiculo_modelo' => 'nullable|string|max:100',
+            'veiculo_placa' => 'nullable|string|max:20',
+            'data_hora_inicio' => 'required|date',
+            'data_hora_fim' => 'nullable|date',
+            'endereco_atendimento' => 'nullable|string|max:255',
+            'cidade' => 'nullable|string|max:100',
+            'observacoes' => 'nullable|string',
+            'status' => 'required|string',
+        ]);
+
+        $id = $request->input('agendamento_id');
+
+        if ($id) {
+            $agendamento = Agendamento::findOrFail($id);
+            $agendamento->update($validated);
+        } else {
+            Agendamento::create($validated);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Agendamento gravado com sucesso no calendário!',
+        ]);
+    }
+
+    /**
+     * Atualização rápida de horário via Drag & Drop do FullCalendar
+     */
+    public function atualizarHorario(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:agendamentos,id',
+            'start' => 'required|date',
+            'end' => 'nullable|date',
+        ]);
+
+        $agendamento = Agendamento::findOrFail($request->input('id'));
+        $agendamento->data_hora_inicio = $request->input('start');
+        if ($request->filled('end')) {
+            $agendamento->data_hora_fim = $request->input('end');
+        }
+        $agendamento->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Horário do agendamento remarcado com sucesso!',
+        ]);
+    }
+
+    /**
+     * Exclui um agendamento
+     */
+    public function excluir($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $agendamento->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Agendamento removido com sucesso!',
+        ]);
+    }
+}

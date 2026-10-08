@@ -1,0 +1,127 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Site\SiteController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Instalador\InstaladorController;
+use App\Http\Controllers\Pagamento\CheckoutController;
+use App\Http\Controllers\Pagamento\WebhookController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\CmsController;
+use App\Http\Controllers\Admin\PlanosController;
+use App\Http\Controllers\Admin\AgendamentosController;
+use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\ManutencaoController;
+use App\Http\Controllers\Admin\GatewaysController;
+use App\Http\Controllers\Cliente\ClienteDashboardController;
+use App\Http\Controllers\Cliente\ClienteFaturasController;
+
+/*
+|--------------------------------------------------------------------------
+| Rotas Públicas do Site Foco 7 (Landing Page)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [SiteController::class, 'index'])->name('site.home');
+Route::post('/contato', [SiteController::class, 'contato'])->name('site.contato');
+Route::post('/agendar', [SiteController::class, 'agendar'])->name('site.agendar');
+Route::get('/manutencao/bypass/{token}', [SiteController::class, 'bypassManutencao'])->name('site.manutencao.bypass');
+Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
+
+/*
+|--------------------------------------------------------------------------
+| Rotas de Autenticação (Login Unificado / Logout)
+|--------------------------------------------------------------------------
+*/
+Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Assistente Web de Instalação (cPanel / MySQL)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('instalar')->group(function () {
+    Route::get('/', [InstaladorController::class, 'index'])->name('instalador.index');
+    Route::post('/testar-banco', [InstaladorController::class, 'testarBanco'])->name('instalador.testar_banco');
+    Route::post('/executar', [InstaladorController::class, 'executar'])->name('instalador.executar');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Webhooks de Gateways de Pagamento (Isentos de CSRF)
+|--------------------------------------------------------------------------
+*/
+Route::post('/webhook/mercadopago', [WebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
+Route::post('/webhook/efi', [WebhookController::class, 'efi'])->name('webhook.efi');
+
+/*
+|--------------------------------------------------------------------------
+| Painel Administrativo CMS (AdminLTE 4) - Requer papel 'admin'
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    // CMS (Banners, Logos, Cores, Textos, FAQs, Depoimentos)
+    Route::prefix('cms')->group(function () {
+        Route::get('/', [CmsController::class, 'index'])->name('admin.cms.index');
+        Route::post('/configuracoes', [CmsController::class, 'salvarConfiguracoes'])->name('admin.cms.salvar_configs');
+        Route::post('/banner', [CmsController::class, 'salvarBanner'])->name('admin.cms.salvar_banner');
+        Route::delete('/banner/{id}', [CmsController::class, 'excluirBanner'])->name('admin.cms.excluir_banner');
+        Route::post('/faq', [CmsController::class, 'salvarFaq'])->name('admin.cms.salvar_faq');
+        Route::delete('/faq/{id}', [CmsController::class, 'excluirFaq'])->name('admin.cms.excluir_faq');
+        Route::post('/depoimento', [CmsController::class, 'salvarDepoimento'])->name('admin.cms.salvar_depoimento');
+        Route::delete('/depoimento/{id}', [CmsController::class, 'excluirDepoimento'])->name('admin.cms.excluir_depoimento');
+    });
+
+    // Planos de Rastreamento
+    Route::prefix('planos')->group(function () {
+        Route::get('/', [PlanosController::class, 'index'])->name('admin.planos.index');
+        Route::get('/obter/{id}', [PlanosController::class, 'obter'])->name('admin.planos.obter');
+        Route::post('/', [PlanosController::class, 'salvar'])->name('admin.planos.salvar');
+        Route::delete('/{id}', [PlanosController::class, 'excluir'])->name('admin.planos.excluir');
+    });
+
+    // Agendamentos (FullCalendar 6)
+    Route::prefix('agendamentos')->group(function () {
+        Route::get('/', [AgendamentosController::class, 'index'])->name('admin.agendamentos.index');
+        Route::get('/eventos', [AgendamentosController::class, 'apiEventos'])->name('admin.agendamentos.eventos');
+        Route::post('/', [AgendamentosController::class, 'salvar'])->name('admin.agendamentos.salvar');
+        Route::post('/horario', [AgendamentosController::class, 'atualizarHorario'])->name('admin.agendamentos.horario');
+        Route::delete('/{id}', [AgendamentosController::class, 'excluir'])->name('admin.agendamentos.excluir');
+    });
+
+    // SEO Score & Meta Tags
+    Route::prefix('seo')->group(function () {
+        Route::get('/', [SeoController::class, 'index'])->name('admin.seo.index');
+        Route::post('/', [SeoController::class, 'salvar'])->name('admin.seo.salvar');
+        Route::post('/analisar', [SeoController::class, 'analisar'])->name('admin.seo.analisar');
+    });
+
+    // Modo de Manutenção
+    Route::prefix('manutencao')->group(function () {
+        Route::get('/', [ManutencaoController::class, 'index'])->name('admin.manutencao.index');
+        Route::post('/toggle', [ManutencaoController::class, 'toggle'])->name('admin.manutencao.toggle');
+        Route::post('/', [ManutencaoController::class, 'salvar'])->name('admin.manutencao.salvar');
+    });
+
+    // Gateways de Pagamento
+    Route::prefix('gateways')->group(function () {
+        Route::get('/', [GatewaysController::class, 'index'])->name('admin.gateways.index');
+        Route::post('/', [GatewaysController::class, 'salvar'])->name('admin.gateways.salvar');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Área do Cliente (Faturas, Serviços, Agendamentos) - Requer papel 'cliente'
+|--------------------------------------------------------------------------
+*/
+Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function () {
+    Route::get('/', fn () => redirect()->route('cliente.dashboard'));
+    Route::get('/dashboard', [ClienteDashboardController::class, 'index'])->name('cliente.dashboard');
+    Route::get('/faturas', [ClienteFaturasController::class, 'index'])->name('cliente.faturas.index');
+    Route::get('/faturas/{codigo}', [ClienteFaturasController::class, 'detalhes'])->name('cliente.faturas.detalhes');
+});

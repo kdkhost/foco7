@@ -1,0 +1,111 @@
+/**
+ * ==============================================================================
+ * SISTEMA FOCO 7 - ESTILOS VISUAIS DO PAINEL ADMINLTE 4 (BOOTSTRAP 5)
+ * Suporte a Dark/Light Mode, Sidebar Treeview e Paleta Oficial (#d90000)
+ * ==============================================================================
+ */
+
+:root {
+    --admin-primary: #d90000;
+    --admin-primary-hover: #b80000;
+    --admin-sidebar-bg: #11141c;
+    --admin-sidebar-active: #d90000;
+}
+
+/* Marcação da rota ativa na Sidebar */
+.app-sidebar .nav-link.active,
+.sidebar .nav-link.active {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(217, 0, 0, 0.35);
+}
+
+.app-sidebar .nav-link:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ff4d4d;
+}
+
+/* Botões do Painel */
+.btn-primary {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--admin-primary-hover) !important;
+    border-color: var(--admin-primary-hover) !important;
+}
+
+/* Badges e Status */
+.badge-foco {
+    background-color: var(--admin-primary);
+    color: #ffffff;
+}
+
+/* Modo Escuro Nativo */
+body.dark-mode {
+    background-color: #0b0e14 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .app-main,
+body.dark-mode .content-wrapper {
+    background-color: #0b0e14 !important;
+}
+
+body.dark-mode .card {
+    background-color: #121722 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9;
+}
+
+body.dark-mode .card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #1a202c !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .form-control:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(217, 0, 0, 0.25) !important;
+}
+
+body.dark-mode .table {
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .modal-content {
+    background-color: #121722 !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* FullCalendar 6 Customização */
+.fc .fc-toolbar-title {
+    font-size: 1.25rem !important;
+    font-weight: 700;
+}
+
+.fc .fc-button-primary {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--admin-primary-hover) !important;
+}
+
+.fc-event {
+    cursor: pointer;
+    font-size: 0.85rem !important;
+    border-radius: 4px !important;
+    padding: 2px 4px;
+}
