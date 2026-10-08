@@ -1,0 +1,132 @@
+# ==============================================================================
+# SISTEMA FOCO 7 - CONFIGURAÇÃO DE SEGURANÇA E ROTEAMENTO CPANEL / LITESPEED
+# Arquivo: public_html/.htaccess (Raiz da Hospedagem cPanel)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. DIRETIVAS GERAIS E SEGURANÇA BÁSICA
+# ------------------------------------------------------------------------------
+# Desativa listagem de diretórios e ativa seguimento de links simbólicos
+Options -Indexes +FollowSymLinks
+ServerSignature Off
+
+# Força codificação UTF-8 sem BOM em todas as respostas
+AddDefaultCharset UTF-8
+DefaultLanguage pt-BR
+
+# ------------------------------------------------------------------------------
+# 2. BLOQUEIO TERMINANTE DE ARQUIVOS E DIRETÓRIOS CRÍTICOS / SENSÍVEIS
+# ------------------------------------------------------------------------------
+# Bloqueio rigoroso de arquivos sensíveis (.env, .git, artisan, composer, etc.)
+<FilesMatch "(^\..*|\.(env|git|json|lock|xml|yml|yaml|md|sql|log|sh|bat)|artisan|composer\..*|package\..*|phpunit\.xml)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Bloqueio de acesso direto a pastas do núcleo do Laravel via navegador
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Bloqueia qualquer tentativa de acessar pastas internas do Laravel
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage/framework|storage/logs|vendor|node_modules)(\/.*)?$ - [F,L,NC]
+    
+    # Bloqueia arquivos vitais explicitamente
+    RewriteRule ^(\.env|\.git|artisan|composer\.(json|lock)|package\.(json|lock)|phpunit\.xml|README\.md) - [F,L,NC]
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 3. CABEÇALHOS DE SEGURANÇA HTTP (SECURITY HEADERS)
+# ------------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Previne Clickjacking (permite exibição apenas na mesma origem)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Previne detecção incorreta de tipo MIME (MIME-Sniffing)
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Proteção ativa contra Cross-Site Scripting (XSS)
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Política estrita de Referrer
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Política de Recursos do Navegador
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 4. COMPRESSÃO GZIP / BROTLI (LITESPEED & APACHE DE ALTA PERFORMANCE)
+# ------------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 5. CACHE DE RECURSOS ESTÁTICOS (OTIMIZAÇÃO DE PERFORMANCE E CONSUMO DE CPU)
+# ------------------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    
+    # Folhas de estilo e scripts JS
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+    
+    # Imagens, favicons e gráficos
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # Fontes Web
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 6. ROTEAMENTO TRANSPARENTE PARA O DIRETÓRIO /public/ DO LARAVEL
+# ------------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Forçar redirecionamento para HTTPS (SSL)
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Previne duplicação de URL caso o usuário acesse diretamente /public/
+    RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+    RewriteRule ^public/(.*)$ /$1 [R=301,L,NE]
+
+    # Se a requisição coincidir com um arquivo ou diretório existente dentro de /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Todas as demais rotas são encaminhadas para o Front Controller /public/index.php
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
