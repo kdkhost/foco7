@@ -439,3 +439,183 @@ body {
         display: none;
     }
 }
+
+/* ==============================================================================
+   CORREÇÃO DO CARROSSEL HERO & CONTROLES DESOBSTRUÍDOS
+   ============================================================================== */
+#heroCarousel {
+    position: relative;
+    padding-bottom: 25px;
+}
+
+/* Desativa a sobreposição padrão de 15% que bloqueia e confunde o usuário */
+#heroCarousel .carousel-control-prev,
+#heroCarousel .carousel-control-next {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    opacity: 0.95;
+    border-radius: 50%;
+    background: rgba(18, 22, 31, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+    transition: var(--foco-transition);
+    z-index: 5;
+    top: auto;
+    bottom: auto;
+}
+
+#heroCarousel .carousel-control-prev:hover,
+#heroCarousel .carousel-control-next:hover {
+    background: var(--foco-red);
+    border-color: var(--foco-red);
+    box-shadow: 0 4px 15px var(--foco-red-glow);
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+#heroCarousel .carousel-control-prev-icon,
+#heroCarousel .carousel-control-next-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.hero-carousel-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.hero-carousel-nav .carousel-indicators {
+    position: static;
+    margin: 0;
+    gap: 6px;
+    justify-content: flex-start;
+}
+
+.hero-carousel-nav .carousel-indicators [data-bs-target] {
+    width: 24px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: none;
+    margin: 0;
+    transition: var(--foco-transition);
+}
+
+.hero-carousel-nav .carousel-indicators .active {
+    width: 42px;
+    background-color: var(--foco-red);
+}
+
+/* ==============================================================================
+   BOTÃO FLUTUANTE DO WHATSAPP (COM PULSO E TOOLTIP)
+   ============================================================================== */
+.foco-whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background: #25d366;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    z-index: 1060;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: pulse-whatsapp 2s infinite;
+}
+
+.foco-whatsapp-float:hover {
+    background: #20ba59;
+    color: #ffffff;
+    transform: scale(1.08) translateY(-3px);
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+}
+
+.foco-whatsapp-float .whatsapp-tooltip {
+    position: absolute;
+    right: 72px;
+    background: #11141c;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+}
+
+.foco-whatsapp-float:hover .whatsapp-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@keyframes pulse-whatsapp {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    }
+}
+
+/* ==============================================================================
+   BOTÃO VOLTAR AO TOPO FLUTUANTE
+   ============================================================================== */
+.foco-btn-topo {
+    position: fixed;
+    bottom: 96px;
+    right: 31px;
+    width: 48px;
+    height: 48px;
+    background: rgba(18, 22, 31, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    z-index: 1050;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+}
+
+.foco-btn-topo.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.foco-btn-topo:hover {
+    background: var(--foco-red);
+    border-color: var(--foco-red);
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px var(--foco-red-glow);
+}
+

@@ -5,6 +5,34 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.3.0] - 2026-10-08
+
+### ✨ Adicionado & Aprimorado
+- **Upload Global com Arrasta e Solta (Drag & Drop), Proporções e Preview:**
+  - Componente universal `public/js/global-dropzone.js` integrado a todos os formulários administrativos.
+  - Exibição de dimensões ideais recomendadas (ex: 1920×650px para Banners, 500×120px para Logo, 512×512px para Favicon, 300×300px para Avatar, 200×200px para Depoimentos e `.pem` para Certificados SSL).
+  - Pré-visualização instantânea do arquivo com leitura em memória, cálculo em tempo real da resolução e peso em KB/MB, e botões para troca e remoção.
+- **Botões Flutuantes no Site Oficial:**
+  - **Botão Flutuante do WhatsApp:** Ícone pulsante verde oficial no canto inferior direito com link dinâmico para o WhatsApp da Foco 7 `(91) 8051-0736` e tooltip de chamada rápida.
+  - **Botão Voltar ao Topo:** Botão elegante que surge após rolagem da tela (> 320px) com animação suave de subida até o início da página.
+- **Correção dos Controles do Carrossel Hero:**
+  - Removido o overlay invasivo de 15% do Bootstrap que bloqueava os botões de ação e o simulador rápido de veículos.
+  - Posicionamento dedicado com botões circulares elegantes e indicadores interativos em barra na base do slide.
+- **Página de Perfil do Administrador (`/admin/perfil`):**
+  - Gerenciamento completo de informações pessoais (Nome, E-mail, Telefone e CPF/CNPJ).
+  - Upload de avatar com drag & drop e preview imediato.
+  - Alteração segura de senha com verificação obrigatória da senha atual e confirmação.
+- **Página de Configurações do Sistema & Servidor SMTP (`/admin/configuracoes`):**
+  - Painel com abas para Dados Institucionais, Identidade Visual (Logo e Favicon), Servidor SMTP e Redes Sociais.
+  - Disparo de e-mail de teste em tempo real via AJAX com feedback via SweetAlert2 e Toastr.
+- **Portal de Pagamentos Expandido (Gateways):**
+  - Campos completos de Mercado Pago (Public Key, Access Token, Client ID, Client Secret, Webhook Secret, Sandbox e Ativação).
+  - Campos completos de Efí PRO (Client ID, Client Secret, Chave PIX, Upload do Certificado `.pem` com Drag & Drop, Sandbox e Ativação).
+  - Regras Comerciais & Financeiras: Desconto no PIX (%), parcelamento no cartão, parcelas sem juros, taxa de juros ao mês, vencimento de boleto, multa por atraso e juros diários.
+- **Suíte de Testes Automatizados:** 16 testes passando com 100% de sucesso e 44 asserções.
+
+---
+
 ## [1.2.0] - 2026-10-08
 
 ### ✨ Adicionado & Atualizado

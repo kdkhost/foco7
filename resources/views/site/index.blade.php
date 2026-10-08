@@ -182,12 +182,19 @@
                     @endforelse
                 </div>
                 @if($slides->count() > 1)
-                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
+                <div class="hero-carousel-nav">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="carousel-indicators">
+                        @foreach($slides as $idx => $s)
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Slide {{ $idx + 1 }}"></button>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Próximo Slide" title="Próximo Slide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
                 @endif
             </div>
         </div>
@@ -691,7 +698,21 @@
                 </div>
             </div>
         </div>
-    </div>
+    <!-- BOTÃO VOLTAR AO TOPO FLUTUANTE -->
+    <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- BOTÃO FLUTUANTE DO WHATSAPP OFICIAL -->
+    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1!%20Gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20o%20rastreamento%20Foco%207." 
+       class="foco-whatsapp-float" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       aria-label="Falar pelo WhatsApp com a Foco 7" 
+       title="Fale Conosco pelo WhatsApp">
+        <span class="whatsapp-tooltip"><i class="fab fa-whatsapp text-success me-1"></i> Fale Conosco: {{ $configs['telefone'] ?? '(91) 8051-0736' }}</span>
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <!-- Scripts CDN e Globais -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -705,6 +726,23 @@
 
     <script>
         $(function () {
+            // Controle dinâmico do botão Voltar ao Topo
+            var $btnTopo = $('#btnVoltarAoTopo');
+            $(window).on('scroll', function () {
+                if ($(this).scrollTop() > 320) {
+                    $btnTopo.addClass('show');
+                } else {
+                    $btnTopo.removeClass('show');
+                }
+            });
+
+            $btnTopo.on('click', function () {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
             // Modal de contratação
             $('.btn-contratar').on('click', function () {
                 var id = $(this).data('plano-id');

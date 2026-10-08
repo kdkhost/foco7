@@ -109,3 +109,43 @@ body.dark-mode .modal-content {
     border-radius: 4px !important;
     padding: 2px 4px;
 }
+
+/* ==============================================================================
+   COMPONENTE GLOBAL DE UPLOAD FOCO 7 (ARRASTA E SOLTA / DRAG & DROP)
+   ============================================================================== */
+.foco-dropzone-box {
+    border: 2px dashed rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    background: rgba(18, 22, 31, 0.6);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.foco-dropzone-box:hover {
+    border-color: rgba(217, 0, 0, 0.6);
+    background: rgba(25, 30, 42, 0.8);
+}
+
+.foco-dropzone-box.is-dragover {
+    border-color: var(--admin-primary) !important;
+    background: rgba(217, 0, 0, 0.12) !important;
+    box-shadow: 0 0 20px rgba(217, 0, 0, 0.3);
+    transform: scale(1.01);
+}
+
+.foco-dropzone-icon i {
+    transition: transform 0.3s ease;
+}
+
+.foco-dropzone-box:hover .foco-dropzone-icon i {
+    transform: translateY(-4px) scale(1.1);
+}
+
+.foco-preview-img {
+    max-width: 100%;
+    background: #0a0c10;
+    padding: 6px;
+}
+

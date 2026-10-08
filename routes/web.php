@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AgendamentosController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ManutencaoController;
 use App\Http\Controllers\Admin\GatewaysController;
+use App\Http\Controllers\Admin\PerfilController;
+use App\Http\Controllers\Admin\ConfiguracoesController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
@@ -111,6 +113,21 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('gateways')->group(function () {
         Route::get('/', [GatewaysController::class, 'index'])->name('admin.gateways.index');
         Route::post('/', [GatewaysController::class, 'salvar'])->name('admin.gateways.salvar');
+    });
+
+    // Meu Perfil de Usuário
+    Route::prefix('perfil')->group(function () {
+        Route::get('/', [PerfilController::class, 'index'])->name('admin.perfil.index');
+        Route::post('/dados', [PerfilController::class, 'salvarDados'])->name('admin.perfil.salvar_dados');
+        Route::post('/avatar', [PerfilController::class, 'salvarAvatar'])->name('admin.perfil.salvar_avatar');
+        Route::post('/senha', [PerfilController::class, 'alterarSenha'])->name('admin.perfil.alterar_senha');
+    });
+
+    // Configurações do Sistema & Servidor SMTP
+    Route::prefix('configuracoes')->group(function () {
+        Route::get('/', [ConfiguracoesController::class, 'index'])->name('admin.configuracoes.index');
+        Route::post('/salvar', [ConfiguracoesController::class, 'salvar'])->name('admin.configuracoes.salvar');
+        Route::post('/testar-smtp', [ConfiguracoesController::class, 'testarSmtp'])->name('admin.configuracoes.testar_smtp');
     });
 });
 

@@ -55,13 +55,28 @@
                     <!-- Perfil do Administrador -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
-                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">
-                                {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
-                            </div>
+                            @if(!empty(auth()->user()->avatar))
+                                <img src="{{ asset(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="rounded-circle border border-danger" style="width: 32px; height: 32px; object-fit: cover;">
+                            @else
+                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">
+                                    {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
+                                </div>
+                            @endif
                             <span class="d-none d-md-inline fw-semibold">{{ auth()->user()->name ?? 'Administrador' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><span class="dropdown-item-text small text-secondary">{{ auth()->user()->email }}</span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}" href="{{ route('admin.perfil.index') }}">
+                                    <i class="fas fa-user-circle me-2 text-danger"></i> Meu Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}" href="{{ route('admin.configuracoes.index') }}">
+                                    <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações & SMTP
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="document.getElementById('formLogout').submit();">
@@ -130,6 +145,13 @@
                         <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
 
                         <li class="nav-item">
+                            <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-sliders-h"></i>
+                                <p>Configurações & SMTP</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-tools"></i>
                                 <p>Modo Manutenção</p>
@@ -140,6 +162,13 @@
                             <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-credit-card"></i>
                                 <p>Gateways de Pagamento</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-circle"></i>
+                                <p>Meu Perfil</p>
                             </a>
                         </li>
                     </ul>
@@ -187,6 +216,7 @@
     <!-- Scripts Globais Foco 7 -->
     <script src="{{ asset('js/global-ajax.js') }}"></script>
     <script src="{{ asset('js/global-mascaras.js') }}"></script>
+    <script src="{{ asset('js/global-dropzone.js') }}"></script>
 
     <script>
         // Alternador Dark / Light Mode no Admin

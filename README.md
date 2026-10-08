@@ -58,30 +58,33 @@ public_html/
 │   ├── js/
 │   │   ├── global-ajax.js         # Interceptor global AJAX com Toastr e SweetAlert2
 │   │   ├── global-mascaras.js     # Máscaras brasileiras (CPF/CNPJ, Moeda, Telefone, CEP)
+│   │   ├── global-dropzone.js     # Upload drag & drop com validação de proporções e preview
 │   │   └── seo-analyzer.js        # Analisador de pontuação SEO em tempo real
 │   ├── img/                       # Logomarca oficial, banners, ícones
 │   └── uploads/                   # Mídias gerenciáveis via CMS
 ├── resources/
 │   └── views/
-│       ├── site/                  # Landing page única baseada no sosrastreamento.com
+│       ├── site/                  # Landing page com WhatsApp flutuante e Voltar ao Topo
 │       │   ├── index.blade.php
-│       │   ├── manutencao.blade.php
-│       │   └── secoes/            # Seções modulares (Hero, Planos, Ronda, FAQ, etc.)
+│       │   └── manutencao.blade.php
 │       ├── admin/                 # Painel Administrativo AdminLTE 4
 │       │   ├── layouts/
 │       │   ├── dashboard.blade.php
-│       │   ├── cms/               # Gestão de logos, banners, carrossel, cores
+│       │   ├── perfil/            # Gestão de perfil, avatar e alteração segura de senha
+│       │   ├── configuracoes/     # Configurações institucionais e Servidor SMTP com teste AJAX
+│       │   ├── gateways/          # Mercado Pago, Efí PRO e Regras Comerciais/Financeiras
+│       │   ├── cms/               # Gestão de logos, banners, carrossel com foco-dropzone
 │       │   ├── seo/               # Gestão de meta tags com SEO Score em tempo real
 │       │   ├── agendamentos/      # FullCalendar 6
 │       │   └── manutencao/        # Configuração do modo de manutenção
 │       ├── cliente/               # Área do Cliente
 │       │   ├── dashboard.blade.php
 │       │   └── faturas.blade.php
+│       ├── errors/                # Páginas de erro personalizadas (404, 500, 403, 419, 503)
 │       └── instalador/            # Assistente web de configuração e banco MySQL
 ├── routes/
-│   ├── web.php                    # Rotas públicas, instalador e webhooks
-│   └── admin.php                  # Rotas autenticadas (Admin e Cliente)
-└── storage/                       # Diretório de logs, sessões e arquivos de upload
+│   └── web.php                    # Rotas públicas, painel admin, cliente e instalador
+└── storage/                       # Diretório de logs, sessões, certificados .pem e uploads
 ```
 
 ---

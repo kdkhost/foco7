@@ -79,15 +79,24 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Alterar Logotipo Principal</label>
-                            <input type="file" name="logo_upload" class="form-control" accept="image/*">
-                            @if(!empty($settings['site_logo']))
-                                <small class="text-secondary d-block mt-1">Logo atual: <a href="{{ $settings['site_logo'] }}" target="_blank">Visualizar imagem</a></small>
-                            @endif
+                            <label class="form-label fw-bold"><i class="fas fa-image text-danger me-1"></i> Logotipo Principal</label>
+                            <div class="foco-dropzone"
+                                 data-input-name="logo_upload"
+                                 data-ratio="500 × 120 px (Horizontal Transparente)"
+                                 data-max-size="5MB"
+                                 data-accept="image/png,image/webp,image/jpeg"
+                                 data-current-preview="{{ !empty($settings['site_logo']) ? asset($settings['site_logo']) : asset('/img/logo-foco7.png') }}">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Alterar Ícone Favicon</label>
-                            <input type="file" name="favicon_upload" class="form-control" accept="image/*">
+                            <label class="form-label fw-bold"><i class="fas fa-gem text-danger me-1"></i> Ícone Favicon</label>
+                            <div class="foco-dropzone"
+                                 data-input-name="favicon_upload"
+                                 data-ratio="512 × 512 px (1:1 Quadrado)"
+                                 data-max-size="2MB"
+                                 data-accept="image/png,image/x-icon,image/webp"
+                                 data-current-preview="{{ !empty($settings['site_favicon']) ? asset($settings['site_favicon']) : asset('/img/favicon.png') }}">
+                            </div>
                         </div>
                         <div class="col-12 mt-4 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
@@ -273,7 +282,7 @@
                 <h5 class="modal-title fw-bold">Novo Slide do Hero Carousel</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_banner') }}" method="POST" class="ajax-form">
+            <form action="{{ route('admin.cms.salvar_banner') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
                 @csrf
                 <input type="hidden" name="tipo" value="hero_slide">
                 <div class="modal-body">
@@ -293,6 +302,15 @@
                         <div class="col-12">
                             <label class="form-label small fw-bold">Subtítulo Explicativo</label>
                             <textarea name="subtitulo" rows="3" class="form-control" placeholder="Descrição do impacto da proteção veicular"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Imagem de Fundo do Slide (Opcional)</label>
+                            <div class="foco-dropzone"
+                                 data-input-name="imagem_upload"
+                                 data-ratio="1920 × 650 px (Banner 16:9)"
+                                 data-max-size="5MB"
+                                 data-accept="image/jpeg,image/png,image/webp">
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Texto do Botão 1</label>
@@ -368,7 +386,7 @@
                 <h5 class="modal-title fw-bold">Novo Depoimento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_depoimento') }}" method="POST" class="ajax-form">
+            <form action="{{ route('admin.cms.salvar_depoimento') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -383,6 +401,15 @@
                         <div class="col-6">
                             <label class="form-label small fw-bold">Veículo</label>
                             <input type="text" name="veiculo" class="form-control" placeholder="Hilux, Fan 160">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Foto do Cliente (Opcional)</label>
+                        <div class="foco-dropzone"
+                             data-input-name="foto_upload"
+                             data-ratio="200 × 200 px (Foto 1:1 Quadrado)"
+                             data-max-size="3MB"
+                             data-accept="image/jpeg,image/png,image/webp">
                         </div>
                     </div>
                     <div class="mb-3">
