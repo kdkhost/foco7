@@ -15,13 +15,13 @@ class GatewaysController extends Controller
     {
         $configs = [
             'mp_ativo' => CmsSetting::get('mercadopago_ativo', '1') == '1',
-            'mp_public_key' => CmsSetting::get('mercadopago_public_key', env('MERCADO_PAGO_PUBLIC_KEY', '')),
-            'mp_access_token' => CmsSetting::get('mercadopago_access_token', env('MERCADO_PAGO_ACCESS_TOKEN', '')),
+            'mp_public_key' => CmsSetting::get('mercadopago_public_key', ''),
+            'mp_access_token' => CmsSetting::get('mercadopago_access_token', ''),
             'mp_sandbox' => CmsSetting::get('mercadopago_sandbox', '1') == '1',
 
             'efi_ativo' => CmsSetting::get('efi_ativo', '1') == '1',
-            'efi_client_id' => CmsSetting::get('efi_client_id', env('EFI_CLIENT_ID', '')),
-            'efi_client_secret' => CmsSetting::get('efi_client_secret', env('EFI_CLIENT_SECRET', '')),
+            'efi_client_id' => CmsSetting::get('efi_client_id', ''),
+            'efi_client_secret' => CmsSetting::get('efi_client_secret', ''),
             'efi_sandbox' => CmsSetting::get('efi_sandbox', '1') == '1',
         ];
 
