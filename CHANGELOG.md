@@ -5,6 +5,20 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.1.0] - 2026-10-08
+
+### ✨ Adicionado
+- **Páginas de Erro Personalizadas do Sistema (`resources/views/errors/`):**
+  - Layout mestre padronizado (`layout.blade.php`) com identidade Foco 7 (Dark Mode, acentos em vermelho `#d90000`, glassmorphism, suporte 24h via WhatsApp e retorno ao início).
+  - Página de erro `404.blade.php` (Página Não Encontrada) com animação e links de navegação.
+  - Página de erro `500.blade.php` (Instabilidade Temporária no Servidor / Erro Inesperado).
+  - Página de erro `403.blade.php` (Acesso Restrito / Não Autorizado).
+  - Página de erro `419.blade.php` (Sessão Expirada por Inatividade).
+  - Página de erro `503.blade.php` (Manutenção Programada em Andamento).
+- **Publicação Automática Remota no cPanel:** Deploy completo via SSH/SFTP com PHP 8.4 em `/home/fococomb/public_html/`.
+
+---
+
 ## [1.0.0] - 2026-10-08
 
 ### ✨ Adicionado
