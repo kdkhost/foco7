@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Instalador Web Foco 7 | Assistente cPanel</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -67,7 +69,7 @@
 
     <div class="wizard-card">
         <div class="text-center mb-4">
-            <span class="fs-2 fw-black text-danger">FOCO<span class="text-white">7</span></span>
+            <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="60" class="mb-2">
             <h4 class="fw-bold mt-2">Assistente de Instalação e Configuração</h4>
             <p class="small text-secondary">Preparado para hospedagens cPanel com LiteSpeed e MySQL 8.0+</p>
         </div>

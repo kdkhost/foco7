@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $titulo ?? 'Foco 7 | Site em Manutenção' }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -93,9 +95,9 @@
     <div class="bg-overlay"></div>
 
     <div class="manutencao-card">
-        <!-- Logomarca -->
+        <!-- Logomarca Oficial Transparente -->
         <div class="mb-4">
-            <span class="fs-1 fw-black text-danger">FOCO<span class="text-white">7</span></span>
+            <img src="{{ asset($logo ?? '/img/logo-foco7.png') }}" alt="Foco 7" height="68" class="mb-2">
         </div>
 
         <span class="badge bg-danger px-3 py-2 text-uppercase mb-3 letter-spacing-1">

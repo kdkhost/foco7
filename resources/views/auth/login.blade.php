@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Foco 7 | Acesso Seguro ao Sistema</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Bootstrap 5.3 & FontAwesome 6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -95,9 +97,11 @@
             <i class="fas fa-moon" id="themeIcon"></i>
         </button>
 
-        <!-- Logomarca -->
+        <!-- Logomarca Oficial Transparente -->
         <div class="text-center mb-4">
-            <span class="fs-2 fw-black text-danger">FOCO<span class="text-secondary" id="logoSub">7</span></span>
+            <a href="{{ route('site.home') }}">
+                <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="68" class="mb-2">
+            </a>
             <p class="small text-secondary mt-1 mb-0">Portal de Gestão & Área do Cliente</p>
         </div>
 

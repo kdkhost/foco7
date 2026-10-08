@@ -5,6 +5,19 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.2.0] - 2026-10-08
+
+### ✨ Adicionado & Atualizado
+- **Logomarca e Favicon Oficiais Transparentes:**
+  - Aplicação dos arquivos oficiais fornecidos pelo cliente (`public/img/logo-foco7.png`, `public/img/favicon.png` e `public/favicon.ico`).
+  - Inserção em todas as interfaces: Navbar e Rodapé da Landing Page, Portal de Login, Área do Cliente, Sidebar do Admin CMS, Assistente de Instalação e Páginas de Erro.
+- **Centralização Dinâmica do Telefone de Atendimento no Banco de Dados:**
+  - Telefone oficial atualizado para **(91) 8051-0736** e WhatsApp para **559180510736** em 100% dos pontos de contato do sistema via `cms_settings`.
+  - Links com disparo direto para chamada telefônica (`tel:`) e conversação no WhatsApp (`https://wa.me/559180510736`).
+  - Banco de dados em produção e local sincronizados com os novos dados de contato.
+
+---
+
 ## [1.1.0] - 2026-10-08
 
 ### ✨ Adicionado

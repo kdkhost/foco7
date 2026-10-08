@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Ops! Ocorreu um erro') | Foco 7 Rastreamento</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -207,8 +209,10 @@
 </head>
 <body>
     <div class="error-container">
-        <div class="brand-badge">
-            <i class="fa-solid fa-satellite-dish"></i> Foco 7 Rastreamento
+        <div class="mb-4 text-center">
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="60" class="img-fluid">
+            </a>
         </div>
 
         <div>
@@ -232,7 +236,7 @@
                 <i class="fa-solid fa-house"></i> Ir para o Início
             </a>
             
-            <a href="https://wa.me/5598988582020?text=Olá,%20encontrei%20um%20erro%20no%20sistema%20Foco%207" target="_blank" class="btn-foco-secondary">
+            <a href="https://wa.me/{{ \App\Models\CmsSetting::get('contato_whatsapp', '559180510736') }}?text={{ urlencode('Olá, preciso de suporte com o sistema Foco 7.') }}" target="_blank" class="btn-foco-secondary">
                 <i class="fa-brands fa-whatsapp text-success"></i> Plantão de Suporte
             </a>
         </div>

@@ -109,11 +109,11 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">WhatsApp Oficial (Com DDI e DDD)</label>
-                            <input type="text" name="contato_whatsapp" class="form-control" value="{{ $settings['contato_whatsapp'] ?? '5591981117777' }}" required placeholder="Ex: 5591981117777">
+                            <input type="text" name="contato_whatsapp" class="form-control" value="{{ $settings['contato_whatsapp'] ?? '559180510736' }}" required placeholder="Ex: 559180510736">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">WhatsApp Formatado (Exibição)</label>
-                            <input type="text" name="contato_whatsapp_formatado" class="form-control mask-telefone" value="{{ $settings['contato_whatsapp_formatado'] ?? '(91) 98111-7777' }}" required>
+                            <input type="text" name="contato_whatsapp_formatado" class="form-control mask-telefone" value="{{ $settings['contato_whatsapp_formatado'] ?? '(91) 8051-0736' }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">E-mail Comercial</label>
@@ -308,7 +308,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Link do Botão 2</label>
-                            <input type="text" name="link_botao_2" class="form-control" value="https://wa.me/5591981117777">
+                            <input type="text" name="link_botao_2" class="form-control" value="https://wa.me/559180510736">
                         </div>
                     </div>
                 </div>

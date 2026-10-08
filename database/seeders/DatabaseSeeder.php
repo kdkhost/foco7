@@ -64,9 +64,9 @@ class DatabaseSeeder extends Seeder
             ['chave' => 'cor_destaque', 'valor' => '#e60000', 'grupo' => 'aparencia', 'tipo' => 'text', 'descricao' => 'Cor de botões e destaques'],
 
             // Contato e Atendimento
-            ['chave' => 'contato_telefone', 'valor' => '(91) 3222-7777', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'Telefone fixo da central'],
-            ['chave' => 'contato_whatsapp', 'valor' => '5591981117777', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'WhatsApp com DDI e DDD (somente dígitos)'],
-            ['chave' => 'contato_whatsapp_formatado', 'valor' => '(91) 98111-7777', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'WhatsApp exibido no cabeçalho'],
+            ['chave' => 'contato_telefone', 'valor' => '(91) 8051-0736', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'Telefone de contato da central'],
+            ['chave' => 'contato_whatsapp', 'valor' => '559180510736', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'WhatsApp com DDI e DDD (somente dígitos)'],
+            ['chave' => 'contato_whatsapp_formatado', 'valor' => '(91) 8051-0736', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'WhatsApp exibido no cabeçalho'],
             ['chave' => 'contato_email', 'valor' => 'contato@foco7.com.br', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'E-mail comercial'],
             ['chave' => 'contato_horario', 'valor' => 'Central 24 Horas | Plantão de Emergência', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'Horário exibido no topo'],
             ['chave' => 'contato_endereco', 'valor' => 'Tv. Quintino Bocaiúva, 1200 - Nazaré, Belém - PA', 'grupo' => 'contato', 'tipo' => 'text', 'descricao' => 'Endereço da sede'],
@@ -107,7 +107,7 @@ class DatabaseSeeder extends Seeder
                 'texto_botao_1' => 'PROTEGER MEU VEÍCULO AGORA',
                 'link_botao_1' => '#planos',
                 'texto_botao_2' => 'FALAR NO WHATSAPP',
-                'link_botao_2' => 'https://wa.me/5591981117777?text=Olá,%20gostaria%20de%20proteger%20meu%20veículo%20com%20a%20Foco%207!',
+                'link_botao_2' => 'https://wa.me/559180510736?text=Olá,%20gostaria%20de%20proteger%20meu%20veículo%20com%20a%20Foco%207!',
                 'imagem' => '/img/hero-banner-1.jpg',
                 'ordem' => 1,
                 'ativo' => true,

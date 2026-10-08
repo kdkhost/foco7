@@ -63,7 +63,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark foco-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
-                <span class="fs-3 fw-black text-danger">FOCO<span class="text-white">7</span></span>
+                <img src="{{ asset($configs['logo'] ?? '/img/logo-foco7.png') }}" alt="{{ $configs['nome'] }}" height="48" class="logo-foco7 d-inline-block">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco">
                 <span class="navbar-toggler-icon"></span>
@@ -580,7 +580,7 @@
         <div class="container">
             <div class="row g-5">
                 <div class="col-lg-4">
-                    <span class="fs-3 fw-black text-danger">FOCO<span class="text-white">7</span></span>
+                    <img src="{{ asset($configs['logo'] ?? '/img/logo-foco7.png') }}" alt="{{ $configs['nome'] }}" height="54" class="mb-3 logo-foco7">
                     <p class="mt-3 text-secondary small">
                         Líder em rastreamento veicular inteligente, bloqueio remoto e ronda tática presencial. Há mais de 10 anos protegendo famílias e frotas corporativas em todo o território nacional.
                     </p>

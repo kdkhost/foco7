@@ -11,7 +11,7 @@
                 <p class="text-secondary small mb-0">Central do Assinante Foco 7. Consulte suas mensalidades e status dos serviços.</p>
             </div>
             <div>
-                <a href="https://wa.me/5591981117777?text=Ol%C3%A1,%20sou%20cliente%20e%20preciso%20de%20suporte%20t%C3%A9cnico" target="_blank" class="btn btn-outline-success fw-bold">
+                <a href="https://wa.me/{{ \App\Models\CmsSetting::get('contato_whatsapp', '559180510736') }}?text={{ urlencode('Olá, sou cliente Foco 7 e preciso de suporte técnico.') }}" target="_blank" class="btn btn-outline-success fw-bold">
                     <i class="fab fa-whatsapp me-1"></i> Suporte Técnico 24h
                 </a>
             </div>

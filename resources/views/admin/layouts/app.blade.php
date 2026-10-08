@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Painel Administrativo') | Foco 7</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Bootstrap 5.3 & FontAwesome 6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -79,9 +81,9 @@
         <!-- SIDEBAR COM TREEVIEW E PALETA FOCO 7 -->
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
             <div class="sidebar-brand d-flex align-items-center justify-content-start px-3 py-3 border-bottom border-secondary">
-                <a href="{{ route('admin.dashboard') }}" class="brand-link text-decoration-none">
-                    <span class="fs-4 fw-black text-danger">FOCO<span class="text-white">7</span></span>
-                    <span class="badge bg-danger ms-2 small">ADMIN</span>
+                <a href="{{ route('admin.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
+                    <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="34" class="brand-image">
+                    <span class="badge bg-danger ms-auto small">ADMIN</span>
                 </a>
             </div>
 

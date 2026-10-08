@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Área do Cliente') | Foco 7</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Bootstrap 5.3 & FontAwesome 6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -40,7 +42,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark cliente-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('cliente.dashboard') }}">
-                <span class="fs-4 fw-black text-danger">FOCO<span class="text-white">7</span></span>
+                <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="38">
                 <span class="badge bg-secondary small">CLIENTE</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCliente">

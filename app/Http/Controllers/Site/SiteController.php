@@ -30,9 +30,9 @@ class SiteController extends Controller
         $configs = [
             'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
             'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa há mais de 10 anos'),
-            'telefone' => CmsSetting::get('contato_telefone', '(91) 3222-7777'),
-            'whatsapp' => CmsSetting::get('contato_whatsapp', '5591981117777'),
-            'whatsapp_formatado' => CmsSetting::get('contato_whatsapp_formatado', '(91) 98111-7777'),
+            'telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
+            'whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
+            'whatsapp_formatado' => CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736'),
             'email' => CmsSetting::get('contato_email', 'contato@foco7.com.br'),
             'endereco' => CmsSetting::get('contato_endereco', 'Tv. Quintino Bocaiúva, 1200 - Nazaré, Belém - PA'),
             'horario' => CmsSetting::get('contato_horario', 'Central 24 Horas | Plantão de Emergência'),
