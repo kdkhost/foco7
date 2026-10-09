@@ -1,66 +1,113 @@
 /**
  * ==============================================================================
- * SISTEMA FOCO 7 - ESTILOS VISUAIS DA LANDING PAGE
- * Design de Alta Conversão, Glassmorphism, Paleta Foco 7 (#d90000)
+ * SISTEMA FOCO 7 - ESTILOS VISUAIS DA LANDING PAGE (TEMA CLARO SOFISTICADO)
+ * Paleta Oficial Foco 7 (#d90000), Tipografia Moderna, Menu de Alta Conversão
  * ==============================================================================
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap');
 
 :root {
+    /* Paleta Oficial Foco 7 */
     --foco-red: #d90000;
     --foco-red-hover: #b30000;
     --foco-red-light: #ff2a2a;
-    --foco-red-glow: rgba(217, 0, 0, 0.4);
-    --foco-dark-900: #080a0f;
-    --foco-dark-800: #0f131a;
-    --foco-dark-700: #161b24;
-    --foco-dark-600: #1e2532;
-    --foco-gray-text: #9aa5b8;
-    --foco-white: #ffffff;
-    --foco-border: rgba(255, 255, 255, 0.08);
-    --foco-glass-bg: rgba(18, 22, 31, 0.75);
+    --foco-red-subtle: rgba(217, 0, 0, 0.08);
+    --foco-red-glow: rgba(217, 0, 0, 0.22);
+    --foco-green-whats: #25d366;
+    --foco-green-hover: #20bd5a;
+
+    /* Tema Claro Premium (Fundos e Superfícies) */
+    --foco-bg-body: #f8fafc;
+    --foco-bg-surface: #ffffff;
+    --foco-bg-subtle: #f1f5f9;
+    --foco-bg-alt: #fcfcfd;
+
+    /* Tipografia e Cores de Texto */
+    --foco-title: #0f172a;
+    --foco-text: #334155;
+    --foco-text-secondary: #475569;
+    --foco-muted: #64748b;
+    --foco-border: #e2e8f0;
+    --foco-border-light: #f1f5f9;
+    --foco-border-hover: #cbd5e1;
+
+    /* Sombras e Elevações */
+    --foco-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+    --foco-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+    --foco-shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.08);
+    --foco-shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+
     --foco-transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
     font-family: 'Outfit', 'Roboto', sans-serif;
-    background-color: var(--foco-dark-900);
-    color: var(--foco-white);
+    background-color: var(--foco-bg-body);
+    color: var(--foco-text);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ==============================================================================
-   TOPBAR FIXO & HEADER DE ALTA CONVERSÃO
+   1. TOPBAR INSTITUCIONAL (GRAFITE EXECUTIVO 24H)
    ============================================================================== */
 .foco-topbar {
-    background: #000000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 0.85rem;
-    padding: 6px 0;
-    color: var(--foco-gray-text);
+    padding: 8px 0;
+    color: #94a3b8;
 }
 
 .foco-topbar a {
-    color: var(--foco-gray-text);
+    color: #cbd5e1;
     text-decoration: none;
     transition: var(--foco-transition);
 }
 
 .foco-topbar a:hover {
-    color: var(--foco-red-light);
+    color: #ff4d4d;
 }
 
+.foco-topbar .btn-cliente-topo {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    transition: var(--foco-transition);
+}
+
+.foco-topbar .btn-cliente-topo:hover {
+    background: var(--foco-red);
+    border-color: var(--foco-red);
+    color: #ffffff;
+    box-shadow: 0 2px 10px var(--foco-red-glow);
+}
+
+/* ==============================================================================
+   2. NAVBAR PRINCIPAL (DESIGN CLARO PREMIUM & GLASSMORPHISM)
+   ============================================================================== */
 .foco-navbar {
-    background: rgba(8, 10, 15, 0.92);
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--foco-border);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    padding: 12px 0;
     transition: var(--foco-transition);
     z-index: 1040;
+}
+
+.foco-navbar.scrolled {
+    padding: 8px 0;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
 }
 
 .logo-foco7 {
@@ -72,137 +119,191 @@ body {
 }
 
 .logo-foco7:hover {
-    filter: brightness(1.08);
+    transform: scale(1.02);
 }
 
 .foco-navbar .nav-link {
-    color: #e2e8f0;
-    font-weight: 500;
+    color: #1e293b;
+    font-weight: 600;
     font-size: 0.95rem;
-    padding: 0.5rem 0.9rem;
+    padding: 0.6rem 1rem;
     transition: var(--foco-transition);
     position: relative;
+    border-radius: 6px;
 }
 
-.foco-navbar .nav-link:hover,
+.foco-navbar .nav-link:hover {
+    color: var(--foco-red);
+    background: rgba(217, 0, 0, 0.03);
+}
+
 .foco-navbar .nav-link.active {
-    color: var(--foco-red-light);
+    color: var(--foco-red);
 }
 
 .foco-navbar .nav-link::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: 2px;
     left: 50%;
     width: 0;
-    height: 2px;
+    height: 3px;
     background: var(--foco-red);
+    border-radius: 2px;
     transition: var(--foco-transition);
     transform: translateX(-50%);
 }
 
 .foco-navbar .nav-link:hover::after,
 .foco-navbar .nav-link.active::after {
-    width: 80%;
+    width: 60%;
 }
 
-/* ==============================================================================
-   BOTÕES E ELEMENTOS DE AÇÃO (CTAs)
-   ============================================================================== */
-.btn-foco-primary {
-    background: linear-gradient(135deg, var(--foco-red) 0%, #aa0000 100%);
-    color: #ffffff;
+/* Botões da Navbar */
+.btn-foco-whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #1ea952 100%);
+    color: #ffffff !important;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    font-size: 0.9rem;
     border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.75rem;
-    box-shadow: 0 4px 20px var(--foco-red-glow);
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
     transition: var(--foco-transition);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-foco-whatsapp:hover {
+    background: linear-gradient(135deg, #2ae16f 0%, #1c9b4b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+    color: #ffffff;
+}
+
+.btn-foco-login-nav {
+    background: transparent;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border: 1.5px solid var(--foco-border);
+    border-radius: 10px;
+    padding: 0.55rem 1.25rem;
+    transition: var(--foco-transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+}
+
+.btn-foco-login-nav:hover {
+    border-color: var(--foco-red);
+    color: var(--foco-red);
+    background: rgba(217, 0, 0, 0.04);
+    transform: translateY(-2px);
+}
+
+.foco-navbar .navbar-toggler {
+    border: 1px solid var(--foco-border);
+    padding: 6px 10px;
+    color: #0f172a;
+}
+
+.foco-navbar .navbar-toggler-icon {
+    filter: invert(0.8);
+}
+
+/* ==============================================================================
+   3. BOTÕES E COMPONENTES DE AÇÃO (CTAS)
+   ============================================================================== */
+.btn-foco-primary {
+    background: linear-gradient(135deg, var(--foco-red) 0%, #b80000 100%);
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem 2rem;
+    box-shadow: 0 4px 18px var(--foco-red-glow);
+    transition: var(--foco-transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-decoration: none;
 }
 
 .btn-foco-primary:hover {
     background: linear-gradient(135deg, var(--foco-red-light) 0%, var(--foco-red) 100%);
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(217, 0, 0, 0.6);
+    box-shadow: 0 8px 25px rgba(217, 0, 0, 0.45);
 }
 
 .btn-foco-outline {
-    background: transparent;
-    color: #ffffff;
+    background: #ffffff;
+    color: #0f172a;
     font-weight: 600;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    padding: 0.75rem 1.75rem;
+    border: 1.5px solid var(--foco-border);
+    border-radius: 10px;
+    padding: 0.85rem 2rem;
+    box-shadow: var(--foco-shadow-sm);
     transition: var(--foco-transition);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    text-decoration: none;
 }
 
 .btn-foco-outline:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #ffffff;
-    color: #ffffff;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: var(--foco-red);
     transform: translateY(-2px);
-}
-
-.btn-foco-whatsapp {
-    background: #25d366;
-    color: #ffffff;
-    font-weight: 700;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.75rem;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-    transition: var(--foco-transition);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.btn-foco-whatsapp:hover {
-    background: #20bd5a;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(37, 211, 102, 0.6);
 }
 
 /* ==============================================================================
-   HERO SECTION COM CARROSSEL E BACKGROUND DINÂMICO
+   4. HERO SECTION COM TEMA CLARO DE ALTA CONVERSÃO
    ============================================================================== */
 .hero-section {
     position: relative;
     min-height: 85vh;
     display: flex;
     align-items: center;
-    background: radial-gradient(circle at 75% 20%, rgba(217, 0, 0, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 20% 80%, rgba(30, 37, 50, 0.4) 0%, transparent 60%),
-                var(--foco-dark-900);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 55%, #fff1f2 100%);
+    border-bottom: 1px solid var(--foco-border);
     overflow: hidden;
-    padding: 100px 0 60px 0;
+    padding: 80px 0 60px 0;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(217, 0, 0, 0.05) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(217, 0, 0, 0.12);
-    border: 1px solid rgba(217, 0, 0, 0.35);
-    color: #ff4d4d;
+    background: rgba(217, 0, 0, 0.08);
+    border: 1px solid rgba(217, 0, 0, 0.2);
+    color: var(--foco-red);
     font-weight: 700;
     font-size: 0.85rem;
-    padding: 6px 14px;
+    padding: 6px 16px;
     border-radius: 50px;
     margin-bottom: 1.25rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
 }
 
 .hero-title {
@@ -210,257 +311,69 @@ body {
     font-weight: 900;
     line-height: 1.15;
     margin-bottom: 1.5rem;
-    color: #ffffff;
+    color: var(--foco-title);
+    letter-spacing: -0.5px;
 }
 
 .hero-title span {
     color: var(--foco-red);
-    text-shadow: 0 0 20px var(--foco-red-glow);
 }
 
 .hero-desc {
-    font-size: 1.2rem;
-    color: var(--foco-gray-text);
+    font-size: 1.18rem;
+    color: var(--foco-text-secondary);
     line-height: 1.6;
     margin-bottom: 2rem;
-    max-width: 600px;
+    max-width: 620px;
 }
 
-/* ==============================================================================
-   SEÇÃO PROBLEMA VS SOLUÇÃO (SOS RASTREAMENTO INSPIRAÇÃO)
-   ============================================================================== */
-.section-risco {
-    background: var(--foco-dark-800);
-    padding: 90px 0;
-    position: relative;
-    border-top: 1px solid var(--foco-border);
-    border-bottom: 1px solid var(--foco-border);
-}
-
-.card-risco {
-    background: var(--foco-dark-700);
+/* Card da Simulação Rápida no Hero */
+.card-simulacao-hero {
+    background: #ffffff;
     border: 1px solid var(--foco-border);
-    border-radius: 12px;
-    padding: 2rem;
-    height: 100%;
-    transition: var(--foco-transition);
-}
-
-.card-risco:hover {
-    border-color: var(--foco-red);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-.card-risco .icon-risco {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: rgba(217, 0, 0, 0.12);
-    color: var(--foco-red);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 1.25rem;
-}
-
-/* ==============================================================================
-   SEÇÃO PLANOS E PREÇOS
-   ============================================================================== */
-.section-planos {
-    padding: 100px 0;
-    background: var(--foco-dark-900);
-    position: relative;
-}
-
-.card-plano {
-    background: var(--foco-dark-800);
-    border: 1px solid var(--foco-border);
-    border-radius: 16px;
-    padding: 2.5rem 2rem;
-    height: 100%;
-    position: relative;
-    transition: var(--foco-transition);
-    display: flex;
-    flex-direction: column;
-}
-
-.card-plano:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-}
-
-.card-plano.destaque {
-    border: 2px solid var(--foco-red);
-    background: linear-gradient(180deg, rgba(217, 0, 0, 0.08) 0%, var(--foco-dark-800) 100%);
-    box-shadow: 0 10px 40px var(--foco-red-glow);
-}
-
-.tag-plano-destaque {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--foco-red);
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 800;
-    padding: 4px 16px;
     border-radius: 20px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.preco-valor {
-    font-size: 2.8rem;
-    font-weight: 900;
-    color: #ffffff;
-    line-height: 1;
-}
-
-.preco-periodo {
-    color: var(--foco-gray-text);
-    font-size: 0.95rem;
-}
-
-.recursos-list {
-    list-style: none;
-    padding: 0;
-    margin: 2rem 0;
-    flex-grow: 1;
-}
-
-.recursos-list li {
-    padding: 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: #cbd5e1;
-    font-size: 0.95rem;
-}
-
-.recursos-list li i {
-    color: var(--foco-red);
-    font-size: 1rem;
-}
-
-/* ==============================================================================
-   SEÇÃO RONDA TÁTICA (FLUXOGRAMA EM 4 ETAPAS)
-   ============================================================================== */
-.section-ronda {
-    background: linear-gradient(180deg, var(--foco-dark-800) 0%, var(--foco-dark-900) 100%);
-    padding: 100px 0;
-    border-top: 1px solid var(--foco-border);
-}
-
-.etapa-ronda-card {
-    background: var(--foco-dark-700);
-    border: 1px solid var(--foco-border);
-    border-radius: 12px;
-    padding: 1.75rem;
-    text-align: center;
+    padding: 2.25rem;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
     position: relative;
-    height: 100%;
-}
-
-.etapa-numero {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--foco-red);
-    color: #ffffff;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem auto;
-    box-shadow: 0 4px 15px var(--foco-red-glow);
-}
-
-/* ==============================================================================
-   FAQ (ACORDEÃO CUSTOMIZADO)
-   ============================================================================== */
-.accordion-foco .accordion-item {
-    background: var(--foco-dark-800);
-    border: 1px solid var(--foco-border);
-    border-radius: 10px !important;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.accordion-foco .accordion-button {
-    background: var(--foco-dark-800);
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 1.05rem;
-    box-shadow: none;
-    padding: 1.25rem 1.5rem;
-}
-
-.accordion-foco .accordion-button:not(.collapsed) {
-    background: var(--foco-dark-700);
-    color: var(--foco-red-light);
-    border-bottom: 1px solid var(--foco-border);
-}
-
-.accordion-foco .accordion-button::after {
-    filter: invert(1);
-}
-
-.accordion-foco .accordion-body {
-    background: var(--foco-dark-700);
-    color: var(--foco-gray-text);
-    line-height: 1.6;
-    padding: 1.5rem;
-}
-
-/* ==============================================================================
-   RODAPÉ INSTITUCIONAL
-   ============================================================================== */
-.foco-footer {
-    background: #040508;
-    border-top: 1px solid var(--foco-border);
-    padding: 80px 0 30px 0;
-    color: var(--foco-gray-text);
-}
-
-.foco-footer h5 {
-    color: #ffffff;
-    font-weight: 700;
-    margin-bottom: 1.25rem;
-}
-
-.foco-footer a {
-    color: var(--foco-gray-text);
-    text-decoration: none;
     transition: var(--foco-transition);
 }
 
-.foco-footer a:hover {
-    color: var(--foco-red-light);
+.card-simulacao-hero:hover {
+    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.12);
 }
 
-/* Responsividade Mobile */
-@media (max-width: 991px) {
-    .hero-title {
-        font-size: 2.2rem;
-    }
-    .foco-navbar .nav-link::after {
-        display: none;
-    }
+.btn-tipo-veiculo {
+    background: #f8fafc;
+    border: 1px solid var(--foco-border);
+    color: var(--foco-title);
+    border-radius: 12px;
+    padding: 1rem;
+    text-decoration: none;
+    display: block;
+    transition: var(--foco-transition);
 }
 
-/* ==============================================================================
-   CORREÇÃO DO CARROSSEL HERO & CONTROLES DESOBSTRUÍDOS
-   ============================================================================== */
+.btn-tipo-veiculo:hover {
+    background: #ffffff;
+    border-color: var(--foco-red);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(217, 0, 0, 0.12);
+    color: var(--foco-red);
+}
+
+/* Controles do Carrossel Hero */
 #heroCarousel {
     position: relative;
-    padding-bottom: 25px;
+    padding-bottom: 20px;
 }
 
-/* Desativa a sobreposição padrão de 15% que bloqueia e confunde o usuário */
+.hero-carousel-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
 #heroCarousel .carousel-control-prev,
 #heroCarousel .carousel-control-next {
     position: relative;
@@ -469,12 +382,12 @@ body {
     justify-content: center;
     width: 44px;
     height: 44px;
-    opacity: 0.95;
+    opacity: 1;
     border-radius: 50%;
-    background: rgba(18, 22, 31, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #ffffff;
-    backdrop-filter: blur(8px);
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    color: #1e293b;
+    box-shadow: var(--foco-shadow-sm);
     transition: var(--foco-transition);
     z-index: 5;
     top: auto;
@@ -485,22 +398,9 @@ body {
 #heroCarousel .carousel-control-next:hover {
     background: var(--foco-red);
     border-color: var(--foco-red);
-    box-shadow: 0 4px 15px var(--foco-red-glow);
-    opacity: 1;
+    color: #ffffff;
+    box-shadow: 0 6px 20px var(--foco-red-glow);
     transform: scale(1.08);
-}
-
-#heroCarousel .carousel-control-prev-icon,
-#heroCarousel .carousel-control-next-icon {
-    width: 16px;
-    height: 16px;
-}
-
-.hero-carousel-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 20px;
 }
 
 .hero-carousel-nav .carousel-indicators {
@@ -512,9 +412,9 @@ body {
 
 .hero-carousel-nav .carousel-indicators [data-bs-target] {
     width: 24px;
-    height: 4px;
-    border-radius: 2px;
-    background-color: rgba(255, 255, 255, 0.3);
+    height: 5px;
+    border-radius: 3px;
+    background-color: #cbd5e1;
     border: none;
     margin: 0;
     transition: var(--foco-transition);
@@ -526,22 +426,383 @@ body {
 }
 
 /* ==============================================================================
-   BOTÃO FLUTUANTE DO WHATSAPP (COM PULSO E TOOLTIP)
+   5. SEÇÃO PROBLEMA VS SOLUÇÃO (POR QUE PROTEGER)
+   ============================================================================== */
+.section-risco {
+    background: #ffffff;
+    padding: 90px 0;
+    position: relative;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.card-risco {
+    background: #f8fafc;
+    border: 1px solid var(--foco-border);
+    border-radius: 16px;
+    padding: 2.25rem 2rem;
+    height: 100%;
+    box-shadow: var(--foco-shadow-sm);
+    transition: var(--foco-transition);
+}
+
+.card-risco:hover {
+    background: #ffffff;
+    border-color: rgba(217, 0, 0, 0.4);
+    transform: translateY(-6px);
+    box-shadow: var(--foco-shadow-card);
+}
+
+.card-risco .icon-risco {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    background: rgba(217, 0, 0, 0.08);
+    color: var(--foco-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    transition: var(--foco-transition);
+}
+
+.card-risco:hover .icon-risco {
+    background: var(--foco-red);
+    color: #ffffff;
+    box-shadow: 0 6px 18px var(--foco-red-glow);
+}
+
+/* ==============================================================================
+   6. SEÇÃO QUEM SOMOS E AUTORIDADE
+   ============================================================================== */
+.section-sobre {
+    background: #f8fafc;
+    padding: 90px 0;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.card-diferenciais {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 20px;
+    box-shadow: var(--foco-shadow-md);
+}
+
+/* ==============================================================================
+   7. SEÇÃO PLANOS E PREÇOS
+   ============================================================================== */
+.section-planos {
+    padding: 100px 0;
+    background: #ffffff;
+    position: relative;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.card-plano {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    height: 100%;
+    position: relative;
+    box-shadow: var(--foco-shadow-sm);
+    transition: var(--foco-transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-plano:hover {
+    transform: translateY(-8px);
+    border-color: #cbd5e1;
+    box-shadow: var(--foco-shadow-card);
+}
+
+.card-plano.destaque {
+    border: 2px solid var(--foco-red);
+    background: linear-gradient(180deg, #fff7f7 0%, #ffffff 100%);
+    box-shadow: 0 16px 40px rgba(217, 0, 0, 0.12);
+}
+
+.tag-plano-destaque {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--foco-red);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 5px 18px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px var(--foco-red-glow);
+}
+
+.preco-valor {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: var(--foco-title);
+    line-height: 1;
+}
+
+.card-plano.destaque .preco-valor {
+    color: var(--foco-red);
+}
+
+.preco-periodo {
+    color: var(--foco-muted);
+    font-size: 0.95rem;
+}
+
+.recursos-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    flex-grow: 1;
+}
+
+.recursos-list li {
+    padding: 0.55rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--foco-text);
+    font-size: 0.95rem;
+    border-bottom: 1px dashed rgba(226, 232, 240, 0.6);
+}
+
+.recursos-list li:last-child {
+    border-bottom: none;
+}
+
+.recursos-list li i {
+    color: var(--foco-red);
+    font-size: 1rem;
+}
+
+/* ==============================================================================
+   8. SEÇÃO RONDA TÁTICA
+   ============================================================================== */
+.section-ronda {
+    background: #f8fafc;
+    padding: 100px 0;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.etapa-ronda-card {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 16px;
+    padding: 2rem 1.75rem;
+    text-align: center;
+    position: relative;
+    height: 100%;
+    box-shadow: var(--foco-shadow-sm);
+    transition: var(--foco-transition);
+}
+
+.etapa-ronda-card:hover {
+    border-color: rgba(217, 0, 0, 0.4);
+    transform: translateY(-6px);
+    box-shadow: var(--foco-shadow-card);
+}
+
+.etapa-numero {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--foco-red);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem auto;
+    box-shadow: 0 6px 18px var(--foco-red-glow);
+}
+
+/* ==============================================================================
+   9. RECURSOS DO APLICATIVO
+   ============================================================================== */
+.section-app {
+    background: #ffffff;
+    padding: 100px 0;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.card-recurso-app {
+    background: #f8fafc;
+    border: 1px solid var(--foco-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    transition: var(--foco-transition);
+}
+
+.card-recurso-app:hover {
+    background: #ffffff;
+    border-color: var(--foco-red);
+    transform: translateY(-2px);
+    box-shadow: var(--foco-shadow-sm);
+}
+
+.mockup-app-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #fee2e2 100%);
+    border: 1px solid var(--foco-border);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    box-shadow: var(--foco-shadow-md);
+}
+
+/* ==============================================================================
+   10. DEPOIMENTOS DE CLIENTES
+   ============================================================================== */
+.section-depoimentos {
+    background: #f8fafc;
+    padding: 100px 0;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.card-depoimento {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 18px;
+    padding: 2rem;
+    box-shadow: var(--foco-shadow-sm);
+    transition: var(--foco-transition);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-depoimento:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-6px);
+    box-shadow: var(--foco-shadow-card);
+}
+
+/* ==============================================================================
+   11. FAQ (PERGUNTAS FREQUENTES)
+   ============================================================================== */
+.section-faq {
+    background: #ffffff;
+    padding: 100px 0;
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.accordion-foco .accordion-item {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 12px !important;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: var(--foco-shadow-sm);
+}
+
+.accordion-foco .accordion-button {
+    background: #ffffff;
+    color: var(--foco-title);
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: none;
+    padding: 1.25rem 1.5rem;
+    transition: var(--foco-transition);
+}
+
+.accordion-foco .accordion-button:not(.collapsed) {
+    background: #f8fafc;
+    color: var(--foco-red);
+    border-bottom: 1px solid var(--foco-border);
+}
+
+.accordion-foco .accordion-button::after {
+    filter: none;
+}
+
+.accordion-foco .accordion-body {
+    background: #ffffff;
+    color: var(--foco-text-secondary);
+    line-height: 1.7;
+    padding: 1.5rem;
+}
+
+/* ==============================================================================
+   12. FORMULÁRIO DE CONTATO (CARD CLARO & CLEAN)
+   ============================================================================== */
+.section-contato {
+    background: #f8fafc;
+    padding: 100px 0;
+}
+
+.card-contato-form {
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--foco-shadow-md);
+}
+
+.card-contato-form .form-control {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: var(--foco-transition);
+}
+
+.card-contato-form .form-control:focus {
+    background: #ffffff;
+    border-color: var(--foco-red);
+    box-shadow: 0 0 0 0.25rem rgba(217, 0, 0, 0.15);
+    color: #0f172a;
+}
+
+/* ==============================================================================
+   13. RODAPÉ INSTITUCIONAL (ANCORAGEM ESCURA ELEGANTE COM LOGO BRANCA)
+   ============================================================================== */
+.foco-footer {
+    background: #080a0f;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 85px 0 35px 0;
+    color: #94a3b8;
+}
+
+.foco-footer h5 {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1.35rem;
+}
+
+.foco-footer a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: var(--foco-transition);
+}
+
+.foco-footer a:hover {
+    color: #ff4d4d;
+}
+
+/* ==============================================================================
+   14. BOTÕES FLUTUANTES (WHATSAPP E VOLTAR AO TOPO)
    ============================================================================== */
 .foco-whatsapp-float {
     position: fixed;
     bottom: 25px;
     right: 25px;
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
     background: #25d366;
     color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    font-size: 32px;
+    box-shadow: 0 6px 24px rgba(37, 211, 102, 0.45);
     z-index: 1060;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -552,13 +813,13 @@ body {
     background: #20ba59;
     color: #ffffff;
     transform: scale(1.08) translateY(-3px);
-    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+    box-shadow: 0 10px 32px rgba(37, 211, 102, 0.6);
 }
 
 .foco-whatsapp-float .whatsapp-tooltip {
     position: absolute;
-    right: 72px;
-    background: #11141c;
+    right: 74px;
+    background: #0f172a;
     color: #ffffff;
     font-size: 0.85rem;
     font-weight: 600;
@@ -566,7 +827,7 @@ body {
     border-radius: 20px;
     white-space: nowrap;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     pointer-events: none;
     opacity: 0;
     transform: translateX(10px);
@@ -583,38 +844,34 @@ body {
         box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
     }
     70% {
-        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+        box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
     }
     100% {
         box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
     }
 }
 
-/* ==============================================================================
-   BOTÃO VOLTAR AO TOPO FLUTUANTE
-   ============================================================================== */
 .foco-btn-topo {
     position: fixed;
-    bottom: 96px;
-    right: 31px;
+    bottom: 98px;
+    right: 32px;
     width: 48px;
     height: 48px;
-    background: rgba(18, 22, 31, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    color: #0f172a;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
     z-index: 1050;
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
     transform: translateY(15px);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(8px);
 }
 
 .foco-btn-topo.show {
@@ -631,3 +888,23 @@ body {
     box-shadow: 0 6px 20px var(--foco-red-glow);
 }
 
+/* Responsividade Mobile */
+@media (max-width: 991px) {
+    .hero-title {
+        font-size: 2.3rem;
+    }
+    .foco-navbar {
+        background: #ffffff;
+    }
+    .foco-navbar .nav-link::after {
+        display: none;
+    }
+    .foco-navbar .navbar-collapse {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        box-shadow: var(--foco-shadow-md);
+        border: 1px solid var(--foco-border);
+    }
+}

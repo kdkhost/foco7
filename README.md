@@ -11,7 +11,7 @@ Sistema integrado de alta performance composto por uma **Landing Page (Single Pa
 | **Framework Backend** | Laravel (PHP 8.2+) | Estrutura moderna, segura, com suporte nativo a Eager Loading e MVC |
 | **Banco de Dados** | MySQL 8.0+ / MariaDB | **100% livre de SQLite**, com índices e chaves estrangeiras otimizadas |
 | **Frontend Site** | Single Page responsiva | Inspirada na estrutura e distribuição do `sosrastreamento.com` |
-| **Identidade Visual** | Paleta Foco 7 (`#d90000`, tons escuros e neutros) | Extraída do portal institucional `foco7.com.br` |
+| **Identidade Visual** | Paleta Oficial Foco 7 (`#d90000`, `#25d366` e tema claro `#f8fafc`) | Design system limpo, navbar glassmorphism e tipografia Outfit/Roboto |
 | **Template do Painel** | AdminLTE 4 com Bootstrap 5 | Interface profissional, suporte nativo Dark/Light mode e Treeview |
 | **Notificações** | Toastr (Global) | Notificações dinâmicas e não intrusivas para operações AJAX |
 | **Confirmações** | SweetAlert2 (Global) | **Nenhum alert() nativo permitido** no sistema |
@@ -166,7 +166,7 @@ public_html/
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/Foco7SystemTest.php` e `ExampleTest.php`):
-- **11 testes executados, 11 aprovados (100% de sucesso), 25 asserções**.
+- **16 testes executados, 16 aprovados (100% de sucesso), 44 asserções**.
 - Verificação de carregamento de rotas, isolamento de perfis ACL (Administrador vs Cliente), validação do modo de manutenção com bypass por token e submissões AJAX de formulários.
 
 ---

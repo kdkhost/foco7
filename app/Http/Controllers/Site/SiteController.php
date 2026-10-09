@@ -39,6 +39,11 @@ class SiteController extends Controller
             $favicon = '/img/favicon.png';
         }
 
+        $logoDark = '/img/logo-foco7-dark.png';
+        if (!file_exists(public_path('img/logo-foco7-dark.png'))) {
+            $logoDark = $logo;
+        }
+
         $configs = [
             'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
             'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa há mais de 10 anos'),
@@ -52,6 +57,7 @@ class SiteController extends Controller
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
             'logo' => $logo,
+            'logo_dark' => $logoDark,
             'favicon' => $favicon,
             'cor_primaria' => CmsSetting::get('cor_primaria', '#d90000'),
         ];

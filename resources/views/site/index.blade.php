@@ -52,7 +52,7 @@
                 @if(!empty($configs['facebook']))
                     <a href="{{ $configs['facebook'] }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
                 @endif
-                <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light px-3 py-1 rounded-pill" style="font-size: 0.78rem;">
+                <a href="{{ route('login') }}" class="btn-cliente-topo">
                     <i class="fas fa-user-lock me-1"></i> Área do Cliente / Painel
                 </a>
             </div>
@@ -60,12 +60,12 @@
     </div>
 
     <!-- 2. NAVBAR NAVEGAÇÃO SUAVE -->
-    <nav class="navbar navbar-expand-lg navbar-dark foco-navbar sticky-top">
+    <nav class="navbar navbar-expand-lg foco-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
-                <img src="{{ asset($configs['logo'] ?? '/img/logo-foco7.png') }}" alt="{{ $configs['nome'] }}" height="48" class="logo-foco7 d-inline-block" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7.png') }}';">
+                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="48" class="logo-foco7 d-inline-block" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco" aria-label="Menu de Navegação">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navFoco">
@@ -81,7 +81,10 @@
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                 </ul>
                 <div class="d-flex gap-2 align-items-center">
-                    <a href="https://wa.me/{{ $configs['whatsapp'] }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2">
+                    <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
+                        <i class="fas fa-user-lock"></i> Área do Cliente
+                    </a>
+                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2">
                         <i class="fab fa-whatsapp"></i> Falar no WhatsApp
                     </a>
                     <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm d-lg-none">
@@ -126,36 +129,36 @@
                                 </div>
                             </div>
                             <div class="col-lg-5 text-center mt-4 mt-lg-0">
-                                <div class="position-relative p-4 rounded-4" style="background: rgba(22, 27, 36, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
+                                <div class="card-simulacao-hero">
                                     <div class="text-start mb-3">
-                                        <span class="badge bg-danger px-3 py-2">PROTEÇÃO ATIVA 24H</span>
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill">PROTEÇÃO ATIVA 24H</span>
                                     </div>
-                                    <h4 class="fw-bold mb-3">Simulação Rápida em 1 Minuto</h4>
-                                    <p class="small text-secondary mb-4">Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.</p>
-                                    <div class="row g-2 mb-3">
+                                    <h4 class="fw-bold mb-2 text-start" style="color: var(--foco-title);">Simulação Rápida em 1 Minuto</h4>
+                                    <p class="small text-secondary mb-4 text-start">Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.</p>
+                                    <div class="row g-2 mb-4">
                                         <div class="col-6">
-                                            <a href="#planos" class="btn btn-outline-light w-100 py-3 text-start">
+                                            <a href="#planos" class="btn-tipo-veiculo">
                                                 <i class="fas fa-car text-danger fs-4 d-block mb-1"></i>
                                                 <span class="fw-bold d-block">Carro</span>
                                                 <span class="small text-secondary">A partir de R$ 69,90</span>
                                             </a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="#planos" class="btn btn-outline-light w-100 py-3 text-start">
+                                            <a href="#planos" class="btn-tipo-veiculo">
                                                 <i class="fas fa-motorcycle text-danger fs-4 d-block mb-1"></i>
                                                 <span class="fw-bold d-block">Moto</span>
                                                 <span class="small text-secondary">A partir de R$ 49,90</span>
                                             </a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="#planos" class="btn btn-outline-light w-100 py-3 text-start">
+                                            <a href="#planos" class="btn-tipo-veiculo">
                                                 <i class="fas fa-truck text-danger fs-4 d-block mb-1"></i>
                                                 <span class="fw-bold d-block">Caminhão</span>
                                                 <span class="small text-secondary">A partir de R$ 99,90</span>
                                             </a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="#planos" class="btn btn-outline-light w-100 py-3 text-start">
+                                            <a href="#planos" class="btn-tipo-veiculo">
                                                 <i class="fas fa-cubes text-danger fs-4 d-block mb-1"></i>
                                                 <span class="fw-bold d-block">Frotas</span>
                                                 <span class="small text-secondary">Condições especiais</span>
@@ -244,30 +247,30 @@
     </section>
 
     <!-- 5. QUEM SOMOS E AUTORIDADE (FOCO 7) -->
-    <section id="sobre" class="py-5" style="background: #080a0f;">
-        <div class="container py-5">
+    <section id="sobre" class="section-sobre">
+        <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <span class="text-danger fw-bold text-uppercase small">Mais de 10 Anos de Experiência</span>
-                    <h2 class="display-6 fw-black mt-2 mb-4">Referência em Rastreamento Veicular e Segurança Eletrônica</h2>
+                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">Referência em Rastreamento Veicular e Segurança Eletrônica</h2>
                     <p class="text-secondary fs-5 leading-relaxed">
-                        A <strong class="text-white">Foco 7</strong> nasceu com o compromisso inegociável de salvar patrimônios e devolver a paz de espírito a condutores e empresários. Presente com forte infraestrutura no Norte e Nordeste, combinamos inteligência artificial em mapas, módulos de telemetria homologados pela Anatel e equipe tática altamente treinada.
+                        A <strong class="text-dark">Foco 7</strong> nasceu com o compromisso inegociável de salvar patrimônios e devolver a paz de espírito a condutores e empresários. Presente com forte infraestrutura no Norte e Nordeste, combinamos inteligência artificial em mapas, módulos de telemetria homologados pela Anatel e equipe tática altamente treinada.
                     </p>
                     <div class="row g-4 mt-2">
                         <div class="col-sm-6">
-                            <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
                                 <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas fa-history"></i></div>
                                 <div>
-                                    <h4 class="fw-bold mb-0">+10 Anos</h4>
+                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">+10 Anos</h4>
                                     <span class="small text-secondary">De Mercado Sólido</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
                                 <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas fa-car-crash"></i></div>
                                 <div>
-                                    <h4 class="fw-bold mb-0">98.4%</h4>
+                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">98.4%</h4>
                                     <span class="small text-secondary">Taxa de Recuperação</span>
                                 </div>
                             </div>
@@ -275,27 +278,27 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="p-4 p-md-5 rounded-4 position-relative" style="background: linear-gradient(145deg, #161b24, #0f131a); border: 1px solid rgba(255, 255, 255, 0.1);">
-                        <h4 class="fw-bold mb-4"><i class="fas fa-shield-virus text-danger me-2"></i> Por Que Somos a Melhor Escolha?</h4>
+                    <div class="card-diferenciais p-4 p-md-5">
+                        <h4 class="fw-bold mb-4" style="color: var(--foco-title);"><i class="fas fa-shield-virus text-danger me-2"></i> Por Que Somos a Melhor Escolha?</h4>
                         <ul class="list-unstyled mb-0">
-                            <li class="d-flex align-items-start gap-3 mb-3">
+                            <li class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom border-light-subtle">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1">Central de Operações Blindada 24 Horas</h6>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Central de Operações Blindada 24 Horas</h6>
                                     <p class="small text-secondary mb-0">Operadores de prontidão todos os dias do ano para atender chamados de emergência.</p>
                                 </div>
                             </li>
-                            <li class="d-flex align-items-start gap-3 mb-3">
+                            <li class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom border-light-subtle">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1">Tecnologia 4G Multioperadora</h6>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Tecnologia 4G Multioperadora</h6>
                                     <p class="small text-secondary mb-0">Chip inteligente que alterna entre as melhores operadoras do país para sinal constante.</p>
                                 </div>
                             </li>
                             <li class="d-flex align-items-start gap-3">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1">Instalação Discreta e Sigilosa</h6>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Instalação Discreta e Sigilosa</h6>
                                     <p class="small text-secondary mb-0">Técnicos certificados que instalam sem cortar chicote original e sem comprometer garantias.</p>
                                 </div>
                             </li>
@@ -397,50 +400,50 @@
     </section>
 
     <!-- 8. RECURSOS DO APLICATIVO -->
-    <section id="app" class="py-5" style="background: #080a0f;">
-        <div class="container py-5">
+    <section id="app" class="section-app">
+        <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <span class="text-danger fw-bold text-uppercase small">Tecnologia Mobile</span>
-                    <h2 class="display-6 fw-black mt-2 mb-4">Controle Total do Seu Veículo na Palma da Mão</h2>
+                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">Controle Total do Seu Veículo na Palma da Mão</h2>
                     <p class="text-secondary fs-5 leading-relaxed mb-4">
                         Disponível para Android e iOS, o app Foco 7 foi projetado para oferecer rapidez instantânea em situações de risco e relatórios completos para o dia a dia.
                     </p>
                     <div class="row g-3">
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background: #121722; border: 1px solid rgba(255, 255, 255, 0.08);">
-                                <h6 class="fw-bold text-white mb-1"><i class="fas fa-lock text-danger me-2"></i> Bloqueio Remoto</h6>
+                            <div class="card-recurso-app">
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-lock text-danger me-2"></i> Bloqueio Remoto</h6>
                                 <p class="small text-secondary mb-0">Corte de combustível com 1 toque no celular.</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background: #121722; border: 1px solid rgba(255, 255, 255, 0.08);">
-                                <h6 class="fw-bold text-white mb-1"><i class="fas fa-draw-polygon text-danger me-2"></i> Cerca Virtual</h6>
+                            <div class="card-recurso-app">
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-draw-polygon text-danger me-2"></i> Cerca Virtual</h6>
                                 <p class="small text-secondary mb-0">Receba avisos imediatos se o carro sair do perímetro.</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background: #121722; border: 1px solid rgba(255, 255, 255, 0.08);">
-                                <h6 class="fw-bold text-white mb-1"><i class="fas fa-key text-danger me-2"></i> Alerta de Ignição</h6>
+                            <div class="card-recurso-app">
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-key text-danger me-2"></i> Alerta de Ignição</h6>
                                 <p class="small text-secondary mb-0">Notificação push assim que a chave for virada.</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background: #121722; border: 1px solid rgba(255, 255, 255, 0.08);">
-                                <h6 class="fw-bold text-white mb-1"><i class="fas fa-route text-danger me-2"></i> Histórico de 90 Dias</h6>
+                            <div class="card-recurso-app">
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-route text-danger me-2"></i> Histórico de 90 Dias</h6>
                                 <p class="small text-secondary mb-0">Rotas, paradas e velocidade com mapa 3D.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
-                    <div class="p-5 rounded-4 text-center position-relative" style="background: radial-gradient(circle, rgba(217, 0, 0, 0.15) 0%, #121722 80%); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="mockup-app-box text-center">
                         <i class="fas fa-mobile-alt text-danger" style="font-size: 8rem;"></i>
-                        <h4 class="fw-bold mt-4">Aplicativo Oficial Foco 7</h4>
+                        <h4 class="fw-bold mt-4" style="color: var(--foco-title);">Aplicativo Oficial Foco 7</h4>
                         <p class="text-secondary small">Baixe gratuitamente na App Store e Google Play Store</p>
                         <div class="d-flex justify-content-center gap-3 mt-3">
-                            <button class="btn btn-outline-light btn-sm"><i class="fab fa-apple me-1"></i> App Store</button>
-                            <button class="btn btn-outline-light btn-sm"><i class="fab fa-google-play me-1"></i> Google Play</button>
+                            <button class="btn btn-outline-dark btn-sm"><i class="fab fa-apple me-1"></i> App Store</button>
+                            <button class="btn btn-outline-dark btn-sm"><i class="fab fa-google-play me-1"></i> Google Play</button>
                         </div>
                     </div>
                 </div>
@@ -449,16 +452,16 @@
     </section>
 
     <!-- 9. DEPOIMENTOS DE CLIENTES (PROVA SOCIAL) -->
-    <section id="depoimentos" class="py-5" style="background: #0b0e14;">
-        <div class="container py-5">
+    <section id="depoimentos" class="section-depoimentos">
+        <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">
                 <span class="text-danger fw-bold text-uppercase small">Quem Já Dorme Tranquilo</span>
-                <h2 class="display-6 fw-black mt-2">Depoimentos Reais de Nossos Clientes</h2>
+                <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">Depoimentos Reais de Nossos Clientes</h2>
             </div>
             <div class="row g-4">
                 @foreach($depoimentos as $dep)
                 <div class="col-md-6 col-lg-3">
-                    <div class="p-4 rounded-4 h-100 d-flex flex-direction-column justify-content-between" style="background: #121722; border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div class="card-depoimento h-100">
                         <div>
                             <div class="text-warning mb-3">
                                 @for($i = 0; $i < $dep->estrelas; $i++)
@@ -467,12 +470,12 @@
                             </div>
                             <p class="text-secondary small fst-italic">"{{ $dep->texto }}"</p>
                         </div>
-                        <div class="mt-3 pt-3 border-top border-dark d-flex align-items-center gap-3">
+                        <div class="mt-3 pt-3 border-top border-light-subtle d-flex align-items-center gap-3">
                             <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
                                 {{ substr($dep->nome_cliente, 0, 1) }}
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-0 text-white">{{ $dep->nome_cliente }}</h6>
+                                <h6 class="fw-bold mb-0 text-dark">{{ $dep->nome_cliente }}</h6>
                                 <span class="small text-secondary">{{ $dep->cidade_uf }} - {{ $dep->veiculo }}</span>
                             </div>
                         </div>
@@ -484,11 +487,11 @@
     </section>
 
     <!-- 10. PERGUNTAS FREQUENTES (FAQ) -->
-    <section id="faq" class="py-5" style="background: #080a0f;">
-        <div class="container py-5">
+    <section id="faq" class="section-faq">
+        <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">
                 <span class="text-danger fw-bold text-uppercase small">Tire Suas Dúvidas</span>
-                <h2 class="display-6 fw-black mt-2">Perguntas Frequentes</h2>
+                <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">Perguntas Frequentes</h2>
             </div>
             <div class="max-w-800 mx-auto">
                 <div class="accordion accordion-foco" id="faqAccordion">
@@ -512,62 +515,62 @@
     </section>
 
     <!-- 11. FORMULÁRIO DE CONTATO & COTAÇÃO RÁPIDA (AJAX) -->
-    <section id="contato" class="py-5" style="background: #11151e;">
-        <div class="container py-5">
+    <section id="contato" class="section-contato">
+        <div class="container">
             <div class="row g-5 align-items-center">
                 <div class="col-lg-5">
                     <span class="text-danger fw-bold text-uppercase small">Fale Conosco</span>
-                    <h2 class="display-6 fw-black mt-2 mb-4">Solicite uma Cotação ou Instalação Imediata</h2>
+                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">Solicite uma Cotação ou Instalação Imediata</h2>
                     <p class="text-secondary fs-5 mb-4">Preencha o formulário e receba a ligação da nossa equipe técnica em menos de 10 minutos.</p>
                     <div class="d-flex flex-column gap-3">
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
                             <div class="bg-danger text-white rounded-circle p-3"><i class="fas fa-phone-alt"></i></div>
                             <div>
                                 <span class="small text-secondary">Telefone Central</span>
-                                <h6 class="fw-bold mb-0 text-white">{{ $configs['telefone'] }}</h6>
+                                <h6 class="fw-bold mb-0 text-dark">{{ $configs['telefone'] }}</h6>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
                             <div class="bg-success text-white rounded-circle p-3"><i class="fab fa-whatsapp"></i></div>
                             <div>
                                 <span class="small text-secondary">WhatsApp Direto</span>
-                                <h6 class="fw-bold mb-0 text-white">{{ $configs['whatsapp_formatado'] }}</h6>
+                                <h6 class="fw-bold mb-0 text-dark">{{ $configs['whatsapp_formatado'] }}</h6>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
                             <div class="bg-danger text-white rounded-circle p-3"><i class="fas fa-map-marker-alt"></i></div>
                             <div>
                                 <span class="small text-secondary">Nossa Sede</span>
-                                <h6 class="fw-bold mb-0 text-white">{{ $configs['endereco'] }}</h6>
+                                <h6 class="fw-bold mb-0 text-dark">{{ $configs['endereco'] }}</h6>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-7">
-                    <div class="p-4 p-md-5 rounded-4" style="background: #161b24; border: 1px solid rgba(255, 255, 255, 0.1);">
-                        <h4 class="fw-bold mb-4">Envie Sua Mensagem</h4>
+                    <div class="card-contato-form">
+                        <h4 class="fw-bold mb-4" style="color: var(--foco-title);">Envie Sua Mensagem</h4>
                         <form action="{{ route('site.contato') }}" method="POST" class="ajax-form reset-on-success">
                             @csrf
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small text-secondary">Seu Nome Completo *</label>
-                                    <input type="text" name="nome" class="form-control bg-dark text-white border-secondary" required placeholder="Ex: Roberto Silva">
+                                    <label class="form-label small text-secondary fw-semibold">Seu Nome Completo *</label>
+                                    <input type="text" name="nome" class="form-control" required placeholder="Ex: Roberto Silva">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small text-secondary">Seu WhatsApp *</label>
-                                    <input type="text" name="telefone" class="form-control bg-dark text-white border-secondary mask-telefone" required placeholder="(00) 00000-0000">
+                                    <label class="form-label small text-secondary fw-semibold">Seu WhatsApp *</label>
+                                    <input type="text" name="telefone" class="form-control mask-telefone" required placeholder="(00) 00000-0000">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small text-secondary">E-mail</label>
-                                    <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="seuemail@exemplo.com">
+                                    <label class="form-label small text-secondary fw-semibold">E-mail</label>
+                                    <input type="email" name="email" class="form-control" placeholder="seuemail@exemplo.com">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small text-secondary">Modelo do Veículo</label>
-                                    <input type="text" name="veiculo" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Onix 2022, Titan 160">
+                                    <label class="form-label small text-secondary fw-semibold">Modelo do Veículo</label>
+                                    <input type="text" name="veiculo" class="form-control" placeholder="Ex: Onix 2022, Titan 160">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small text-secondary">Dúvida ou Mensagem *</label>
-                                    <textarea name="mensagem" rows="4" class="form-control bg-dark text-white border-secondary" required placeholder="Como podemos ajudar você?"></textarea>
+                                    <label class="form-label small text-secondary fw-semibold">Dúvida ou Mensagem *</label>
+                                    <textarea name="mensagem" rows="4" class="form-control" required placeholder="Como podemos ajudar você?"></textarea>
                                 </div>
                                 <div class="col-12 mt-4">
                                     <button type="submit" class="btn-foco-primary w-100 py-3">
@@ -633,47 +636,47 @@
     <!-- MODAL DE CHECKOUT TRANSPARENTE -->
     <div class="modal fade" id="modalCheckout" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-shield-alt text-danger me-2"></i> Contratar Plano</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-content bg-white text-dark border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" style="color: var(--foco-title);"><i class="fas fa-shield-alt text-danger me-2"></i> Contratar Plano</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div id="checkoutStep1">
-                        <div class="p-3 rounded-3 mb-3" style="background: #121722;">
+                        <div class="p-3 rounded-3 mb-3 border" style="background: #f8fafc;">
                             <span class="small text-secondary">Plano Selecionado:</span>
                             <h5 class="fw-bold mb-0 text-danger" id="checkoutPlanoNome">Plano</h5>
-                            <span class="fw-bold text-white" id="checkoutPlanoPreco">R$ 0,00</span>
+                            <span class="fw-bold text-dark fs-5" id="checkoutPlanoPreco">R$ 0,00</span>
                         </div>
                         <form id="formCheckout" action="{{ route('checkout.gerar') }}" method="POST" class="ajax-form">
                             @csrf
                             <input type="hidden" name="plano_id" id="checkoutPlanoId">
                             <div class="mb-3">
-                                <label class="form-label small text-secondary">Nome Completo *</label>
-                                <input type="text" name="nome" class="form-control bg-black text-white border-secondary" required>
+                                <label class="form-label small text-secondary fw-semibold">Nome Completo *</label>
+                                <input type="text" name="nome" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label small text-secondary">E-mail *</label>
-                                <input type="email" name="email" class="form-control bg-black text-white border-secondary" required>
+                                <label class="form-label small text-secondary fw-semibold">E-mail *</label>
+                                <input type="email" name="email" class="form-control" required>
                             </div>
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label small text-secondary">WhatsApp *</label>
-                                    <input type="text" name="telefone" class="form-control bg-black text-white border-secondary mask-telefone" required>
+                                    <label class="form-label small text-secondary fw-semibold">WhatsApp *</label>
+                                    <input type="text" name="telefone" class="form-control mask-telefone" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small text-secondary">CPF ou CNPJ *</label>
-                                    <input type="text" name="cpf_cnpj" class="form-control bg-black text-white border-secondary mask-cpf-cnpj" required>
+                                    <label class="form-label small text-secondary fw-semibold">CPF ou CNPJ *</label>
+                                    <input type="text" name="cpf_cnpj" class="form-control mask-cpf-cnpj" required>
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label class="form-label small text-secondary">Forma de Pagamento *</label>
+                                <label class="form-label small text-secondary fw-semibold">Forma de Pagamento *</label>
                                 <div class="d-flex gap-2">
-                                    <div class="form-check flex-fill p-2 border border-secondary rounded">
+                                    <div class="form-check flex-fill p-2 border rounded bg-light">
                                         <input class="form-check-input" type="radio" name="metodo_pagamento" id="metodoPix" value="pix" checked>
                                         <label class="form-check-label small fw-bold" for="metodoPix"><i class="fab fa-pix text-success"></i> PIX Imediato</label>
                                     </div>
-                                    <div class="form-check flex-fill p-2 border border-secondary rounded">
+                                    <div class="form-check flex-fill p-2 border rounded bg-light">
                                         <input class="form-check-input" type="radio" name="metodo_pagamento" id="metodoCartao" value="cartao">
                                         <label class="form-check-label small fw-bold" for="metodoCartao"><i class="fas fa-credit-card text-primary"></i> Cartão</label>
                                     </div>
@@ -687,10 +690,10 @@
 
                     <div id="checkoutStep2" class="d-none text-center">
                         <div class="alert alert-success py-2 mb-3">Cobrança PIX Gerada com Sucesso!</div>
-                        <img id="pixQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border border-light p-2 bg-white mb-3" style="max-width: 200px;">
+                        <img id="pixQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white mb-3 shadow-sm" style="max-width: 200px;">
                         <p class="small text-secondary mb-2">Escaneie o QR Code no app do seu banco ou use a chave Copia e Cola:</p>
                         <div class="input-group mb-3">
-                            <input type="text" id="pixCopiaCola" class="form-control bg-black text-white border-secondary small" readonly>
+                            <input type="text" id="pixCopiaCola" class="form-control bg-light small" readonly>
                             <button class="btn btn-danger" type="button" id="btnCopiarPix">Copiar</button>
                         </div>
                         <div class="small text-secondary">Após a confirmação do pagamento, entraremos em contato para agendar sua instalação!</div>
@@ -698,6 +701,7 @@
                 </div>
             </div>
         </div>
+    </div>
     <!-- BOTÃO VOLTAR AO TOPO FLUTUANTE -->
     <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
