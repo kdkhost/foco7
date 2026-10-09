@@ -5,6 +5,19 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.6.4] - 2026-10-09
+
+### 🎛️ Gestão de Conteúdo (CMS & Painel Administrativo)
+- **Painel Administrativo Completo para a Seção de Tecnologia Mobile (App Foco 7):**
+  - **Cabeçalho & Textos Dinâmicos:** Adicionada gestão completa de Badge/Tag superior (`secao_app_badge`), Título principal (`secao_app_titulo`) e Texto explicativo/narrativo (`secao_app_descricao`).
+  - **Gestão dos 4 Recursos do Aplicativo:** Cada um dos 4 cards de funcionalidades agora possui campos dedicados no painel com seletor de ícone FontAwesome, título do recurso e descrição operacional (Bloqueio Remoto, Cerca Virtual, Alerta de Ignição e Histórico de 90 Dias).
+  - **Card Lateral de Download & Imagem/Mockup:** Adicionada personalização do título e subtítulo do card, URLs diretas para a Apple App Store e Google Play Store, além de suporte a upload de screenshot/mockup do aplicativo com pré-visualização e opção de remoção.
+- **Painel Administrativo para os 4 Diferenciais e Selos da Estética Automotiva:**
+  - **Gestão Integrada no CMS e no Módulo de Estética:** Criados campos para os 4 selos de diferenciais técnicos e garantia da estética automotiva (Ícone, Título e Descrição/Marcas) acessíveis tanto na aba *Textos das Seções* do CMS quanto diretamente na tela de gerenciamento de *Estética Automotiva* (`/admin/estetica`).
+  - **Operações 100% AJAX & Sem Page Reload:** Formulários conectados ao sistema global de feedback com SweetAlert2 e Toastr.
+
+---
+
 ## [1.6.3] - 2026-10-09
 
 ### 📐 Layout & Responsividade

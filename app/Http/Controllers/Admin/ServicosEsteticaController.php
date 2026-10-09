@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServicoEstetica;
+use App\Models\CmsSetting;
 use Illuminate\Support\Str;
 
 class ServicosEsteticaController extends Controller
@@ -15,7 +16,8 @@ class ServicosEsteticaController extends Controller
     public function index()
     {
         $servicos = ServicoEstetica::orderBy('ordem', 'asc')->orderBy('id', 'asc')->get();
-        return view('admin.estetica.index', compact('servicos'));
+        $settings = CmsSetting::all()->pluck('valor', 'chave')->toArray();
+        return view('admin.estetica.index', compact('servicos', 'settings'));
     }
 
     /**

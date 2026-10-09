@@ -128,6 +128,103 @@
     @endforelse
 </div>
 
+<!-- DIFERENCIAIS E SELOS DE GARANTIA DA ESTÉTICA NO SITE -->
+<div class="card shadow-sm border-0 mt-5">
+    <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-danger">
+            <i class="fas fa-certificate me-2"></i> Diferenciais Técnicos e Selos de Garantia (Exibidos no Site)
+        </h5>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rodapé da Seção Estética Automotiva</span>
+    </div>
+    <div class="card-body p-4">
+        <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+            @csrf
+            <p class="text-secondary small mb-4">
+                Personalize os 4 cards de diferenciais e garantias que aparecem logo abaixo dos pacotes de serviços de estética automotiva na Landing Page.
+            </p>
+            <div class="row g-3">
+                <!-- DIFERENCIAL 1 -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <span class="badge bg-danger mb-2">Diferencial 1</span>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                            <input type="text" name="secao_estetica_dif1_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_icone'] ?? 'fa-award' }}" placeholder="ex: fa-award">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="secao_estetica_dif1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_titulo'] ?? 'Produtos Nobres' }}">
+                        </div>
+                        <div>
+                            <label class="form-label small fw-bold">Descrição / Marcas</label>
+                            <input type="text" name="secao_estetica_dif1_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_desc'] ?? 'Vonixx, CarPro e Menzerna' }}">
+                        </div>
+                    </div>
+                </div>
+                <!-- DIFERENCIAL 2 -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <span class="badge bg-danger mb-2">Diferencial 2</span>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                            <input type="text" name="secao_estetica_dif2_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_icone'] ?? 'fa-warehouse' }}" placeholder="ex: fa-warehouse">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="secao_estetica_dif2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_titulo'] ?? 'Box Climatizado' }}">
+                        </div>
+                        <div>
+                            <label class="form-label small fw-bold">Descrição</label>
+                            <input type="text" name="secao_estetica_dif2_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_desc'] ?? 'Sem poeira ou sol direto' }}">
+                        </div>
+                    </div>
+                </div>
+                <!-- DIFERENCIAL 3 -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <span class="badge bg-danger mb-2">Diferencial 3</span>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                            <input type="text" name="secao_estetica_dif3_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_icone'] ?? 'fa-certificate' }}" placeholder="ex: fa-certificate">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="secao_estetica_dif3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_titulo'] ?? 'Certificado de Garantia' }}">
+                        </div>
+                        <div>
+                            <label class="form-label small fw-bold">Descrição</label>
+                            <input type="text" name="secao_estetica_dif3_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_desc'] ?? 'Proteção com laudo técnico' }}">
+                        </div>
+                    </div>
+                </div>
+                <!-- DIFERENCIAL 4 -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <span class="badge bg-danger mb-2">Diferencial 4</span>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                            <input type="text" name="secao_estetica_dif4_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_icone'] ?? 'fa-user-clock' }}" placeholder="ex: fa-user-clock">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Título</label>
+                            <input type="text" name="secao_estetica_dif4_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_titulo'] ?? 'Horário Marcado' }}">
+                        </div>
+                        <div>
+                            <label class="form-label small fw-bold">Descrição</label>
+                            <input type="text" name="secao_estetica_dif4_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_desc'] ?? 'Entrega pontual sem filas' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-danger fw-bold shadow-sm">
+                    <i class="fas fa-save me-1"></i> Salvar Diferenciais da Estética
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- MODAL CADASTRAR / EDITAR SERVIÇO -->
 <div class="modal fade" id="modalServico" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">

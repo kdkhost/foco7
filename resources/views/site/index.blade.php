@@ -470,37 +470,37 @@
             <div class="row g-3 mt-5 pt-3">
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-award text-danger fs-2"></i>
+                        <i class="fas {{ $configs['secao_estetica_dif1_icone'] ?? 'fa-award' }} text-danger fs-2"></i>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark">Produtos Nobres</h6>
-                            <span class="small text-secondary">Vonixx, CarPro e Menzerna</span>
+                            <h6 class="fw-bold mb-0 text-dark">{{ $configs['secao_estetica_dif1_titulo'] ?? 'Produtos Nobres' }}</h6>
+                            <span class="small text-secondary">{{ $configs['secao_estetica_dif1_desc'] ?? 'Vonixx, CarPro e Menzerna' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-warehouse text-danger fs-2"></i>
+                        <i class="fas {{ $configs['secao_estetica_dif2_icone'] ?? 'fa-warehouse' }} text-danger fs-2"></i>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark">Box Climatizado</h6>
-                            <span class="small text-secondary">Sem poeira ou sol direto</span>
+                            <h6 class="fw-bold mb-0 text-dark">{{ $configs['secao_estetica_dif2_titulo'] ?? 'Box Climatizado' }}</h6>
+                            <span class="small text-secondary">{{ $configs['secao_estetica_dif2_desc'] ?? 'Sem poeira ou sol direto' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-certificate text-danger fs-2"></i>
+                        <i class="fas {{ $configs['secao_estetica_dif3_icone'] ?? 'fa-certificate' }} text-danger fs-2"></i>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark">Certificado de Garantia</h6>
-                            <span class="small text-secondary">Proteção com laudo técnico</span>
+                            <h6 class="fw-bold mb-0 text-dark">{{ $configs['secao_estetica_dif3_titulo'] ?? 'Certificado de Garantia' }}</h6>
+                            <span class="small text-secondary">{{ $configs['secao_estetica_dif3_desc'] ?? 'Proteção com laudo técnico' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-user-clock text-danger fs-2"></i>
+                        <i class="fas {{ $configs['secao_estetica_dif4_icone'] ?? 'fa-user-clock' }} text-danger fs-2"></i>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark">Horário Marcado</h6>
-                            <span class="small text-secondary">Entrega pontual sem filas</span>
+                            <h6 class="fw-bold mb-0 text-dark">{{ $configs['secao_estetica_dif4_titulo'] ?? 'Horário Marcado' }}</h6>
+                            <span class="small text-secondary">{{ $configs['secao_estetica_dif4_desc'] ?? 'Entrega pontual sem filas' }}</span>
                         </div>
                     </div>
                 </div>
@@ -554,46 +554,54 @@
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <span class="text-danger fw-bold text-uppercase small">Tecnologia Mobile</span>
-                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">Controle Total do Seu Veículo na Palma da Mão</h2>
+                    <span class="text-danger fw-bold text-uppercase small letter-spacing-1">{{ $configs['secao_app_badge'] ?? 'Tecnologia Mobile' }}</span>
+                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">{{ $configs['secao_app_titulo'] ?? 'Controle Total do Seu Veículo na Palma da Mão' }}</h2>
                     <p class="text-secondary fs-5 leading-relaxed mb-4">
-                        Disponível para Android e iOS, o app Foco 7 foi projetado para oferecer rapidez instantânea em situações de risco e relatórios completos para o dia a dia.
+                        {!! nl2br(e($configs['secao_app_descricao'] ?? 'Disponível para Android e iOS, o app Foco 7 foi projetado para oferecer rapidez instantânea em situações de risco e relatórios completos para o dia a dia.')) !!}
                     </p>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <div class="card-recurso-app">
-                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-lock text-danger me-2"></i> Bloqueio Remoto</h6>
-                                <p class="small text-secondary mb-0">Corte de combustível com 1 toque no celular.</p>
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas {{ $configs['secao_app_rec1_icone'] ?? 'fa-lock' }} text-danger me-2"></i> {{ $configs['secao_app_rec1_titulo'] ?? 'Bloqueio Remoto' }}</h6>
+                                <p class="small text-secondary mb-0">{{ $configs['secao_app_rec1_desc'] ?? 'Corte de combustível com 1 toque no celular.' }}</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="card-recurso-app">
-                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-draw-polygon text-danger me-2"></i> Cerca Virtual</h6>
-                                <p class="small text-secondary mb-0">Receba avisos imediatos se o carro sair do perímetro.</p>
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas {{ $configs['secao_app_rec2_icone'] ?? 'fa-draw-polygon' }} text-danger me-2"></i> {{ $configs['secao_app_rec2_titulo'] ?? 'Cerca Virtual' }}</h6>
+                                <p class="small text-secondary mb-0">{{ $configs['secao_app_rec2_desc'] ?? 'Receba avisos imediatos se o carro sair do perímetro.' }}</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="card-recurso-app">
-                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-key text-danger me-2"></i> Alerta de Ignição</h6>
-                                <p class="small text-secondary mb-0">Notificação push assim que a chave for virada.</p>
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas {{ $configs['secao_app_rec3_icone'] ?? 'fa-key' }} text-danger me-2"></i> {{ $configs['secao_app_rec3_titulo'] ?? 'Alerta de Ignição' }}</h6>
+                                <p class="small text-secondary mb-0">{{ $configs['secao_app_rec3_desc'] ?? 'Notificação push assim que a chave for virada.' }}</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="card-recurso-app">
-                                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-route text-danger me-2"></i> Histórico de 90 Dias</h6>
-                                <p class="small text-secondary mb-0">Rotas, paradas e velocidade com mapa 3D.</p>
+                                <h6 class="fw-bold text-dark mb-1"><i class="fas {{ $configs['secao_app_rec4_icone'] ?? 'fa-route' }} text-danger me-2"></i> {{ $configs['secao_app_rec4_titulo'] ?? 'Histórico de 90 Dias' }}</h6>
+                                <p class="small text-secondary mb-0">{{ $configs['secao_app_rec4_desc'] ?? 'Rotas, paradas e velocidade com mapa 3D.' }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="mockup-app-box text-center">
-                        <i class="fas fa-mobile-alt text-danger" style="font-size: 8rem;"></i>
-                        <h4 class="fw-bold mt-4" style="color: var(--foco-title);">Aplicativo Oficial Foco 7</h4>
-                        <p class="text-secondary small">Baixe gratuitamente na App Store e Google Play Store</p>
+                        @if(!empty($configs['secao_app_mockup_imagem']))
+                            <img src="{{ asset($configs['secao_app_mockup_imagem']) }}" alt="{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Foco 7' }}" class="img-fluid rounded-4 mb-3" style="max-height: 280px; object-fit: contain;">
+                        @else
+                            <i class="fas fa-mobile-alt text-danger" style="font-size: 8rem;"></i>
+                        @endif
+                        <h4 class="fw-bold mt-4" style="color: var(--foco-title);">{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Oficial Foco 7' }}</h4>
+                        <p class="text-secondary small">{{ $configs['secao_app_card_subtitulo'] ?? 'Baixe gratuitamente na App Store e Google Play Store' }}</p>
                         <div class="d-flex justify-content-center gap-3 mt-3">
-                            <button class="btn btn-outline-dark btn-sm"><i class="fab fa-apple me-1"></i> App Store</button>
-                            <button class="btn btn-outline-dark btn-sm"><i class="fab fa-google-play me-1"></i> Google Play</button>
+                            <a href="{{ $configs['secao_app_link_appstore'] ?? 'https://www.apple.com/app-store/' }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                                <i class="fab fa-apple me-1"></i> App Store
+                            </a>
+                            <a href="{{ $configs['secao_app_link_playstore'] ?? 'https://play.google.com/store/apps' }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                                <i class="fab fa-google-play me-1"></i> Google Play
+                            </a>
                         </div>
                     </div>
                 </div>

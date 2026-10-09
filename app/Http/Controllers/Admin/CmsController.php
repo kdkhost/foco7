@@ -30,7 +30,15 @@ class CmsController extends Controller
      */
     public function salvarConfiguracoes(Request $request)
     {
-        $dados = $request->except(['_token', 'logo_upload', 'favicon_upload', 'hero_bg_upload', 'remover_hero_bg']);
+        $dados = $request->except([
+            '_token',
+            'logo_upload',
+            'favicon_upload',
+            'hero_bg_upload',
+            'remover_hero_bg',
+            'app_mockup_upload',
+            'remover_app_mockup'
+        ]);
 
         // Upload de Logo se enviado
         if ($request->hasFile('logo_upload')) {
@@ -50,6 +58,14 @@ class CmsController extends Controller
             $dados['hero_bg_imagem'] = '/storage/' . $path;
         } elseif ($request->boolean('remover_hero_bg')) {
             $dados['hero_bg_imagem'] = '';
+        }
+
+        // Upload de Mockup / Imagem da Seção do Aplicativo se enviado
+        if ($request->hasFile('app_mockup_upload')) {
+            $path = $request->file('app_mockup_upload')->store('uploads/app', 'public');
+            $dados['secao_app_mockup_imagem'] = '/storage/' . $path;
+        } elseif ($request->boolean('remover_app_mockup')) {
+            $dados['secao_app_mockup_imagem'] = '';
         }
 
         // Validação e garantia de valor numérico para opacidade (0 a 100)

@@ -449,27 +449,107 @@
                         </div>
                     </div>
 
-                    <!-- 2. SEÇÃO ESTÉTICA AUTOMOTIVA -->
+                    <!-- 2. SEÇÃO ESTÉTICA AUTOMOTIVA & DIFERENCIAIS -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3">
-                            <h6 class="fw-bold mb-0 text-warning"><i class="fas fa-car-side me-2"></i> Seção Estética Automotiva no Site</h6>
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-car-side me-2"></i> Seção Estética Automotiva no Site</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Landing Page & Diferenciais</span>
                         </div>
                         <div class="card-body p-4">
-                            <div class="row g-3">
+                            <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Título da Seção de Estética</label>
-                                    <input type="text" name="secao_estetica_titulo" class="form-control" value="{{ $settings['secao_estetica_titulo'] ?? 'Estética Automotiva Premium Foco 7' }}">
+                                    <input type="text" name="secao_estetica_titulo" class="form-control" value="{{ $settings['secao_estetica_titulo'] ?? 'Estética Automotiva de Alta Performance' }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Subtítulo da Seção</label>
-                                    <input type="text" name="secao_estetica_subtitulo" class="form-control" value="{{ $settings['secao_estetica_subtitulo'] ?? 'Cuidado minucioso, proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.' }}">
+                                    <input type="text" name="secao_estetica_subtitulo" class="form-control" value="{{ $settings['secao_estetica_subtitulo'] ?? 'Além de proteger com tecnologia, cuidamos do visual, valorização e conservação do seu veículo com padrão premium.' }}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
-                                        <span>Texto de Chamada de Ação</span>
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                        <span>Texto de Chamada de Ação / Descrição</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
                                     </label>
-                                    <textarea name="secao_estetica_chamada" id="secao_estetica_chamada" class="form-control summernote" data-height="130">{{ $settings['secao_estetica_chamada'] ?? 'Agende o serviço de estética automotiva do seu carro ou moto com profissionais certificados e produtos de primeira linha.' }}</textarea>
+                                    <textarea name="secao_estetica_chamada" id="secao_estetica_chamada" class="form-control summernote" data-height="130">{{ $settings['secao_estetica_chamada'] ?? 'Serviços especializados com produtos nobres, vitrificação técnica, polimento com brilho espelhado e higienização profunda.' }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- 4 CARDS DE DIFERENCIAIS / GARANTIAS DA ESTÉTICA AUTOMOTIVA -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-certificate text-danger me-2"></i> 4 Diferenciais e Selos de Garantia (Rodapé da Seção Estética)</h6>
+                                <div class="row g-3">
+                                    <!-- DIFERENCIAL 1 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Diferencial 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_estetica_dif1_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_icone'] ?? 'fa-award' }}" placeholder="ex: fa-award">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_estetica_dif1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_titulo'] ?? 'Produtos Nobres' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição / Marcas</label>
+                                                <input type="text" name="secao_estetica_dif1_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif1_desc'] ?? 'Vonixx, CarPro e Menzerna' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DIFERENCIAL 2 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Diferencial 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_estetica_dif2_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_icone'] ?? 'fa-warehouse' }}" placeholder="ex: fa-warehouse">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_estetica_dif2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_titulo'] ?? 'Box Climatizado' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_estetica_dif2_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif2_desc'] ?? 'Sem poeira ou sol direto' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DIFERENCIAL 3 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Diferencial 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_estetica_dif3_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_icone'] ?? 'fa-certificate' }}" placeholder="ex: fa-certificate">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_estetica_dif3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_titulo'] ?? 'Certificado de Garantia' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_estetica_dif3_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif3_desc'] ?? 'Proteção com laudo técnico' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DIFERENCIAL 4 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Diferencial 4</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_estetica_dif4_icone" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_icone'] ?? 'fa-user-clock' }}" placeholder="ex: fa-user-clock">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_estetica_dif4_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_titulo'] ?? 'Horário Marcado' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_estetica_dif4_desc" class="form-control form-control-sm" value="{{ $settings['secao_estetica_dif4_desc'] ?? 'Entrega pontual sem filas' }}">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -516,37 +596,147 @@
                         </div>
                     </div>
 
-                    <!-- 5. SEÇÃO APLICATIVO MÓVEL -->
+                    <!-- 5. SEÇÃO APLICATIVO MÓVEL (ANDROID & IOS) -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3">
-                            <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-mobile-alt me-2"></i> Seção Aplicativo Móvel (Android & iOS)</h6>
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-mobile-alt me-2"></i> Seção Aplicativo Móvel (Tecnologia Mobile)</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Recursos & Download</span>
                         </div>
                         <div class="card-body p-4">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Título do App</label>
+                            <!-- CABEÇALHO DO APP -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge / Tag Superior</label>
+                                    <input type="text" name="secao_app_badge" class="form-control" value="{{ $settings['secao_app_badge'] ?? 'Tecnologia Mobile' }}">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
                                     <input type="text" name="secao_app_titulo" class="form-control" value="{{ $settings['secao_app_titulo'] ?? 'Controle Total do Seu Veículo na Palma da Mão' }}">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
-                                        <span>Descrição do App</span>
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
-                                    </label>
-                                    <textarea name="secao_app_descricao" id="secao_app_descricao" class="form-control summernote" data-height="130">{{ $settings['secao_app_descricao'] ?? 'Acompanhe velocidade em tempo real, rotas históricas, crie cercas virtuais, receba alertas de ignição e bloqueie o motor com apenas um toque no celular.' }}</textarea>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Texto Narrativo / Descrição Explicativa</label>
+                                    <textarea name="secao_app_descricao" rows="2" class="form-control">{{ $settings['secao_app_descricao'] ?? 'Disponível para Android e iOS, o app Foco 7 foi projetado para oferecer rapidez instantânea em situações de risco e relatórios completos para o dia a dia.' }}</textarea>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Link Google Play Store</label>
-                                    <input type="text" name="secao_app_link_playstore" class="form-control" value="{{ $settings['secao_app_link_playstore'] ?? 'https://play.google.com/store/apps' }}">
+                            </div>
+
+                            <!-- 4 CARDS DE RECURSOS DO APP -->
+                            <div class="border-top pt-3 mb-4">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Cards de Recursos do Aplicativo</h6>
+                                <div class="row g-3">
+                                    <!-- RECURSO 1 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Recurso 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_app_rec1_icone" class="form-control form-control-sm" value="{{ $settings['secao_app_rec1_icone'] ?? 'fa-lock' }}" placeholder="ex: fa-lock">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_app_rec1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_app_rec1_titulo'] ?? 'Bloqueio Remoto' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_app_rec1_desc" class="form-control form-control-sm" value="{{ $settings['secao_app_rec1_desc'] ?? 'Corte de combustível com 1 toque no celular.' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- RECURSO 2 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Recurso 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_app_rec2_icone" class="form-control form-control-sm" value="{{ $settings['secao_app_rec2_icone'] ?? 'fa-draw-polygon' }}" placeholder="ex: fa-draw-polygon">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_app_rec2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_app_rec2_titulo'] ?? 'Cerca Virtual' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_app_rec2_desc" class="form-control form-control-sm" value="{{ $settings['secao_app_rec2_desc'] ?? 'Receba avisos imediatos se o carro sair do perímetro.' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- RECURSO 3 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Recurso 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_app_rec3_icone" class="form-control form-control-sm" value="{{ $settings['secao_app_rec3_icone'] ?? 'fa-key' }}" placeholder="ex: fa-key">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_app_rec3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_app_rec3_titulo'] ?? 'Alerta de Ignição' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_app_rec3_desc" class="form-control form-control-sm" value="{{ $settings['secao_app_rec3_desc'] ?? 'Notificação push assim que a chave for virada.' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- RECURSO 4 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Recurso 4</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="secao_app_rec4_icone" class="form-control form-control-sm" value="{{ $settings['secao_app_rec4_icone'] ?? 'fa-route' }}" placeholder="ex: fa-route">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_app_rec4_titulo" class="form-control form-control-sm" value="{{ $settings['secao_app_rec4_titulo'] ?? 'Histórico de 90 Dias' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <input type="text" name="secao_app_rec4_desc" class="form-control form-control-sm" value="{{ $settings['secao_app_rec4_desc'] ?? 'Rotas, paradas e velocidade com mapa 3D.' }}">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Link Apple App Store</label>
-                                    <input type="text" name="secao_app_link_appstore" class="form-control" value="{{ $settings['secao_app_link_appstore'] ?? 'https://www.apple.com/app-store/' }}">
+                            </div>
+
+                            <!-- CARD DE DOWNLOAD & MOCKUP DO APP -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-download text-danger me-2"></i> Card Lateral de Download & Imagem do Aplicativo</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Título do Card de Download</label>
+                                        <input type="text" name="secao_app_card_titulo" class="form-control" value="{{ $settings['secao_app_card_titulo'] ?? 'Aplicativo Oficial Foco 7' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Subtítulo do Card</label>
+                                        <input type="text" name="secao_app_card_subtitulo" class="form-control" value="{{ $settings['secao_app_card_subtitulo'] ?? 'Baixe gratuitamente na App Store e Google Play Store' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold"><i class="fab fa-apple me-1 text-dark"></i> Link Apple App Store</label>
+                                        <input type="text" name="secao_app_link_appstore" class="form-control" value="{{ $settings['secao_app_link_appstore'] ?? 'https://www.apple.com/app-store/' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold"><i class="fab fa-google-play me-1 text-success"></i> Link Google Play Store</label>
+                                        <input type="text" name="secao_app_link_playstore" class="form-control" value="{{ $settings['secao_app_link_playstore'] ?? 'https://play.google.com/store/apps' }}">
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label class="form-label small fw-bold"><i class="fas fa-image text-danger me-1"></i> Mockup / Imagem Personalizada do Celular (Opcional)</label>
+                                        <p class="text-secondary small mb-2">Se nenhuma imagem for enviada, o sistema exibe o ícone mobile oficial com gradiente e estilo responsivo.</p>
+                                        <input type="file" name="app_mockup_upload" class="form-control" accept="image/png,image/jpeg,image/webp">
+                                        @if(!empty($settings['secao_app_mockup_imagem']))
+                                            <div class="d-flex align-items-center gap-3 mt-2 p-2 bg-light rounded border">
+                                                <img src="{{ asset($settings['secao_app_mockup_imagem']) }}" alt="Mockup App" style="max-height: 60px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="remover_app_mockup" value="1" id="rem_mockup">
+                                                    <label class="form-check-label small text-danger fw-bold" for="rem_mockup">Remover imagem personalizada (usar ícone padrão)</label>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-end">
                     <div class="text-end">
                         <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
                             <i class="fas fa-save me-1"></i> Salvar Textos das Seções
