@@ -19,6 +19,7 @@ Sistema integrado de alta performance composto por uma **Landing Page (Single Pa
 | **Agendamento** | FullCalendar 6 | Gestão completa de instalações, suporte e visitas técnicas |
 | **Gateways de Pagamento**| Efí PRO (Gerencianet) & Mercado Pago | Checkout Transparente (PIX, Cartão e Boleto) com Webhooks |
 | **Uploads de Arquivos** | FocoDropzone (Arrasta e Solta Global) | **100% dos uploads via drag & drop** com preview imediato, specs de proporção e remoção AJAX |
+| **Central de E-mails**  | EmailTemplateService + Layout Master | **Rota única obrigatória**, layout responsivo (Desktop, Tablet, Mobile) e preview ao vivo |
 | **Ambiente de Hospedagem**| cPanel / LiteSpeed (`public_html`) | `.htaccess` raiz blindando arquivos sensíveis e roteando para `public/` |
 | **Fuso Horário & Locale**| `America/Sao_Paulo` / `pt_BR` | Formatação estrita de Moeda (R$), CPF/CNPJ, CEP, Datas e Horas |
 

@@ -3,6 +3,21 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.6.7] - 2026-10-09
+
+### ✉️ Rota Única de E-mails, Layout Master Responsivo & Preview em Tempo Real por Dispositivo
+- **Pipeline Unificada de E-mails (`EmailTemplateService`):**
+  - **Rota Única Obrigatória:** Todos os e-mails disparados pelo sistema (transacionais, cobranças, notificações de atraso, faturas, carnês, lembretes de cron e testes de servidor SMTP) passam estritamente pela mesma pipeline unificada de compilação.
+  - **Layout Master Responsivo Oficial (`resources/views/emails/layouts/master.blade.php`):** Criado template mestre compatível com clientes móveis e webmail (Gmail, Outlook, Apple Mail), com cabeçalho corporativo Foco 7 (`#0b0f19` e `#d90000`), card com tipografia calibrada, bloco de suporte 24h via WhatsApp, rodapé institucional padronizado e media queries `@media only screen and (max-width: 620px)` garantindo que botões virem bloco 100% e nenhum dispositivo quebre a leitura.
+- **Preview em Tempo Real Multi-Dispositivo (`/admin/gateways`):**
+  - **Divisão Split-Screen 2 Colunas:** A aba de templates de e-mail foi reestruturada para exibir o Editor Summernote + Assunto à esquerda e o Simulador de Pré-Visualização à direita.
+  - **Alternador de Resolução Instantâneo:** Modos **Desktop (100%)**, **Tablet (520px com moldura)** e **Mobile (375px estilo smartphone)** para inspeção responsiva ao vivo.
+  - **Renderização com Latência Zero (0ms):** Injeção em tempo real no `iframe` ao digitar qualquer caractere no campo de Assunto ou no Summernote, complementada por sincronização debounced (350ms) via AJAX com a rota `/admin/gateways/preview-email`.
+  - **Criação e Gestão de Novos Templates:** Modal interativo para criação de templates personalizados com slug automático, inclusão e exclusão com SweetAlert2.
+  - **Inserção de Variáveis em 1 Clique:** Badges dinâmicos (`{cliente_nome}`, `{valor}`, etc.) que copiam e colam no ponto exato do cursor no Summernote ativo.
+
+---
+
 ## [1.6.6] - 2026-10-09
 
 ### 📤 Padronização Global de Uploads (Arrasta e Solta / foco-dropzone)

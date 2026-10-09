@@ -5,47 +5,103 @@ namespace App\Services;
 use App\Models\CmsSetting;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Exception;
 
 class EmailTemplateService
 {
     /**
-     * Retorna a lista de chaves e definições dos templates de e-mail
+     * Retorna a lista de chaves e definições dos templates de e-mail (nativos e customizados)
      */
     public static function getTemplates(): array
     {
-        return [
+        $templates = [
             'fatura_gerada' => [
                 'nome' => 'Nova Fatura Gerada',
                 'descricao' => 'Disparado quando uma nova cobrança de adesão ou mensalidade é gerada para o cliente.',
                 'assunto_padrao' => '📄 Fatura Gerada (#{fatura_id}) - Foco 7 Rastreamento',
                 'corpo_padrao' => self::getTemplatePadraoFaturaGerada(),
+                'sistema' => true,
             ],
             'pagamento_confirmado' => [
                 'nome' => 'Confirmação de Pagamento Aprovado',
                 'descricao' => 'Disparado imediatamente após a confirmação do pagamento via PIX, Cartão ou Boleto.',
                 'assunto_padrao' => '✅ Pagamento Confirmado com Sucesso! - Foco 7 Rastreamento',
                 'corpo_padrao' => self::getTemplatePadraoPagamentoConfirmado(),
+                'sistema' => true,
             ],
             'carne_gerado' => [
                 'nome' => 'Carnê de Mensalidades Emitido',
                 'descricao' => 'Disparado quando um carnê parcelado (Efí PRO) é gerado para um cliente existente.',
                 'assunto_padrao' => '📅 Seu Carnê de Mensalidades Foco 7 Foi Emitido',
                 'corpo_padrao' => self::getTemplatePadraoCarneGerado(),
+                'sistema' => true,
             ],
             'lembrete_vencimento' => [
                 'nome' => 'Lembrete Preventivo de Vencimento',
                 'descricao' => 'Disparado automaticamente pelo Cron 3 dias antes do vencimento da fatura.',
                 'assunto_padrao' => '⏰ Lembrete: Sua fatura Foco 7 vence em breve',
                 'corpo_padrao' => self::getTemplatePadraoLembreteVencimento(),
+                'sistema' => true,
             ],
             'fatura_vencida' => [
                 'nome' => 'Aviso de Fatura Vencida & Alerta de Suspensão',
                 'descricao' => 'Disparado pelo Cron para faturas em atraso com instruções para regularização.',
                 'assunto_padrao' => '⚠️ Importante: Fatura Vencida (#{fatura_id}) - Evite Suspensão',
                 'corpo_padrao' => self::getTemplatePadraoFaturaVencida(),
+                'sistema' => true,
             ],
         ];
+
+        // Mesclar com templates personalizados cadastrados
+        $customizadosRaw = CmsSetting::get('email_templates_personalizados', '[]');
+        $customizados = json_decode($customizadosRaw, true);
+        if (is_array($customizados)) {
+            foreach ($customizados as $chave => $dados) {
+                if (!isset($templates[$chave])) {
+                    $dados['sistema'] = false;
+                    $templates[$chave] = $dados;
+                }
+            }
+        }
+
+        return $templates;
+    }
+
+    /**
+     * Salva ou cria um novo template customizado
+     */
+    public static function salvarTemplateCustomizado(string $chave, string $nome, string $descricao, string $assunto, string $corpo): bool
+    {
+        $chave = Str::slug($chave, '_');
+        $customizadosRaw = CmsSetting::get('email_templates_personalizados', '[]');
+        $customizados = json_decode($customizadosRaw, true) ?: [];
+        $customizados[$chave] = [
+            'nome' => $nome,
+            'descricao' => $descricao,
+            'assunto_padrao' => $assunto,
+            'corpo_padrao' => $corpo,
+            'sistema' => false,
+        ];
+        CmsSetting::set('email_templates_personalizados', json_encode($customizados));
+        CmsSetting::set("email_assunto_{$chave}", $assunto);
+        CmsSetting::set("email_corpo_{$chave}", $corpo);
+        return true;
+    }
+
+    /**
+     * Exclui um template customizado
+     */
+    public static function excluirTemplateCustomizado(string $chave): bool
+    {
+        $customizadosRaw = CmsSetting::get('email_templates_personalizados', '[]');
+        $customizados = json_decode($customizadosRaw, true) ?: [];
+        if (isset($customizados[$chave])) {
+            unset($customizados[$chave]);
+            CmsSetting::set('email_templates_personalizados', json_encode($customizados));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -94,51 +150,89 @@ class EmailTemplateService
     }
 
     /**
-     * Envolve o conteúdo em um layout HTML elegante com a identidade visual da Foco 7
+     * Retorna o conjunto oficial de dados simulados para preview em tempo real e testes
+     */
+    public static function getDadosSimulados(array $custom = []): array
+    {
+        return array_merge([
+            'cliente_nome' => 'Carlos Alberto Silva (Demonstração)',
+            'cliente_email' => 'carlos.silva@exemplo.com.br',
+            'fatura_id' => 'FAT-20261009-0824',
+            'plano_nome' => 'FOCO 7 PLUS - Rastreamento Veicular Completo',
+            'valor' => 'R$ 89,90',
+            'data_vencimento' => date('d/m/Y', strtotime('+5 days')),
+            'link_fatura' => url('/cliente/faturas'),
+            'link_carne' => url('/cliente/faturas'),
+            'pix_copia_cola' => '00020126580014br.gov.bcb.pix0136foco7-pix-demonstracao-2026520400005303986540589.905802BR5915FOCO 7 SISTEMAS6009BELEM62070503FAT6304ABCD',
+            'codigo_barras' => '36490.00001 00000.000000 00000.000000 1 90000000008990',
+            'nome_empresa' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
+            'telefone_empresa' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
+            'whatsapp_empresa' => CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736'),
+            'ano_atual' => date('Y'),
+        ], $custom);
+    }
+
+    /**
+     * Renderiza a pré-visualização em tempo real do template encapsulado no layout master responsivo
+     */
+    public static function renderPreview(string $chaveTemplate, ?string $corpoCustom = null, ?string $assuntoCustom = null): string
+    {
+        $dados = self::getDadosSimulados();
+        $assunto = $assuntoCustom ?: self::getAssunto($chaveTemplate);
+        $corpo = $corpoCustom !== null ? $corpoCustom : self::getCorpo($chaveTemplate);
+        $dados['assunto'] = self::preencherTags($assunto, $dados);
+
+        return self::compilarHtml($corpo, $dados);
+    }
+
+    /**
+     * Envolve o conteúdo no layout HTML oficial responsivo da Foco 7
      */
     public static function compilarHtml(string $conteudo, array $dados): string
     {
         $corpoProcessado = self::preencherTags($conteudo, $dados);
         $nomeEmpresa = CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança');
         $whatsapp = CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736');
-        $ano = date('Y');
+        $assunto = $dados['assunto'] ?? ($dados['titulo'] ?? $nomeEmpresa);
 
+        if (view()->exists('emails.layouts.master')) {
+            return view('emails.layouts.master', [
+                'corpo' => $corpoProcessado,
+                'nomeEmpresa' => $nomeEmpresa,
+                'whatsapp' => $whatsapp,
+                'assunto' => $assunto,
+            ])->render();
+        }
+
+        // Fallback seguro caso a view esteja em processo de compilação
+        $ano = date('Y');
         return <<<HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{$nomeEmpresa}</title>
+    <title>{$assunto}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e293b;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 25px 10px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
-                    <!-- CABEÇALHO COM IDENTIDADE FOCO 7 -->
+                <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 28px 32px; text-align: center; border-bottom: 3px solid #d90000;">
-                            <div style="font-size: 26px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">
-                                <span style="color: #d90000;">FOCO</span> 7
-                            </div>
-                            <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 2px; margin-top: 4px;">
-                                Rastreamento &amp; Segurança Veicular
-                            </div>
+                        <td style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 24px 28px; text-align: center; border-bottom: 4px solid #d90000;">
+                            <div style="font-size: 26px; font-weight: 900; color: #ffffff;"><span style="color: #d90000;">FOCO</span> 7</div>
                         </td>
                     </tr>
-                    <!-- CORPO DA MENSAGEM -->
                     <tr>
-                        <td style="padding: 36px 32px; font-size: 15px; line-height: 1.6; color: #334155;">
+                        <td style="padding: 32px 28px; font-size: 15px; line-height: 1.65; color: #334155;">
                             {$corpoProcessado}
                         </td>
                     </tr>
-                    <!-- RODAPÉ OFICIAL -->
                     <tr>
-                        <td style="background-color: #f8fafc; padding: 24px 32px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
-                            <p style="margin: 0 0 6px 0; font-weight: 700; color: #334155;">{$nomeEmpresa}</p>
-                            <p style="margin: 0 0 8px 0;">Central 24h &bull; WhatsApp de Suporte: <strong>{$whatsapp}</strong></p>
-                            <p style="margin: 0; font-size: 11px; color: #94a3b8;">&copy; {$ano} Todos os direitos reservados. Mensagem automática do portal de segurança.</p>
+                        <td style="background-color: #0f172a; padding: 22px 28px; text-align: center; border-top: 1px solid #1e293b; font-size: 12px; color: #94a3b8;">
+                            <p style="margin: 0 0 6px 0; font-weight: 700; color: #f8fafc;">{$nomeEmpresa}</p>
+                            <p style="margin: 0; font-size: 11px;">&copy; {$ano} Todos os direitos reservados.</p>
                         </td>
                     </tr>
                 </table>
@@ -151,13 +245,61 @@ HTML;
     }
 
     /**
+     * Envia qualquer e-mail direto ou do sistema utilizando obrigatoriamente o layout responsivo master
+     */
+    public static function enviarDireto(string $destinatario, string $assunto, string $corpoHtml, array $dados = []): bool
+    {
+        $dadosCompletos = array_merge(self::getDadosSimulados(), $dados);
+        $assuntoProcessado = self::preencherTags($assunto, $dadosCompletos);
+        $dadosCompletos['assunto'] = $assuntoProcessado;
+        $htmlCompleto = self::compilarHtml($corpoHtml, $dadosCompletos);
+
+        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'smtp.foco7.com.br'));
+        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 587));
+        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'contato@foco7.com.br'));
+        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', ''));
+        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
+        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'contato@foco7.com.br'));
+        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7'));
+
+        if (empty($host) || empty($username)) {
+            return false;
+        }
+
+        try {
+            Config::set('mail.mailers.smtp_foco7', [
+                'transport' => 'smtp',
+                'host' => $host,
+                'port' => $port,
+                'encryption' => ($encryption === 'nenhum' || empty($encryption)) ? null : $encryption,
+                'username' => $username,
+                'password' => $password,
+                'timeout' => 10,
+            ]);
+
+            Mail::mailer('smtp_foco7')->html($htmlCompleto, function ($message) use ($destinatario, $fromAddress, $fromName, $assuntoProcessado) {
+                $message->to($destinatario)
+                        ->from($fromAddress, $fromName)
+                        ->subject($assuntoProcessado);
+            });
+
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    /**
      * Envia um e-mail transacional usando a configuração SMTP do sistema
      */
     public static function enviar(string $destinatario, string $chaveTemplate, array $dados): bool
     {
-        $assunto = self::preencherTags(self::getAssunto($chaveTemplate), $dados);
+        $dadosCompletos = array_merge(self::getDadosSimulados(), $dados);
+        $assunto = self::preencherTags(self::getAssunto($chaveTemplate), $dadosCompletos);
+        $dadosCompletos['assunto'] = $assunto;
         $corpoRaw = self::getCorpo($chaveTemplate);
-        $htmlCompleto = self::compilarHtml($corpoRaw, $dados);
+        $htmlCompleto = self::compilarHtml($corpoRaw, $dadosCompletos);
 
         // Carrega configurações SMTP do CMS
         $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'smtp.foco7.com.br'));
@@ -198,25 +340,15 @@ HTML;
     }
 
     /**
-     * Dispara um e-mail de teste com dados simulados
+     * Dispara um e-mail de teste com dados simulados ou conteúdo personalizado de rascunho
      */
-    public static function enviarTeste(string $destinatario, string $chaveTemplate): array
+    public static function enviarTeste(string $destinatario, string $chaveTemplate, ?string $corpoCustom = null, ?string $assuntoCustom = null): array
     {
-        $dadosSimulados = [
-            'cliente_nome' => 'Marcelo Silva (Demonstração)',
-            'cliente_email' => $destinatario,
-            'fatura_id' => 'FAT-20261009-TESTE',
-            'plano_nome' => 'FOCO7 PLUS - Rastreamento Completo',
-            'valor' => 'R$ 59,90',
-            'data_vencimento' => date('d/m/Y', strtotime('+3 days')),
-            'link_fatura' => url('/cliente/faturas'),
-            'link_carne' => url('/cliente/faturas'),
-            'pix_copia_cola' => '00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540559.905802BR5915FOCO 7 SISTEMAS6009BELEM62070503FAT6304ABCD',
-            'codigo_barras' => '36490.00001 00000.000000 00000.000000 1 90000000005990',
-        ];
+        $dadosSimulados = self::getDadosSimulados(['cliente_email' => $destinatario]);
 
-        $assunto = self::preencherTags(self::getAssunto($chaveTemplate), $dadosSimulados);
-        $corpoRaw = self::getCorpo($chaveTemplate);
+        $assunto = $assuntoCustom ? self::preencherTags($assuntoCustom, $dadosSimulados) : self::preencherTags(self::getAssunto($chaveTemplate), $dadosSimulados);
+        $dadosSimulados['assunto'] = $assunto;
+        $corpoRaw = $corpoCustom !== null ? $corpoCustom : self::getCorpo($chaveTemplate);
         $htmlCompleto = self::compilarHtml($corpoRaw, $dadosSimulados);
 
         $host = CmsSetting::get('mail_host', env('MAIL_HOST', ''));
@@ -258,7 +390,7 @@ HTML;
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Erro ao enviar e-mail via SMTP: ' . $e->getMessage(),
+                'message' => 'Erro ao enviar e-mail de teste: ' . $e->getMessage(),
             ];
         }
     }

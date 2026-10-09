@@ -150,6 +150,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/gerar-carne', [GatewaysController::class, 'gerarCarne'])->name('admin.gateways.gerar_carne');
         Route::post('/email-teste', [GatewaysController::class, 'enviarEmailTeste'])->name('admin.gateways.email_teste');
         Route::post('/salvar-email', [GatewaysController::class, 'salvarTemplateEmail'])->name('admin.gateways.salvar_email');
+        Route::post('/criar-template-email', [GatewaysController::class, 'criarEmailTemplate'])->name('admin.gateways.criar_email_template');
+        Route::delete('/excluir-template-email/{chave}', [GatewaysController::class, 'excluirEmailTemplate'])->name('admin.gateways.excluir_email_template');
+        Route::post('/preview-email', [GatewaysController::class, 'previewEmail'])->name('admin.gateways.preview_email');
         Route::post('/executar-cron', [GatewaysController::class, 'executarCron'])->name('admin.gateways.executar_cron');
     });
 

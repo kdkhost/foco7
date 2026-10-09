@@ -163,9 +163,28 @@ class ConfiguracoesController extends Controller
             Config::set('mail.from.name', $fromName);
 
             $dataHora = date('d/m/Y H:i:s');
-            $corpo = "Este é um e-mail de teste disparado pelo Sistema Foco 7 para validar a integridade da conexão SMTP.\n\nData e Hora: {$dataHora}\nHost: {$host}:{$port}\nCriptografia: {$encryption}\nRemetente: {$fromName} <{$fromAddress}>\n\nSe você recebeu este e-mail, as configurações estão 100% operacionais!";
+            $corpoHtml = "
+                <div style='text-align: center; margin-bottom: 24px;'>
+                    <span style='background-color: #dcfce7; color: #166534; padding: 6px 18px; border-radius: 50px; font-weight: 800; font-size: 13px; display: inline-block; border: 1px solid #bbf7d0;'>
+                        ✓ SERVIDOR SMTP CONECTADO COM SUCESSO
+                    </span>
+                </div>
+                <h3 style='color: #0f172a; margin-bottom: 12px;'>Validação de Comunicação por E-mail</h3>
+                <p>Este é um e-mail de teste disparado pelo <strong>Sistema Foco 7</strong> para certificar a integridade das credenciais SMTP e a entrega via layout responsivo padronizado.</p>
+                <div class='info-card'>
+                    <p style='margin: 0 0 6px 0;'><strong>Data e Hora do Envio:</strong> {$dataHora}</p>
+                    <p style='margin: 0 0 6px 0;'><strong>Host Conectado:</strong> {$host}:{$port}</p>
+                    <p style='margin: 0 0 6px 0;'><strong>Criptografia:</strong> {$encryption}</p>
+                    <p style='margin: 0;'><strong>Remetente Oficial:</strong> {$fromName} &lt;{$fromAddress}&gt;</p>
+                </div>
+                <p>Todas as notificações do sistema (faturas, carnês, pagamentos e avisos de segurança) estão configuradas para utilizar este canal oficial com entrega em formato responsivo para todos os dispositivos.</p>
+            ";
 
-            Mail::mailer('smtp_teste')->raw($corpo, function ($message) use ($destinatario, $fromAddress, $fromName) {
+            $htmlCompleto = \App\Services\EmailTemplateService::compilarHtml($corpoHtml, [
+                'assunto' => '✅ Teste de Conexão SMTP - Foco 7 Rastreamento',
+            ]);
+
+            Mail::mailer('smtp_teste')->html($htmlCompleto, function ($message) use ($destinatario, $fromAddress, $fromName) {
                 $message->to($destinatario)
                         ->from($fromAddress, $fromName)
                         ->subject('✅ Teste de Conexão SMTP - Foco 7 Rastreamento');

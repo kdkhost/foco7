@@ -62,6 +62,7 @@
                 callbacks: {
                     onChange: function (contents) {
                         $textarea.val(contents);
+                        $textarea.trigger('change').trigger('input').trigger('summernote.change', [contents]);
                     },
                     onInit: function () {
                         // Aplica classes do bootstrap para harmonia estética

@@ -348,6 +348,71 @@ class GatewaysController extends Controller
     }
 
     /**
+     * Cria um novo template de e-mail personalizado com suporte a preview em tempo real
+     */
+    public function criarEmailTemplate(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:100',
+            'chave' => 'nullable|string|max:50',
+            'descricao' => 'nullable|string|max:255',
+            'assunto' => 'required|string|max:200',
+            'corpo' => 'required|string',
+        ]);
+
+        $nome = $request->input('nome');
+        $chave = $request->input('chave') ?: \Illuminate\Support\Str::slug($nome, '_');
+        $descricao = $request->input('descricao') ?: 'Template de e-mail personalizado';
+        $assunto = $request->input('assunto');
+        $corpo = $request->input('corpo');
+
+        EmailTemplateService::salvarTemplateCustomizado($chave, $nome, $descricao, $assunto, $corpo);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Template '{$nome}' criado com sucesso!",
+            'chave' => $chave,
+        ]);
+    }
+
+    /**
+     * Exclui um template customizado
+     */
+    public function excluirEmailTemplate(string $chave)
+    {
+        $removido = EmailTemplateService::excluirTemplateCustomizado($chave);
+
+        if ($removido) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Template personalizado removido com sucesso!',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Templates nativos do sistema não podem ser removidos.',
+        ], 422);
+    }
+
+    /**
+     * Retorna a pré-visualização completa em tempo real no layout responsivo oficial
+     */
+    public function previewEmail(Request $request)
+    {
+        $chave = $request->input('template_chave', 'fatura_gerada');
+        $assunto = $request->input('assunto');
+        $corpo = $request->input('corpo');
+
+        $html = EmailTemplateService::renderPreview($chave, $corpo, $assunto);
+
+        return response()->json([
+            'success' => true,
+            'html' => $html,
+        ]);
+    }
+
+    /**
      * Dispara um e-mail de teste para validar a formatação do template
      */
     public function enviarEmailTeste(Request $request)
@@ -359,8 +424,10 @@ class GatewaysController extends Controller
 
         $chave = $request->input('template_chave');
         $email = $request->input('email_destinatario');
+        $corpo = $request->input('corpo');
+        $assunto = $request->input('assunto');
 
-        $resultado = EmailTemplateService::enviarTeste($email, $chave);
+        $resultado = EmailTemplateService::enviarTeste($email, $chave, $corpo, $assunto);
 
         return response()->json($resultado);
     }

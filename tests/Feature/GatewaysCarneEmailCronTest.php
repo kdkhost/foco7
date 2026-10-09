@@ -170,4 +170,76 @@ class GatewaysCarneEmailCronTest extends TestCase
         $lastRun = CmsSetting::get('cron_last_run_verificar_vencidas');
         $this->assertNotEmpty($lastRun);
     }
+
+    public function test_rota_unica_de_email_compila_layout_responsivo_master(): void
+    {
+        $corpo = '<p>Prezado {cliente_nome}, informamos que seu pagamento de {valor} foi confirmado.</p>';
+        $dados = [
+            'cliente_nome' => 'Marcos Vinicius',
+            'valor' => 'R$ 89,90',
+            'assunto' => 'Confirmação de Pagamento',
+        ];
+
+        $html = \App\Services\EmailTemplateService::compilarHtml($corpo, $dados);
+
+        // Deve conter os elementos mandatórios do layout responsivo master
+        $this->assertStringContainsString('Marcos Vinicius', $html);
+        $this->assertStringContainsString('R$ 89,90', $html);
+        $this->assertStringContainsString('FOCO</span> 7', $html);
+        $this->assertStringContainsString('max-width: 620px', $html);
+        $this->assertStringContainsString('@media only screen and (max-width: 620px)', $html);
+        $this->assertStringContainsString('Suporte', $html);
+        $this->assertStringContainsString('WhatsApp', $html);
+        $this->assertStringContainsString('Todos os direitos reservados', $html);
+    }
+
+    public function test_preview_email_retorna_html_responsivo_via_ajax(): void
+    {
+        $payload = [
+            'template_chave' => 'fatura_gerada',
+            'assunto' => 'Preview Teste Dinâmico - {cliente_nome}',
+            'corpo' => '<p>Olá <strong>{cliente_nome}</strong>, fatura #{fatura_id} gerada com sucesso!</p>',
+        ];
+
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/gateways/preview-email', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+        $response->assertJsonStructure(['success', 'html']);
+
+        $html = $response->json('html');
+        $this->assertStringContainsString('Carlos Alberto Silva (Demonstração)', $html);
+        $this->assertStringContainsString('wrapper-table', $html);
+        $this->assertStringContainsString('@media only screen and (max-width: 620px)', $html);
+    }
+
+    public function test_admin_cria_e_exclui_template_personalizado_com_preview(): void
+    {
+        // Criação de template personalizado
+        $payload = [
+            'nome' => 'Boas-Vindas Novo Associado',
+            'chave' => 'boas_vindas_associado',
+            'descricao' => 'Disparado logo após a ativação do rastreador',
+            'assunto' => '🎉 Seja bem-vindo à Foco 7, {cliente_nome}!',
+            'corpo' => '<p>Parabéns {cliente_nome}! Seu veículo agora está sob proteção 24h.</p>',
+        ];
+
+        $resCriar = $this->actingAs($this->adminUser)->postJson('/admin/gateways/criar-template-email', $payload);
+        $resCriar->assertStatus(200);
+        $resCriar->assertJson(['success' => true]);
+
+        // Verifica se o template aparece na lista
+        $templates = \App\Services\EmailTemplateService::getTemplates();
+        $this->assertArrayHasKey('boas_vindas_associado', $templates);
+        $this->assertEquals('Boas-Vindas Novo Associado', $templates['boas_vindas_associado']['nome']);
+
+        // Exclusão do template personalizado
+        $resExcluir = $this->actingAs($this->adminUser)->deleteJson('/admin/gateways/excluir-template-email/boas_vindas_associado');
+        $resExcluir->assertStatus(200);
+        $resExcluir->assertJson(['success' => true]);
+
+        // Templates do sistema não podem ser excluídos
+        $resExcluirNativo = $this->actingAs($this->adminUser)->deleteJson('/admin/gateways/excluir-template-email/fatura_gerada');
+        $resExcluirNativo->assertStatus(422);
+    }
 }
