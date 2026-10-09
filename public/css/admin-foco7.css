@@ -332,4 +332,54 @@ body.dark-mode .note-dropdown-menu a:hover {
     color: #ffffff !important;
 }
 
+/* ==============================================================================
+   HARMONIZAÇÃO GLOBAL DARK MODE (CARDS, HEADERS, BG-LIGHT, TEXT-DARK)
+   ============================================================================== */
+[data-bs-theme="dark"] .bg-light,
+body.dark-mode .bg-light,
+[data-bs-theme="dark"] .card-header.bg-light,
+body.dark-mode .card-header.bg-light,
+[data-bs-theme="dark"] .card.bg-light,
+body.dark-mode .card.bg-light {
+    background-color: #1e2638 !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .text-dark,
+body.dark-mode .text-dark {
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .card-header .text-dark,
+body.dark-mode .card-header .text-dark {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .alert-light,
+body.dark-mode .alert-light {
+    background-color: #182030 !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .table-light,
+body.dark-mode .table-light,
+[data-bs-theme="dark"] .table-light th,
+body.dark-mode .table-light th,
+[data-bs-theme="dark"] .table-light td,
+body.dark-mode .table-light td {
+    background-color: #1a2234 !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .form-control.bg-light,
+body.dark-mode .form-control.bg-light {
+    background-color: #131926 !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+
 

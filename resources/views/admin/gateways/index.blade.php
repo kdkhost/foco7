@@ -167,8 +167,8 @@
 
                     <!-- MÉTODOS DE PAGAMENTO E WEBHOOK -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-2">
-                            <span class="fw-bold small text-dark"><i class="fas fa-sliders-h me-1"></i> Métodos Aceitos & Webhook de Retorno</span>
+                        <div class="card-header bg-body-tertiary py-2">
+                            <span class="fw-bold small text-body"><i class="fas fa-sliders-h me-1"></i> Métodos Aceitos & Webhook de Retorno</span>
                         </div>
                         <div class="card-body p-4">
                             <div class="row g-3">
@@ -197,7 +197,7 @@
                                 <div class="col-12">
                                     <label class="form-label small fw-bold">URL de Webhook para Cadastro no Mercado Pago:</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-light font-monospace" value="{{ $webhookUrlMp }}" readonly id="urlWebhookMp">
+                                        <input type="text" class="form-control bg-body-secondary font-monospace" value="{{ $webhookUrlMp }}" readonly id="urlWebhookMp">
                                         <button class="btn btn-outline-secondary" type="button" onclick="copiarTexto('urlWebhookMp')"><i class="fas fa-copy me-1"></i> Copiar URL</button>
                                     </div>
                                 </div>
@@ -234,7 +234,7 @@
                     </div>
 
                     <!-- SELETOR DINÂMICO DE AMBIENTE EFÍ PRO -->
-                    <div class="card bg-light border mb-4">
+                    <div class="card bg-body-tertiary border mb-4">
                         <div class="card-body p-3">
                             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                                 <div>
@@ -422,7 +422,7 @@
                                 <div class="col-12">
                                     <label class="form-label small fw-bold">URL de Webhook Efí PRO (PIX):</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-light font-monospace" value="{{ $webhookUrlEfi }}" readonly id="urlWebhookEfi">
+                                        <input type="text" class="form-control bg-body-secondary font-monospace" value="{{ $webhookUrlEfi }}" readonly id="urlWebhookEfi">
                                         <button class="btn btn-outline-secondary" type="button" onclick="copiarTexto('urlWebhookEfi')"><i class="fas fa-copy me-1"></i> Copiar URL</button>
                                     </div>
                                 </div>
@@ -446,7 +446,7 @@
                     <!-- CONFIGURAÇÕES DE CARNÊ -->
                     <div class="col-lg-6">
                         <div class="card border h-100">
-                            <div class="card-header bg-light py-3">
+                            <div class="card-header bg-body-tertiary py-3">
                                 <h6 class="fw-bold mb-0 text-success"><i class="fas fa-cog me-2"></i> Parâmetros de Carnê de Mensalidades</h6>
                             </div>
                             <div class="card-body p-4">
