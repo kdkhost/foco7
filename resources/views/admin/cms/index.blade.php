@@ -721,16 +721,13 @@
                                     <div class="col-12 mt-3">
                                         <label class="form-label small fw-bold"><i class="fas fa-image text-danger me-1"></i> Mockup / Imagem Personalizada do Celular (Opcional)</label>
                                         <p class="text-secondary small mb-2">Se nenhuma imagem for enviada, o sistema exibe o ícone mobile oficial com gradiente e estilo responsivo.</p>
-                                        <input type="file" name="app_mockup_upload" class="form-control" accept="image/png,image/jpeg,image/webp">
-                                        @if(!empty($settings['secao_app_mockup_imagem']))
-                                            <div class="d-flex align-items-center gap-3 mt-2 p-2 bg-light rounded border">
-                                                <img src="{{ asset($settings['secao_app_mockup_imagem']) }}" alt="Mockup App" style="max-height: 60px;">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="remover_app_mockup" value="1" id="rem_mockup">
-                                                    <label class="form-check-label small text-danger fw-bold" for="rem_mockup">Remover imagem personalizada (usar ícone padrão)</label>
-                                                </div>
-                                            </div>
-                                        @endif
+                                        <div class="foco-dropzone"
+                                             data-input-name="app_mockup_upload"
+                                             data-ratio="500 × 800 px (Vertical Celular)"
+                                             data-max-size="5MB"
+                                             data-accept="image/png,image/webp,image/jpeg"
+                                             data-current-preview="{{ !empty($settings['secao_app_mockup_imagem']) ? asset($settings['secao_app_mockup_imagem']) : '' }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -929,6 +926,9 @@
         $('#banner_id').val('');
         $('#formBannerSlide')[0].reset();
         window.clearSummernote('#banner_subtitulo');
+        if (window.FocoDropzone) {
+            window.FocoDropzone.reset('#formBannerSlide .foco-dropzone');
+        }
         $('#modalBannerTitulo').text('Novo Slide do Hero Carousel');
         new bootstrap.Modal(document.getElementById('modalBanner')).show();
     }
@@ -946,6 +946,11 @@
                 $('#banner_link_botao_1').val(b.link_botao_1);
                 $('#banner_texto_botao_2').val(b.texto_botao_2);
                 $('#banner_link_botao_2').val(b.link_botao_2);
+
+                if (window.FocoDropzone) {
+                    var imgUrl = res.imagem_url || (b.imagem ? ('/' + b.imagem.replace(/^\//, '')) : '');
+                    window.FocoDropzone.setPreview('#formBannerSlide .foco-dropzone', imgUrl);
+                }
 
                 $('#modalBannerTitulo').text('Editar Slide #' + b.id);
                 new bootstrap.Modal(document.getElementById('modalBanner')).show();
@@ -980,6 +985,9 @@
         $('#depoimento_id').val('');
         $('#formDepoimento')[0].reset();
         window.clearSummernote('#depoimento_texto');
+        if (window.FocoDropzone) {
+            window.FocoDropzone.reset('#formDepoimento .foco-dropzone');
+        }
         $('#modalDepoimentoTitulo').text('Novo Depoimento');
         new bootstrap.Modal(document.getElementById('modalDepoimento')).show();
     }
@@ -994,6 +1002,11 @@
                 $('#depoimento_veiculo').val(d.veiculo);
                 $('#depoimento_estrelas').val(d.estrelas);
                 window.setSummernoteContent('#depoimento_texto', d.texto || '');
+
+                if (window.FocoDropzone) {
+                    var fotoUrl = res.foto_url || (d.foto ? ('/' + d.foto.replace(/^\//, '')) : '');
+                    window.FocoDropzone.setPreview('#formDepoimento .foco-dropzone', fotoUrl);
+                }
 
                 $('#modalDepoimentoTitulo').text('Editar Depoimento: ' + d.nome_cliente);
                 new bootstrap.Modal(document.getElementById('modalDepoimento')).show();

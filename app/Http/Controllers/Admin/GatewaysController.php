@@ -258,8 +258,11 @@ class GatewaysController extends Controller
         }
 
         // Certificado Sandbox
-        if ($request->boolean('remover_efi_cert_sandbox')) {
+        if ($request->boolean('remover_efi_cert_sandbox') || $request->boolean('remover_efi_certificado_sandbox')) {
             CmsSetting::set('efi_certificado_pem_sandbox', '', 'gateways');
+            if ($efiAmbiente === 'sandbox') {
+                CmsSetting::set('efi_certificado_pem', '', 'gateways');
+            }
         }
         if ($request->hasFile('efi_certificado_sandbox')) {
             $file = $request->file('efi_certificado_sandbox');
@@ -274,8 +277,11 @@ class GatewaysController extends Controller
         }
 
         // Certificado Produção
-        if ($request->boolean('remover_efi_cert_prod')) {
+        if ($request->boolean('remover_efi_cert_prod') || $request->boolean('remover_efi_certificado_prod')) {
             CmsSetting::set('efi_certificado_pem_prod', '', 'gateways');
+            if ($efiAmbiente === 'producao') {
+                CmsSetting::set('efi_certificado_pem', '', 'gateways');
+            }
         }
         if ($request->hasFile('efi_certificado_prod')) {
             $file = $request->file('efi_certificado_prod');

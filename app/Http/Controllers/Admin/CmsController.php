@@ -64,7 +64,7 @@ class CmsController extends Controller
         if ($request->hasFile('app_mockup_upload')) {
             $path = $request->file('app_mockup_upload')->store('uploads/app', 'public');
             $dados['secao_app_mockup_imagem'] = '/storage/' . $path;
-        } elseif ($request->boolean('remover_app_mockup')) {
+        } elseif ($request->boolean('remover_app_mockup') || $request->boolean('remover_app_mockup_upload')) {
             $dados['secao_app_mockup_imagem'] = '';
         }
 

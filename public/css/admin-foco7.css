@@ -114,24 +114,44 @@ body.dark-mode .modal-content {
    COMPONENTE GLOBAL DE UPLOAD FOCO 7 (ARRASTA E SOLTA / DRAG & DROP)
    ============================================================================== */
 .foco-dropzone-box {
-    border: 2px dashed rgba(255, 255, 255, 0.22);
+    border: 2px dashed #cbd5e1;
     border-radius: 12px;
-    background: rgba(18, 22, 31, 0.6);
+    background: #f8fafc;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
 }
 
+.foco-dropzone-box .foco-dropzone-title {
+    color: #1e293b;
+}
+
+.card.bg-dark .foco-dropzone-box,
+[data-bs-theme="dark"] .foco-dropzone-box {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(18, 22, 31, 0.6);
+}
+
+.card.bg-dark .foco-dropzone-box .foco-dropzone-title,
+[data-bs-theme="dark"] .foco-dropzone-box .foco-dropzone-title {
+    color: #ffffff;
+}
+
 .foco-dropzone-box:hover {
     border-color: rgba(217, 0, 0, 0.6);
+    background: #f1f5f9;
+}
+
+.card.bg-dark .foco-dropzone-box:hover,
+[data-bs-theme="dark"] .foco-dropzone-box:hover {
     background: rgba(25, 30, 42, 0.8);
 }
 
 .foco-dropzone-box.is-dragover {
     border-color: var(--admin-primary) !important;
-    background: rgba(217, 0, 0, 0.12) !important;
-    box-shadow: 0 0 20px rgba(217, 0, 0, 0.3);
+    background: rgba(217, 0, 0, 0.08) !important;
+    box-shadow: 0 0 20px rgba(217, 0, 0, 0.25);
     transform: scale(1.01);
 }
 
@@ -145,8 +165,8 @@ body.dark-mode .modal-content {
 
 .foco-preview-img {
     max-width: 100%;
-    background: #0a0c10;
-    padding: 6px;
+    background: transparent;
+    padding: 4px;
 }
 
 /* ==============================================================================

@@ -296,17 +296,14 @@
                                         <input type="text" name="efi_chave_pix_sandbox" class="form-control" value="{{ $configs['efi_chave_pix_sandbox'] }}" placeholder="Chave de testes gerada na Efí">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Certificado .PEM (Sandbox)</label>
-                                        @if(!empty($configs['efi_certificado_pem_sandbox']))
-                                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 bg-light border rounded">
-                                                <span class="small font-monospace text-success"><i class="fas fa-file-code me-1"></i> {{ $configs['efi_certificado_pem_sandbox'] }}</span>
-                                                <div class="form-check m-0">
-                                                    <input class="form-check-input" type="checkbox" name="remover_efi_cert_sandbox" value="1" id="rem_cert_sb">
-                                                    <label class="form-check-label small text-danger" for="rem_cert_sb">Remover</label>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <input type="file" name="efi_certificado_sandbox" class="form-control form-control-sm" accept=".pem">
+                                        <label class="form-label small fw-bold"><i class="fas fa-file-code text-warning me-1"></i> Certificado .PEM (Sandbox / Homologação)</label>
+                                        <div class="foco-dropzone"
+                                             data-input-name="efi_certificado_sandbox"
+                                             data-ratio="Certificado Oficial .PEM"
+                                             data-max-size="2MB"
+                                             data-accept=".pem"
+                                             data-current-preview="{{ !empty($configs['efi_certificado_pem_sandbox']) ? $configs['efi_certificado_pem_sandbox'] : '' }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -337,17 +334,14 @@
                                         <input type="text" name="efi_chave_pix_prod" class="form-control" value="{{ $configs['efi_chave_pix_prod'] }}" placeholder="Chave EVP, CNPJ, Telefone ou E-mail da Foco 7">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Certificado Oficial .PEM (Produção) *</label>
-                                        @if(!empty($configs['efi_certificado_pem_prod']))
-                                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 bg-light border rounded">
-                                                <span class="small font-monospace text-success"><i class="fas fa-certificate text-success me-1"></i> {{ $configs['efi_certificado_pem_prod'] }}</span>
-                                                <div class="form-check m-0">
-                                                    <input class="form-check-input" type="checkbox" name="remover_efi_cert_prod" value="1" id="rem_cert_prod">
-                                                    <label class="form-check-label small text-danger" for="rem_cert_prod">Remover</label>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <input type="file" name="efi_certificado_prod" class="form-control form-control-sm" accept=".pem">
+                                        <label class="form-label small fw-bold"><i class="fas fa-certificate text-success me-1"></i> Certificado Oficial .PEM (Produção) *</label>
+                                        <div class="foco-dropzone"
+                                             data-input-name="efi_certificado_prod"
+                                             data-ratio="Certificado Oficial .PEM"
+                                             data-max-size="2MB"
+                                             data-accept=".pem"
+                                             data-current-preview="{{ !empty($configs['efi_certificado_pem_prod']) ? $configs['efi_certificado_pem_prod'] : '' }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -49,6 +49,8 @@ class SeoController extends Controller
         if ($request->hasFile('og_image_upload')) {
             $path = $request->file('og_image_upload')->store('uploads/seo', 'public');
             $validated['og_image'] = '/storage/' . $path;
+        } elseif ($request->boolean('remover_og_image_upload') || $request->boolean('remover_og_image')) {
+            $validated['og_image'] = '';
         }
 
         $score = $this->calcularScore(

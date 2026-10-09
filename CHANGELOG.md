@@ -3,6 +3,21 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.6.6] - 2026-10-09
+
+### 📤 Padronização Global de Uploads (Arrasta e Solta / foco-dropzone)
+- **Eliminação Total de Inputs Legados de Upload:**
+  - **Varredura Completa no Sistema:** Substituídos todos os campos de upload que ainda utilizavam `<input type="file">` básico pelo componente oficial `foco-dropzone`.
+  - **Certificados Digitais .PEM da Efí PRO (`/admin/gateways`):** Ambos os campos de envio de certificado (Sandbox e Produção) agora utilizam a caixa interativa com arrasta e solta, exibição de ícone de certificado/chave criptográfica, indicação de arquivo anexado e botão de remoção sincronizado via AJAX.
+  - **Mockup do Aplicativo Mobile (`/admin/cms`):** A seção de tecnologia mobile teve seu campo de screenshot/mockup migrado para `foco-dropzone` com preview vertical em tempo real (500x800).
+  - **Imagem de Compartilhamento Open Graph (`/admin/seo`):** O upload da imagem para redes sociais (1200x630) foi totalmente padronizado com proporção social, pré-visualização instantânea e detecção dimensional em pixels.
+- **Aprimoramentos no Componente Global (`global-dropzone.js` & `admin-foco7.css`):**
+  - **Suporte Híbrido a Imagens e Arquivos Não-Imagem:** Renderização inteligente de previews gráficos para imagens e blocos estilizados com nome e extensão para arquivos técnicos (`.pem`, `.pdf`).
+  - **Adaptação Cromática Claro/Escuro:** Ajuste automático de bordas tracejadas, fundos e tipografia contrastante em containers de tema claro (`#f8fafc`) e escuro (`rgba(18, 22, 31, 0.6)`).
+  - **Novos Helpers de API Global:** Disponibilizados `window.FocoDropzone.setPreview(selector, url, name)` e `window.FocoDropzone.reset(selector)` para controle programático fluido em modais dinâmicos (Banners, Depoimentos, etc.).
+
+---
+
 ## [1.6.5] - 2026-10-09
 
 ### 💳 Gateways, Cobrança por Carnê Efí, Templates de E-mail & Central de Cron

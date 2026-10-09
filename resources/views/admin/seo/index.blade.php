@@ -52,11 +52,14 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label small fw-bold">Imagem de Compartilhamento (OG Image - 1200x630)</label>
-                        <input type="file" name="og_image_upload" class="form-control" accept="image/*">
-                        @if(!empty($seo->og_image))
-                            <small class="text-secondary d-block mt-1">Imagem atual: <a href="{{ $seo->og_image }}" target="_blank">Ver imagem configurada</a></small>
-                        @endif
+                        <label class="form-label small fw-bold"><i class="fas fa-image text-danger me-1"></i> Imagem de Compartilhamento (OG Image - 1200x630)</label>
+                        <div class="foco-dropzone"
+                             data-input-name="og_image_upload"
+                             data-ratio="1200 × 630 px (Open Graph 1.91:1)"
+                             data-max-size="5MB"
+                             data-accept="image/png,image/jpeg,image/webp"
+                             data-current-preview="{{ !empty($seo->og_image) ? asset($seo->og_image) : '' }}">
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-danger w-100 py-3 fw-bold">
