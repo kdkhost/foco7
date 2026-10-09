@@ -5,6 +5,25 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.4.0] - 2026-10-09
+
+### ✨ Adicionado & Aprimorado
+- **Plano de Fundo Dinâmico & Controle de Opacidade do Hero Carousel:**
+  - Gerenciador completo integrado à aba *Banners & Slides* do CMS (`/admin/cms`).
+  - Upload de imagem de fundo panorâmica (1920×800px) com Drag & Drop e preview instantâneo.
+  - Slider interativo de controle de opacidade (0% a 100%) com mostrador dinâmico em tempo real.
+  - Seletor de cor da sobreposição (overlay) e desfoque gaussiano suave (blur de 0 a 15px).
+  - Pré-visualização ao vivo (*live preview box*) no painel administrativo simulando o contraste antes de salvar.
+  - Renderização otimizada no site oficial (`hero-bg-media` e `hero-bg-overlay`) com preservação total de legibilidade do texto e do simulador.
+- **Aprimoramento Visual dos Cards de Planos de Rastreamento:**
+  - Layout refinado com bordas harmonizadas, cantos arredondados (22px), sombras tridimensionais e efeito hover suave com elevação.
+  - **Checados Restaurados para a Cor Oficial:** Ícones da lista de recursos voltaram à cor vermelha característica da Foco 7 (`var(--foco-red)` / `#d90000`).
+  - Tag de destaque reluzente com ícone de fogo (`<i class="fas fa-fire"></i> MAIS ESCOLHIDO`) e gradiente avermelhado.
+  - Box de ícone com rotação e escala sutil ao passar o cursor, badges de adesão grátis estilizados e botões de alta conversão com micro-interações.
+- **Suíte de Testes Automatizados:** 17 testes passando com 100% de sucesso e 52 asserções.
+
+---
+
 ## [1.3.0] - 2026-10-08
 
 ### ✨ Adicionado & Aprimorado

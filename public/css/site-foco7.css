@@ -272,7 +272,7 @@ body {
 }
 
 /* ==============================================================================
-   4. HERO SECTION COM TEMA CLARO DE ALTA CONVERSÃO
+   4. HERO SECTION COM TEMA CLARO DE ALTA CONVERSÃO & CONTROLE DE OPACIDADE
    ============================================================================== */
 .hero-section {
     position: relative;
@@ -282,7 +282,55 @@ body {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 55%, #fff1f2 100%);
     border-bottom: 1px solid var(--foco-border);
     overflow: hidden;
-    padding: 80px 0 60px 0;
+    padding: 85px 0 65px 0;
+}
+
+.hero-bg-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 1;
+    pointer-events: none;
+    transition: filter 0.3s ease;
+}
+
+.hero-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.slide-custom-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.slide-custom-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .hero-section::before {
@@ -294,6 +342,7 @@ body {
     height: 600px;
     background: radial-gradient(circle, rgba(217, 0, 0, 0.05) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 2;
 }
 
 .hero-badge {
@@ -497,7 +546,7 @@ body {
    7. SEÇÃO PLANOS E PREÇOS (CARDS ESPAÇOSOS, ELEGANTES E DE ALTA CONVERSÃO)
    ============================================================================== */
 .section-planos {
-    padding: 90px 0;
+    padding: 95px 0;
     background: #ffffff;
     position: relative;
     border-bottom: 1px solid var(--foco-border);
@@ -505,102 +554,110 @@ body {
 
 .card-plano {
     background: #ffffff;
-    border: 1px solid var(--foco-border);
-    border-radius: 20px;
-    padding: 2.2rem 1.6rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 2.35rem 1.75rem;
     height: 100%;
     position: relative;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
-    transition: var(--foco-transition);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
 }
 
 .card-plano:hover {
-    transform: translateY(-6px);
+    transform: translateY(-7px);
     border-color: #cbd5e1;
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.09);
 }
 
 .card-plano.destaque {
     border: 2px solid var(--foco-red);
-    background: linear-gradient(180deg, #fffafa 0%, #ffffff 100%);
-    box-shadow: 0 12px 35px rgba(217, 0, 0, 0.1);
+    background: linear-gradient(180deg, #fff8f8 0%, #ffffff 100%);
+    box-shadow: 0 14px 38px rgba(217, 0, 0, 0.12), 0 0 0 1px rgba(217, 0, 0, 0.08);
 }
 
 .card-plano.destaque:hover {
-    box-shadow: 0 18px 45px rgba(217, 0, 0, 0.16);
+    transform: translateY(-9px);
+    box-shadow: 0 22px 50px rgba(217, 0, 0, 0.18), 0 0 0 1px var(--foco-red);
 }
 
 .tag-plano-destaque {
     position: absolute;
-    top: -13px;
+    top: -14px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, var(--foco-red) 0%, #b80000 100%);
     color: #ffffff;
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 800;
-    padding: 4px 16px;
-    border-radius: 20px;
-    letter-spacing: 0.8px;
+    padding: 5px 18px;
+    border-radius: 50px;
+    letter-spacing: 0.9px;
     text-transform: uppercase;
-    box-shadow: 0 4px 12px var(--foco-red-glow);
+    box-shadow: 0 4px 14px rgba(217, 0, 0, 0.35);
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .icone-plano-box {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
-    background: rgba(217, 0, 0, 0.08);
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(217, 0, 0, 0.07);
     color: var(--foco-red);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.45rem;
-    margin-bottom: 0.85rem;
-    transition: var(--foco-transition);
+    font-size: 1.55rem;
+    margin-bottom: 0.95rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(217, 0, 0, 0.12);
 }
 
 .card-plano:hover .icone-plano-box {
     background: var(--foco-red);
     color: #ffffff;
-    transform: scale(1.06);
-    box-shadow: 0 4px 12px var(--foco-red-glow);
+    transform: scale(1.08) rotate(-3deg);
+    box-shadow: 0 6px 18px var(--foco-red-glow);
+    border-color: var(--foco-red);
 }
 
 .plano-titulo {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: var(--foco-title);
     margin-bottom: 0.35rem;
+    letter-spacing: -0.3px;
 }
 
 .plano-subtitulo {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     color: var(--foco-muted);
-    min-height: 40px;
+    min-height: 42px;
     line-height: 1.45;
     margin-bottom: 0.5rem;
 }
 
 .bloco-preco {
     background: #f8fafc;
-    border-radius: 14px;
-    padding: 1rem 0.85rem;
-    margin: 0.75rem 0 1.25rem 0;
+    border-radius: 16px;
+    padding: 1.15rem 0.95rem;
+    margin: 0.85rem 0 1.35rem 0;
     border: 1px solid var(--foco-border-light);
     text-align: center;
+    transition: background-color 0.25s ease;
 }
 
 .card-plano.destaque .bloco-preco {
     background: #fff5f5;
-    border-color: rgba(217, 0, 0, 0.15);
+    border-color: rgba(217, 0, 0, 0.18);
 }
 
 .preco-valor {
-    font-size: 2.3rem;
+    font-size: 2.35rem;
     font-weight: 900;
     color: var(--foco-title);
     line-height: 1;
@@ -613,45 +670,50 @@ body {
 
 .preco-periodo {
     color: var(--foco-muted);
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.92rem;
+    font-weight: 700;
 }
 
 .badge-adesao {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 3px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.73rem;
+    font-weight: 800;
+    padding: 3px 12px;
     border-radius: 20px;
-    margin-top: 6px;
+    margin-top: 8px;
     letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 .badge-adesao-gratis {
     background: #dcfce7;
     color: #15803d;
+    border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
 .badge-adesao-paga {
     background: #f1f5f9;
     color: #64748b;
+    border: 1px solid #e2e8f0;
 }
 
 .recursos-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 1.75rem 0;
     flex-grow: 1;
 }
 
 .recursos-list li {
-    padding: 0.45rem 0;
+    padding: 0.52rem 0;
     display: flex;
     align-items: flex-start;
     gap: 0.65rem;
     color: #334155;
-    font-size: 0.86rem;
-    line-height: 1.4;
+    font-size: 0.87rem;
+    line-height: 1.45;
     border-bottom: 1px dashed rgba(226, 232, 240, 0.85);
 }
 
@@ -659,11 +721,26 @@ body {
     border-bottom: none;
 }
 
+/* Cor dos checados restaurada para o vermelho característico original da Foco 7 */
 .recursos-list li i {
-    color: #16a34a;
-    font-size: 0.9rem;
+    color: var(--foco-red) !important;
+    font-size: 0.95rem;
     margin-top: 2px;
     flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(217, 0, 0, 0.25));
+}
+
+.card-plano .btn-contratar {
+    font-size: 0.92rem;
+    letter-spacing: 0.4px;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.card-plano:not(.destaque) .btn-contratar:hover {
+    background: var(--foco-red);
+    color: #ffffff;
+    box-shadow: 0 6px 18px var(--foco-red-glow);
 }
 
 /* ==============================================================================

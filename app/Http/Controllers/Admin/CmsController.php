@@ -30,7 +30,7 @@ class CmsController extends Controller
      */
     public function salvarConfiguracoes(Request $request)
     {
-        $dados = $request->except(['_token', 'logo_upload', 'favicon_upload']);
+        $dados = $request->except(['_token', 'logo_upload', 'favicon_upload', 'hero_bg_upload', 'remover_hero_bg']);
 
         // Upload de Logo se enviado
         if ($request->hasFile('logo_upload')) {
@@ -42,6 +42,20 @@ class CmsController extends Controller
         if ($request->hasFile('favicon_upload')) {
             $path = $request->file('favicon_upload')->store('uploads/logos', 'public');
             $dados['site_favicon'] = '/storage/' . $path;
+        }
+
+        // Upload de Imagem de Fundo do Hero se enviada
+        if ($request->hasFile('hero_bg_upload')) {
+            $path = $request->file('hero_bg_upload')->store('uploads/banners', 'public');
+            $dados['hero_bg_imagem'] = '/storage/' . $path;
+        } elseif ($request->boolean('remover_hero_bg')) {
+            $dados['hero_bg_imagem'] = '';
+        }
+
+        // Validação e garantia de valor numérico para opacidade (0 a 100)
+        if ($request->has('hero_bg_opacidade')) {
+            $opacidade = (int) $request->input('hero_bg_opacidade', 85);
+            $dados['hero_bg_opacidade'] = max(0, min(100, $opacidade));
         }
 
         foreach ($dados as $chave => $valor) {

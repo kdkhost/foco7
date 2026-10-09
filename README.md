@@ -101,10 +101,10 @@ public_html/
 
 ### Módulo 2: Landing Page Única (Inspirada no SOS Rastreamento)
 - **Topo / Header Fixo:** Telefone, WhatsApp, Horário e botão de acesso à Área do Cliente.
-- **Hero Section Dinâmico:** Carrossel de alta conversão, chamada para ação e CTAs duplos.
+- **Hero Section Dinâmico:** Carrossel de alta conversão com controle de imagem e opacidade do plano de fundo pelo painel CMS (0% a 100%), preview em tempo real, chamada para ação e CTAs duplos.
 - **Problema vs Solução:** "O risco não avisa antes de chegar" com cards de riscos e soluções Foco 7.
 - **Quem Somos:** Autoridade de mais de uma década no mercado e abrangência no Norte e Nordeste.
-- **Planos e Preços:** Tabela comparativa e cards modernos para Carros, Motos, Frotas e Cargas.
+- **Planos e Preços:** Cards modernos de alta conversão para Carros, Motos, Frotas e Cargas com checados na cor oficial Foco 7 e checkout transparente integrado.
 - **Ronda Tática Foco 7 & Central 24h:** Fluxograma em 4 etapas ilustrando a velocidade de resposta.
 - **Recursos do App e Plataforma:** Visualização interativa das funcionalidades de rastreamento.
 - **6 Diferenciais:** Pilares de confiança da empresa.

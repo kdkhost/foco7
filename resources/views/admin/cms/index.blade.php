@@ -159,8 +159,120 @@
 
             <!-- ABA 3: BANNERS & SLIDES -->
             <div class="tab-pane fade" id="tab-banners" role="tabpanel">
+                <!-- SEÇÃO 1: PLANO DE FUNDO & CONTROLE DE OPACIDADE DO HERO -->
+                <div class="card border border-light-subtle shadow-sm mb-4 rounded-3 overflow-hidden">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="fas fa-sliders-h text-danger me-2"></i> Plano de Fundo & Controle de Opacidade do Hero Carousel
+                            </h5>
+                            <small class="text-secondary">Defina a imagem de fundo panorâmica e controle com precisão a opacidade da camada de sobreposição no site.</small>
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-semibold">
+                            <i class="fas fa-sliders text-danger me-1"></i> Controle Interativo
+                        </span>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formHeroBg">
+                            @csrf
+                            <div class="row g-4 align-items-center">
+                                <div class="col-lg-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-image text-danger me-1"></i> Imagem de Fundo Panorâmica (Hero Banner)
+                                    </label>
+                                    <div class="foco-dropzone"
+                                         data-input-name="hero_bg_upload"
+                                         data-ratio="1920 × 800 px (Panorâmica Alta Resolução)"
+                                         data-max-size="5MB"
+                                         data-accept="image/jpeg,image/png,image/webp"
+                                         data-current-preview="{{ !empty($settings['hero_bg_imagem']) ? asset($settings['hero_bg_imagem']) : '' }}">
+                                    </div>
+                                    @if(!empty($settings['hero_bg_imagem']))
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="remover_hero_bg" value="1" id="removerHeroBg">
+                                        <label class="form-check-label small text-danger fw-semibold" for="removerHeroBg">
+                                            <i class="fas fa-trash-alt me-1"></i> Remover imagem de fundo e voltar ao gradiente padrão
+                                        </label>
+                                    </div>
+                                    @endif
+                                </div>
+                                
+                                <div class="col-lg-6">
+                                    <!-- Controle Deslizante de Opacidade -->
+                                    <div class="p-3 rounded-3 bg-light border mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label for="hero_bg_opacidade" class="form-label fw-bold mb-0">
+                                                <i class="fas fa-adjust text-danger me-1"></i> Opacidade da Camada de Sobreposição:
+                                            </label>
+                                            <span id="badgeOpacidade" class="badge bg-danger fs-6 px-3 py-1">
+                                                {{ $settings['hero_bg_opacidade'] ?? 85 }}%
+                                            </span>
+                                        </div>
+                                        <input type="range" class="form-range" min="0" max="100" step="1"
+                                               name="hero_bg_opacidade" id="hero_bg_opacidade"
+                                               value="{{ $settings['hero_bg_opacidade'] ?? 85 }}"
+                                               oninput="atualizarPreviewOpacidade(this.value)">
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span>0% (Mais transparente / Foto nítida)</span>
+                                            <span class="fw-bold text-danger">Recomendado: 80%–90%</span>
+                                            <span>100% (Totalmente opaco)</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cor da Sobreposição & Efeito Desfoque -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small">Cor da Sobreposição (Overlay)</label>
+                                            <div class="input-group">
+                                                <input type="color" name="hero_overlay_cor" id="hero_overlay_cor"
+                                                       class="form-control form-control-color"
+                                                       value="{{ $settings['hero_overlay_cor'] ?? '#ffffff' }}"
+                                                       onchange="atualizarCorOverlay(this.value)">
+                                                <input type="text" class="form-control form-control-sm"
+                                                       id="hero_overlay_cor_text"
+                                                       value="{{ $settings['hero_overlay_cor'] ?? '#ffffff' }}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small">
+                                                Desfoque do Fundo (Blur): <span id="badgeBlur" class="badge bg-secondary">{{ $settings['hero_bg_blur'] ?? 0 }}px</span>
+                                            </label>
+                                            <input type="range" class="form-range" min="0" max="15" step="1"
+                                                   name="hero_bg_blur" id="hero_bg_blur"
+                                                   value="{{ $settings['hero_bg_blur'] ?? 0 }}"
+                                                   oninput="atualizarBlur(this.value)">
+                                        </div>
+                                    </div>
+
+                                    <!-- Mini Preview Interativo -->
+                                    <div class="mt-3">
+                                        <label class="form-label fw-bold small text-muted">Pré-visualização Instantânea do Contraste:</label>
+                                        <div id="heroPreviewBox" class="p-3 rounded-3 position-relative overflow-hidden border"
+                                             style="height: 110px; background-color: #f1f5f9; background-image: url('{{ !empty($settings['hero_bg_imagem']) ? asset($settings['hero_bg_imagem']) : asset('/img/og-foco7.jpg') }}'); background-size: cover; background-position: center;">
+                                            <div id="heroPreviewOverlay" class="position-absolute top-0 start-0 w-100 h-100"
+                                                 style="background-color: {{ $settings['hero_overlay_cor'] ?? '#ffffff' }}; opacity: {{ ((float)($settings['hero_bg_opacidade'] ?? 85)) / 100 }}; transition: opacity 0.15s ease;"></div>
+                                            <div class="position-relative" style="z-index: 2;">
+                                                <h6 class="fw-black mb-1 text-dark" id="heroPreviewText">Proteger hoje para que você viva o amanhã</h6>
+                                                <p class="small text-secondary mb-0">Monitoramento veicular 24h com Ronda Tática presencial.</p>
+                                                <span class="badge bg-danger mt-1">Simulação de Legibilidade</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 text-end pt-2 border-top">
+                                    <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                                        <i class="fas fa-save me-1"></i> SALVAR PLANO DE FUNDO & OPACIDADE
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: SLIDES DO HERO CAROUSEL -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Slides do Hero Carousel</h5>
+                    <h5 class="fw-bold mb-0">Slides Individuais do Hero Carousel</h5>
                     <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalBanner()">
                         <i class="fas fa-plus me-1"></i> Adicionar Novo Slide
                     </button>
@@ -471,6 +583,41 @@
                 });
             }
         );
+    }
+
+    // Controle em Tempo Real da Opacidade e Overlay do Hero
+    function atualizarPreviewOpacidade(val) {
+        var badge = document.getElementById('badgeOpacidade');
+        if (badge) badge.innerText = val + '%';
+        var decimal = (parseFloat(val) / 100);
+        var overlay = document.getElementById('heroPreviewOverlay');
+        if (overlay) {
+            overlay.style.opacity = decimal;
+        }
+    }
+
+    function atualizarCorOverlay(cor) {
+        var textInput = document.getElementById('hero_overlay_cor_text');
+        if (textInput) textInput.value = cor;
+        var overlay = document.getElementById('heroPreviewOverlay');
+        if (overlay) {
+            overlay.style.backgroundColor = cor;
+        }
+        var textTitle = document.getElementById('heroPreviewText');
+        if (textTitle) {
+            // Se cor for muito escura, ajusta contraste do texto do preview
+            var isDark = cor.toLowerCase() === '#000000' || cor.toLowerCase() === '#0b0f19';
+            textTitle.className = isDark ? 'fw-black mb-1 text-white' : 'fw-black mb-1 text-dark';
+        }
+    }
+
+    function atualizarBlur(val) {
+        var badge = document.getElementById('badgeBlur');
+        if (badge) badge.innerText = val + 'px';
+        var box = document.getElementById('heroPreviewBox');
+        if (box) {
+            box.style.filter = val > 0 ? 'blur(' + val + 'px)' : 'none';
+        }
     }
 </script>
 @endsection

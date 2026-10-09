@@ -125,4 +125,26 @@ class AdminPerfilEConfiguracoesTest extends TestCase
         $this->assertEquals('foco7@pix.com.br', CmsSetting::get('efi_chave_pix'));
         $this->assertEquals('5', CmsSetting::get('pix_desconto'));
     }
+
+    public function test_admin_consegue_salvar_controle_de_opacidade_e_configuracoes_do_hero_via_cms(): void
+    {
+        $responsePost = $this->actingAs($this->adminUser)->postJson('/admin/cms/configuracoes', [
+            'hero_bg_opacidade' => '75',
+            'hero_overlay_cor' => '#0b0f19',
+            'hero_bg_blur' => '3',
+        ]);
+
+        $responsePost->assertStatus(200);
+        $responsePost->assertJson(['success' => true]);
+
+        $this->assertEquals('75', CmsSetting::get('hero_bg_opacidade'));
+        $this->assertEquals('#0b0f19', CmsSetting::get('hero_overlay_cor'));
+        $this->assertEquals('3', CmsSetting::get('hero_bg_blur'));
+
+        // Verifica que a landing page pública reflete a configuração
+        $responseSite = $this->get('/');
+        $responseSite->assertStatus(200);
+        $responseSite->assertSee('hero-bg-overlay');
+        $responseSite->assertSee('opacity: 0.75');
+    }
 }

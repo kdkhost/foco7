@@ -60,6 +60,10 @@ class SiteController extends Controller
             'logo_dark' => $logoDark,
             'favicon' => $favicon,
             'cor_primaria' => CmsSetting::get('cor_primaria', '#d90000'),
+            'hero_bg_imagem' => CmsSetting::get('hero_bg_imagem', ''),
+            'hero_bg_opacidade' => (int) CmsSetting::get('hero_bg_opacidade', 85),
+            'hero_overlay_cor' => CmsSetting::get('hero_overlay_cor', '#ffffff'),
+            'hero_bg_blur' => (int) CmsSetting::get('hero_bg_blur', 0),
         ];
 
         return view('site.index', compact('slides', 'planos', 'faqs', 'depoimentos', 'seo', 'configs'));

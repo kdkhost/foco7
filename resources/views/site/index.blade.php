@@ -94,14 +94,30 @@
         </div>
     </nav>
 
-    <!-- 3. HERO SECTION COM CARROSSEL DE ALTA CONVERSÃO -->
-    <header class="hero-section">
-        <div class="container">
+    <!-- 3. HERO SECTION COM CARROSSEL DE ALTA CONVERSÃO & CONTROLE DE OPACIDADE DO CMS -->
+    @php
+        $heroBgImagem = !empty($configs['hero_bg_imagem']) ? asset($configs['hero_bg_imagem']) : '';
+        $heroOpacidadeDecimal = isset($configs['hero_bg_opacidade']) ? round(((float)$configs['hero_bg_opacidade'] / 100), 2) : 0.85;
+        $heroOverlayCor = $configs['hero_overlay_cor'] ?? '#ffffff';
+        $heroBlur = (int)($configs['hero_bg_blur'] ?? 0);
+    @endphp
+    <header class="hero-section" id="inicio">
+        <!-- Camada de Fundo Dinâmica do Hero com Imagem e Desfoque -->
+        <div class="hero-bg-media" style="@if(!empty($heroBgImagem)) background-image: url('{{ $heroBgImagem }}'); @endif {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
+        <!-- Camada de Sobreposição com Controle de Opacidade do Painel Admin -->
+        <div class="hero-bg-overlay" style="background-color: {{ $heroOverlayCor }}; opacity: {{ $heroOpacidadeDecimal }};"></div>
+
+        <div class="container position-relative" style="z-index: 3;">
             <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
                 <div class="carousel-inner">
                     @forelse($slides as $index => $slide)
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                        <div class="row align-items-center min-vh-50">
+                        @if(!empty($slide->imagem))
+                            <!-- Imagem e overlay de fundo individual deste slide -->
+                            <div class="slide-custom-bg" style="background-image: url('{{ asset($slide->imagem) }}');"></div>
+                            <div class="slide-custom-overlay" style="background-color: {{ $heroOverlayCor }}; opacity: {{ $heroOpacidadeDecimal }};"></div>
+                        @endif
+                        <div class="row align-items-center min-vh-50 position-relative" style="z-index: 2;">
                             <div class="col-lg-7">
                                 @if(!empty($slide->badge))
                                     <div class="hero-badge">
@@ -320,8 +336,10 @@
                 @foreach($planos as $plano)
                 <div class="col-xl-3 col-lg-6 col-md-6">
                     <div class="card-plano {{ $plano->destaque ? 'destaque' : '' }}">
-                        @if($plano->destaque && !empty($plano->tag_destaque))
-                            <div class="tag-plano-destaque">{{ $plano->tag_destaque }}</div>
+                        @if($plano->destaque)
+                            <div class="tag-plano-destaque">
+                                <i class="fas fa-fire me-1"></i> {{ !empty($plano->tag_destaque) ? $plano->tag_destaque : 'MAIS ESCOLHIDO' }}
+                            </div>
                         @endif
                         <div class="text-center">
                             <div class="icone-plano-box">
