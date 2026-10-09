@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('cliente.layouts.app')
 
 @section('title', 'Minhas Faturas')
 @section('page_title', 'Minhas Faturas & Mensalidades')
