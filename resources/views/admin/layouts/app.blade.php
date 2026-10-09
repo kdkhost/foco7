@@ -18,6 +18,8 @@
     <!-- Toastr & SweetAlert2 (Global) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Summernote BS5 CSS (Global WYSIWYG) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css">
 
     <!-- Customização Foco 7 para AdminLTE 4 -->
     <link rel="stylesheet" href="{{ asset('css/admin-foco7.css') }}">
@@ -286,10 +288,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Summernote BS5 (0.8.20) & Tradução pt-BR -->
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js"></script>
+
     <!-- Scripts Globais Foco 7 -->
     <script src="{{ asset('js/global-ajax.js') }}"></script>
     <script src="{{ asset('js/global-mascaras.js') }}"></script>
     <script src="{{ asset('js/global-dropzone.js') }}"></script>
+    <script src="{{ asset('js/global-summernote.js') }}"></script>
 
     <script>
         // Alternador Dark / Light Mode no Admin

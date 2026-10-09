@@ -117,6 +117,16 @@
                 var method = ($form.attr('method') || 'POST').toUpperCase();
                 var isFormData = $form.attr('enctype') === 'multipart/form-data';
 
+                // Sincronização explícita de campos Summernote WYSIWYG
+                if (typeof $.fn.summernote !== 'undefined') {
+                    $form.find('.summernote').each(function () {
+                        var $s = $(this);
+                        if ($s.next('.note-editor').length) {
+                            $s.val($s.summernote('code'));
+                        }
+                    });
+                }
+
                 var data = isFormData ? new FormData(this) : $form.serialize();
 
                 $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processando...');

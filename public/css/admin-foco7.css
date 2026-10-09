@@ -149,3 +149,104 @@ body.dark-mode .modal-content {
     padding: 6px;
 }
 
+/* ==============================================================================
+   SUMMERNOTE WYSIWYG - INTEGRAÇÃO VISUAL FOCO 7 (BOOTSTRAP 5 & DARK MODE)
+   ============================================================================== */
+.note-editor.note-frame {
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-editor.note-frame:focus-within {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(217, 0, 0, 0.18) !important;
+}
+
+.note-editor.note-frame .note-toolbar {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    padding: 8px 10px !important;
+}
+
+.note-editor.note-frame .note-btn {
+    border-radius: 6px !important;
+    border: 1px solid transparent !important;
+    font-size: 0.82rem !important;
+    color: #334155 !important;
+    background: #ffffff !important;
+    margin: 2px !important;
+    padding: 4px 8px !important;
+}
+
+.note-editor.note-frame .note-btn:hover {
+    background-color: #e2e8f0 !important;
+    color: var(--admin-primary) !important;
+}
+
+.note-editor.note-frame .note-btn.active {
+    background-color: rgba(217, 0, 0, 0.12) !important;
+    color: var(--admin-primary) !important;
+    border-color: rgba(217, 0, 0, 0.3) !important;
+}
+
+.note-editor.note-frame .note-statusbar {
+    background-color: #f8fafc !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Estilo do Summernote no Dark Mode do AdminLTE 4 */
+body.dark-mode .note-editor.note-frame {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background-color: #121722 !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-toolbar {
+    background-color: #161c28 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-editing-area .note-editable {
+    background-color: #1a202c !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-btn {
+    background-color: #232a3b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-btn:hover {
+    background-color: #2d3748 !important;
+    color: #ff4d4d !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-btn.active {
+    background-color: rgba(217, 0, 0, 0.25) !important;
+    color: #ffffff !important;
+    border-color: var(--admin-primary) !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-statusbar {
+    background-color: #161c28 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .note-dropdown-menu {
+    background-color: #161c28 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .note-dropdown-menu a {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .note-dropdown-menu a:hover {
+    background-color: #232a3b !important;
+    color: #ffffff !important;
+}
+
+

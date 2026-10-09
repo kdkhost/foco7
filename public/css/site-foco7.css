@@ -272,34 +272,47 @@ body {
 }
 
 /* ==============================================================================
-   4. HERO SECTION COM TEMA CLARO DE ALTA CONVERSÃO & CONTROLE DE OPACIDADE
+   4. HERO SECTION COM BACKGROUND CINEMATOGRÁFICO & OVERLAY DIREIONAL
    ============================================================================== */
 .hero-section {
     position: relative;
     min-height: 85vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 55%, #fff1f2 100%);
-    border-bottom: 1px solid var(--foco-border);
+    background: #0b0f19;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
-    padding: 85px 0 65px 0;
+    padding: 60px 0;
 }
 
-.hero-bg-media {
+#heroCarousel {
+    width: 100%;
+    position: relative;
+    z-index: 3;
+}
+
+.hero-section .carousel-item {
+    position: relative;
+    min-height: 540px;
+    display: flex;
+    align-items: center;
+}
+
+.hero-slide-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: center center;
+    background-position: center right;
     background-repeat: no-repeat;
     z-index: 1;
     pointer-events: none;
     transition: filter 0.3s ease;
 }
 
-.hero-bg-overlay {
+.hero-slide-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -307,50 +320,21 @@ body {
     height: 100%;
     z-index: 2;
     pointer-events: none;
-    transition: opacity 0.3s ease, background-color 0.3s ease;
+    transition: opacity 0.3s ease, background 0.3s ease;
 }
 
-.slide-custom-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.slide-custom-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(217, 0, 0, 0.05) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 2;
+.hero-slide-content {
+    position: relative;
+    z-index: 4;
+    padding: 20px 0;
 }
 
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(217, 0, 0, 0.08);
-    border: 1px solid rgba(217, 0, 0, 0.2);
-    color: var(--foco-red);
+    background: rgba(217, 0, 0, 0.18);
+    border: 1px solid rgba(255, 42, 42, 0.45);
+    color: #ff3b3b;
     font-weight: 700;
     font-size: 0.85rem;
     padding: 6px 16px;
@@ -358,6 +342,7 @@ body {
     margin-bottom: 1.25rem;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    backdrop-filter: blur(8px);
 }
 
 .hero-title {
@@ -365,35 +350,38 @@ body {
     font-weight: 900;
     line-height: 1.15;
     margin-bottom: 1.5rem;
-    color: var(--foco-title);
+    color: #ffffff;
     letter-spacing: -0.5px;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
 }
 
 .hero-title span {
-    color: var(--foco-red);
+    color: #ff2a2a;
 }
 
 .hero-desc {
     font-size: 1.18rem;
-    color: var(--foco-text-secondary);
+    color: #cbd5e1;
     line-height: 1.6;
     margin-bottom: 2rem;
     max-width: 620px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Card da Simulação Rápida no Hero */
+/* Card da Simulação Rápida no Hero (Contraste premium sobre o fundo escuro) */
 .card-simulacao-hero {
     background: #ffffff;
-    border: 1px solid var(--foco-border);
+    border: 1px solid rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     padding: 2.25rem;
-    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
     position: relative;
     transition: var(--foco-transition);
 }
 
 .card-simulacao-hero:hover {
-    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
 }
 
 .btn-tipo-veiculo {
@@ -416,11 +404,6 @@ body {
 }
 
 /* Controles do Carrossel Hero */
-#heroCarousel {
-    position: relative;
-    padding-bottom: 20px;
-}
-
 .hero-carousel-nav {
     display: flex;
     align-items: center;
@@ -438,10 +421,11 @@ body {
     height: 44px;
     opacity: 1;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1px solid var(--foco-border);
-    color: #1e293b;
-    box-shadow: var(--foco-shadow-sm);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     transition: var(--foco-transition);
     z-index: 5;
     top: auto;
@@ -458,25 +442,29 @@ body {
 }
 
 .hero-carousel-nav .carousel-indicators {
-    position: static;
+    position: relative;
     margin: 0;
-    gap: 6px;
-    justify-content: flex-start;
+    gap: 8px;
+    display: flex;
+    align-items: center;
 }
 
 .hero-carousel-nav .carousel-indicators [data-bs-target] {
-    width: 24px;
+    width: 28px;
     height: 5px;
-    border-radius: 3px;
-    background-color: #cbd5e1;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.45);
     border: none;
+    opacity: 0.85;
     margin: 0;
-    transition: var(--foco-transition);
+    transition: all 0.3s ease;
 }
 
 .hero-carousel-nav .carousel-indicators .active {
-    width: 42px;
+    width: 48px;
     background-color: var(--foco-red);
+    opacity: 1;
+    box-shadow: 0 0 10px var(--foco-red-glow);
 }
 
 /* ==============================================================================

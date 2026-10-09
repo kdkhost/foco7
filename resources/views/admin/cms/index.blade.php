@@ -2,12 +2,7 @@
 
 @section('title', 'Gerenciador do CMS')
 @section('page_title', 'CMS & Identidade Visual')
-@section('page_description', 'Gerencie todos os textos, logotipo, carrossel de imagens, banners, FAQs e depoimentos.')
-
-@section('styles')
-<!-- Summernote WYSIWYG -->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.css" rel="stylesheet">
-@endsection
+@section('page_description', 'Gerencie todos os textos, logotipo, carrossel de imagens, banners, FAQs e depoimentos com editor visual Summernote.')
 
 @section('content')
 <div class="card shadow-sm border-0">
@@ -210,16 +205,16 @@
                                                 <i class="fas fa-adjust text-danger me-1"></i> Opacidade da Camada de Sobreposição:
                                             </label>
                                             <span id="badgeOpacidade" class="badge bg-danger fs-6 px-3 py-1">
-                                                {{ $settings['hero_bg_opacidade'] ?? 85 }}%
+                                                {{ $settings['hero_bg_opacidade'] ?? 70 }}%
                                             </span>
                                         </div>
                                         <input type="range" class="form-range" min="0" max="100" step="1"
                                                name="hero_bg_opacidade" id="hero_bg_opacidade"
-                                               value="{{ $settings['hero_bg_opacidade'] ?? 85 }}"
+                                               value="{{ $settings['hero_bg_opacidade'] ?? 70 }}"
                                                oninput="atualizarPreviewOpacidade(this.value)">
                                         <div class="d-flex justify-content-between text-muted small">
                                             <span>0% (Mais transparente / Foto nítida)</span>
-                                            <span class="fw-bold text-danger">Recomendado: 80%–90%</span>
+                                            <span class="fw-bold text-danger">Recomendado: 60%–75% (Equilíbrio foto + texto)</span>
                                             <span>100% (Totalmente opaco)</span>
                                         </div>
                                     </div>
@@ -227,15 +222,23 @@
                                     <!-- Cor da Sobreposição & Efeito Desfoque -->
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold small">Cor da Sobreposição (Overlay)</label>
-                                            <div class="input-group">
+                                            <label class="form-label fw-bold small">Cor da Película / Sobreposição (Overlay)</label>
+                                            <div class="input-group mb-2">
                                                 <input type="color" name="hero_overlay_cor" id="hero_overlay_cor"
                                                        class="form-control form-control-color"
-                                                       value="{{ $settings['hero_overlay_cor'] ?? '#ffffff' }}"
+                                                       value="{{ (!empty($settings['hero_overlay_cor']) && strtolower($settings['hero_overlay_cor']) !== '#ffffff') ? $settings['hero_overlay_cor'] : '#0b0f19' }}"
                                                        onchange="atualizarCorOverlay(this.value)">
                                                 <input type="text" class="form-control form-control-sm"
                                                        id="hero_overlay_cor_text"
-                                                       value="{{ $settings['hero_overlay_cor'] ?? '#ffffff' }}" readonly>
+                                                       value="{{ (!empty($settings['hero_overlay_cor']) && strtolower($settings['hero_overlay_cor']) !== '#ffffff') ? $settings['hero_overlay_cor'] : '#0b0f19' }}" readonly>
+                                            </div>
+                                            <!-- Presets Rápidos de Película -->
+                                            <div class="d-flex flex-wrap gap-1 align-items-center">
+                                                <span class="small text-muted me-1">Presets:</span>
+                                                <button type="button" class="btn btn-xs btn-outline-dark py-0 px-2 rounded-pill small" onclick="selecionarPresetCor('#0b0f19')">Grafite Escuro</button>
+                                                <button type="button" class="btn btn-xs btn-outline-dark py-0 px-2 rounded-pill small" onclick="selecionarPresetCor('#000000')">Preto Puro</button>
+                                                <button type="button" class="btn btn-xs btn-outline-dark py-0 px-2 rounded-pill small" onclick="selecionarPresetCor('#0f172a')">Azul Noturno</button>
+                                                <button type="button" class="btn btn-xs btn-outline-dark py-0 px-2 rounded-pill small" onclick="selecionarPresetCor('#18181b')">Zinco Premium</button>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -246,20 +249,21 @@
                                                    name="hero_bg_blur" id="hero_bg_blur"
                                                    value="{{ $settings['hero_bg_blur'] ?? 0 }}"
                                                    oninput="atualizarBlur(this.value)">
+                                            <span class="small text-muted d-block mt-1">Dica: 0px mantém a foto do veículo 100% nítida.</span>
                                         </div>
                                     </div>
 
                                     <!-- Mini Preview Interativo -->
                                     <div class="mt-3">
                                         <label class="form-label fw-bold small text-muted">Pré-visualização Instantânea do Contraste:</label>
-                                        <div id="heroPreviewBox" class="p-3 rounded-3 position-relative overflow-hidden border"
-                                             style="height: 110px; background-color: #f1f5f9; background-image: url('{{ !empty($settings['hero_bg_imagem']) ? asset($settings['hero_bg_imagem']) : asset('/img/og-foco7.jpg') }}'); background-size: cover; background-position: center;">
+                                        <div id="heroPreviewBox" class="p-3 rounded-3 position-relative overflow-hidden border shadow-sm"
+                                             style="height: 120px; background-color: #0b0f19; background-image: url('{{ !empty($settings['hero_bg_imagem']) ? asset($settings['hero_bg_imagem']) : asset('/img/og-foco7.jpg') }}'); background-size: cover; background-position: center;">
                                             <div id="heroPreviewOverlay" class="position-absolute top-0 start-0 w-100 h-100"
-                                                 style="background-color: {{ $settings['hero_overlay_cor'] ?? '#ffffff' }}; opacity: {{ ((float)($settings['hero_bg_opacidade'] ?? 85)) / 100 }}; transition: opacity 0.15s ease;"></div>
+                                                 style="background: linear-gradient(90deg, {{ (!empty($settings['hero_overlay_cor']) && strtolower($settings['hero_overlay_cor']) !== '#ffffff') ? $settings['hero_overlay_cor'] : '#0b0f19' }}f5 0%, {{ (!empty($settings['hero_overlay_cor']) && strtolower($settings['hero_overlay_cor']) !== '#ffffff') ? $settings['hero_overlay_cor'] : '#0b0f19' }}c0 50%, {{ (!empty($settings['hero_overlay_cor']) && strtolower($settings['hero_overlay_cor']) !== '#ffffff') ? $settings['hero_overlay_cor'] : '#0b0f19' }}40 100%); opacity: {{ ((float)($settings['hero_bg_opacidade'] ?? 70)) / 100 }}; transition: opacity 0.15s ease;"></div>
                                             <div class="position-relative" style="z-index: 2;">
-                                                <h6 class="fw-black mb-1 text-dark" id="heroPreviewText">Proteger hoje para que você viva o amanhã</h6>
-                                                <p class="small text-secondary mb-0">Monitoramento veicular 24h com Ronda Tática presencial.</p>
-                                                <span class="badge bg-danger mt-1">Simulação de Legibilidade</span>
+                                                <h6 class="fw-black mb-1 text-white" id="heroPreviewText">Proteger hoje para que você viva o amanhã</h6>
+                                                <p class="small text-light-50 text-white-50 mb-0">Monitoramento veicular 24h com Ronda Tática presencial.</p>
+                                                <span class="badge bg-danger mt-1">Simulação de Legibilidade & Contraste</span>
                                             </div>
                                         </div>
                                     </div>
@@ -423,8 +427,11 @@
                                     <input type="text" name="secao_sobre_subtitulo" class="form-control" value="{{ $settings['secao_sobre_subtitulo'] ?? 'A Foco 7 nasceu com a missão de transformar tecnologia de rastreamento em tranquilidade real.' }}">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold">Texto Narrativo / História da Empresa</label>
-                                    <textarea name="secao_sobre_texto" class="form-control" rows="4">{{ $settings['secao_sobre_texto'] ?? 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.' }}</textarea>
+                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                        <span>Texto Narrativo / História da Empresa</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                    </label>
+                                    <textarea name="secao_sobre_texto" id="secao_sobre_texto" class="form-control summernote" data-height="180">{{ $settings['secao_sobre_texto'] ?? 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.' }}</textarea>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold">Métrica: Anos de Experiência</label>
@@ -458,8 +465,11 @@
                                     <input type="text" name="secao_estetica_subtitulo" class="form-control" value="{{ $settings['secao_estetica_subtitulo'] ?? 'Cuidado minucioso, proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.' }}">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold">Texto de Chamada de Ação</label>
-                                    <textarea name="secao_estetica_chamada" class="form-control" rows="2">{{ $settings['secao_estetica_chamada'] ?? 'Agende o serviço de estética automotiva do seu carro ou moto com profissionais certificados e produtos de primeira linha.' }}</textarea>
+                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                        <span>Texto de Chamada de Ação</span>
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                    </label>
+                                    <textarea name="secao_estetica_chamada" id="secao_estetica_chamada" class="form-control summernote" data-height="130">{{ $settings['secao_estetica_chamada'] ?? 'Agende o serviço de estética automotiva do seu carro ou moto com profissionais certificados e produtos de primeira linha.' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -496,8 +506,11 @@
                                     <input type="text" name="secao_ronda_titulo" class="form-control" value="{{ $settings['secao_ronda_titulo'] ?? 'Ronda Tática Foco 7: Apoio Presencial Imediato' }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Descrição da Atuação Presencial</label>
-                                    <textarea name="secao_ronda_descricao" class="form-control" rows="2">{{ $settings['secao_ronda_descricao'] ?? 'Em caso de roubo ou furto, nossa equipe tática especializada se desloca rapidamente até as coordenadas exatas do veículo para efetuar a recuperação em conjunto com as autoridades policiais.' }}</textarea>
+                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                        <span>Descrição da Atuação Presencial</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                    </label>
+                                    <textarea name="secao_ronda_descricao" id="secao_ronda_descricao" class="form-control summernote" data-height="130">{{ $settings['secao_ronda_descricao'] ?? 'Em caso de roubo ou furto, nossa equipe tática especializada se desloca rapidamente até as coordenadas exatas do veículo para efetuar a recuperação em conjunto com as autoridades policiais.' }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -515,8 +528,11 @@
                                     <input type="text" name="secao_app_titulo" class="form-control" value="{{ $settings['secao_app_titulo'] ?? 'Controle Total do Seu Veículo na Palma da Mão' }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Descrição do App</label>
-                                    <textarea name="secao_app_descricao" class="form-control" rows="2">{{ $settings['secao_app_descricao'] ?? 'Acompanhe velocidade em tempo real, rotas históricas, crie cercas virtuais, receba alertas de ignição e bloqueie o motor com apenas um toque no celular.' }}</textarea>
+                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                        <span>Descrição do App</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                    </label>
+                                    <textarea name="secao_app_descricao" id="secao_app_descricao" class="form-control summernote" data-height="130">{{ $settings['secao_app_descricao'] ?? 'Acompanhe velocidade em tempo real, rotas históricas, crie cercas virtuais, receba alertas de ignição e bloqueie o motor com apenas um toque no celular.' }}</textarea>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Link Google Play Store</label>
@@ -570,8 +586,11 @@
                             <input type="text" name="titulo" id="banner_titulo" class="form-control" required placeholder="Título chamativo de alta conversão">
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Subtítulo Explicativo</label>
-                            <textarea name="subtitulo" id="banner_subtitulo" rows="3" class="form-control" placeholder="Descrição do impacto da proteção veicular"></textarea>
+                            <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                <span>Subtítulo Explicativo</span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Summernote</span>
+                            </label>
+                            <textarea name="subtitulo" id="banner_subtitulo" rows="3" class="form-control summernote" data-height="120" placeholder="Descrição do impacto da proteção veicular"></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Imagem de Fundo do Slide (Opcional)</label>
@@ -637,8 +656,11 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Resposta Completa *</label>
-                        <textarea name="resposta" id="faq_resposta" rows="4" class="form-control" required></textarea>
+                        <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                            <span>Resposta Completa *</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Summernote</span>
+                        </label>
+                        <textarea name="resposta" id="faq_resposta" rows="4" class="form-control summernote" data-height="180" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
@@ -694,8 +716,11 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Depoimento *</label>
-                        <textarea name="texto" id="depoimento_texto" rows="3" class="form-control" required placeholder="O que o cliente disse sobre a proteção e agilidade?"></textarea>
+                        <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                            <span>Depoimento *</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Summernote</span>
+                        </label>
+                        <textarea name="texto" id="depoimento_texto" rows="3" class="form-control summernote" data-height="140" required placeholder="O que o cliente disse sobre a proteção e agilidade?"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
@@ -709,13 +734,11 @@
 @endsection
 
 @section('scripts')
-<!-- Summernote WYSIWYG -->
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs5.min.js"></script>
-
 <script>
     function abrirModalBanner() {
         $('#banner_id').val('');
         $('#formBannerSlide')[0].reset();
+        window.clearSummernote('#banner_subtitulo');
         $('#modalBannerTitulo').text('Novo Slide do Hero Carousel');
         new bootstrap.Modal(document.getElementById('modalBanner')).show();
     }
@@ -728,7 +751,7 @@
                 $('#banner_badge').val(b.badge);
                 $('#banner_ordem').val(b.ordem);
                 $('#banner_titulo').val(b.titulo);
-                $('#banner_subtitulo').val(b.subtitulo);
+                window.setSummernoteContent('#banner_subtitulo', b.subtitulo || '');
                 $('#banner_texto_botao_1').val(b.texto_botao_1);
                 $('#banner_link_botao_1').val(b.link_botao_1);
                 $('#banner_texto_botao_2').val(b.texto_botao_2);
@@ -743,6 +766,7 @@
     function abrirModalFaq() {
         $('#faq_id').val('');
         $('#formFaq')[0].reset();
+        window.clearSummernote('#faq_resposta');
         $('#modalFaqTitulo').text('Nova Pergunta Frequente');
         new bootstrap.Modal(document.getElementById('modalFaq')).show();
     }
@@ -754,7 +778,7 @@
                 $('#faq_id').val(f.id);
                 $('#faq_pergunta').val(f.pergunta);
                 $('#faq_categoria').val(f.categoria);
-                $('#faq_resposta').val(f.resposta);
+                window.setSummernoteContent('#faq_resposta', f.resposta || '');
 
                 $('#modalFaqTitulo').text('Editar Pergunta Frequente');
                 new bootstrap.Modal(document.getElementById('modalFaq')).show();
@@ -765,6 +789,7 @@
     function abrirModalDepoimento() {
         $('#depoimento_id').val('');
         $('#formDepoimento')[0].reset();
+        window.clearSummernote('#depoimento_texto');
         $('#modalDepoimentoTitulo').text('Novo Depoimento');
         new bootstrap.Modal(document.getElementById('modalDepoimento')).show();
     }
@@ -778,7 +803,7 @@
                 $('#depoimento_cidade_uf').val(d.cidade_uf);
                 $('#depoimento_veiculo').val(d.veiculo);
                 $('#depoimento_estrelas').val(d.estrelas);
-                $('#depoimento_texto').val(d.texto);
+                window.setSummernoteContent('#depoimento_texto', d.texto || '');
 
                 $('#modalDepoimentoTitulo').text('Editar Depoimento: ' + d.nome_cliente);
                 new bootstrap.Modal(document.getElementById('modalDepoimento')).show();

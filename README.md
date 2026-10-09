@@ -123,7 +123,8 @@ public_html/
 - Alternância nativa de Modo Escuro (Dark) e Claro (Light) com persistência no navegador.
 - Navbar fixa e Sidebar com marcação dinâmica da rota ativa.
 - Notificações globais com Toastr e exclusões/ações críticas confirmadas via SweetAlert2.
-- Summernote integrado em todas as textareas gerenciáveis.
+- Summernote WYSIWYG oficial (`v0.8.20-bs5`) com tradução pt-BR, suporte nativo a Dark/Light Mode, toolbar completa e sincronização automática AJAX em todas as textareas gerenciáveis (História da Empresa, Ronda Tática, Aplicativo Mobile, Estética, FAQs, Depoimentos e Banners).
+- Hero Carousel com película gradiente cinematográfica escura (`#0b0f19`), controle de opacidade e layout em tela cheia (100% full-bleed).
 - Gerenciador visual de conteúdo (Logo, Banners, Carrossel, Textos, FAQ, Telefones, Cores).
 
 ### Módulo 5: Sistema de Agendamento (FullCalendar 6)

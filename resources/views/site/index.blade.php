@@ -98,30 +98,33 @@
         </div>
     </nav>
 
-    <!-- 3. HERO SECTION COM CARROSSEL DE ALTA CONVERSÃO & CONTROLE DE OPACIDADE DO CMS -->
+    <!-- 3. HERO SECTION COM CARROSSEL DE ALTA CONVERSÃO & PELÍCULA CINEMATOGRÁFICA -->
     @php
         $heroBgImagem = !empty($configs['hero_bg_imagem']) ? asset($configs['hero_bg_imagem']) : '';
-        $heroOpacidadeDecimal = isset($configs['hero_bg_opacidade']) ? round(((float)$configs['hero_bg_opacidade'] / 100), 2) : 0.85;
-        $heroOverlayCor = $configs['hero_overlay_cor'] ?? '#ffffff';
+        $heroOpacidadeDecimal = isset($configs['hero_bg_opacidade']) ? round(((float)$configs['hero_bg_opacidade'] / 100), 2) : 0.70;
+        $heroOverlayCor = !empty($configs['hero_overlay_cor']) && strtolower($configs['hero_overlay_cor']) !== '#ffffff' 
+            ? $configs['hero_overlay_cor'] 
+            : '#0b0f19';
         $heroBlur = (int)($configs['hero_bg_blur'] ?? 0);
     @endphp
     <header class="hero-section" id="inicio">
-        <!-- Camada de Fundo Dinâmica do Hero com Imagem e Desfoque -->
-        <div class="hero-bg-media" style="@if(!empty($heroBgImagem)) background-image: url('{{ $heroBgImagem }}'); @endif {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
-        <!-- Camada de Sobreposição com Controle de Opacidade do Painel Admin -->
-        <div class="hero-bg-overlay" style="background-color: {{ $heroOverlayCor }}; opacity: {{ $heroOpacidadeDecimal }};"></div>
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+            <div class="carousel-inner">
+                @forelse($slides as $index => $slide)
+                @php
+                    $slideImg = !empty($slide->imagem) ? asset($slide->imagem) : $heroBgImagem;
+                @endphp
+                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                    @if(!empty($slideImg))
+                        <!-- Imagem de fundo em tela cheia (100% de ponta a ponta sem corte) -->
+                        <div class="hero-slide-bg" style="background-image: url('{{ $slideImg }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
+                    @endif
+                    <!-- Película degradê profissional em tela cheia para contraste cinematográfico -->
+                    <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
 
-        <div class="container position-relative" style="z-index: 3;">
-            <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
-                <div class="carousel-inner">
-                    @forelse($slides as $index => $slide)
-                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                        @if(!empty($slide->imagem))
-                            <!-- Imagem e overlay de fundo individual deste slide -->
-                            <div class="slide-custom-bg" style="background-image: url('{{ asset($slide->imagem) }}');"></div>
-                            <div class="slide-custom-overlay" style="background-color: {{ $heroOverlayCor }}; opacity: {{ $heroOpacidadeDecimal }};"></div>
-                        @endif
-                        <div class="row align-items-center min-vh-50 position-relative" style="z-index: 2;">
+                    <!-- Conteúdo em container centralizado com alinhamento impecável -->
+                    <div class="container position-relative hero-slide-content">
+                        <div class="row align-items-center min-vh-50">
                             <div class="col-lg-7">
                                 @if(!empty($slide->badge))
                                     <div class="hero-badge">
@@ -131,9 +134,9 @@
                                 <h1 class="hero-title">
                                     {{ $slide->titulo }}
                                 </h1>
-                                <p class="hero-desc">
-                                    {{ $slide->subtitulo }}
-                                </p>
+                                <div class="hero-desc">
+                                    {!! $slide->subtitulo !!}
+                                </div>
                                 <div class="d-flex flex-wrap gap-3">
                                     @if(!empty($slide->texto_botao_1))
                                         <a href="{{ $slide->link_botao_1 }}" class="btn-foco-primary">
@@ -190,9 +193,31 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if($slides->count() > 1)
+                        <div class="hero-carousel-nav">
+                            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="carousel-indicators">
+                                @foreach($slides as $idx => $s)
+                                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Slide {{ $idx + 1 }}"></button>
+                                @endforeach
+                            </div>
+                            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Próximo Slide" title="Próximo Slide">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        @endif
                     </div>
-                    @empty
-                    <div class="carousel-item active">
+                </div>
+                @empty
+                <div class="carousel-item active">
+                    @if(!empty($heroBgImagem))
+                        <div class="hero-slide-bg" style="background-image: url('{{ $heroBgImagem }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
+                    @endif
+                    <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
+                    <div class="container position-relative hero-slide-content">
                         <div class="row align-items-center">
                             <div class="col-lg-8">
                                 <h1 class="hero-title">Proteger hoje para que você viva o amanhã com tranquilidade</h1>
@@ -201,23 +226,8 @@
                             </div>
                         </div>
                     </div>
-                    @endforelse
                 </div>
-                @if($slides->count() > 1)
-                <div class="hero-carousel-nav">
-                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="carousel-indicators">
-                        @foreach($slides as $idx => $s)
-                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Slide {{ $idx + 1 }}"></button>
-                        @endforeach
-                    </div>
-                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Próximo Slide" title="Próximo Slide">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                @endif
+                @endforelse
             </div>
         </div>
     </header>
@@ -415,7 +425,7 @@
                             </div>
 
                             <h4 class="fw-bold mb-2" style="color: var(--foco-title);">{{ $servico->nome }}</h4>
-                            <p class="text-secondary small leading-relaxed mb-4">{{ $servico->descricao }}</p>
+                            <div class="text-secondary small leading-relaxed mb-4">{!! $servico->descricao !!}</div>
                         </div>
 
                         <div class="pt-3 border-top border-light-subtle">
@@ -596,7 +606,7 @@
                                     <i class="fas fa-star"></i>
                                 @endfor
                             </div>
-                            <p class="text-secondary small fst-italic">"{{ $dep->texto }}"</p>
+                            <div class="text-secondary small fst-italic">"{!! $dep->texto !!}"</div>
                         </div>
                         <div class="mt-3 pt-3 border-top border-light-subtle d-flex align-items-center gap-3">
                             <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
@@ -632,7 +642,7 @@
                         </h2>
                         <div id="faqCollapse{{ $faq->id }}" class="accordion-collapse collapse {{ $idx === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                {{ $faq->resposta }}
+                                {!! $faq->resposta !!}
                             </div>
                         </div>
                     </div>

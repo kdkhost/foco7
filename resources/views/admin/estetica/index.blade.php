@@ -162,8 +162,11 @@
                             <input type="text" name="tempo_estimado" id="servico_tempo" class="form-control" placeholder="Ex: 4 a 6 horas ou 1 dia útil">
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Descrição Detalhada do Tratamento</label>
-                            <textarea name="descricao" id="servico_descricao" class="form-control" rows="3" placeholder="Explique os benefícios técnicos e resultados esperados"></textarea>
+                            <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                <span>Descrição Detalhada do Tratamento</span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                            </label>
+                            <textarea name="descricao" id="servico_descricao" class="form-control summernote" data-height="150" placeholder="Explique os benefícios técnicos e resultados esperados"></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Itens Inclusos / Etapas (Um por linha)</label>
@@ -200,6 +203,7 @@
     function abrirModalServico() {
         $('#servico_id').val('');
         $('#formServicoEstetica')[0].reset();
+        window.clearSummernote('#servico_descricao');
         $('#servico_ativo').prop('checked', true);
         $('#modalServicoTitulo').text('Novo Serviço de Estética Automotiva');
         new bootstrap.Modal(document.getElementById('modalServico')).show();
@@ -215,7 +219,7 @@
                 $('#servico_icone').val(s.icone);
                 $('#servico_preco').val(s.preco ? 'R$ ' + parseFloat(s.preco).toFixed(2).replace('.', ',') : '');
                 $('#servico_tempo').val(s.tempo_estimado);
-                $('#servico_descricao').val(s.descricao);
+                window.setSummernoteContent('#servico_descricao', s.descricao || '');
                 $('#servico_ordem').val(s.ordem);
                 $('#servico_destaque').prop('checked', s.destaque == 1);
                 $('#servico_ativo').prop('checked', s.ativo == 1);

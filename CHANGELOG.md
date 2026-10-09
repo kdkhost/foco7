@@ -5,6 +5,22 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.6.0] - 2026-10-09
+
+### ✨ Adicionado & Aprimorado
+- **Integração Global & Definitiva do Editor Summernote WYSIWYG (Bootstrap 5 & AdminLTE 4):**
+  - **Correção da CDN e Suporte Oficial:** Migrado da CDN inexistente/quebrada (0.8.18-bs5 com erro 404) para a versão estável oficial `summernote@0.8.20-bs5` com biblioteca de idioma completa em Português do Brasil (`summernote-pt-BR.min.js`).
+  - **Inicializador Global (`public/js/global-summernote.js`):** Script modular com detecção automática de `.summernote`, toolbar profissional completa (estilos de título, negrito, itálico, cores, listas, tabelas, links, imagens, fullscreen e codeview), suporte a `data-height` e sincronização automática.
+  - **Sincronização com Modais e AJAX:** Garantida a atualização bidirecional de conteúdo nos modais de Banners/Slides, FAQs, Depoimentos e Estética Automotiva (`window.setSummernoteContent` e `window.clearSummernote`), além da sincronização forçada dos campos antes de qualquer submissão de formulário via `global-ajax.js`.
+  - **Estilização Visual & Dark Mode:** Adicionadas regras CSS refinadas em `public/css/admin-foco7.css` harmonizando a barra de ferramentas, botões e área de edição com o tema escuro/claro do AdminLTE 4.
+  - **Renderização Rica no Site:** Respostas de FAQ, subtítulos de banners, depoimentos e descrições de estética agora renderizam tags e formatações visuais ricas sem quebra de layout.
+- **Remoção do Bloco Branco e Novo Overlay Cinematográfico do Hero Carousel:**
+  - Eliminado o container branco rígido central que cortava a foto de fundo do veículo.
+  - Carrossel expandido para largura total (100% full-bleed) com imagem de fundo cobrindo todo o viewport.
+  - Aplicado degradê horizontal direcional escuro em grafite tático (`#0b0f19`) garantindo máxima legibilidade aos textos e botões à esquerda, enquanto preserva a nitidez e o impacto visual da foto do veículo à direita.
+
+---
+
 ## [1.5.0] - 2026-10-09
 
 ### ✨ Adicionado & Aprimorado

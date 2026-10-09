@@ -46,6 +46,12 @@ class SiteController extends Controller
             $logoDark = $logo;
         }
 
+        $heroOverlayCor = CmsSetting::get('hero_overlay_cor', '#0b0f19');
+        if (empty($heroOverlayCor) || strtolower($heroOverlayCor) === '#ffffff') {
+            $heroOverlayCor = '#0b0f19';
+        }
+        $heroOpacidade = (int) CmsSetting::get('hero_bg_opacidade', 70);
+
         $configs = [
             'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
             'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa há mais de 10 anos'),
@@ -63,8 +69,8 @@ class SiteController extends Controller
             'favicon' => $favicon,
             'cor_primaria' => CmsSetting::get('cor_primaria', '#d90000'),
             'hero_bg_imagem' => CmsSetting::get('hero_bg_imagem', ''),
-            'hero_bg_opacidade' => (int) CmsSetting::get('hero_bg_opacidade', 85),
-            'hero_overlay_cor' => CmsSetting::get('hero_overlay_cor', '#ffffff'),
+            'hero_bg_opacidade' => $heroOpacidade,
+            'hero_overlay_cor' => $heroOverlayCor,
             'hero_bg_blur' => (int) CmsSetting::get('hero_bg_blur', 0),
             // Textos das seções gerenciados via CMS
             'secao_sobre_titulo' => CmsSetting::get('secao_sobre_titulo', 'Protegendo seu patrimônio há mais de uma década'),
