@@ -142,10 +142,14 @@ public_html/
 - Visualização de contratos ativos, veículos cadastrados e histórico financeiro.
 - Emissão de 2ª via de faturas (PIX / Boleto / Cartão).
 
-### Módulo 8: Gateways de Pagamento (Efí PRO & Mercado Pago)
-- Checkout Transparente sem redirecionamento para fora do site.
-- Suporte a PIX com cópia e cola e QR Code dinâmico, Boleto Bancário e Cartão de Crédito.
-- Webhooks dinâmicos com logs e validação de segurança para retorno automático de status.
+### Módulo 8: Gateways de Pagamento, Carnê Efí, E-mails & Central de Cron (`/admin/gateways`)
+- **Organização Modular por Abas:** Guias dedicadas para Mercado Pago, Efí PRO (Gerencianet), Cobrança por Carnê, Templates de E-mail e Central de Cron.
+- **Seleção Dinâmica Sandbox vs Produção:** Alternância dinâmica que exibe e armazena chaves e certificados separados para testes e produção com retrocompatibilidade automática.
+- **Cobrança por Carnê Efí PRO para Clientes Existentes:** Emissão parcelada de 2x a 24x sob demanda para clientes cadastrados, com geração sequencial de faturas mensais e notificações.
+- **Templates de E-mails Próprios:** 5 modelos transacionais customizáveis com Summernote, tags dinâmicas (`{cliente_nome}`, `{valor}`, `{data_vencimento}`) e disparo de e-mail de teste.
+- **Central de Cron & Automação:** Comandos Artisan dedicados (`faturas:verificar-vencidas`, `faturas:enviar-lembretes`, `gateways:sincronizar-pagamentos`), monitoramento de agendamento e execução imediata sob demanda via AJAX com SweetAlert2.
+- **Checkout Transparente:** Suporte a PIX com cópia e cola / QR Code dinâmico, Boleto Bancário e Cartão de Crédito.
+- **Webhooks Oficiais:** Retorno automático de compensação e atualização instantânea de faturas.
 
 ### Módulo 9: Estética Automotiva & Detalhamento Premium
 - **Landing Page Pública:** Nova seção elegante e de alta conversão apresentando os serviços de estética (Polimento Técnico, Vitrificação Cerâmica 9H, Higienização Interna, Lavagem Detalhada, Cristalização e PPF).

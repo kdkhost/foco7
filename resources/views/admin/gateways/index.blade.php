@@ -1,236 +1,771 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Portal de Pagamentos')
-@section('page_title', 'Gateways & Portal de Pagamentos')
-@section('page_description', 'Configure credenciais de Checkout Transparente para Mercado Pago, Efí PRO (PIX/Boleto) e regras financeiras.')
+@section('title', 'Portal de Pagamentos & Gateways')
+@section('page_title', 'Gateways de Pagamento & Cobranças')
+@section('page_description', 'Gerencie credenciais de Checkout Transparente (Mercado Pago e Efí PRO), carnês, templates de e-mail e tarefas agendadas.')
 
 @section('content')
-<div class="row g-4">
-    <div class="col-lg-8">
-        <form action="{{ route('admin.gateways.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
-            @csrf
-
-            <!-- 1. MERCADO PAGO (CHECKOUT TRANSPARENTE) -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0 text-primary">
-                        <i class="fab fa-cc-mastercard me-2"></i> Mercado Pago (Cartão, PIX & Boleto)
-                    </h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="mp_ativo" id="mp_ativo" value="1" {{ $configs['mp_ativo'] ? 'checked' : '' }}>
-                        <label class="form-check-label small fw-bold" for="mp_ativo">Gateway Ativo</label>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Public Key (Chave Pública) *</label>
-                            <input type="text" name="mp_public_key" class="form-control" value="{{ $configs['mp_public_key'] }}" placeholder="APP_USR-xxxx...">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Access Token (Token de Acesso) *</label>
-                            <div class="input-group">
-                                <input type="password" name="mp_access_token" id="mpAccessToken" class="form-control" value="{{ $configs['mp_access_token'] }}" placeholder="APP_USR-xxxx...">
-                                <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpAccessToken')">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Client ID</label>
-                            <input type="text" name="mp_client_id" class="form-control" value="{{ $configs['mp_client_id'] }}" placeholder="Ex: 1234567890">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Client Secret</label>
-                            <div class="input-group">
-                                <input type="password" name="mp_client_secret" id="mpClientSecret" class="form-control" value="{{ $configs['mp_client_secret'] }}" placeholder="Client_Secret_xxxx...">
-                                <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpClientSecret')">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Chave Secreta do Webhook (Assinatura HMAC)</label>
-                            <input type="password" name="mp_webhook_secret" class="form-control" value="{{ $configs['mp_webhook_secret'] }}" placeholder="Assinatura enviada no cabeçalho x-signature">
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" name="mp_sandbox" id="mp_sandbox" value="1" {{ $configs['mp_sandbox'] ? 'checked' : '' }}>
-                                <label class="form-check-label small fw-bold" for="mp_sandbox">
-                                    Modo Sandbox (Ambiente de Testes do Mercado Pago)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. EFÍ PRO (GERENCIANET - PIX EM TEMPO REAL) -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0 text-warning">
-                        <i class="fas fa-bolt me-2"></i> Efí PRO (Gerencianet - PIX Instantâneo)
-                    </h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="efi_ativo" id="efi_ativo" value="1" {{ $configs['efi_ativo'] ? 'checked' : '' }}>
-                        <label class="form-check-label small fw-bold" for="efi_ativo">Gateway Ativo</label>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Client ID da Aplicação *</label>
-                            <input type="text" name="efi_client_id" class="form-control" value="{{ $configs['efi_client_id'] }}" placeholder="Client_Id_xxxx...">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Client Secret *</label>
-                            <div class="input-group">
-                                <input type="password" name="efi_client_secret" id="efiClientSecret" class="form-control" value="{{ $configs['efi_client_secret'] }}" placeholder="Client_Secret_xxxx...">
-                                <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('efiClientSecret')">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Chave PIX Cadastrada na Conta Efí *</label>
-                            <input type="text" name="efi_chave_pix" class="form-control" value="{{ $configs['efi_chave_pix'] }}" placeholder="Chave Aleatória EVP, CNPJ, E-mail ou Telefone">
-                            <small class="text-secondary">Chave PIX associada à conta bancária para receber os créditos automáticos.</small>
-                        </div>
-
-                        <!-- UPLOAD DO CERTIFICADO .PEM COM ARRASTA E SOLTA -->
-                        <div class="col-12 mt-3">
-                            <label class="form-label small fw-bold text-white">
-                                <i class="fas fa-shield-alt text-warning me-1"></i> Certificado Digital Oficial (.PEM)
-                            </label>
-                            
-                            @if(!empty($configs['efi_certificado_pem']))
-                                <div class="alert alert-success d-flex align-items-center justify-content-between p-2 mb-2">
-                                    <span class="small font-monospace">
-                                        <i class="fas fa-certificate text-success me-1"></i> Certificado atual: <strong>{{ $configs['efi_certificado_pem'] }}</strong>
-                                    </span>
-                                    <span class="badge bg-success">INSTALADO</span>
-                                </div>
-                            @endif
-
-                            <div class="foco-dropzone"
-                                 data-input-name="efi_certificado"
-                                 data-ratio="Formato .PEM (Chave privada / Certificado Gerencianet)"
-                                 data-max-size="2MB"
-                                 data-accept=".pem">
-                            </div>
-                            <small class="text-secondary d-block mt-1">O certificado .pem é gerado dentro do painel da Efí PRO na aba API PIX.</small>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" name="efi_sandbox" id="efi_sandbox" value="1" {{ $configs['efi_sandbox'] ? 'checked' : '' }}>
-                                <label class="form-check-label small fw-bold" for="efi_sandbox">
-                                    Modo Homologação (Sandbox Efí)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. REGRAS COMERCIAIS & FINANCEIRAS -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h5 class="fw-bold mb-0 text-danger">
-                        <i class="fas fa-calculator me-2"></i> Condições Comerciais, Parcelas & Prazos
-                    </h5>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Desconto no PIX à Vista (%)</label>
-                            <div class="input-group">
-                                <input type="number" step="0.1" name="pix_desconto" class="form-control" value="{{ $configs['pix_desconto'] }}">
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Expiração do QR Code PIX (Minutos)</label>
-                            <div class="input-group">
-                                <input type="number" name="pix_expiracao_minutos" class="form-control" value="{{ $configs['pix_expiracao_minutos'] }}">
-                                <span class="input-group-text">min</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Máximo de Parcelas no Cartão</label>
-                            <input type="number" name="cartao_max_parcelas" class="form-control" value="{{ $configs['cartao_max_parcelas'] }}" max="24">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Parcelas Sem Juros</label>
-                            <input type="number" name="cartao_sem_juros" class="form-control" value="{{ $configs['cartao_sem_juros'] }}" max="12">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Juros Mensal Parcelas com Juros (%)</label>
-                            <div class="input-group">
-                                <input type="number" step="0.01" name="cartao_juros_mensal" class="form-control" value="{{ $configs['cartao_juros_mensal'] }}">
-                                <span class="input-group-text">% ao mês</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Dias para Vencimento do Boleto</label>
-                            <div class="input-group">
-                                <input type="number" name="boleto_dias_vencimento" class="form-control" value="{{ $configs['boleto_dias_vencimento'] }}">
-                                <span class="input-group-text">dias</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Multa por Atraso (%)</label>
-                            <div class="input-group">
-                                <input type="number" step="0.1" name="multa_atraso" class="form-control" value="{{ $configs['multa_atraso'] }}">
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Juros de Mora Diário (%)</label>
-                            <div class="input-group">
-                                <input type="number" step="0.001" name="juros_diario" class="form-control" value="{{ $configs['juros_diario'] }}">
-                                <span class="input-group-text">% ao dia</span>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Instruções de Pagamento (Impressas na Cobrança)</label>
-                            <textarea name="instrucoes_cobranca" rows="2" class="form-control">{{ $configs['instrucoes_cobranca'] }}</textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-danger w-100 py-3 fw-bold">
-                <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES COMPLETAS DO PORTAL DE PAGAMENTOS
-            </button>
-        </form>
+<div class="card shadow-sm border-0">
+    <!-- NAVEGAÇÃO POR GUIAS (TABS) -->
+    <div class="card-header bg-transparent p-0 border-bottom">
+        <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="gatewaysTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-semibold" id="mp-tab" data-bs-toggle="tab" data-bs-target="#tab-mercadopago" type="button" role="tab">
+                    <i class="fab fa-cc-mastercard text-primary me-2"></i> Mercado Pago
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="efi-tab" data-bs-toggle="tab" data-bs-target="#tab-efipro" type="button" role="tab">
+                    <i class="fas fa-bolt text-warning me-2"></i> Efí PRO (Gerencianet)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="carne-tab" data-bs-toggle="tab" data-bs-target="#tab-carne" type="button" role="tab">
+                    <i class="fas fa-book text-success me-2"></i> Cobrança por Carnê
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="emails-tab" data-bs-toggle="tab" data-bs-target="#tab-emails" type="button" role="tab">
+                    <i class="fas fa-envelope-open-text text-danger me-2"></i> Templates de E-mails
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="cron-tab" data-bs-toggle="tab" data-bs-target="#tab-cron" type="button" role="tab">
+                    <i class="fas fa-clock text-info me-2"></i> Central de Cron
+                </button>
+            </li>
+        </ul>
     </div>
 
-    <!-- URLs de Webhook e Informações -->
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 mb-4 sticky-top" style="top: 20px;">
-            <div class="card-header bg-transparent py-3">
-                <h6 class="fw-bold mb-0"><i class="fas fa-network-wired text-danger me-2"></i> Webhooks de Retorno Automático</h6>
+    <div class="card-body p-4">
+        <div class="tab-content" id="gatewaysTabsContent">
+
+            <!-- ===================================================================
+                 GUIA 1: MERCADO PAGO (COM SELEÇÃO DINÂMICA SANDBOX / PRODUÇÃO)
+                 =================================================================== -->
+            <div class="tab-pane fade show active" id="tab-mercadopago" role="tabpanel">
+                <form action="{{ route('admin.gateways.salvar') }}" method="POST" class="ajax-form">
+                    @csrf
+                    
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-primary"><i class="fab fa-cc-mastercard me-2"></i> Integração Mercado Pago</h5>
+                            <p class="text-secondary small mb-0">Checkout Transparente para PIX instantâneo, Cartão de Crédito e Boleto Bancário.</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-switch fs-5 mb-0">
+                                <input class="form-check-input" type="checkbox" name="mp_ativo" id="mp_ativo" value="1" {{ $configs['mp_ativo'] ? 'checked' : '' }}>
+                                <label class="form-check-label fs-6 fw-bold" for="mp_ativo">Gateway Ativo</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SELETOR DINÂMICO DE AMBIENTE MERCADO PAGO -->
+                    <div class="card bg-light border mb-4">
+                        <div class="card-body p-3">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                <div>
+                                    <span class="small fw-bold text-uppercase text-secondary d-block">Ambiente de Execução Ativo</span>
+                                    <span class="small text-muted">Selecione se as cobranças serão processadas em ambiente de testes ou real.</span>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="mp_ambiente" id="mp_amb_sandbox" value="sandbox" {{ $configs['mp_ambiente'] === 'sandbox' ? 'checked' : '' }} onchange="alternarAmbienteMp('sandbox')">
+                                    <label class="btn btn-outline-warning fw-bold px-3" for="mp_amb_sandbox">
+                                        <i class="fas fa-flask me-1"></i> Sandbox (Testes)
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="mp_ambiente" id="mp_amb_prod" value="producao" {{ $configs['mp_ambiente'] === 'producao' ? 'checked' : '' }} onchange="alternarAmbienteMp('producao')">
+                                    <label class="btn btn-outline-success fw-bold px-3" for="mp_amb_prod">
+                                        <i class="fas fa-check-circle me-1"></i> Produção Real
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ALERTA DINÂMICO DO AMBIENTE ATIVO -->
+                    <div id="mpAlertSandbox" class="alert alert-warning border-warning d-flex align-items-center {{ $configs['mp_ambiente'] === 'sandbox' ? '' : 'd-none' }}">
+                        <i class="fas fa-exclamation-triangle fs-3 me-3 text-warning"></i>
+                        <div>
+                            <strong>Modo Sandbox (Homologação) Ativo:</strong> Nenhuma cobrança financeira real será realizada. Utilize as credenciais de teste fornecidas no painel de desenvolvedor do Mercado Pago.
+                        </div>
+                    </div>
+                    <div id="mpAlertProd" class="alert alert-success border-success d-flex align-items-center {{ $configs['mp_ambiente'] === 'producao' ? '' : 'd-none' }}">
+                        <i class="fas fa-shield-alt fs-3 me-3 text-success"></i>
+                        <div>
+                            <strong>Modo Produção Real Ativo:</strong> As cobranças estão operando ao vivo com processamento financeiro real pelo Mercado Pago.
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS: AMBIENTE SANDBOX -->
+                    <div id="mpCamposSandbox" class="{{ $configs['mp_ambiente'] === 'sandbox' ? '' : 'd-none' }}">
+                        <div class="card border border-warning mb-4">
+                            <div class="card-header bg-warning bg-opacity-10 py-2">
+                                <span class="fw-bold small text-dark"><i class="fas fa-key text-warning me-1"></i> Credenciais de Testes (Sandbox)</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Public Key (Sandbox) *</label>
+                                        <input type="text" name="mp_public_key_sandbox" class="form-control" value="{{ $configs['mp_public_key_sandbox'] }}" placeholder="TEST-xxxx...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Access Token (Sandbox) *</label>
+                                        <div class="input-group">
+                                            <input type="password" name="mp_access_token_sandbox" id="mpAccessTokenSandbox" class="form-control" value="{{ $configs['mp_access_token_sandbox'] }}" placeholder="TEST-xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpAccessTokenSandbox')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client ID (Sandbox)</label>
+                                        <input type="text" name="mp_client_id_sandbox" class="form-control" value="{{ $configs['mp_client_id_sandbox'] }}" placeholder="Ex: 123456789">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client Secret (Sandbox)</label>
+                                        <div class="input-group">
+                                            <input type="password" name="mp_client_secret_sandbox" id="mpClientSecretSandbox" class="form-control" value="{{ $configs['mp_client_secret_sandbox'] }}" placeholder="Client_Secret_xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpClientSecretSandbox')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS: AMBIENTE PRODUÇÃO -->
+                    <div id="mpCamposProd" class="{{ $configs['mp_ambiente'] === 'producao' ? '' : 'd-none' }}">
+                        <div class="card border border-success mb-4">
+                            <div class="card-header bg-success bg-opacity-10 py-2">
+                                <span class="fw-bold small text-success"><i class="fas fa-lock me-1"></i> Credenciais de Produção Real</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Public Key (Produção) *</label>
+                                        <input type="text" name="mp_public_key_prod" class="form-control" value="{{ $configs['mp_public_key_prod'] }}" placeholder="APP_USR-xxxx...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Access Token (Produção) *</label>
+                                        <div class="input-group">
+                                            <input type="password" name="mp_access_token_prod" id="mpAccessTokenProd" class="form-control" value="{{ $configs['mp_access_token_prod'] }}" placeholder="APP_USR-xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpAccessTokenProd')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client ID (Produção)</label>
+                                        <input type="text" name="mp_client_id_prod" class="form-control" value="{{ $configs['mp_client_id_prod'] }}" placeholder="Ex: 987654321">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client Secret (Produção)</label>
+                                        <div class="input-group">
+                                            <input type="password" name="mp_client_secret_prod" id="mpClientSecretProd" class="form-control" value="{{ $configs['mp_client_secret_prod'] }}" placeholder="Client_Secret_xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('mpClientSecretProd')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MÉTODOS DE PAGAMENTO E WEBHOOK -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-2">
+                            <span class="fw-bold small text-dark"><i class="fas fa-sliders-h me-1"></i> Métodos Aceitos & Webhook de Retorno</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="mp_aceita_pix" id="mp_aceita_pix" value="1" {{ $configs['mp_aceita_pix'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="mp_aceita_pix">Aceitar PIX</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="mp_aceita_cartao" id="mp_aceita_cartao" value="1" {{ $configs['mp_aceita_cartao'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="mp_aceita_cartao">Aceitar Cartão de Crédito</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="mp_aceita_boleto" id="mp_aceita_boleto" value="1" {{ $configs['mp_aceita_boleto'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="mp_aceita_boleto">Aceitar Boleto Bancário</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label class="form-label small fw-bold">Chave Secreta do Webhook (Assinatura HMAC x-signature)</label>
+                                    <input type="password" name="mp_webhook_secret" class="form-control" value="{{ $configs['mp_webhook_secret'] }}" placeholder="Cole a assinatura secreta do Webhook gerada no Mercado Pago">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">URL de Webhook para Cadastro no Mercado Pago:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light font-monospace" value="{{ $webhookUrlMp }}" readonly id="urlWebhookMp">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="copiarTexto('urlWebhookMp')"><i class="fas fa-copy me-1"></i> Copiar URL</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Configurações do Mercado Pago
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="card-body p-4 small text-secondary">
-                <p>Cadastre estas URLs nos painéis dos gateways para que as baixas ocorram automaticamente em tempo real:</p>
 
-                <label class="fw-bold text-white mb-1">Webhook Mercado Pago:</label>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ $webhookUrlMp }}" readonly id="urlMp">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copiarTexto('urlMp')">Copiar</button>
-                </div>
+            <!-- ===================================================================
+                 GUIA 2: EFÍ PRO (GERENCIANET - PIX, BOLETO, CARTÃO E CERTIFICADO PEM)
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-efipro" role="tabpanel">
+                <form action="{{ route('admin.gateways.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+                    @csrf
 
-                <label class="fw-bold text-white mb-1">Webhook Efí PRO (PIX):</label>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ $webhookUrlEfi }}" readonly id="urlEfi">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copiarTexto('urlEfi')">Copiar</button>
-                </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-warning"><i class="fas fa-bolt me-2"></i> Integração Efí PRO (Gerencianet)</h5>
+                            <p class="text-secondary small mb-0">API Oficial do Banco Central para PIX com confirmação em tempo real, Boletos e Cartão.</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-switch fs-5 mb-0">
+                                <input class="form-check-input" type="checkbox" name="efi_ativo" id="efi_ativo" value="1" {{ $configs['efi_ativo'] ? 'checked' : '' }}>
+                                <label class="form-check-label fs-6 fw-bold" for="efi_ativo">Gateway Ativo</label>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="alert alert-info py-2 small mb-0">
-                    <i class="fas fa-shield-alt me-1"></i> Os pagamentos via PIX são aprovados em menos de 5 segundos via Webhook seguro.
+                    <!-- SELETOR DINÂMICO DE AMBIENTE EFÍ PRO -->
+                    <div class="card bg-light border mb-4">
+                        <div class="card-body p-3">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                <div>
+                                    <span class="small fw-bold text-uppercase text-secondary d-block">Ambiente de Execução Ativo</span>
+                                    <span class="small text-muted">Defina se a API da Efí operará em Homologação ou Produção.</span>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="efi_ambiente" id="efi_amb_sandbox" value="sandbox" {{ $configs['efi_ambiente'] === 'sandbox' ? 'checked' : '' }} onchange="alternarAmbienteEfi('sandbox')">
+                                    <label class="btn btn-outline-warning fw-bold px-3" for="efi_amb_sandbox">
+                                        <i class="fas fa-flask me-1"></i> Homologação (Sandbox)
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="efi_ambiente" id="efi_amb_prod" value="producao" {{ $configs['efi_ambiente'] === 'producao' ? 'checked' : '' }} onchange="alternarAmbienteEfi('producao')">
+                                    <label class="btn btn-outline-success fw-bold px-3" for="efi_amb_prod">
+                                        <i class="fas fa-check-circle me-1"></i> Produção Oficial
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ALERTA DINÂMICO EFÍ -->
+                    <div id="efiAlertSandbox" class="alert alert-warning border-warning d-flex align-items-center {{ $configs['efi_ambiente'] === 'sandbox' ? '' : 'd-none' }}">
+                        <i class="fas fa-exclamation-triangle fs-3 me-3 text-warning"></i>
+                        <div>
+                            <strong>Modo Homologação Efí Ativo:</strong> Utiliza o certificado de testes da Efí PRO e endpoints de sandbox. Não gera débitos bancários reais.
+                        </div>
+                    </div>
+                    <div id="efiAlertProd" class="alert alert-success border-success d-flex align-items-center {{ $configs['efi_ambiente'] === 'producao' ? '' : 'd-none' }}">
+                        <i class="fas fa-shield-alt fs-3 me-3 text-success"></i>
+                        <div>
+                            <strong>Modo Produção Oficial Efí Ativo:</strong> Conexão criptografada diretamente com os servidores da Efí PRO com liquidação financeira instantânea.
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS: AMBIENTE SANDBOX EFÍ -->
+                    <div id="efiCamposSandbox" class="{{ $configs['efi_ambiente'] === 'sandbox' ? '' : 'd-none' }}">
+                        <div class="card border border-warning mb-4">
+                            <div class="card-header bg-warning bg-opacity-10 py-2">
+                                <span class="fw-bold small text-dark"><i class="fas fa-key text-warning me-1"></i> Credenciais & Certificado Homologação (Sandbox)</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client ID (Sandbox) *</label>
+                                        <input type="text" name="efi_client_id_sandbox" class="form-control" value="{{ $configs['efi_client_id_sandbox'] }}" placeholder="Client_Id_xxxx...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client Secret (Sandbox) *</label>
+                                        <div class="input-group">
+                                            <input type="password" name="efi_client_secret_sandbox" id="efiClientSecretSandbox" class="form-control" value="{{ $configs['efi_client_secret_sandbox'] }}" placeholder="Client_Secret_xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('efiClientSecretSandbox')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Chave PIX (Homologação)</label>
+                                        <input type="text" name="efi_chave_pix_sandbox" class="form-control" value="{{ $configs['efi_chave_pix_sandbox'] }}" placeholder="Chave de testes gerada na Efí">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Certificado .PEM (Sandbox)</label>
+                                        @if(!empty($configs['efi_certificado_pem_sandbox']))
+                                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 bg-light border rounded">
+                                                <span class="small font-monospace text-success"><i class="fas fa-file-code me-1"></i> {{ $configs['efi_certificado_pem_sandbox'] }}</span>
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input" type="checkbox" name="remover_efi_cert_sandbox" value="1" id="rem_cert_sb">
+                                                    <label class="form-check-label small text-danger" for="rem_cert_sb">Remover</label>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <input type="file" name="efi_certificado_sandbox" class="form-control form-control-sm" accept=".pem">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS: AMBIENTE PRODUÇÃO EFÍ -->
+                    <div id="efiCamposProd" class="{{ $configs['efi_ambiente'] === 'producao' ? '' : 'd-none' }}">
+                        <div class="card border border-success mb-4">
+                            <div class="card-header bg-success bg-opacity-10 py-2">
+                                <span class="fw-bold small text-success"><i class="fas fa-lock me-1"></i> Credenciais & Certificado de Produção Oficial</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client ID Oficial (Produção) *</label>
+                                        <input type="text" name="efi_client_id_prod" class="form-control" value="{{ $configs['efi_client_id_prod'] }}" placeholder="Client_Id_xxxx...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Client Secret Oficial (Produção) *</label>
+                                        <div class="input-group">
+                                            <input type="password" name="efi_client_secret_prod" id="efiClientSecretProd" class="form-control" value="{{ $configs['efi_client_secret_prod'] }}" placeholder="Client_Secret_xxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('efiClientSecretProd')"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Chave PIX Oficial da Conta *</label>
+                                        <input type="text" name="efi_chave_pix_prod" class="form-control" value="{{ $configs['efi_chave_pix_prod'] }}" placeholder="Chave EVP, CNPJ, Telefone ou E-mail da Foco 7">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Certificado Oficial .PEM (Produção) *</label>
+                                        @if(!empty($configs['efi_certificado_pem_prod']))
+                                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 bg-light border rounded">
+                                                <span class="small font-monospace text-success"><i class="fas fa-certificate text-success me-1"></i> {{ $configs['efi_certificado_pem_prod'] }}</span>
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input" type="checkbox" name="remover_efi_cert_prod" value="1" id="rem_cert_prod">
+                                                    <label class="form-check-label small text-danger" for="rem_cert_prod">Remover</label>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <input type="file" name="efi_certificado_prod" class="form-control form-control-sm" accept=".pem">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MÉTODOS DE PAGAMENTO E REGRAS FINANCEIRAS EFÍ -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-2">
+                            <span class="fw-bold small text-dark"><i class="fas fa-sliders-h me-1"></i> Métodos Efí & Condições Comerciais</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="efi_aceita_pix" id="efi_aceita_pix" value="1" {{ $configs['efi_aceita_pix'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="efi_aceita_pix">PIX Instantâneo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="efi_aceita_boleto" id="efi_aceita_boleto" value="1" {{ $configs['efi_aceita_boleto'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="efi_aceita_boleto">Boleto Bancário</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="efi_aceita_cartao" id="efi_aceita_cartao" value="1" {{ $configs['efi_aceita_cartao'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="efi_aceita_cartao">Cartão de Crédito</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="efi_aceita_carne" id="efi_aceita_carne" value="1" {{ $configs['efi_aceita_carne'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-bold small" for="efi_aceita_carne">Carnê de Mensalidade</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Desconto no PIX à Vista (%)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.1" name="pix_desconto" class="form-control" value="{{ $configs['pix_desconto'] }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Expiração do QR Code PIX (Minutos)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="pix_expiracao_minutos" class="form-control" value="{{ $configs['pix_expiracao_minutos'] }}">
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Dias para Vencimento do Boleto</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="boleto_dias_vencimento" class="form-control" value="{{ $configs['boleto_dias_vencimento'] }}">
+                                        <span class="input-group-text">dias</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Multa por Atraso (%)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.1" name="multa_atraso" class="form-control" value="{{ $configs['multa_atraso'] }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Juros de Mora Diário (%)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.001" name="juros_diario" class="form-control" value="{{ $configs['juros_diario'] }}">
+                                        <span class="input-group-text">% ao dia</span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Instruções Bancárias no Boleto:</label>
+                                    <textarea name="instrucoes_cobranca" rows="2" class="form-control">{{ $configs['instrucoes_cobranca'] }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">URL de Webhook Efí PRO (PIX):</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light font-monospace" value="{{ $webhookUrlEfi }}" readonly id="urlWebhookEfi">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="copiarTexto('urlWebhookEfi')"><i class="fas fa-copy me-1"></i> Copiar URL</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Configurações da Efí PRO
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================================================================
+                 GUIA 3: COBRANÇA POR CARNÊ (EFÍ PRO PARA CLIENTES EXISTENTES)
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-carne" role="tabpanel">
+                <div class="row g-4">
+                    <!-- CONFIGURAÇÕES DE CARNÊ -->
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light py-3">
+                                <h6 class="fw-bold mb-0 text-success"><i class="fas fa-cog me-2"></i> Parâmetros de Carnê de Mensalidades</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <form action="{{ route('admin.gateways.salvar') }}" method="POST" class="ajax-form">
+                                    @csrf
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch fs-5 mb-3">
+                                                <input class="form-check-input" type="checkbox" name="carne_ativo" id="carne_ativo" value="1" {{ $configs['carne_ativo'] ? 'checked' : '' }}>
+                                                <label class="form-check-label fs-6 fw-bold" for="carne_ativo">Carnê Habilitado no Sistema</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Máximo de Parcelas Permitidas</label>
+                                            <input type="number" name="carne_max_parcelas" class="form-control" value="{{ $configs['carne_max_parcelas'] }}" min="2" max="24">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Dias para 1º Vencimento</label>
+                                            <input type="number" name="carne_dias_primeiro_vencimento" class="form-control" value="{{ $configs['carne_dias_primeiro_vencimento'] }}" min="1" max="60">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Intervalo Entre Parcelas</label>
+                                            <div class="input-group">
+                                                <input type="number" name="carne_intervalo_dias" class="form-control" value="{{ $configs['carne_intervalo_dias'] }}" min="15" max="60">
+                                                <span class="input-group-text">dias</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Notificações Automáticas</label>
+                                            <div class="form-check mt-1">
+                                                <input class="form-check-input" type="checkbox" name="carne_envio_email" id="carne_envio_email" value="1" {{ $configs['carne_envio_email'] ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="carne_envio_email">Enviar por E-mail</label>
+                                            </div>
+                                            <div class="form-check mt-1">
+                                                <input class="form-check-input" type="checkbox" name="carne_envio_whatsapp" id="carne_envio_whatsapp" value="1" {{ $configs['carne_envio_whatsapp'] ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="carne_envio_whatsapp">Notificar via WhatsApp</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Instruções Impressas nas Folhas do Carnê</label>
+                                            <textarea name="carne_instrucoes" rows="3" class="form-control">{{ $configs['carne_instrucoes'] }}</textarea>
+                                        </div>
+                                        <div class="col-12 text-end mt-4">
+                                            <button type="submit" class="btn btn-success fw-bold">
+                                                <i class="fas fa-save me-1"></i> Salvar Regras do Carnê
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EMISSÃO SOB DEMANDA DE CARNÊ PARA CLIENTES EXISTENTES -->
+                    <div class="col-lg-6">
+                        <div class="card border border-success h-100 shadow-sm">
+                            <div class="card-header bg-success bg-opacity-10 py-3">
+                                <h6 class="fw-bold mb-0 text-success"><i class="fas fa-file-invoice-dollar me-2"></i> Emitir Carnê para Cliente Já Existente</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <form action="{{ route('admin.gateways.gerar_carne') }}" method="POST" class="ajax-form" id="formGerarCarne">
+                                    @csrf
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Selecionar Cliente Cadastrado *</label>
+                                            <select name="cliente_id" class="form-select select2" required>
+                                                <option value="">Selecione o cliente...</option>
+                                                @foreach($clientes as $cli)
+                                                    <option value="{{ $cli->id }}">{{ $cli->name }} ({{ $cli->email }}) - {{ $cli->cpf_cnpj ?? 'Sem CPF' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Plano ou Serviço Vinculado (Opcional)</label>
+                                            <select name="plano_id" class="form-select">
+                                                <option value="">Nenhum plano específico (Mensalidade Personalizada)</option>
+                                                @foreach($planos as $pln)
+                                                    <option value="{{ $pln->id }}">{{ $pln->nome }} - {{ $pln->preco_formatado }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Descrição da Cobrança *</label>
+                                            <input type="text" name="descricao" class="form-control" required placeholder="Ex: Mensalidade Rastreamento Veicular 2026">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Valor de Cada Parcela *</label>
+                                            <input type="text" name="valor_parcela" class="form-control mask-dinheiro" required placeholder="R$ 59,90">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Número de Parcelas *</label>
+                                            <select name="total_parcelas" class="form-select" required>
+                                                <option value="2">2x parcelas (Bimestral)</option>
+                                                <option value="3">3x parcelas (Trimestral)</option>
+                                                <option value="6">6x parcelas (Semestral)</option>
+                                                <option value="12" selected>12x parcelas (Anual - Recomendado)</option>
+                                                <option value="24">24x parcelas (Bienal)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Data do 1º Vencimento *</label>
+                                            <input type="date" name="data_primeiro_vencimento" class="form-control" required value="{{ date('Y-m-d', strtotime('+10 days')) }}">
+                                        </div>
+                                        <div class="col-12 text-end mt-4">
+                                            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                                                <i class="fas fa-print me-1"></i> Gerar Carnê &amp; Enviar ao Cliente
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- ===================================================================
+                 GUIA 4: TEMPLATES DE E-MAILS PRÓPRIOS
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-emails" role="tabpanel">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-danger"><i class="fas fa-envelope-open-text me-2"></i> Templates de E-mails Transacionais</h5>
+                        <p class="text-secondary small mb-0">Personalize o assunto e conteúdo de cada e-mail disparado pelo sistema com editor visual Summernote.</p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger fw-bold btn-sm" onclick="abrirModalTesteEmail()">
+                            <i class="fas fa-paper-plane me-1"></i> Enviar E-mail de Demonstração
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAGS DISPONÍVEIS COM CLIQUE PARA COPIAR -->
+                <div class="alert alert-light border mb-4">
+                    <span class="small fw-bold text-dark d-block mb-2"><i class="fas fa-tags text-danger me-1"></i> Variáveis Dinâmicas Disponíveis (Clique para copiar):</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{cliente_nome}')">{cliente_nome}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{cliente_email}')">{cliente_email}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{fatura_id}')">{fatura_id}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{plano_nome}')">{plano_nome}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{valor}')">{valor}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{data_vencimento}')">{data_vencimento}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{link_fatura}')">{link_fatura}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{link_carne}')">{link_carne}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{nome_empresa}')">{nome_empresa}</span>
+                        <span class="badge bg-secondary-subtle text-dark border font-monospace cursor-pointer" onclick="copiarTag('{whatsapp_empresa}')">{whatsapp_empresa}</span>
+                    </div>
+                </div>
+
+                <!-- SUB-GUIAS DOS 5 TEMPLATES -->
+                <ul class="nav nav-pills mb-4" id="emailTemplatesPills" role="tablist">
+                    @foreach($templatesEmail as $key => $tpl)
+                    <li class="nav-item me-2 mb-2">
+                        <button class="nav-link {{ $loop->first ? 'active' : '' }} fw-semibold btn-sm" id="pill-{{ $key }}-tab" data-bs-toggle="pill" data-bs-target="#pill-{{ $key }}" type="button" role="tab">
+                            {{ $tpl['nome'] }}
+                        </button>
+                    </li>
+                    @endforeach
+                </ul>
+
+                <div class="tab-content" id="emailTemplatesPillsContent">
+                    @foreach($templatesEmail as $key => $tpl)
+                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="pill-{{ $key }}" role="tabpanel">
+                        <form action="{{ route('admin.gateways.salvar_email') }}" method="POST" class="ajax-form">
+                            @csrf
+                            <input type="hidden" name="template_chave" value="{{ $key }}">
+                            <div class="card border mb-3">
+                                <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark small">{{ $tpl['nome'] }}</span>
+                                    <span class="text-secondary small">{{ $tpl['descricao'] }}</span>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Assunto do E-mail</label>
+                                        <input type="text" name="assunto" class="form-control" value="{{ $tpl['assunto_atual'] }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold d-flex justify-content-between">
+                                            <span>Corpo da Mensagem (HTML Formatado)</span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                        </label>
+                                        <textarea name="corpo" id="summernote_{{ $key }}" class="form-control summernote" data-height="250">{{ $tpl['corpo_atual'] }}</textarea>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="dispararTesteIndividual('{{ $key }}')">
+                                            <i class="fas fa-vial me-1"></i> Testar Envio Deste Template
+                                        </button>
+                                        <button type="submit" class="btn btn-danger fw-bold shadow-sm">
+                                            <i class="fas fa-save me-1"></i> Salvar Template: {{ $tpl['nome'] }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- ===================================================================
+                 GUIA 5: CENTRAL DE CRON & AUTOMAÇÃO
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-cron" role="tabpanel">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-info"><i class="fas fa-clock me-2"></i> Central de Cron Jobs & Agendamento</h5>
+                        <p class="text-secondary small mb-0">Acompanhe as rotinas automáticas de verificação de faturas, reconciliação de pagamentos e lembretes.</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-info-subtle text-info border border-info-subtle p-2">
+                            <i class="fas fa-server me-1"></i> Horário do Servidor: {{ date('d/m/Y H:i:s') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- COMANDO PARA CPANEL -->
+                <div class="card border mb-4 shadow-sm">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="fas fa-terminal me-2 text-warning"></i> Comando Cron Oficial para o cPanel</span>
+                        <span class="badge bg-success">EXECUTAR A CADA MINUTO (* * * * *)</span>
+                    </div>
+                    <div class="card-body p-4 bg-light">
+                        <p class="small text-secondary mb-2">
+                            Acesse o <strong>cPanel &rarr; Cron Jobs (Tarefas Cron)</strong> da sua hospedagem e cadastre exatamente a linha abaixo para automatizar todas as rotinas da Foco 7:
+                        </p>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace bg-dark text-white border-0 py-2 fs-6" id="cronCpanelCmd" value="{{ $cronStatus['comando_cpanel'] }}" readonly>
+                            <button class="btn btn-warning fw-bold px-3" type="button" onclick="copiarTexto('cronCpanelCmd')">
+                                <i class="fas fa-copy me-1"></i> Copiar Comando
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABELA DE ROTINAS AUTOMÁTICAS COM EXECUÇÃO SOB DEMANDA -->
+                <div class="card border shadow-sm">
+                    <div class="card-header bg-light py-3">
+                        <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-tasks me-2 text-danger"></i> Rotinas Agendadas do Sistema</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Rotina Automática</th>
+                                    <th>Comando Artisan</th>
+                                    <th>Frequência</th>
+                                    <th>Última Execução</th>
+                                    <th class="text-end">Execução Sob Demanda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($cronStatus['rotinas'] as $tarefaKey => $rotina)
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ $rotina['nome'] }}</div>
+                                        <small class="text-secondary">{{ $rotina['descricao'] }}</small>
+                                    </td>
+                                    <td><code class="bg-light text-danger p-1 rounded font-monospace">{{ $rotina['comando'] }}</code></td>
+                                    <td><span class="badge bg-secondary">{{ $rotina['frequencia'] }}</span></td>
+                                    <td>
+                                        <span class="small text-dark font-monospace" id="lastRun_{{ $tarefaKey }}">
+                                            <i class="fas fa-history text-secondary me-1"></i> {{ $rotina['ultima_execucao'] }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="executarCronManual('{{ $tarefaKey }}', '{{ $rotina['nome'] }}')">
+                                            <i class="fas fa-play me-1"></i> Executar Agora
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA DISPARO DE TESTE DE E-MAIL -->
+<div class="modal fade" id="modalTesteEmail" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold"><i class="fas fa-paper-plane text-danger me-2"></i> Enviar E-mail de Demonstração</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('admin.gateways.email_teste') }}" method="POST" class="ajax-form" id="formTesteEmail">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Template a Testar</label>
+                        <select name="template_chave" id="modalTemplateChave" class="form-select" required>
+                            @foreach($templatesEmail as $k => $t)
+                                <option value="{{ $k }}">{{ $t['nome'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">E-mail de Destino</label>
+                        <input type="email" name="email_destinatario" class="form-control" value="{{ auth()->user()->email }}" required placeholder="seuemail@empresa.com">
+                        <small class="text-secondary">O e-mail será disparado imediatamente com dados fictícios formatados.</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-paper-plane me-1"></i> Disparar Demonstração</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -238,17 +773,119 @@
 
 @section('scripts')
 <script>
-    function toggleSenha(inputId) {
-        var input = document.getElementById(inputId);
-        input.type = input.type === 'password' ? 'text' : 'password';
+    // Alternância Dinâmica de Ambiente Mercado Pago
+    function alternarAmbienteMp(ambiente) {
+        if (ambiente === 'sandbox') {
+            $('#mpAlertSandbox').removeClass('d-none');
+            $('#mpAlertProd').addClass('d-none');
+            $('#mpCamposSandbox').removeClass('d-none');
+            $('#mpCamposProd').addClass('d-none');
+        } else {
+            $('#mpAlertSandbox').addClass('d-none');
+            $('#mpAlertProd').removeClass('d-none');
+            $('#mpCamposSandbox').addClass('d-none');
+            $('#mpCamposProd').removeClass('d-none');
+        }
     }
 
+    // Alternância Dinâmica de Ambiente Efí PRO
+    function alternarAmbienteEfi(ambiente) {
+        if (ambiente === 'sandbox') {
+            $('#efiAlertSandbox').removeClass('d-none');
+            $('#efiAlertProd').addClass('d-none');
+            $('#efiCamposSandbox').removeClass('d-none');
+            $('#efiCamposProd').addClass('d-none');
+        } else {
+            $('#efiAlertSandbox').addClass('d-none');
+            $('#efiAlertProd').removeClass('d-none');
+            $('#efiCamposSandbox').addClass('d-none');
+            $('#efiCamposProd').removeClass('d-none');
+        }
+    }
+
+    // Alternador de visualização de senhas/chaves
+    function toggleSenha(inputId) {
+        var el = document.getElementById(inputId);
+        if (el) {
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+    }
+
+    // Copiar Texto para o Clipboard com Feedback Toastr
     function copiarTexto(id) {
         var el = document.getElementById(id);
-        el.select();
-        el.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(el.value);
-        window.foco7Notify.success('URL de Webhook copiada com sucesso!');
+        if (el) {
+            el.select();
+            el.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(el.value);
+            window.foco7Notify.success('Copiado com sucesso para a área de transferência!');
+        }
+    }
+
+    // Copiar Tag Dinâmica
+    function copiarTag(tag) {
+        navigator.clipboard.writeText(tag);
+        window.foco7Notify.success('Tag ' + tag + ' copiada!');
+    }
+
+    // Modal de Teste de E-mail
+    function abrirModalTesteEmail() {
+        new bootstrap.Modal(document.getElementById('modalTesteEmail')).show();
+    }
+
+    function dispararTesteIndividual(chave) {
+        $('#modalTemplateChave').val(chave);
+        abrirModalTesteEmail();
+    }
+
+    // Execução Manual de Tarefa Cron com SweetAlert2
+    function executarCronManual(tarefa, nome) {
+        window.foco7Confirm('Executar ' + nome + '?', 'Deseja disparar esta rotina em segundo plano agora?', function() {
+            Swal.fire({
+                title: 'Executando Rotina...',
+                html: '<div class="spinner-border text-danger" role="status"></div><p class="mt-3">Processando rotina <strong>' + nome + '</strong>...</p>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+            });
+
+            $.ajax({
+                url: '{{ route("admin.gateways.executar_cron") }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    tarefa: tarefa
+                },
+                success: function(res) {
+                    if (res.success) {
+                        $('#lastRun_' + tarefa).html('<i class="fas fa-check text-success me-1"></i> ' + res.data_hora);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Rotina Concluída com Sucesso!',
+                            html: '<div class="text-start bg-dark text-white p-3 rounded font-monospace small" style="max-height: 250px; overflow-y: auto;">' + (res.output || res.message) + '</div>',
+                            confirmButtonColor: '#d90000',
+                            confirmButtonText: 'Fechar'
+                        });
+                        window.foco7Notify.success(res.message);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Falha na Execução',
+                            text: res.message || 'Ocorreu um erro ao processar a tarefa.',
+                            confirmButtonColor: '#d90000'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro interno do servidor.';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro de Execução',
+                        text: msg,
+                        confirmButtonColor: '#d90000'
+                    });
+                }
+            });
+        });
     }
 </script>
 @endsection

@@ -143,10 +143,14 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/', [ManutencaoController::class, 'salvar'])->name('admin.manutencao.salvar');
     });
 
-    // Gateways de Pagamento
+    // Gateways de Pagamento, Carnê, Templates de E-mails & Central de Cron
     Route::prefix('gateways')->group(function () {
         Route::get('/', [GatewaysController::class, 'index'])->name('admin.gateways.index');
         Route::post('/', [GatewaysController::class, 'salvar'])->name('admin.gateways.salvar');
+        Route::post('/gerar-carne', [GatewaysController::class, 'gerarCarne'])->name('admin.gateways.gerar_carne');
+        Route::post('/email-teste', [GatewaysController::class, 'enviarEmailTeste'])->name('admin.gateways.email_teste');
+        Route::post('/salvar-email', [GatewaysController::class, 'salvarTemplateEmail'])->name('admin.gateways.salvar_email');
+        Route::post('/executar-cron', [GatewaysController::class, 'executarCron'])->name('admin.gateways.executar_cron');
     });
 
     // Meu Perfil de Usuário

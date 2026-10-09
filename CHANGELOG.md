@@ -3,6 +3,25 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.6.5] - 2026-10-09
+
+### 💳 Gateways, Cobrança por Carnê Efí, Templates de E-mail & Central de Cron
+- **Portal de Gateways Reorganizado em Guias (`/admin/gateways`):**
+  - **Interface Modular por Abas:** Painel segmentado em 5 guias Bootstrap 5: Mercado Pago, Efí PRO (Gerencianet), Cobrança por Carnê, Templates de E-mails Próprios e Central de Cron & Automação.
+  - **Seleção Dinâmica Sandbox vs Produção:** Alternador instantâneo via rádio que exibe e oculta os campos de credenciais correspondentes de cada ambiente (Public Key, Access Token, Client ID, Client Secret, Chave PIX e Certificados .PEM), gravando chaves isoladas no banco e mantendo retrocompatibilidade transparente com o fluxo de checkout da landing page.
+- **Módulo de Cobrança por Carnê Efí PRO para Clientes Existentes:**
+  - **Emissão sob Demanda:** Permite selecionar clientes ativos já cadastrados, plano opcional, valor customizado de parcela e quantidade de parcelas (2x a 24x).
+  - **Faturamento em Lote e Vencimentos Consecutivos:** Geração de faturas vinculadas com prefixo unificado `CARNE-YYYYMMDD-XXXX-XX` e vencimentos sequenciais automáticos com intervalo mensal.
+  - **Notificação Automática:** Disparo opcional do e-mail do carnê com resumo das parcelas e instruções financeiras.
+- **Central de Templates de E-mails Próprios com Editor Summernote:**
+  - **5 Modelos Transacionais Nativos:** Fatura Gerada, Pagamento Confirmado, Carnê Emitido, Lembrete Preventivo e Fatura Vencida.
+  - **Tags Dinâmicas Clicáveis:** Inserção em 1 clique de tags operacionais (`{cliente_nome}`, `{valor}`, `{data_vencimento}`, `{link_fatura}`, etc.).
+  - **Disparo de E-mail de Teste:** Ferramenta integrada com validação dinâmica de SMTP a partir das configurações do CMS e feedback visual via SweetAlert2.
+- **Central de Cron & Automação de Faturas:**
+  - **Comandos Artisan Desenvolvidos:** `faturas:verificar-vencidas` (marca faturas vencidas e notifica), `faturas:enviar-lembretes` (lembrete preventivo 3 dias antes) e `gateways:sincronizar-pagamentos` (consulta de status via API).
+  - **Agendamento Laravel:** Rotinas agendadas registradas em `routes/console.php`.
+  - **Painel de Monitoramento & Execução Sob Demanda:** Visualização do comando do cPanel (`* * * * * cd ... && php artisan schedule:run`) e botão "Executar Agora" com feedback AJAX e exibição de log no SweetAlert2.
+
 ---
 
 ## [1.6.4] - 2026-10-09
