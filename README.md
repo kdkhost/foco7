@@ -146,6 +146,21 @@ public_html/
 - Suporte a PIX com cópia e cola e QR Code dinâmico, Boleto Bancário e Cartão de Crédito.
 - Webhooks dinâmicos com logs e validação de segurança para retorno automático de status.
 
+### Módulo 9: Estética Automotiva & Detalhamento Premium
+- **Landing Page Pública:** Nova seção elegante e de alta conversão apresentando os serviços de estética (Polimento Técnico, Vitrificação Cerâmica 9H, Higienização Interna, Lavagem Detalhada, Cristalização e PPF).
+- **Agendamento Online no Site:** Modal inteligente multi-categoria permitindo aos clientes agendarem tanto serviços de estética quanto instalações de rastreamento.
+- **Painel Administrativo (`/admin/estetica`):** CRUD completo com gerenciamento de preços, tempos de aplicação, ícones, descrições detalhadas, itens inclusos e ativação/desativação instantânea via AJAX.
+- **FullCalendar 6 Integrado:** Identificação visual automática por cores (Roxo `#6f42c1` para estética, Verde `#28a745` para rastreamento) com edição e reagendamento via arrastar e soltar (drag & drop).
+- **Área do Cliente:** O cliente pode solicitar serviços de estética diretamente pelo seu painel, com acompanhamento de status em tempo real.
+
+### Módulo 10: Gestão Completa de Clientes & Faturas/Financeiro
+- **Base de Clientes (`/admin/clientes`):** Painel administrativo completo para listar, filtrar, cadastrar e editar dados cadastrais, redefinir senhas de acesso e gerenciar status ativo/inativo.
+- **Faturas & Mensalidades (`/admin/faturas`):** Controle financeiro com métricas em tempo real (Total Faturado, Pendente, Vencido), emissão de faturas avulsas ou atreladas a planos, e alteração rápida de status para quitação.
+
+### Módulo 11: Edição Avançada do CMS & Textos das Seções
+- **Edição Dinâmica via Modal:** Recursos completos para editar banners/slides existentes, perguntas frequentes (FAQs) e depoimentos de clientes.
+- **Aba de Textos das Seções:** Controle total sobre os títulos, subtítulos e textos das seções Sobre Nós, Riscos vs Prevenção, Ronda Tática, Recursos do App e Estética Automotiva.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -156,18 +171,21 @@ public_html/
 | **Módulo 2** | Landing Page Single Page de Alta Conversão (`sosrastreamento.com` + Foco 7) | ✅ Concluído & Validado |
 | **Módulo 3** | Página de Manutenção Avançada com Countdown, bypass de IP e dispositivo | ✅ Concluído & Validado |
 | **Módulo 4** | Painel Administrativo CMS (AdminLTE 4, Dark/Light mode, Toastr, SweetAlert2) | ✅ Concluído & Validado |
-| **Módulo 5** | Sistema de Agendamento Interativo (FullCalendar 6 com Drag & Drop) | ✅ Concluído & Validado |
+| **Módulo 5** | Sistema de Agendamento Interativo (FullCalendar 6 com Drag & Drop e Categorias) | ✅ Concluído & Validado |
 | **Módulo 6** | Motor de SEO com Preview do Google, Score em Tempo Real e Sitemap XML | ✅ Concluído & Validado |
 | **Módulo 7** | Área do Cliente com Controle de Acesso (ACL) e Emissão de Faturas | ✅ Concluído & Validado |
 | **Módulo 8** | Gateways de Pagamento (Mercado Pago e Efí PRO) com Webhooks | ✅ Concluído & Validado |
+| **Módulo 9** | Estética Automotiva & Agendamento Multi-categoria (Site, Admin e Cliente) | ✅ Concluído & Validado |
+| **Módulo 10**| Gestão Completa de Clientes & Faturas/Financeiro no Admin | ✅ Concluído & Validado |
+| **Módulo 11**| Edição Avançada de Banners, FAQs, Depoimentos e Textos de Seções no CMS | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
-A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/Foco7SystemTest.php` e `ExampleTest.php`):
-- **16 testes executados, 16 aprovados (100% de sucesso), 44 asserções**.
-- Verificação de carregamento de rotas, isolamento de perfis ACL (Administrador vs Cliente), validação do modo de manutenção com bypass por token e submissões AJAX de formulários.
+A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
+- **24 testes executados, 24 aprovados (100% de sucesso), 84 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online, CRUD de estética, clientes e faturas, edição no CMS e isolamento ACL (Administrador vs Cliente).
 
 ---
 
@@ -176,4 +194,5 @@ A aplicação conta com uma suíte de testes de integração automatizados (`tes
 - **Prevenção de N+1 e Sobrecarga:** Todas as consultas com Eager Loading (`with()`) e índices nas tabelas do MySQL.
 - **UTF-8 Sem BOM:** Arquivos salvos rigorosamente em UTF-8 sem Byte Order Mark.
 - **Timezone:** `America/Sao_Paulo`.
+
 

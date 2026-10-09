@@ -127,19 +127,40 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
-                <h5 class="fw-bold mb-0"><i class="fas fa-calendar-alt text-danger me-2"></i> Minhas Instalações & Visitas</h5>
-                <span class="badge bg-secondary">{{ $agendamentos->count() }} Registros</span>
+                <h5 class="fw-bold mb-0"><i class="fas fa-calendar-alt text-danger me-2"></i> Meus Agendamentos</h5>
+                <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalAgendamentoCliente()">
+                    <i class="fas fa-plus me-1"></i> Solicitar Agendamento
+                </button>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">
                     @forelse($agendamentos as $ag)
                     <div class="list-group-item bg-transparent border-bottom px-3 py-3 d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="fw-bold mb-1">{{ $ag->tipo_servico }}: {{ $ag->veiculo_modelo ?? 'Veículo' }}</h6>
-                            <small class="text-secondary"><i class="fas fa-clock me-1"></i> {{ $ag->data_hora_inicio->format('d/m/Y \à\s H:i') }}</small>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                @if($ag->categoria === 'estetica')
+                                    <span class="badge" style="background-color: #6f42c1; font-size: 0.75rem;">
+                                        <i class="fas fa-sparkles me-1"></i> Estética
+                                    </span>
+                                @else
+                                    <span class="badge" style="background-color: #28a745; font-size: 0.75rem;">
+                                        <i class="fas fa-satellite-dish me-1"></i> Rastreamento
+                                    </span>
+                                @endif
+                                <h6 class="fw-bold mb-0">{{ $ag->tipo_servico }}</h6>
+                            </div>
+                            <small class="text-secondary d-block">
+                                <i class="fas fa-car me-1"></i> {{ $ag->veiculo_modelo ?? 'Veículo' }} {{ $ag->veiculo_placa ? "({$ag->veiculo_placa})" : '' }}
+                            </small>
+                            <small class="text-secondary">
+                                <i class="fas fa-clock me-1"></i> {{ $ag->data_hora_inicio->format('d/m/Y \à\s H:i') }}
+                            </small>
                         </div>
-                        <div>
+                        <div class="text-end">
                             {!! $ag->status_badge !!}
+                            @if($ag->valor)
+                                <div class="small fw-bold text-dark mt-1">R$ {{ number_format($ag->valor, 2, ',', '.') }}</div>
+                            @endif
                         </div>
                     </div>
                     @empty
@@ -149,6 +170,72 @@
                     @endforelse
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL SOLICITAR AGENDAMENTO PELO CLIENTE -->
+<div class="modal fade" id="modalAgendamentoCliente" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold"><i class="fas fa-calendar-plus text-danger me-2"></i> Solicitar Novo Atendimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAgendamentoCliente" action="{{ route('cliente.agendamentos.solicitar') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Categoria *</label>
+                            <select name="categoria" id="cli_categoria" class="form-select" onchange="aoMudarCategoriaCliente()" required>
+                                <option value="estetica">✨ Estética Automotiva / Detalhamento</option>
+                                <option value="rastreamento">📡 Rastreamento / Manutenção</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="boxCliServicoEstetica">
+                            <label class="form-label small fw-bold">Serviço de Estética Desejado *</label>
+                            <select name="servico_estetica_id" id="cli_servico_estetica_id" class="form-select">
+                                <option value="">-- Selecione o serviço --</option>
+                                @foreach($servicosEstetica as $srv)
+                                    <option value="{{ $srv->id }}">{{ $srv->nome }} ({{ $srv->preco_formatado }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="boxCliTipoRastreamento" style="display: none;">
+                            <label class="form-label small fw-bold">Tipo de Serviço *</label>
+                            <select name="tipo_servico" id="cli_tipo_servico" class="form-select">
+                                <option value="Manutenção do Rastreador">Manutenção do Rastreador</option>
+                                <option value="Troca de Veículo">Troca de Veículo</option>
+                                <option value="Vistoria Técnica">Vistoria Técnica</option>
+                                <option value="Novo Rastreador Adicional">Instalar Rastreador em Novo Veículo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Modelo do Veículo *</label>
+                            <input type="text" name="veiculo_modelo" id="cli_veiculo_modelo" class="form-control" required placeholder="Ex: Corolla 2023, Titan 160">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Placa do Veículo</label>
+                            <input type="text" name="veiculo_placa" id="cli_veiculo_placa" class="form-control text-uppercase" placeholder="ABC-1D23">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Data & Horário Preferencial *</label>
+                            <input type="datetime-local" name="data_hora_inicio" id="cli_data_hora_inicio" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Observações / Detalhes</label>
+                            <textarea name="observacoes" id="cli_observacoes" rows="2" class="form-control" placeholder="Descreva suas preferências ou necessidades especiais..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold" id="btnSalvarAgendamentoCli">
+                        <i class="fas fa-check-circle me-1"></i> Enviar Solicitação
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -198,6 +285,34 @@
         });
     }
 
+    function aoMudarCategoriaCliente() {
+        var cat = $('#cli_categoria').val();
+        if (cat === 'estetica') {
+            $('#boxCliServicoEstetica').show();
+            $('#boxCliTipoRastreamento').hide();
+            $('#cli_servico_estetica_id').attr('required', 'required');
+            $('#cli_tipo_servico').removeAttr('required');
+        } else {
+            $('#boxCliServicoEstetica').hide();
+            $('#boxCliTipoRastreamento').show();
+            $('#cli_servico_estetica_id').removeAttr('required');
+            $('#cli_tipo_servico').attr('required', 'required');
+        }
+    }
+
+    function abrirModalAgendamentoCliente() {
+        $('#formAgendamentoCliente')[0].reset();
+        $('#cli_categoria').val('estetica');
+        aoMudarCategoriaCliente();
+
+        var now = new Date();
+        now.setDate(now.getDate() + 1);
+        var nowStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + 'T09:00';
+        $('#cli_data_hora_inicio').val(nowStr);
+
+        new bootstrap.Modal(document.getElementById('modalAgendamentoCliente')).show();
+    }
+
     $(function () {
         $('#btnCopiarPixCliente').on('click', function () {
             var copyText = document.getElementById("pixInputCode");
@@ -205,6 +320,49 @@
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
             window.foco7Notify.success('Código PIX copiado!');
+        });
+
+        // Submit AJAX da solicitação de agendamento do cliente
+        $('#formAgendamentoCliente').on('submit', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            var $btn = $('#btnSalvarAgendamentoCli');
+            var btnHtml = $btn.html();
+
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Enviando...');
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    $btn.prop('disabled', false).html(btnHtml);
+                    var modalEl = document.getElementById('modalAgendamentoCliente');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Agendamento Solicitado!',
+                        text: res.message,
+                        confirmButtonColor: '#d90000',
+                        confirmButtonText: 'OK'
+                    }).then(function () {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    $btn.prop('disabled', false).html(btnHtml);
+                    var msg = 'Erro ao solicitar agendamento.';
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    window.foco7Notify.error(msg);
+                }
+            });
         });
     });
 </script>

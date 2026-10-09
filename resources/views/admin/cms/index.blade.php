@@ -38,6 +38,11 @@
                     <i class="fas fa-star text-danger me-1"></i> Depoimentos
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
+                    <i class="fas fa-layer-group text-danger me-1"></i> Textos das Seções
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -299,9 +304,14 @@
                                 <td><span class="badge bg-dark">{{ $slide->texto_botao_1 ?? '-' }}</span></td>
                                 <td><span class="badge bg-dark">{{ $slide->texto_botao_2 ?? '-' }}</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('banner', {{ $slide->id }})">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarBanner({{ $slide->id }})" title="Editar Slide">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirItem('banner', {{ $slide->id }})" title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -324,7 +334,7 @@
                             <tr>
                                 <th>Pergunta</th>
                                 <th>Categoria</th>
-                                <th>Ações</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -332,10 +342,15 @@
                             <tr>
                                 <td class="fw-semibold">{{ $faq->pergunta }}</td>
                                 <td><span class="badge bg-secondary">{{ $faq->categoria }}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('faq', {{ $faq->id }})">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarFaq({{ $faq->id }})" title="Editar FAQ">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirItem('faq', {{ $faq->id }})" title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -359,7 +374,7 @@
                                 <th>Cliente</th>
                                 <th>Cidade / Veículo</th>
                                 <th>Estrelas</th>
-                                <th>Ações</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -370,10 +385,15 @@
                                 <td class="text-warning">
                                     @for($i=0; $i<$dep->estrelas; $i++) <i class="fas fa-star"></i> @endfor
                                 </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('depoimento', {{ $dep->id }})">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarDepoimento({{ $dep->id }})" title="Editar Depoimento">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirItem('depoimento', {{ $dep->id }})" title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -382,38 +402,176 @@
                 </div>
             </div>
 
+            <!-- ABA 6: TEXTOS DAS SEÇÕES DO SITE -->
+            <div class="tab-pane fade" id="tab-secoes" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
+                    
+                    <!-- 1. SEÇÃO SOBRE NÓS / QUEM SOMOS -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Seção Sobre Nós / Autoridade Foco 7</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
+                                    <input type="text" name="secao_sobre_titulo" class="form-control" value="{{ $settings['secao_sobre_titulo'] ?? 'Mais de 10 Anos de Autoridade em Segurança Veicular' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Subtítulo</label>
+                                    <input type="text" name="secao_sobre_subtitulo" class="form-control" value="{{ $settings['secao_sobre_subtitulo'] ?? 'A Foco 7 nasceu com a missão de transformar tecnologia de rastreamento em tranquilidade real.' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Texto Narrativo / História da Empresa</label>
+                                    <textarea name="secao_sobre_texto" class="form-control" rows="4">{{ $settings['secao_sobre_texto'] ?? 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.' }}</textarea>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Métrica: Anos de Experiência</label>
+                                    <input type="text" name="secao_sobre_anos" class="form-control" value="{{ $settings['secao_sobre_anos'] ?? '10+' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Métrica: Veículos Monitorados</label>
+                                    <input type="text" name="secao_sobre_veiculos" class="form-control" value="{{ $settings['secao_sobre_veiculos'] ?? '15.000+' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Métrica: Índice de Recuperação</label>
+                                    <input type="text" name="secao_sobre_recuperacao" class="form-control" value="{{ $settings['secao_sobre_recuperacao'] ?? '98.7%' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. SEÇÃO ESTÉTICA AUTOMOTIVA -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3">
+                            <h6 class="fw-bold mb-0 text-warning"><i class="fas fa-car-side me-2"></i> Seção Estética Automotiva no Site</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título da Seção de Estética</label>
+                                    <input type="text" name="secao_estetica_titulo" class="form-control" value="{{ $settings['secao_estetica_titulo'] ?? 'Estética Automotiva Premium Foco 7' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Subtítulo da Seção</label>
+                                    <input type="text" name="secao_estetica_subtitulo" class="form-control" value="{{ $settings['secao_estetica_subtitulo'] ?? 'Cuidado minucioso, proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Texto de Chamada de Ação</label>
+                                    <textarea name="secao_estetica_chamada" class="form-control" rows="2">{{ $settings['secao_estetica_chamada'] ?? 'Agende o serviço de estética automotiva do seu carro ou moto com profissionais certificados e produtos de primeira linha.' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. SEÇÃO RISCOS VS SOLUÇÕES -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Seção Riscos vs Soluções</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título da Seção</label>
+                                    <input type="text" name="secao_riscos_titulo" class="form-control" value="{{ $settings['secao_riscos_titulo'] ?? 'O Risco Não Avisa Antes de Chegar' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Subtítulo</label>
+                                    <input type="text" name="secao_riscos_subtitulo" class="form-control" value="{{ $settings['secao_riscos_subtitulo'] ?? 'Todos os dias centenas de veículos são roubados ou furtados. Veja a diferença entre estar desprotegido e ter a Foco 7:' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. SEÇÃO RONDA TÁTICA -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-motorcycle me-2"></i> Seção Ronda Tática & Apoio Presencial</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título da Ronda Tática</label>
+                                    <input type="text" name="secao_ronda_titulo" class="form-control" value="{{ $settings['secao_ronda_titulo'] ?? 'Ronda Tática Foco 7: Apoio Presencial Imediato' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Descrição da Atuação Presencial</label>
+                                    <textarea name="secao_ronda_descricao" class="form-control" rows="2">{{ $settings['secao_ronda_descricao'] ?? 'Em caso de roubo ou furto, nossa equipe tática especializada se desloca rapidamente até as coordenadas exatas do veículo para efetuar a recuperação em conjunto com as autoridades policiais.' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. SEÇÃO APLICATIVO MÓVEL -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3">
+                            <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-mobile-alt me-2"></i> Seção Aplicativo Móvel (Android & iOS)</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título do App</label>
+                                    <input type="text" name="secao_app_titulo" class="form-control" value="{{ $settings['secao_app_titulo'] ?? 'Controle Total do Seu Veículo na Palma da Mão' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Descrição do App</label>
+                                    <textarea name="secao_app_descricao" class="form-control" rows="2">{{ $settings['secao_app_descricao'] ?? 'Acompanhe velocidade em tempo real, rotas históricas, crie cercas virtuais, receba alertas de ignição e bloqueie o motor com apenas um toque no celular.' }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Link Google Play Store</label>
+                                    <input type="text" name="secao_app_link_playstore" class="form-control" value="{{ $settings['secao_app_link_playstore'] ?? 'https://play.google.com/store/apps' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Link Apple App Store</label>
+                                    <input type="text" name="secao_app_link_appstore" class="form-control" value="{{ $settings['secao_app_link_appstore'] ?? 'https://www.apple.com/app-store/' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Textos das Seções
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
 
-<!-- MODAL NOVO SLIDE -->
+<!-- MODAL CADASTRAR / EDITAR SLIDE -->
 <div class="modal fade" id="modalBanner" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Novo Slide do Hero Carousel</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalBannerTitulo">Slide do Hero Carousel</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_banner') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+            <form action="{{ route('admin.cms.salvar_banner') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formBannerSlide">
                 @csrf
                 <input type="hidden" name="tipo" value="hero_slide">
-                <div class="modal-body">
+                <input type="hidden" name="banner_id" id="banner_id">
+                <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Badge Superior (Opcional)</label>
-                            <input type="text" name="badge" class="form-control" placeholder="Ex: 🛡️ TECNOLOGIA DE PONTA">
+                            <input type="text" name="badge" id="banner_badge" class="form-control" placeholder="Ex: 🛡️ TECNOLOGIA DE PONTA">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Ordem de Exibição</label>
-                            <input type="number" name="ordem" class="form-control" value="1">
+                            <input type="number" name="ordem" id="banner_ordem" class="form-control" value="1">
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Título Principal *</label>
-                            <input type="text" name="titulo" class="form-control" required placeholder="Título chamativo de alta conversão">
+                            <input type="text" name="titulo" id="banner_titulo" class="form-control" required placeholder="Título chamativo de alta conversão">
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Subtítulo Explicativo</label>
-                            <textarea name="subtitulo" rows="3" class="form-control" placeholder="Descrição do impacto da proteção veicular"></textarea>
+                            <textarea name="subtitulo" id="banner_subtitulo" rows="3" class="form-control" placeholder="Descrição do impacto da proteção veicular"></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Imagem de Fundo do Slide (Opcional)</label>
@@ -426,51 +584,53 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Texto do Botão 1</label>
-                            <input type="text" name="texto_botao_1" class="form-control" value="PROTEGER MEU VEÍCULO AGORA">
+                            <input type="text" name="texto_botao_1" id="banner_texto_botao_1" class="form-control" value="PROTEGER MEU VEÍCULO AGORA">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Link do Botão 1</label>
-                            <input type="text" name="link_botao_1" class="form-control" value="#planos">
+                            <input type="text" name="link_botao_1" id="banner_link_botao_1" class="form-control" value="#planos">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Texto do Botão 2</label>
-                            <input type="text" name="texto_botao_2" class="form-control" value="FALAR NO WHATSAPP">
+                            <input type="text" name="texto_botao_2" id="banner_texto_botao_2" class="form-control" value="FALAR NO WHATSAPP">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Link do Botão 2</label>
-                            <input type="text" name="link_botao_2" class="form-control" value="https://wa.me/559180510736">
+                            <input type="text" name="link_botao_2" id="banner_link_botao_2" class="form-control" value="https://wa.me/559180510736">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold">Salvar Slide</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-save me-1"></i> Gravar Slide</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- MODAL NOVA FAQ -->
+<!-- MODAL CADASTRAR / EDITAR FAQ -->
 <div class="modal fade" id="modalFaq" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Nova Pergunta Frequente</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalFaqTitulo">Pergunta Frequente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_faq') }}" method="POST" class="ajax-form">
+            <form action="{{ route('admin.cms.salvar_faq') }}" method="POST" class="ajax-form" id="formFaq">
                 @csrf
-                <div class="modal-body">
+                <input type="hidden" name="faq_id" id="faq_id">
+                <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Pergunta *</label>
-                        <input type="text" name="pergunta" class="form-control" required placeholder="Como funciona a instalação?">
+                        <input type="text" name="pergunta" id="faq_pergunta" class="form-control" required placeholder="Como funciona a instalação?">
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Categoria</label>
-                        <select name="categoria" class="form-select">
+                        <select name="categoria" id="faq_categoria" class="form-select">
                             <option value="geral">Geral</option>
                             <option value="instalacao">Instalação</option>
+                            <option value="estetica">Estética Automotiva</option>
                             <option value="ronda">Ronda Tática</option>
                             <option value="aplicativo">Aplicativo</option>
                             <option value="financeiro">Financeiro / Pagamento</option>
@@ -478,41 +638,42 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Resposta Completa *</label>
-                        <textarea name="resposta" rows="4" class="form-control" required></textarea>
+                        <textarea name="resposta" id="faq_resposta" rows="4" class="form-control" required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold">Salvar FAQ</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-save me-1"></i> Gravar FAQ</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- MODAL NOVO DEPOIMENTO -->
+<!-- MODAL CADASTRAR / EDITAR DEPOIMENTO -->
 <div class="modal fade" id="modalDepoimento" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Novo Depoimento</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalDepoimentoTitulo">Depoimento de Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_depoimento') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+            <form action="{{ route('admin.cms.salvar_depoimento') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formDepoimento">
                 @csrf
-                <div class="modal-body">
+                <input type="hidden" name="depoimento_id" id="depoimento_id">
+                <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Nome do Cliente *</label>
-                        <input type="text" name="nome_cliente" class="form-control" required placeholder="Ex: Roberto Silva">
+                        <input type="text" name="nome_cliente" id="depoimento_nome" class="form-control" required placeholder="Ex: Roberto Silva">
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label class="form-label small fw-bold">Cidade - UF</label>
-                            <input type="text" name="cidade_uf" class="form-control" placeholder="Belém - PA">
+                            <input type="text" name="cidade_uf" id="depoimento_cidade_uf" class="form-control" placeholder="Belém - PA">
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-bold">Veículo</label>
-                            <input type="text" name="veiculo" class="form-control" placeholder="Hilux, Fan 160">
+                            <input type="text" name="veiculo" id="depoimento_veiculo" class="form-control" placeholder="Hilux, Fan 160">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -526,19 +687,20 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Estrelas</label>
-                        <select name="estrelas" class="form-select">
+                        <select name="estrelas" id="depoimento_estrelas" class="form-select">
                             <option value="5" selected>5 Estrelas (Excelente)</option>
                             <option value="4">4 Estrelas</option>
+                            <option value="3">3 Estrelas</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Depoimento *</label>
-                        <textarea name="texto" rows="3" class="form-control" required placeholder="O que o cliente disse sobre a proteção e agilidade?"></textarea>
+                        <textarea name="texto" id="depoimento_texto" rows="3" class="form-control" required placeholder="O que o cliente disse sobre a proteção e agilidade?"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold">Salvar Depoimento</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-save me-1"></i> Gravar Depoimento</button>
                 </div>
             </form>
         </div>
@@ -552,13 +714,76 @@
 
 <script>
     function abrirModalBanner() {
+        $('#banner_id').val('');
+        $('#formBannerSlide')[0].reset();
+        $('#modalBannerTitulo').text('Novo Slide do Hero Carousel');
         new bootstrap.Modal(document.getElementById('modalBanner')).show();
     }
+
+    function editarBanner(id) {
+        $.getJSON('/admin/cms/banner/obter/' + id, function(res) {
+            if (res.success && res.banner) {
+                var b = res.banner;
+                $('#banner_id').val(b.id);
+                $('#banner_badge').val(b.badge);
+                $('#banner_ordem').val(b.ordem);
+                $('#banner_titulo').val(b.titulo);
+                $('#banner_subtitulo').val(b.subtitulo);
+                $('#banner_texto_botao_1').val(b.texto_botao_1);
+                $('#banner_link_botao_1').val(b.link_botao_1);
+                $('#banner_texto_botao_2').val(b.texto_botao_2);
+                $('#banner_link_botao_2').val(b.link_botao_2);
+
+                $('#modalBannerTitulo').text('Editar Slide #' + b.id);
+                new bootstrap.Modal(document.getElementById('modalBanner')).show();
+            }
+        });
+    }
+
     function abrirModalFaq() {
+        $('#faq_id').val('');
+        $('#formFaq')[0].reset();
+        $('#modalFaqTitulo').text('Nova Pergunta Frequente');
         new bootstrap.Modal(document.getElementById('modalFaq')).show();
     }
+
+    function editarFaq(id) {
+        $.getJSON('/admin/cms/faq/obter/' + id, function(res) {
+            if (res.success && res.faq) {
+                var f = res.faq;
+                $('#faq_id').val(f.id);
+                $('#faq_pergunta').val(f.pergunta);
+                $('#faq_categoria').val(f.categoria);
+                $('#faq_resposta').val(f.resposta);
+
+                $('#modalFaqTitulo').text('Editar Pergunta Frequente');
+                new bootstrap.Modal(document.getElementById('modalFaq')).show();
+            }
+        });
+    }
+
     function abrirModalDepoimento() {
+        $('#depoimento_id').val('');
+        $('#formDepoimento')[0].reset();
+        $('#modalDepoimentoTitulo').text('Novo Depoimento');
         new bootstrap.Modal(document.getElementById('modalDepoimento')).show();
+    }
+
+    function editarDepoimento(id) {
+        $.getJSON('/admin/cms/depoimento/obter/' + id, function(res) {
+            if (res.success && res.depoimento) {
+                var d = res.depoimento;
+                $('#depoimento_id').val(d.id);
+                $('#depoimento_nome').val(d.nome_cliente);
+                $('#depoimento_cidade_uf').val(d.cidade_uf);
+                $('#depoimento_veiculo').val(d.veiculo);
+                $('#depoimento_estrelas').val(d.estrelas);
+                $('#depoimento_texto').val(d.texto);
+
+                $('#modalDepoimentoTitulo').text('Editar Depoimento: ' + d.nome_cliente);
+                new bootstrap.Modal(document.getElementById('modalDepoimento')).show();
+            }
+        });
     }
 
     // Exclusão com SweetAlert2 (Sem alert() nativo)
@@ -575,7 +800,7 @@
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (res) {
                         window.foco7Notify.success(res.message);
-                        setTimeout(function () { window.location.reload(); }, 800);
+                        setTimeout(function () { window.location.reload(); }, 600);
                     },
                     error: function () {
                         window.foco7Notify.error('Falha ao remover item.');
@@ -605,7 +830,6 @@
         }
         var textTitle = document.getElementById('heroPreviewText');
         if (textTitle) {
-            // Se cor for muito escura, ajusta contraste do texto do preview
             var isDark = cor.toLowerCase() === '#000000' || cor.toLowerCase() === '#0b0f19';
             textTitle.className = isDark ? 'fw-black mb-1 text-white' : 'fw-black mb-1 text-dark';
         }

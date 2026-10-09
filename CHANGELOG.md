@@ -5,6 +5,28 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.5.0] - 2026-10-09
+
+### ✨ Adicionado & Aprimorado
+- **Módulo Completo de Estética Automotiva & Detalhamento:**
+  - **Tabela e Modelos:** Criada a migration `2026_10_09_000010_create_servicos_estetica_and_update_agendamentos_table` e o model `ServicoEstetica` com relacionamentos, formatações de moeda e escopos ativos.
+  - **CRUD Administrativo (`/admin/estetica`):** Interface AdminLTE 4 com métricas, cards visuais, modal AJAX para criação/edição de serviços (Polimento Técnico, Vitrificação Cerâmica 9H, Higienização Interna, Lavagem Detalhada, Cristalização e PPF), controle de ordem, preços e tempo estimado, além de ativação/desativação instantânea e exclusão protegida.
+  - **Seção Exclusiva no Site Oficial (`#estetica`):** Seção responsiva com cards refinados, badges de tempo de aplicação, preços "A partir de R$...", 4 pilares de diferenciais técnicos (Produtos Nobres Vonixx/Menzerna, Box Climatizado, Certificado de Garantia, Atendimento com Hora Marcada) e link na navbar e rodapé.
+  - **Agendamento Online Inteligente (Multi-Categoria):** Modal `#modalAgendamentoSite` permitindo agendar tanto serviços de estética quanto instalações de rastreamento com cálculo automático de valor e submissão AJAX limpa.
+  - **FullCalendar 6 com Categorização por Cores:** Eventos identificados visualmente com roxo (#6f42c1) para estética e verde/azul para rastreamento, além de carregamento completo dos dados via modal e suporte a drag & drop.
+- **Gestão de Clientes no Painel Administrativo (`/admin/clientes`):**
+  - Módulo completo para consulta, filtros em tempo real, cadastro de novos clientes, edição de dados pessoais e redefinição segura de senhas via modal AJAX.
+- **Gestão de Faturas & Financeiro no Painel Administrativo (`/admin/faturas`):**
+  - Dashboard financeiro com métricas de total faturado, pendente e vencido, listagem com filtros rápidos, emissão de faturas avulsas ou atreladas a planos de rastreamento e alternância de status de quitação em 1 clique.
+- **Edição Avançada no CMS & Textos Dinâmicos das Seções:**
+  - Modais de edição direta para Banners/Slides (`/admin/cms/banner/obter/{id}`), Perguntas Frequentes (`/admin/cms/faq/obter/{id}`) e Depoimentos de Clientes (`/admin/cms/depoimento/obter/{id}`).
+  - Nova aba "Textos das Seções" no CMS (`/admin/cms`) para personalização de títulos, subtítulos e descrições de todas as seções da Landing Page.
+- **Área do Cliente com Solicitação de Agendamentos:**
+  - Clientes podem solicitar serviços de estética automotiva ou manutenções de rastreador diretamente pelo painel do assinante com acompanhamento de status em tempo real.
+- **Suíte de Testes de Integração:** 24 testes executados e 100% aprovados com 84 asserções no PHPUnit.
+
+---
+
 ## [1.4.0] - 2026-10-09
 
 ### ✨ Adicionado & Aprimorado

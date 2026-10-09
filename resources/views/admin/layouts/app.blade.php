@@ -128,12 +128,19 @@
                                 </a>
                             </li>
 
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal</li>
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal & Serviços</li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-laptop-code"></i>
-                                    <p>CMS & Identidade</p>
+                                    <p>CMS & Seções do Site</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-car-side text-warning"></i>
+                                    <p>Estética Automotiva</p>
                                 </a>
                             </li>
 
@@ -147,7 +154,7 @@
                             <li class="nav-item">
                                 <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
-                                    <p>Agendamentos (Agenda)</p>
+                                    <p>Agenda & Ordens</p>
                                 </a>
                             </li>
 
@@ -155,6 +162,22 @@
                                 <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-search"></i>
                                     <p>SEO & Meta Tags</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Clientes & Financeiro</li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-users text-info"></i>
+                                    <p>Base de Clientes</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-invoice-dollar text-success"></i>
+                                    <p>Faturas & Mensalidades</p>
                                 </a>
                             </li>
 

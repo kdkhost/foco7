@@ -11,6 +11,7 @@ use App\Models\Fatura;
 use App\Models\Faq;
 use App\Models\Depoimento;
 use App\Models\SeoConfig;
+use App\Models\ServicoEstetica;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -91,6 +92,29 @@ class DatabaseSeeder extends Seeder
             ['chave' => 'mercadopago_sandbox', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ambiente Sandbox Mercado Pago'],
             ['chave' => 'efi_ativo', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ativar Efí PRO (Gerencianet)'],
             ['chave' => 'efi_sandbox', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ambiente Sandbox Efí PRO'],
+
+            // Textos das Seções do Site (Gerenciamento Total via CMS)
+            ['chave' => 'secao_sobre_titulo', 'valor' => 'Mais de 10 Anos de Autoridade em Segurança Veicular', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção Sobre'],
+            ['chave' => 'secao_sobre_subtitulo', 'valor' => 'A Foco 7 nasceu com a missão de transformar tecnologia de rastreamento em tranquilidade real.', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Subtítulo da seção Sobre'],
+            ['chave' => 'secao_sobre_texto', 'valor' => 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.', 'grupo' => 'secoes', 'tipo' => 'textarea', 'descricao' => 'Texto descritivo da seção Sobre'],
+            ['chave' => 'secao_sobre_anos', 'valor' => '10+', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Contador: Anos de Experiência'],
+            ['chave' => 'secao_sobre_veiculos', 'valor' => '15.000+', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Contador: Veículos Monitorados'],
+            ['chave' => 'secao_sobre_recuperacao', 'valor' => '98.7%', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Contador: Índice de Recuperação'],
+
+            ['chave' => 'secao_riscos_titulo', 'valor' => 'O Risco Não Avisa Antes de Chegar', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção Riscos'],
+            ['chave' => 'secao_riscos_subtitulo', 'valor' => 'Todos os dias centenas de veículos são roubados ou furtados. Veja a diferença entre estar desprotegido e ter a Foco 7:', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Subtítulo da seção Riscos'],
+
+            ['chave' => 'secao_ronda_titulo', 'valor' => 'Ronda Tática Foco 7: Apoio Presencial Imediato', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção Ronda Tática'],
+            ['chave' => 'secao_ronda_descricao', 'valor' => 'Em caso de roubo ou furto, nossa equipe tática especializada se desloca rapidamente até as coordenadas exatas do veículo para efetuar a recuperação em conjunto com as autoridades policiais.', 'grupo' => 'secoes', 'tipo' => 'textarea', 'descricao' => 'Descrição da Ronda Tática'],
+
+            ['chave' => 'secao_app_titulo', 'valor' => 'Controle Total do Seu Veículo na Palma da Mão', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título do Aplicativo Móvel'],
+            ['chave' => 'secao_app_descricao', 'valor' => 'Acompanhe velocidade em tempo real, rotas históricas, crie cercas virtuais, receba alertas de ignição e bloqueie o motor com apenas um toque no celular.', 'grupo' => 'secoes', 'tipo' => 'textarea', 'descricao' => 'Descrição do Aplicativo Móvel'],
+            ['chave' => 'secao_app_link_playstore', 'valor' => 'https://play.google.com/store/apps', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Link Google Play'],
+            ['chave' => 'secao_app_link_appstore', 'valor' => 'https://www.apple.com/app-store/', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Link Apple App Store'],
+
+            ['chave' => 'secao_estetica_titulo', 'valor' => 'Estética Automotiva Premium Foco 7', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção Estética'],
+            ['chave' => 'secao_estetica_subtitulo', 'valor' => 'Cuidado minucioso, proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Subtítulo da seção Estética'],
+            ['chave' => 'secao_estetica_chamada', 'valor' => 'Agende o serviço de estética automotiva do seu carro ou moto com profissionais certificados e produtos de primeira linha.', 'grupo' => 'secoes', 'tipo' => 'textarea', 'descricao' => 'Chamada da seção Estética'],
         ];
 
         foreach ($configs as $cfg) {
@@ -383,6 +407,98 @@ class DatabaseSeeder extends Seeder
                     'qr_code_pix_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=FOCO7PIXDEMO',
                 ]
             );
+        }
+
+        // 10. Serviços Oficiais de Estética Automotiva
+        $servicosEstetica = [
+            [
+                'nome' => 'Polimento Técnico & Correção de Pintura',
+                'slug' => 'polimento-tecnico',
+                'subtitulo' => 'Restauração do brilho espelhado e remoção de riscos superficiais',
+                'descricao' => 'Procedimento minucioso em 3 etapas (corte, refino e lustro) utilizando compostos alemães de alta precisão que removem até 95% das imperfeições do verniz, trazendo de volta o brilho de zero km.',
+                'icone' => 'fa-car-side',
+                'imagem' => '/img/estetica/polimento.jpg',
+                'preco' => 450.00,
+                'tempo_estimado' => '4 a 6 horas',
+                'recursos' => ['Descontaminação ferrosa e clay bar', 'Remoção de micro-riscos e marcas de lavagem', 'Lustro com proteção de cera carnaúba', 'Acabamento minucioso de borrachas e frisos'],
+                'destaque' => true,
+                'ordem' => 1,
+                'ativo' => true,
+            ],
+            [
+                'nome' => 'Vitrificação Cerâmica 9H (Proteção Premium)',
+                'slug' => 'vitrificacao-ceramica-9h',
+                'subtitulo' => 'Blindagem química de altíssima dureza e efeito hidrofóbico por até 3 anos',
+                'descricao' => 'Aplicação de revestimento nano-cerâmico 9H que forma uma película de quartzo sobre o verniz contra raios UV, dejetos de pássaros, maresia e riscos leves, garantindo repelência absoluta à água e sujeira.',
+                'icone' => 'fa-shield-halved',
+                'imagem' => '/img/estetica/vitrificacao.jpg',
+                'preco' => 890.00,
+                'tempo_estimado' => '1 dia útil',
+                'recursos' => ['Polimento técnico de preparação incluso', 'Camada de quartzo cerâmico dureza 9H', 'Efeito super hidrofóbico (repele água e sujeira)', 'Certificado e garantia de proteção de até 3 anos'],
+                'destaque' => true,
+                'ordem' => 2,
+                'ativo' => true,
+            ],
+            [
+                'nome' => 'Higienização Interna & Oxi-sanitização',
+                'slug' => 'higienizacao-interna-oxi',
+                'subtitulo' => 'Limpeza profunda de estofados, carpetes e eliminação de fungos e odores',
+                'descricao' => 'Higienização com extratora profissional a quente e bactericidas potentes em todos os bancos, teto, assoalho e portas. Finalização com Oxi-sanitização por gerador de Ozônio para eliminar 99,9% de bactérias e maus odores.',
+                'icone' => 'fa-spray-can-sparkles',
+                'imagem' => '/img/estetica/higienizacao.jpg',
+                'preco' => 290.00,
+                'tempo_estimado' => '3 a 4 horas',
+                'recursos' => ['Extração profunda de bancos e carpetes', 'Limpeza e hidratação de plásticos e couro', 'Higienização de teto e porta-malas', 'Oxi-sanitização por Ozônio (elimina bactérias)'],
+                'destaque' => false,
+                'ordem' => 3,
+                'ativo' => true,
+            ],
+            [
+                'nome' => 'Lavagem Técnica Detalhada & Chassi',
+                'slug' => 'lavagem-detalhada-chassi',
+                'subtitulo' => 'Limpeza artesanal sem atrito com snow foam de pH neutro e pincéis de cerdas naturais',
+                'descricao' => 'Lavagem técnica método de dois baldes, snow foam desengraxante com pH balanceado, detalhamento com pincéis em emblemas, grades, frestas, rodas, caixas de rodas e motor a seco.',
+                'icone' => 'fa-soap',
+                'imagem' => '/img/estetica/lavagem.jpg',
+                'preco' => 160.00,
+                'tempo_estimado' => '2 a 3 horas',
+                'recursos' => ['Snow foam desengraxante de pH neutro', 'Detalhamento com pincéis em frisos e emblemas', 'Limpeza profunda de rodas e caixas de rodas', 'Proteção com selante UV e brilho de pneus duradouro'],
+                'destaque' => false,
+                'ordem' => 4,
+                'ativo' => true,
+            ],
+            [
+                'nome' => 'Cristalização & Repelência de Vidros',
+                'slug' => 'cristalizacao-vidros',
+                'subtitulo' => 'Visibilidade impecável sob chuva forte e segurança total ao dirigir',
+                'descricao' => 'Remoção química de manchas de chuva ácida dos vidros e para-brisas, seguida da aplicação de selante fluoropolímero de alta repelência. Acima de 60 km/h a água escorre sozinha.',
+                'icone' => 'fa-cloud-rain',
+                'imagem' => '/img/estetica/cristalizacao.jpg',
+                'preco' => 140.00,
+                'tempo_estimado' => '1 a 2 horas',
+                'recursos' => ['Descontaminação química de manchas de chuva ácida', 'Aplicação de selante repelente de alta durabilidade', 'Visibilidade superior em tempestades', 'Preservação das palhetas do limpador'],
+                'destaque' => false,
+                'ordem' => 5,
+                'ativo' => true,
+            ],
+            [
+                'nome' => 'Aplicação de Película Solar & PPF',
+                'slug' => 'pelicula-ppf-protecao',
+                'subtitulo' => 'Película térmica nano-cerâmica e filme de proteção de pintura anti-impacto (PPF)',
+                'descricao' => 'Aplicação de películas térmicas de alta tecnologia com até 90% de retenção de calor infravermelho e bloqueio 99% UV. Aplicação de PPF regenerativo em quinas, conchas e áreas vulneráveis.',
+                'icone' => 'fa-sun',
+                'imagem' => '/img/estetica/ppf.jpg',
+                'preco' => 380.00,
+                'tempo_estimado' => '3 a 4 horas',
+                'recursos' => ['Película nano-cerâmica de alto controle solar', 'Redução térmica superior e bloqueio 99% UV', 'Proteção contra arranhões em maçanetas e soleiras', 'Garantia de 3 a 5 anos contra desbotamento'],
+                'destaque' => false,
+                'ordem' => 6,
+                'ativo' => true,
+            ],
+        ];
+
+        foreach ($servicosEstetica as $serv) {
+            ServicoEstetica::updateOrCreate(['slug' => $serv['slug']], $serv);
         }
     }
 }

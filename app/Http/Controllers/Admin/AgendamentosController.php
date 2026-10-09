@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Agendamento;
+use App\Models\ServicoEstetica;
 
 class AgendamentosController extends Controller
 {
@@ -13,7 +14,23 @@ class AgendamentosController extends Controller
      */
     public function index()
     {
-        return view('admin.agendamentos.index');
+        $servicosEstetica = ServicoEstetica::where('ativo', true)->orderBy('ordem')->get();
+        return view('admin.agendamentos.index', compact('servicosEstetica'));
+    }
+
+    /**
+     * Retorna dados de um agendamento específico para edição
+     */
+    public function obter($id)
+    {
+        $agendamento = Agendamento::with('servicoEstetica')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'agendamento' => $agendamento,
+            'inicio_iso' => $agendamento->data_hora_inicio ? $agendamento->data_hora_inicio->format('Y-m-d\TH:i') : '',
+            'fim_iso' => $agendamento->data_hora_fim ? $agendamento->data_hora_fim->format('Y-m-d\TH:i') : '',
+        ]);
     }
 
     /**
@@ -24,7 +41,7 @@ class AgendamentosController extends Controller
         $start = $request->input('start');
         $end = $request->input('end');
 
-        $query = Agendamento::query();
+        $query = Agendamento::with('servicoEstetica');
 
         if ($start && $end) {
             $query->whereBetween('data_hora_inicio', [
@@ -36,22 +53,29 @@ class AgendamentosController extends Controller
         $agendamentos = $query->get();
 
         $eventos = $agendamentos->map(function ($ag) {
+            $isEstetica = $ag->categoria === 'estetica';
+
             $cor = match ($ag->status) {
-                'confirmado' => '#28a745',
+                'confirmado' => $isEstetica ? '#6f42c1' : '#28a745',
                 'concluido' => '#007bff',
                 'cancelado' => '#dc3545',
                 default => '#ffc107',
             };
 
+            $prefixo = $isEstetica ? '[Estética] ' : '[Rastreador] ';
+
             return [
                 'id' => $ag->id,
-                'title' => "{$ag->tipo_servico}: {$ag->cliente_nome} ({$ag->veiculo_modelo})",
+                'title' => "{$prefixo}{$ag->tipo_servico}: {$ag->cliente_nome} ({$ag->veiculo_modelo})",
                 'start' => $ag->data_hora_inicio->format('Y-m-d\TH:i:s'),
                 'end' => $ag->data_hora_fim ? $ag->data_hora_fim->format('Y-m-d\TH:i:s') : null,
                 'backgroundColor' => $cor,
                 'borderColor' => $cor,
                 'textColor' => $ag->status === 'pendente' ? '#000000' : '#ffffff',
                 'extendedProps' => [
+                    'categoria' => $ag->categoria,
+                    'servico_estetica_id' => $ag->servico_estetica_id,
+                    'valor' => $ag->valor,
                     'cliente_nome' => $ag->cliente_nome,
                     'cliente_telefone' => $ag->cliente_telefone,
                     'tipo_servico' => $ag->tipo_servico,
@@ -77,7 +101,10 @@ class AgendamentosController extends Controller
             'cliente_nome' => 'required|string|max:150',
             'cliente_telefone' => 'required|string|max:30',
             'cliente_email' => 'nullable|email|max:150',
+            'categoria' => 'nullable|string|in:rastreamento,estetica',
+            'servico_estetica_id' => 'nullable|exists:servicos_estetica,id',
             'tipo_servico' => 'required|string',
+            'valor' => 'nullable',
             'veiculo_modelo' => 'nullable|string|max:100',
             'veiculo_placa' => 'nullable|string|max:20',
             'data_hora_inicio' => 'required|date',
@@ -89,6 +116,17 @@ class AgendamentosController extends Controller
         ]);
 
         $id = $request->input('agendamento_id');
+
+        // Tratamento do valor se fornecido
+        if (!empty($validated['valor'])) {
+            $vLimpo = str_replace(['R$', ' ', '.'], '', $validated['valor']);
+            $vLimpo = str_replace(',', '.', $vLimpo);
+            $validated['valor'] = is_numeric($vLimpo) ? (float) $vLimpo : null;
+        }
+
+        if (empty($validated['categoria'])) {
+            $validated['categoria'] = $request->filled('servico_estetica_id') ? 'estetica' : 'rastreamento';
+        }
 
         if ($id) {
             $agendamento = Agendamento::findOrFail($id);

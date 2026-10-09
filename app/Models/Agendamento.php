@@ -18,6 +18,9 @@ class Agendamento extends Model
         'cliente_telefone',
         'cliente_email',
         'tipo_servico',
+        'categoria',
+        'servico_estetica_id',
+        'valor',
         'veiculo_modelo',
         'veiculo_placa',
         'data_hora_inicio',
@@ -32,11 +35,17 @@ class Agendamento extends Model
     protected $casts = [
         'data_hora_inicio' => 'datetime',
         'data_hora_fim' => 'datetime',
+        'valor' => 'decimal:2',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function servicoEstetica(): BelongsTo
+    {
+        return $this->belongsTo(ServicoEstetica::class, 'servico_estetica_id');
     }
 
     public function getStatusBadgeAttribute(): string

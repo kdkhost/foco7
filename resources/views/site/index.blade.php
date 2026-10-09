@@ -74,12 +74,16 @@
                     <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
                     <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
                     <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
+                    <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-sparkles text-danger me-1"></i>Estética</a></li>
                     <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
                     <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
                     <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                 </ul>
                 <div class="d-flex gap-2 align-items-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger d-none d-xl-inline-flex align-items-center gap-1" onclick="abrirModalAgendamentoSite()">
+                        <i class="fas fa-calendar-check"></i> Agendar
+                    </button>
                     <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
                         <i class="fas fa-user-lock"></i> Área do Cliente
                     </a>
@@ -379,6 +383,109 @@
         </div>
     </section>
 
+    <!-- 6.1 SEÇÃO ESTÉTICA AUTOMOTIVA PREMIUM -->
+    <section id="estetica" class="section-estetica">
+        <div class="container" style="max-width: 1280px;">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-uppercase small fw-bold px-3 py-1 rounded-pill" style="background: rgba(111, 66, 193, 0.1); color: #6f42c1; letter-spacing: 1px;">
+                    <i class="fas fa-sparkles me-1"></i> Cuidado & Valorização Automotiva
+                </span>
+                <h2 class="display-6 fw-black mt-3" style="color: var(--foco-title);">{{ $configs['secao_estetica_titulo'] }}</h2>
+                <p class="text-secondary fs-5 mt-2">{{ $configs['secao_estetica_subtitulo'] }}</p>
+                @if(!empty($configs['secao_estetica_descricao']))
+                    <p class="small text-muted">{{ $configs['secao_estetica_descricao'] }}</p>
+                @endif
+            </div>
+
+            <!-- Grid de Serviços de Estética Automotiva -->
+            <div class="row g-4 justify-content-center">
+                @forelse($servicosEstetica as $servico)
+                <div class="col-xl-4 col-md-6">
+                    <div class="card-estetica">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="icon-estetica-box">
+                                    <i class="fas {{ $servico->icone ?? 'fa-spray-can-sparkles' }}"></i>
+                                </div>
+                                @if(!empty($servico->tempo_estimado))
+                                    <span class="badge-estetica-tempo">
+                                        <i class="fas fa-clock text-secondary"></i> {{ $servico->tempo_estimado }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <h4 class="fw-bold mb-2" style="color: var(--foco-title);">{{ $servico->nome }}</h4>
+                            <p class="text-secondary small leading-relaxed mb-4">{{ $servico->descricao }}</p>
+                        </div>
+
+                        <div class="pt-3 border-top border-light-subtle">
+                            <div class="d-flex align-items-baseline justify-content-between mb-3">
+                                <span class="small text-muted fw-semibold">Investimento:</span>
+                                <div class="text-end">
+                                    <span class="small text-secondary d-block" style="font-size: 0.75rem;">A partir de</span>
+                                    <span class="preco-estetica-valor" style="color: #6f42c1;">{{ $servico->preco_formatado }}</span>
+                                </div>
+                            </div>
+
+                            <button type="button" 
+                                    class="btn-agendar-estetica"
+                                    onclick="abrirModalAgendamentoSite('estetica', '{{ $servico->id }}', '{{ addslashes($servico->nome) }}')">
+                                <i class="fas fa-calendar-check me-2"></i> Agendar Este Serviço
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="col-12 text-center py-4">
+                    <div class="alert alert-light border">
+                        <i class="fas fa-info-circle text-primary me-2"></i> Novos pacotes de estética automotiva sendo adicionados pela equipe.
+                    </div>
+                </div>
+                @endforelse
+            </div>
+
+            <!-- Diferenciais da Estética Foco 7 -->
+            <div class="row g-3 mt-5 pt-3">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-diferencial-estetica">
+                        <i class="fas fa-award text-purple fs-2" style="color: #6f42c1;"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Produtos Nobres</h6>
+                            <span class="small text-secondary">Vonixx, CarPro e Menzerna</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-diferencial-estetica">
+                        <i class="fas fa-warehouse text-purple fs-2" style="color: #6f42c1;"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Box Climatizado</h6>
+                            <span class="small text-secondary">Sem poeira ou sol direto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-diferencial-estetica">
+                        <i class="fas fa-certificate text-purple fs-2" style="color: #6f42c1;"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Certificado de Garantia</h6>
+                            <span class="small text-secondary">Proteção com laudo técnico</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-diferencial-estetica">
+                        <i class="fas fa-user-clock text-purple fs-2" style="color: #6f42c1;"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Horário Marcado</h6>
+                            <span class="small text-secondary">Entrega pontual sem filas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 7. SEÇÃO RONDA TÁTICA (FLUXOGRAMA EM 4 ETAPAS) -->
     <section id="ronda" class="section-ronda">
         <div class="container">
@@ -627,6 +734,7 @@
                         <li class="mb-2"><a href="#riscos">Benefícios</a></li>
                         <li class="mb-2"><a href="#sobre">Sobre Nós</a></li>
                         <li class="mb-2"><a href="#planos">Planos & Preços</a></li>
+                        <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-sparkles me-1"></i> Estética Automotiva</a></li>
                         <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
                         <li class="mb-2"><a href="#app">Aplicativo</a></li>
                         <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
@@ -724,6 +832,89 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL DE AGENDAMENTO ONLINE (RASTREAMENTO & ESTÉTICA AUTOMOTIVA) -->
+    <div class="modal fade" id="modalAgendamentoSite" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-white text-dark border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" style="color: var(--foco-title);" id="modalAgendamentoSiteTitulo">
+                        <i class="fas fa-calendar-check text-danger me-2"></i> Agendamento Online Foco 7
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formAgendamentoSite" action="{{ route('site.agendar') }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">Categoria de Atendimento *</label>
+                                <select name="categoria" id="site_categoria" class="form-select" onchange="aoMudarCategoriaSite()" required>
+                                    <option value="estetica">✨ Estética Automotiva / Detalhamento</option>
+                                    <option value="rastreamento">📡 Rastreamento Veicular / Segurança</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" id="boxSiteServicoEstetica">
+                                <label class="form-label small text-secondary fw-semibold">Serviço de Estética Desejado *</label>
+                                <select name="servico_estetica_id" id="site_servico_estetica_id" class="form-select">
+                                    <option value="">-- Selecione o serviço --</option>
+                                    @foreach($servicosEstetica as $srv)
+                                        <option value="{{ $srv->id }}" data-preco="{{ $srv->preco_formatado }}">
+                                            {{ $srv->nome }} ({{ $srv->preco_formatado }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6" id="boxSiteTipoRastreamento" style="display: none;">
+                                <label class="form-label small text-secondary fw-semibold">Tipo de Atendimento *</label>
+                                <select name="tipo_servico" id="site_tipo_servico" class="form-select">
+                                    <option value="Instalação de Rastreador">Instalação de Rastreador Novo</option>
+                                    <option value="Manutenção ou Troca de Chip">Manutenção / Troca de Chip</option>
+                                    <option value="Vistoria Técnica">Vistoria Técnica Presencial</option>
+                                    <option value="Troca de Veículo">Troca de Veículo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">Seu Nome Completo *</label>
+                                <input type="text" name="cliente_nome" id="site_cliente_nome" class="form-control" required placeholder="Ex: Carlos Mendes">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">WhatsApp para Confirmação *</label>
+                                <input type="text" name="cliente_telefone" id="site_cliente_telefone" class="form-control mask-telefone" required placeholder="(91) 98000-0000">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">E-mail</label>
+                                <input type="email" name="cliente_email" id="site_cliente_email" class="form-control" placeholder="cliente@email.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">Modelo do Veículo (Carro/Moto) *</label>
+                                <input type="text" name="veiculo_modelo" id="site_veiculo_modelo" class="form-control" required placeholder="Ex: Hilux 2023, Civic, CB 500">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">Sua Cidade *</label>
+                                <input type="text" name="cidade" id="site_cidade" class="form-control" value="Belém" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">Data de Preferência</label>
+                                <input type="date" name="data_preferencial" id="site_data_preferencial" class="form-control" min="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small text-secondary fw-semibold">Observações / Detalhes Adicionais</label>
+                                <textarea name="observacoes" id="site_observacoes" rows="2" class="form-control" placeholder="Algum detalhe importante sobre o veículo, mancha, estado da pintura ou horário preferido..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold" id="btnEnviarAgendamentoSite">
+                            <i class="fas fa-check-circle me-1"></i> Confirmar Solicitação de Agendamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- BOTÃO VOLTAR AO TOPO FLUTUANTE -->
     <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
@@ -751,6 +942,40 @@
     <script src="{{ asset('js/global-mascaras.js') }}"></script>
 
     <script>
+        function aoMudarCategoriaSite() {
+            var cat = $('#site_categoria').val();
+            if (cat === 'estetica') {
+                $('#boxSiteServicoEstetica').show();
+                $('#boxSiteTipoRastreamento').hide();
+                $('#site_servico_estetica_id').attr('required', 'required');
+                $('#site_tipo_servico').removeAttr('required');
+            } else {
+                $('#boxSiteServicoEstetica').hide();
+                $('#boxSiteTipoRastreamento').show();
+                $('#site_servico_estetica_id').removeAttr('required');
+                $('#site_tipo_servico').attr('required', 'required');
+            }
+        }
+
+        function abrirModalAgendamentoSite(categoria, servicoId, servicoNome) {
+            $('#formAgendamentoSite')[0].reset();
+            var modalEl = document.getElementById('modalAgendamentoSite');
+            var modal = new bootstrap.Modal(modalEl);
+
+            if (categoria) {
+                $('#site_categoria').val(categoria);
+            } else {
+                $('#site_categoria').val('estetica');
+            }
+            aoMudarCategoriaSite();
+
+            if (servicoId) {
+                $('#site_servico_estetica_id').val(servicoId);
+            }
+
+            modal.show();
+        }
+
         $(function () {
             // Controle dinâmico do botão Voltar ao Topo
             var $btnTopo = $('#btnVoltarAoTopo');
@@ -816,6 +1041,51 @@
                         $btn.prop('disabled', false).html(orig);
                         var msg = 'Erro ao processar dados de cobrança.';
                         if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                        window.foco7Notify.error(msg);
+                    }
+                });
+            });
+
+            // Submissão do agendamento do site
+            $('#formAgendamentoSite').on('submit', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var $btn = $('#btnEnviarAgendamentoSite');
+                var orig = $btn.html();
+
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Enviando...');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    success: function (res) {
+                        $btn.prop('disabled', false).html(orig);
+                        if (res.success) {
+                            var modalEl = document.getElementById('modalAgendamentoSite');
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Solicitação Enviada!',
+                                text: res.message,
+                                confirmButtonColor: '#d90000',
+                                confirmButtonText: 'Entendido'
+                            });
+                        } else {
+                            window.foco7Notify.error(res.message || 'Erro ao agendar.');
+                        }
+                    },
+                    error: function (xhr) {
+                        $btn.prop('disabled', false).html(orig);
+                        var msg = 'Erro ao processar agendamento.';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
                         window.foco7Notify.error(msg);
                     }
                 });

@@ -11,6 +11,7 @@ use App\Models\Faq;
 use App\Models\Depoimento;
 use App\Models\SeoConfig;
 use App\Models\Agendamento;
+use App\Models\ServicoEstetica;
 use Illuminate\Support\Facades\Cookie;
 
 class SiteController extends Controller
@@ -23,6 +24,7 @@ class SiteController extends Controller
         // Consultas otimizadas com cache e índices
         $slides = BannerSlide::ativo()->tipo('hero_slide')->get();
         $planos = Plano::ativo()->get();
+        $servicosEstetica = ServicoEstetica::where('ativo', true)->orderBy('ordem')->get();
         $faqs = Faq::ativo()->get();
         $depoimentos = Depoimento::ativo()->get();
         $seo = SeoConfig::paraPagina('home');
@@ -64,9 +66,21 @@ class SiteController extends Controller
             'hero_bg_opacidade' => (int) CmsSetting::get('hero_bg_opacidade', 85),
             'hero_overlay_cor' => CmsSetting::get('hero_overlay_cor', '#ffffff'),
             'hero_bg_blur' => (int) CmsSetting::get('hero_bg_blur', 0),
+            // Textos das seções gerenciados via CMS
+            'secao_sobre_titulo' => CmsSetting::get('secao_sobre_titulo', 'Protegendo seu patrimônio há mais de uma década'),
+            'secao_sobre_texto' => CmsSetting::get('secao_sobre_texto', 'A Foco 7 nasceu em Belém com o compromisso de trazer paz de espírito para motoristas, famílias e frotistas.'),
+            'secao_riscos_titulo' => CmsSetting::get('secao_riscos_titulo', 'Você sabe o real risco de rodar desprotegido?'),
+            'secao_riscos_subtitulo' => CmsSetting::get('secao_riscos_subtitulo', 'Compare a incerteza do prejuízo com a tranquilidade da tecnologia Foco 7.'),
+            'secao_tatica_titulo' => CmsSetting::get('secao_tatica_titulo', 'Pronta Resposta Tática 24 Horas em Toda a Região'),
+            'secao_tatica_texto' => CmsSetting::get('secao_tatica_texto', 'Equipes armadas e treinadas prontas para agir ao menor sinal de furto ou roubo.'),
+            'secao_app_titulo' => CmsSetting::get('secao_app_titulo', 'Controle Completo na Palma da Sua Mão'),
+            'secao_app_subtitulo' => CmsSetting::get('secao_app_subtitulo', 'Aplicativo moderno para Android e iOS com telemetria e bloqueio instantâneo.'),
+            'secao_estetica_titulo' => CmsSetting::get('secao_estetica_titulo', 'Estética Automotiva de Alta Performance'),
+            'secao_estetica_subtitulo' => CmsSetting::get('secao_estetica_subtitulo', 'Além de proteger com tecnologia, cuidamos do visual, valorização e conservação do seu veículo com padrão premium.'),
+            'secao_estetica_descricao' => CmsSetting::get('secao_estetica_descricao', 'Serviços especializados com produtos nobres, vitrificação técnica, polimento com brilho espelhado e higienização profunda.'),
         ];
 
-        return view('site.index', compact('slides', 'planos', 'faqs', 'depoimentos', 'seo', 'configs'));
+        return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'seo', 'configs'));
     }
 
     /**
@@ -101,6 +115,9 @@ class SiteController extends Controller
             'cliente_nome' => 'required|string|max:120',
             'cliente_telefone' => 'required|string|max:30',
             'cliente_email' => 'nullable|email|max:120',
+            'categoria' => 'nullable|string|in:rastreamento,estetica',
+            'servico_estetica_id' => 'nullable|exists:servicos_estetica,id',
+            'tipo_servico' => 'nullable|string|max:100',
             'plano_id' => 'nullable|exists:planos,id',
             'veiculo_modelo' => 'required|string|max:100',
             'cidade' => 'required|string|max:100',
@@ -113,26 +130,45 @@ class SiteController extends Controller
             'cidade.required' => 'Informe sua cidade.',
         ]);
 
+        $categoria = $validated['categoria'] ?? (!empty($validated['servico_estetica_id']) ? 'estetica' : 'rastreamento');
+        $tipoServico = $validated['tipo_servico'] ?? ($categoria === 'estetica' ? 'Estética Automotiva' : 'Instalação de Rastreador');
+        $valor = null;
+
+        if ($categoria === 'estetica' && !empty($validated['servico_estetica_id'])) {
+            $servico = ServicoEstetica::find($validated['servico_estetica_id']);
+            if ($servico) {
+                $tipoServico = $servico->nome;
+                $valor = $servico->preco;
+            }
+        }
+
         $dataHora = !empty($validated['data_preferencial'])
             ? date('Y-m-d 09:00:00', strtotime($validated['data_preferencial']))
             : date('Y-m-d 09:00:00', strtotime('+2 days'));
 
         $agendamento = Agendamento::create([
+            'categoria' => $categoria,
+            'servico_estetica_id' => $validated['servico_estetica_id'] ?? null,
             'cliente_nome' => $validated['cliente_nome'],
             'cliente_telefone' => $validated['cliente_telefone'],
             'cliente_email' => $validated['cliente_email'] ?? null,
-            'tipo_servico' => 'Instalação',
+            'tipo_servico' => $tipoServico,
+            'valor' => $valor,
             'veiculo_modelo' => $validated['veiculo_modelo'],
             'cidade' => $validated['cidade'],
             'data_hora_inicio' => $dataHora,
             'observacoes' => $validated['observacoes'] ?? 'Solicitação realizada via Landing Page.',
             'status' => 'pendente',
-            'cor_calendario' => '#d90000',
+            'cor_calendario' => $categoria === 'estetica' ? '#6f42c1' : '#d90000',
         ]);
+
+        $msg = $categoria === 'estetica'
+            ? 'Solicitação de agendamento de Estética Automotiva enviada com sucesso! Entraremos em contato via WhatsApp para confirmar o horário.'
+            : 'Solicitação de instalação recebida com sucesso! Em até 30 minutos confirmaremos seu horário.';
 
         return response()->json([
             'success' => true,
-            'message' => 'Solicitação de instalação recebida com sucesso! Em até 30 minutos confirmaremos seu horário.',
+            'message' => $msg,
             'agendamento_id' => $agendamento->id,
         ]);
     }

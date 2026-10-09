@@ -107,6 +107,20 @@ class CmsController extends Controller
     }
 
     /**
+     * Retorna os dados de um banner para edição via modal AJAX
+     */
+    public function obterBanner($id)
+    {
+        $banner = BannerSlide::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'banner' => $banner,
+            'imagem_url' => $banner->imagem ? asset($banner->imagem) : '',
+        ]);
+    }
+
+    /**
      * Exclui um banner
      */
     public function excluirBanner($id)
@@ -148,6 +162,19 @@ class CmsController extends Controller
     }
 
     /**
+     * Retorna os dados de uma pergunta frequente para edição via modal AJAX
+     */
+    public function obterFaq($id)
+    {
+        $faq = Faq::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'faq' => $faq,
+        ]);
+    }
+
+    /**
      * Exclui uma pergunta frequente
      */
     public function excluirFaq($id)
@@ -158,6 +185,20 @@ class CmsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Pergunta removida com sucesso!',
+        ]);
+    }
+
+    /**
+     * Retorna os dados de um depoimento para edição via modal AJAX
+     */
+    public function obterDepoimento($id)
+    {
+        $depoimento = Depoimento::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'depoimento' => $depoimento,
+            'foto_url' => $depoimento->foto ? asset($depoimento->foto) : '',
         ]);
     }
 

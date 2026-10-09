@@ -25,14 +25,21 @@
 
 @section('content')
 <div class="row g-4">
-    <!-- Legenda de Status -->
+    <!-- Legenda de Status e Categorias -->
     <div class="col-12">
-        <div class="d-flex flex-wrap gap-3 align-items-center p-3 rounded bg-body shadow-sm">
-            <span class="small fw-bold text-secondary">Status dos Atendimentos:</span>
-            <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pendente</span>
-            <span class="badge bg-success"><i class="fas fa-check me-1"></i> Confirmado</span>
-            <span class="badge bg-primary"><i class="fas fa-tools me-1"></i> Concluído</span>
-            <span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Cancelado</span>
+        <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between p-3 rounded bg-body shadow-sm">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small fw-bold text-secondary me-1">Categorias:</span>
+                <span class="badge" style="background-color: #28a745;"><i class="fas fa-satellite-dish me-1"></i> Rastreamento</span>
+                <span class="badge" style="background-color: #6f42c1;"><i class="fas fa-spray-can-sparkles me-1"></i> Estética Automotiva</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small fw-bold text-secondary me-1">Status:</span>
+                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pendente</span>
+                <span class="badge bg-success"><i class="fas fa-check me-1"></i> Confirmado</span>
+                <span class="badge bg-primary"><i class="fas fa-check-double me-1"></i> Concluído</span>
+                <span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Cancelado</span>
+            </div>
         </div>
     </div>
 
@@ -49,14 +56,49 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalAgendamentoTitulo">Agendar Atendimento Técnico</h5>
+                <h5 class="modal-title fw-bold" id="modalAgendamentoTitulo">Agendar Atendimento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.agendamentos.salvar') }}" method="POST" class="ajax-form" id="formAgendamento">
+            <form action="{{ route('admin.agendamentos.salvar') }}" method="POST" id="formAgendamento">
                 @csrf
                 <input type="hidden" name="agendamento_id" id="agendamento_id">
                 <div class="modal-body">
                     <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Categoria do Atendimento *</label>
+                            <select name="categoria" id="categoria" class="form-select" required onchange="aoMudarCategoria()">
+                                <option value="rastreamento">📡 Rastreamento Veicular / Segurança</option>
+                                <option value="estetica">✨ Estética Automotiva / Detalhamento</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="boxServicoEstetica" style="display: none;">
+                            <label class="form-label small fw-bold">Serviço de Estética *</label>
+                            <select name="servico_estetica_id" id="servico_estetica_id" class="form-select" onchange="aoSelecionarServicoEstetica()">
+                                <option value="">-- Selecione o serviço de estética --</option>
+                                @foreach($servicosEstetica as $srv)
+                                    <option value="{{ $srv->id }}" data-preco="{{ $srv->preco }}" data-nome="{{ $srv->nome }}">
+                                        {{ $srv->nome }} (R$ {{ number_format($srv->preco, 2, ',', '.') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="boxTipoServicoRastreamento">
+                            <label class="form-label small fw-bold">Tipo de Serviço *</label>
+                            <select name="tipo_servico" id="tipo_servico" class="form-select" required>
+                                <option value="Instalação de Rastreador">Instalação de Rastreador</option>
+                                <option value="Manutenção / Troca de Chip">Manutenção / Troca de Chip</option>
+                                <option value="Vistoria Tática">Vistoria Tática</option>
+                                <option value="Suporte Técnico Domiciliar">Suporte Técnico Domiciliar</option>
+                                <option value="Retirada / Troca de Veículo">Retirada / Troca de Veículo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Valor do Serviço (R$)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" step="0.01" name="valor" id="valor" class="form-control" placeholder="0,00">
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Nome do Cliente *</label>
                             <input type="text" name="cliente_nome" id="cliente_nome" class="form-control" required placeholder="Ex: Marcelo Oliveira">
@@ -69,22 +111,13 @@
                             <label class="form-label small fw-bold">E-mail</label>
                             <input type="email" name="cliente_email" id="cliente_email" class="form-control" placeholder="cliente@email.com">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Tipo de Serviço *</label>
-                            <select name="tipo_servico" id="tipo_servico" class="form-select" required>
-                                <option value="Instalação">Instalação de Rastreador</option>
-                                <option value="Manutenção">Manutenção / Troca de Chip</option>
-                                <option value="Vistoria">Vistoria Tática</option>
-                                <option value="Suporte Técnico">Suporte Técnico Domiciliar</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label small fw-bold">Modelo do Veículo</label>
-                            <input type="text" name="veiculo_modelo" id="veiculo_modelo" class="form-control" placeholder="Ex: Corolla Cross 2024">
+                            <input type="text" name="veiculo_modelo" id="veiculo_modelo" class="form-control" placeholder="Ex: Corolla Cross">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label small fw-bold">Placa do Veículo</label>
-                            <input type="text" name="veiculo_placa" id="veiculo_placa" class="form-control mask-placa" placeholder="ABC-1D23">
+                            <input type="text" name="veiculo_placa" id="veiculo_placa" class="form-control text-uppercase" placeholder="ABC-1D23">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Data & Hora de Início *</label>
@@ -95,8 +128,8 @@
                             <input type="datetime-local" name="data_hora_fim" id="data_hora_fim" class="form-control">
                         </div>
                         <div class="col-md-8">
-                            <label class="form-label small fw-bold">Endereço do Atendimento</label>
-                            <input type="text" name="endereco_atendimento" id="endereco_atendimento" class="form-control" placeholder="Rua, número e bairro">
+                            <label class="form-label small fw-bold">Endereço do Atendimento / Loja</label>
+                            <input type="text" name="endereco_atendimento" id="endereco_atendimento" class="form-control" placeholder="Rua, número e bairro ou Sede Foco 7">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold">Cidade</label>
@@ -112,8 +145,8 @@
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Observações Técnicas</label>
-                            <textarea name="observacoes" id="observacoes" rows="3" class="form-control" placeholder="Instruções para o técnico instalador..."></textarea>
+                            <label class="form-label small fw-bold">Observações / Detalhes</label>
+                            <textarea name="observacoes" id="observacoes" rows="2" class="form-control" placeholder="Instruções para a equipe técnica ou equipe de estética..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -123,7 +156,9 @@
                     </button>
                     <div>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <button type="submit" class="btn btn-danger fw-bold">Salvar Agendamento</button>
+                        <button type="submit" class="btn btn-danger fw-bold" id="btnSalvarAgendamento">
+                            <i class="fas fa-save me-1"></i> Salvar Agendamento
+                        </button>
                     </div>
                 </div>
             </form>
@@ -139,6 +174,33 @@
 
 <script>
     var calendar;
+
+    function aoMudarCategoria() {
+        var cat = $('#categoria').val();
+        if (cat === 'estetica') {
+            $('#boxServicoEstetica').show();
+            $('#boxTipoServicoRastreamento').hide();
+            $('#tipo_servico').removeAttr('required');
+            $('#servico_estetica_id').attr('required', 'required');
+        } else {
+            $('#boxServicoEstetica').hide();
+            $('#boxTipoServicoRastreamento').show();
+            $('#servico_estetica_id').removeAttr('required');
+            $('#tipo_servico').attr('required', 'required');
+        }
+    }
+
+    function aoSelecionarServicoEstetica() {
+        var opt = $('#servico_estetica_id option:selected');
+        var preco = opt.data('preco');
+        var nome = opt.data('nome');
+        if (preco !== undefined && preco !== '') {
+            $('#valor').val(preco);
+        }
+        if (nome) {
+            $('#tipo_servico').val(nome);
+        }
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -160,31 +222,43 @@
             events: '{{ route("admin.agendamentos.eventos") }}',
             editable: true,
             eventClick: function (info) {
-                var props = info.event.extendedProps;
-                $('#agendamento_id').val(info.event.id);
-                $('#cliente_nome').val(props.cliente_nome);
-                $('#cliente_telefone').val(props.cliente_telefone);
-                $('#tipo_servico').val(props.tipo_servico);
-                $('#veiculo_modelo').val(props.veiculo_modelo);
-                $('#veiculo_placa').val(props.veiculo_placa);
-                $('#endereco_atendimento').val(props.endereco);
-                $('#cidade').val(props.cidade);
-                $('#status').val(props.status);
-                $('#observacoes').val(props.observacoes);
+                var id = info.event.id;
+                $.ajax({
+                    url: '/admin/agendamentos/obter/' + id,
+                    type: 'GET',
+                    success: function (res) {
+                        if (res.success && res.agendamento) {
+                            var ag = res.agendamento;
+                            $('#agendamento_id').val(ag.id);
+                            $('#categoria').val(ag.categoria || 'rastreamento');
+                            aoMudarCategoria();
 
-                // Formatar datas para input datetime-local
-                if (info.event.start) {
-                    var s = info.event.start;
-                    var sStr = s.getFullYear() + '-' + String(s.getMonth()+1).padStart(2, '0') + '-' + String(s.getDate()).padStart(2, '0') + 'T' + String(s.getHours()).padStart(2, '0') + ':' + String(s.getMinutes()).padStart(2, '0');
-                    $('#data_hora_inicio').val(sStr);
-                }
+                            $('#cliente_nome').val(ag.cliente_nome);
+                            $('#cliente_telefone').val(ag.cliente_telefone);
+                            $('#cliente_email').val(ag.cliente_email || '');
+                            $('#servico_estetica_id').val(ag.servico_estetica_id || '');
+                            $('#tipo_servico').val(ag.tipo_servico);
+                            $('#valor').val(ag.valor || '');
+                            $('#veiculo_modelo').val(ag.veiculo_modelo || '');
+                            $('#veiculo_placa').val(ag.veiculo_placa || '');
+                            $('#endereco_atendimento').val(ag.endereco_atendimento || '');
+                            $('#cidade').val(ag.cidade || 'Belém');
+                            $('#status').val(ag.status);
+                            $('#observacoes').val(ag.observacoes || '');
+                            $('#data_hora_inicio').val(res.inicio_iso || '');
+                            $('#data_hora_fim').val(res.fim_iso || '');
 
-                $('#modalAgendamentoTitulo').text('Editar Agendamento #' + info.event.id);
-                $('#btnExcluirAgendamento').removeClass('d-none');
-                new bootstrap.Modal(document.getElementById('modalAgendamento')).show();
+                            $('#modalAgendamentoTitulo').html('<i class="fas fa-edit me-1 text-danger"></i> Editar Agendamento #' + ag.id);
+                            $('#btnExcluirAgendamento').removeClass('d-none');
+                            new bootstrap.Modal(document.getElementById('modalAgendamento')).show();
+                        }
+                    },
+                    error: function () {
+                        window.foco7Notify.error('Falha ao obter dados do agendamento.');
+                    }
+                });
             },
             eventDrop: function (info) {
-                // Reagendamento por arrastar e soltar
                 var s = info.event.start;
                 var sStr = s.getFullYear() + '-' + String(s.getMonth()+1).padStart(2, '0') + '-' + String(s.getDate()).padStart(2, '0') + ' ' + String(s.getHours()).padStart(2, '0') + ':' + String(s.getMinutes()).padStart(2, '0') + ':00';
 
@@ -208,13 +282,60 @@
         });
 
         calendar.render();
+
+        // Submissão AJAX do formulário de agendamento
+        $('#formAgendamento').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $('#btnSalvarAgendamento');
+            var btnHtml = btn.html();
+
+            // Garantir que tipo_servico tenha valor caso estetica
+            if ($('#categoria').val() === 'estetica') {
+                var srvNome = $('#servico_estetica_id option:selected').data('nome');
+                if (srvNome) {
+                    $('#tipo_servico').val(srvNome);
+                }
+            }
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando...');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    btn.prop('disabled', false).html(btnHtml);
+                    window.foco7Notify.success(res.message || 'Agendamento salvo com sucesso!');
+                    var modalEl = document.getElementById('modalAgendamento');
+                    var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    calendar.refetchEvents();
+                },
+                error: function (xhr) {
+                    btn.prop('disabled', false).html(btnHtml);
+                    var msg = 'Erro ao salvar agendamento.';
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    window.foco7Notify.error(msg);
+                }
+            });
+        });
     });
 
     function abrirModalAgendamento() {
         $('#formAgendamento')[0].reset();
         $('#agendamento_id').val('');
         $('#btnExcluirAgendamento').addClass('d-none');
-        $('#modalAgendamentoTitulo').text('Novo Agendamento');
+        $('#modalAgendamentoTitulo').html('<i class="fas fa-calendar-plus me-1 text-danger"></i> Novo Agendamento');
+        $('#categoria').val('rastreamento');
+        aoMudarCategoria();
 
         var now = new Date();
         var nowStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + 'T09:00';
@@ -229,7 +350,7 @@
 
         window.confirmarAcao(
             'Excluir Agendamento?',
-            'Este horário será removido do calendário.',
+            'Este horário será removido do calendário permanentemente.',
             'warning',
             function () {
                 $.ajax({
@@ -238,7 +359,11 @@
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (res) {
                         window.foco7Notify.success(res.message);
-                        bootstrap.Modal.getInstance(document.getElementById('modalAgendamento')).hide();
+                        var modalEl = document.getElementById('modalAgendamento');
+                        var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
                         calendar.refetchEvents();
                     },
                     error: function () {

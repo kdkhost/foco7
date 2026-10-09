@@ -15,6 +15,9 @@ use App\Http\Controllers\Admin\ManutencaoController;
 use App\Http\Controllers\Admin\GatewaysController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\ConfiguracoesController;
+use App\Http\Controllers\Admin\ServicosEsteticaController;
+use App\Http\Controllers\Admin\ClientesController;
+use App\Http\Controllers\Admin\FaturasController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
@@ -70,12 +73,42 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('cms')->group(function () {
         Route::get('/', [CmsController::class, 'index'])->name('admin.cms.index');
         Route::post('/configuracoes', [CmsController::class, 'salvarConfiguracoes'])->name('admin.cms.salvar_configs');
+        Route::get('/banner/obter/{id}', [CmsController::class, 'obterBanner'])->name('admin.cms.obter_banner');
         Route::post('/banner', [CmsController::class, 'salvarBanner'])->name('admin.cms.salvar_banner');
         Route::delete('/banner/{id}', [CmsController::class, 'excluirBanner'])->name('admin.cms.excluir_banner');
+        Route::get('/faq/obter/{id}', [CmsController::class, 'obterFaq'])->name('admin.cms.obter_faq');
         Route::post('/faq', [CmsController::class, 'salvarFaq'])->name('admin.cms.salvar_faq');
         Route::delete('/faq/{id}', [CmsController::class, 'excluirFaq'])->name('admin.cms.excluir_faq');
+        Route::get('/depoimento/obter/{id}', [CmsController::class, 'obterDepoimento'])->name('admin.cms.obter_depoimento');
         Route::post('/depoimento', [CmsController::class, 'salvarDepoimento'])->name('admin.cms.salvar_depoimento');
         Route::delete('/depoimento/{id}', [CmsController::class, 'excluirDepoimento'])->name('admin.cms.excluir_depoimento');
+    });
+
+    // Estética Automotiva (Serviços & Pacotes)
+    Route::prefix('estetica')->group(function () {
+        Route::get('/', [ServicosEsteticaController::class, 'index'])->name('admin.estetica.index');
+        Route::get('/obter/{id}', [ServicosEsteticaController::class, 'obter'])->name('admin.estetica.obter');
+        Route::post('/', [ServicosEsteticaController::class, 'salvar'])->name('admin.estetica.salvar');
+        Route::post('/toggle/{id}', [ServicosEsteticaController::class, 'toggleStatus'])->name('admin.estetica.toggle');
+        Route::delete('/{id}', [ServicosEsteticaController::class, 'excluir'])->name('admin.estetica.excluir');
+    });
+
+    // Gestão de Clientes (Base Cadastral, Edição e Senhas)
+    Route::prefix('clientes')->group(function () {
+        Route::get('/', [ClientesController::class, 'index'])->name('admin.clientes.index');
+        Route::get('/obter/{id}', [ClientesController::class, 'obter'])->name('admin.clientes.obter');
+        Route::post('/', [ClientesController::class, 'salvar'])->name('admin.clientes.salvar');
+        Route::post('/senha/{id}', [ClientesController::class, 'alterarSenha'])->name('admin.clientes.senha');
+        Route::delete('/{id}', [ClientesController::class, 'excluir'])->name('admin.clientes.excluir');
+    });
+
+    // Gestão de Faturas & Mensalidades
+    Route::prefix('faturas')->group(function () {
+        Route::get('/', [FaturasController::class, 'index'])->name('admin.faturas.index');
+        Route::get('/obter/{id}', [FaturasController::class, 'obter'])->name('admin.faturas.obter');
+        Route::post('/', [FaturasController::class, 'salvar'])->name('admin.faturas.salvar');
+        Route::post('/status/{id}', [FaturasController::class, 'alterarStatus'])->name('admin.faturas.status');
+        Route::delete('/{id}', [FaturasController::class, 'excluir'])->name('admin.faturas.excluir');
     });
 
     // Planos de Rastreamento
@@ -86,10 +119,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/{id}', [PlanosController::class, 'excluir'])->name('admin.planos.excluir');
     });
 
-    // Agendamentos (FullCalendar 6)
+    // Agendamentos (FullCalendar 6 - Rastreamento e Estética)
     Route::prefix('agendamentos')->group(function () {
         Route::get('/', [AgendamentosController::class, 'index'])->name('admin.agendamentos.index');
         Route::get('/eventos', [AgendamentosController::class, 'apiEventos'])->name('admin.agendamentos.eventos');
+        Route::get('/obter/{id}', [AgendamentosController::class, 'obter'])->name('admin.agendamentos.obter');
         Route::post('/', [AgendamentosController::class, 'salvar'])->name('admin.agendamentos.salvar');
         Route::post('/horario', [AgendamentosController::class, 'atualizarHorario'])->name('admin.agendamentos.horario');
         Route::delete('/{id}', [AgendamentosController::class, 'excluir'])->name('admin.agendamentos.excluir');
@@ -139,6 +173,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/', fn () => redirect()->route('cliente.dashboard'));
     Route::get('/dashboard', [ClienteDashboardController::class, 'index'])->name('cliente.dashboard');
+    Route::post('/agendamentos/solicitar', [ClienteDashboardController::class, 'solicitarAgendamento'])->name('cliente.agendamentos.solicitar');
     Route::get('/faturas', [ClienteFaturasController::class, 'index'])->name('cliente.faturas.index');
     Route::get('/faturas/{codigo}', [ClienteFaturasController::class, 'detalhes'])->name('cliente.faturas.detalhes');
 });
