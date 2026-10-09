@@ -63,6 +63,18 @@ body {
     z-index: 1040;
 }
 
+.logo-foco7 {
+    max-height: 48px;
+    width: auto;
+    object-fit: contain;
+    display: inline-block;
+    transition: var(--foco-transition);
+}
+
+.logo-foco7:hover {
+    filter: brightness(1.08);
+}
+
 .foco-navbar .nav-link {
     color: #e2e8f0;
     font-weight: 500;

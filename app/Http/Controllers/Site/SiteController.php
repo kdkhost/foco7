@@ -27,6 +27,18 @@ class SiteController extends Controller
         $depoimentos = Depoimento::ativo()->get();
         $seo = SeoConfig::paraPagina('home');
 
+        $logo = CmsSetting::get('site_logo', '/img/logo-foco7.png');
+        $cleanLogoPath = parse_url($logo, PHP_URL_PATH) ?: $logo;
+        if (empty($logo) || !file_exists(public_path(ltrim($cleanLogoPath, '/')))) {
+            $logo = '/img/logo-foco7.png';
+        }
+
+        $favicon = CmsSetting::get('site_favicon', '/img/favicon.png');
+        $cleanFavPath = parse_url($favicon, PHP_URL_PATH) ?: $favicon;
+        if (empty($favicon) || !file_exists(public_path(ltrim($cleanFavPath, '/')))) {
+            $favicon = '/img/favicon.png';
+        }
+
         $configs = [
             'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
             'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa há mais de 10 anos'),
@@ -39,7 +51,8 @@ class SiteController extends Controller
             'instagram' => CmsSetting::get('social_instagram', ''),
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
-            'logo' => CmsSetting::get('site_logo', '/img/logo-foco7.png'),
+            'logo' => $logo,
+            'favicon' => $favicon,
             'cor_primaria' => CmsSetting::get('cor_primaria', '#d90000'),
         ];
 
