@@ -20,7 +20,12 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - **Checados Restaurados para a Cor Oficial:** Ícones da lista de recursos voltaram à cor vermelha característica da Foco 7 (`var(--foco-red)` / `#d90000`).
   - Tag de destaque reluzente com ícone de fogo (`<i class="fas fa-fire"></i> MAIS ESCOLHIDO`) e gradiente avermelhado.
   - Box de ícone com rotação e escala sutil ao passar o cursor, badges de adesão grátis estilizados e botões de alta conversão com micro-interações.
-- **Suíte de Testes Automatizados:** 17 testes passando com 100% de sucesso e 52 asserções.
+- **Unificação Total da Área do Cliente ao Padrão AdminLTE 4:**
+  - A Área do Cliente agora compartilha 100% da estrutura, componentes, navbar fixa, sidebar com treeview e scripts originais do AdminLTE 4.
+  - Aparência rigorosamente idêntica ao painel administrativo (zero divergência visual), com segregação precisa de menus pelo papel de usuário (`admin` vs `cliente`).
+  - Suporte nativo ao seletor de tema Dark/Light mode com persistência em `localStorage` e paleta oficial Foco 7.
+  - Telas de Dashboard do Assinante e Minhas Faturas modernizadas com cards e tabelas responsivas do AdminLTE 4.
+- **Suíte de Testes Automatizados:** 17 testes passando com 100% de sucesso e 57 asserções.
 
 ---
 

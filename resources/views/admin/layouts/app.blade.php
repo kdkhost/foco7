@@ -67,16 +67,29 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><span class="dropdown-item-text small text-secondary">{{ auth()->user()->email }}</span></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}" href="{{ route('admin.perfil.index') }}">
-                                    <i class="fas fa-user-circle me-2 text-danger"></i> Meu Perfil
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}" href="{{ route('admin.configuracoes.index') }}">
-                                    <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações & SMTP
-                                </a>
-                            </li>
+                            @if(auth()->user()->role === 'admin')
+                                <li>
+                                    <a class="dropdown-item {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}" href="{{ route('admin.perfil.index') }}">
+                                        <i class="fas fa-user-circle me-2 text-danger"></i> Meu Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}" href="{{ route('admin.configuracoes.index') }}">
+                                        <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações & SMTP
+                                    </a>
+                                </li>
+                            @else
+                                <li>
+                                    <a class="dropdown-item {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}" href="{{ route('cliente.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2 text-danger"></i> Painel do Assinante
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ request()->routeIs('cliente.faturas.*') ? 'active' : '' }}" href="{{ route('cliente.faturas.index') }}">
+                                        <i class="fas fa-file-invoice-dollar me-2 text-danger"></i> Minhas Faturas
+                                    </a>
+                                </li>
+                            @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="document.getElementById('formLogout').submit();">
@@ -93,84 +106,121 @@
             @csrf
         </form>
 
-        <!-- SIDEBAR COM TREEVIEW E PALETA FOCO 7 -->
+        <!-- SIDEBAR COM TREEVIEW E PALETA FOCO 7 (ADMINLTE 4) -->
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
             <div class="sidebar-brand d-flex align-items-center justify-content-start px-3 py-3 border-bottom border-secondary">
-                <a href="{{ route('admin.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
+                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
                     <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="34" class="brand-image">
-                    <span class="badge bg-danger ms-auto small">ADMIN</span>
+                    <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-auto small">
+                        {{ auth()->user()->role === 'admin' ? 'ADMIN' : 'CLIENTE' }}
+                    </span>
                 </a>
             </div>
 
             <div class="sidebar-wrapper">
                 <nav class="mt-2">
                     <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
-                        <li class="nav-item">
-                            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li>
+                        @if(auth()->user()->role === 'admin')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal</li>
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal</li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-laptop-code"></i>
-                                <p>CMS & Identidade</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-laptop-code"></i>
+                                    <p>CMS & Identidade</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tags"></i>
-                                <p>Planos & Preços</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tags"></i>
+                                    <p>Planos & Preços</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-calendar-alt"></i>
-                                <p>Agendamentos (Agenda)</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <p>Agendamentos (Agenda)</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-search"></i>
-                                <p>SEO & Meta Tags</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-search"></i>
+                                    <p>SEO & Meta Tags</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-sliders-h"></i>
-                                <p>Configurações & SMTP</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-sliders-h"></i>
+                                    <p>Configurações & SMTP</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tools"></i>
-                                <p>Modo Manutenção</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tools"></i>
+                                    <p>Modo Manutenção</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-credit-card"></i>
-                                <p>Gateways de Pagamento</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-credit-card"></i>
+                                    <p>Gateways de Pagamento</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-user-circle"></i>
-                                <p>Meu Perfil</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-user-circle"></i>
+                                    <p>Meu Perfil</p>
+                                </a>
+                            </li>
+                        @else
+                            <!-- ITENS DA ÁREA DO CLIENTE (MESMO PADRÃO ADMINLTE 4) -->
+                            <li class="nav-item">
+                                <a href="{{ route('cliente.dashboard') }}" class="nav-link {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>Painel do Assinante</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Financeiro & Mensalidades</li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('cliente.faturas.index') }}" class="nav-link {{ request()->routeIs('cliente.faturas.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                                    <p>Minhas Faturas</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Atendimento & Suporte</li>
+
+                            <li class="nav-item">
+                                <a href="https://wa.me/{{ \App\Models\CmsSetting::get('contato_whatsapp', '559180510736') }}?text={{ urlencode('Olá, sou cliente Foco 7 e preciso de suporte técnico.') }}" target="_blank" class="nav-link text-success">
+                                    <i class="nav-icon fab fa-whatsapp"></i>
+                                    <p>Suporte WhatsApp 24h</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('site.home') }}" target="_blank" class="nav-link">
+                                    <i class="nav-icon fas fa-globe"></i>
+                                    <p>Site Oficial Foco 7</p>
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </nav>
             </div>

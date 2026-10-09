@@ -92,6 +92,11 @@ class Foco7SystemTest extends TestCase
         $response = $this->actingAs($cliente)->get('/cliente/dashboard');
         $response->assertStatus(200);
         $response->assertSee('Central do Assinante');
+        $response->assertSee('app-wrapper');
+        $response->assertSee('app-sidebar');
+        $response->assertSee('adminThemeToggle');
+        $response->assertSee('Minhas Faturas');
+        $response->assertSee('CLIENTE');
     }
 
     /**
