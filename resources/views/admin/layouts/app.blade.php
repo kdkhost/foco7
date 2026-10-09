@@ -186,9 +186,30 @@
                             <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
 
                             <li class="nav-item">
+                                <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-credit-card text-success"></i>
+                                    <p>Gateways &amp; Carnê</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-envelope-open-text text-danger"></i>
+                                    <p>Templates de E-mails</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-clock text-info"></i>
+                                    <p>Central de Cron Jobs</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-sliders-h"></i>
-                                    <p>Configurações & SMTP</p>
+                                    <i class="nav-icon fas fa-sliders-h text-warning"></i>
+                                    <p>Configurações &amp; SMTP</p>
                                 </a>
                             </li>
 
@@ -196,13 +217,6 @@
                                 <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tools"></i>
                                     <p>Modo Manutenção</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-credit-card"></i>
-                                    <p>Gateways de Pagamento</p>
                                 </a>
                             </li>
 
@@ -305,10 +319,10 @@
 
             function applyAdminTheme(t) {
                 if (t === 'dark') {
-                    $('body').addClass('dark-mode').attr('data-bs-theme', 'dark');
+                    $('html, body').attr('data-bs-theme', 'dark').addClass('dark-mode');
                     $('#adminThemeIcon').removeClass('fa-sun').addClass('fa-moon');
                 } else {
-                    $('body').removeClass('dark-mode').attr('data-bs-theme', 'light');
+                    $('html, body').attr('data-bs-theme', 'light').removeClass('dark-mode');
                     $('#adminThemeIcon').removeClass('fa-moon').addClass('fa-sun');
                 }
             }

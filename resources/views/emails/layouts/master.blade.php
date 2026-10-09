@@ -22,23 +22,32 @@
         li { margin-bottom: 6px; }
         a { color: #d90000; text-decoration: underline; font-weight: 600; }
         
-        /* BOTÕES DE AÇÃO */
+        /* BOTÕES DE AÇÃO RESPONSIVOS E DINÂMICOS */
         .btn-action {
             display: inline-block;
             background: linear-gradient(135deg, #d90000 0%, #b80000 100%);
             color: #ffffff !important;
             text-decoration: none !important;
-            padding: 14px 28px;
+            padding: 14px 32px;
             font-size: 15px;
             font-weight: 700;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(217, 0, 0, 0.25);
             text-align: center;
-            margin: 12px 0 20px 0;
+            margin: 12px auto 20px auto;
             letter-spacing: 0.3px;
+            max-width: 100%;
+            box-sizing: border-box;
+            line-height: 1.35;
         }
         .btn-action:hover {
             background: #b80000 !important;
+            box-shadow: 0 6px 16px rgba(217, 0, 0, 0.35);
+        }
+        .btn-wrapper {
+            text-align: center;
+            margin: 18px 0 24px 0;
+            width: 100%;
         }
 
         /* CAIXAS DE DESTAQUE / CARDS */
@@ -79,7 +88,7 @@
             font-weight: 700;
         }
 
-        /* REGRAS MOBILE RESPONSIVAS */
+        /* REGRAS MOBILE RESPONSIVAS (DINÂMICAS POR DISPOSITIVO) */
         @media only screen and (max-width: 620px) {
             .wrapper-table {
                 width: 100% !important;
@@ -103,13 +112,29 @@
             .btn-action {
                 display: block !important;
                 width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
                 box-sizing: border-box !important;
-                padding: 14px 16px !important;
+                padding: 16px 18px !important;
+                font-size: 16px !important;
+                text-align: center !important;
+                margin: 16px auto 22px auto !important;
+                border-radius: 10px !important;
+            }
+            .btn-wrapper {
+                width: 100% !important;
+                display: block !important;
             }
             .fluid-stack {
                 display: block !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
+            }
+        }
+        @media only screen and (max-width: 420px) {
+            .btn-action {
+                padding: 15px 12px !important;
+                font-size: 15px !important;
             }
         }
     </style>

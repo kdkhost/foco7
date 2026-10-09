@@ -44,45 +44,108 @@
     color: #ffffff;
 }
 
-/* Modo Escuro Nativo */
-body.dark-mode {
+/* Modo Escuro Nativo (Sincronizado Bootstrap 5.3 & AdminLTE 4) */
+body.dark-mode,
+[data-bs-theme="dark"] body,
+html[data-bs-theme="dark"] {
     background-color: #0b0e14 !important;
     color: #f1f5f9 !important;
 }
 
 body.dark-mode .app-main,
-body.dark-mode .content-wrapper {
+body.dark-mode .content-wrapper,
+[data-bs-theme="dark"] .app-main,
+[data-bs-theme="dark"] .content-wrapper {
     background-color: #0b0e14 !important;
 }
 
-body.dark-mode .card {
+body.dark-mode .card,
+[data-bs-theme="dark"] .card {
     background-color: #121722 !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: #f1f5f9;
 }
 
-body.dark-mode .card-header {
+body.dark-mode .card-header,
+[data-bs-theme="dark"] .card-header {
+    background-color: #161c28 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .card-header.bg-light,
+body.dark-mode .card-footer.bg-light,
+body.dark-mode .card-body.bg-light,
+[data-bs-theme="dark"] .card-header.bg-light,
+[data-bs-theme="dark"] .card-footer.bg-light,
+[data-bs-theme="dark"] .card-body.bg-light,
+[data-bs-theme="dark"] .bg-light {
+    background-color: #161c28 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .alert-light,
+[data-bs-theme="dark"] .alert-light {
+    background-color: #151b27 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .text-dark,
+[data-bs-theme="dark"] .text-dark {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .bg-secondary-subtle,
+[data-bs-theme="dark"] .bg-secondary-subtle {
+    background-color: #0d111a !important;
+}
+
+body.dark-mode .badge.bg-secondary-subtle,
+[data-bs-theme="dark"] .badge.bg-secondary-subtle {
+    background-color: #1a2233 !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.dark-mode .table,
+[data-bs-theme="dark"] .table {
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .table-light,
+body.dark-mode thead.table-light th,
+[data-bs-theme="dark"] .table-light,
+[data-bs-theme="dark"] thead.table-light th {
+    background-color: #161c28 !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .table-hover tbody tr:hover,
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode .form-control,
-body.dark-mode .form-select {
+body.dark-mode .form-select,
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
     background-color: #1a202c !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
 }
 
-body.dark-mode .form-control:focus {
+body.dark-mode .form-control:focus,
+[data-bs-theme="dark"] .form-control:focus {
     border-color: var(--admin-primary) !important;
     box-shadow: 0 0 0 0.25rem rgba(217, 0, 0, 0.25) !important;
 }
 
-body.dark-mode .table {
-    color: #f1f5f9 !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-body.dark-mode .modal-content {
+body.dark-mode .modal-content,
+[data-bs-theme="dark"] .modal-content {
     background-color: #121722 !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;

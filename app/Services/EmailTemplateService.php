@@ -254,13 +254,13 @@ HTML;
         $dadosCompletos['assunto'] = $assuntoProcessado;
         $htmlCompleto = self::compilarHtml($corpoHtml, $dadosCompletos);
 
-        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'smtp.foco7.com.br'));
-        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 587));
-        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'contato@foco7.com.br'));
-        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', ''));
-        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
-        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'contato@foco7.com.br'));
-        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7'));
+        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'mail.foco7.com.br'));
+        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 465));
+        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'notificacoes@foco7.com.br'));
+        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', 'Foco7#Smtp@2026!'));
+        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'ssl'));
+        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'notificacoes@foco7.com.br'));
+        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7 Rastreamento'));
 
         if (empty($host) || empty($username)) {
             return false;
@@ -302,13 +302,13 @@ HTML;
         $htmlCompleto = self::compilarHtml($corpoRaw, $dadosCompletos);
 
         // Carrega configurações SMTP do CMS
-        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'smtp.foco7.com.br'));
-        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 587));
-        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'contato@foco7.com.br'));
-        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', ''));
-        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
-        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'financeiro@foco7.com.br'));
-        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7 Financeiro'));
+        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'mail.foco7.com.br'));
+        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 465));
+        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'notificacoes@foco7.com.br'));
+        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', 'Foco7#Smtp@2026!'));
+        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'ssl'));
+        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'notificacoes@foco7.com.br'));
+        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7 Rastreamento'));
 
         if (empty($host) || empty($username)) {
             // Em ambiente local sem SMTP configurado, não falha
@@ -351,13 +351,20 @@ HTML;
         $corpoRaw = $corpoCustom !== null ? $corpoCustom : self::getCorpo($chaveTemplate);
         $htmlCompleto = self::compilarHtml($corpoRaw, $dadosSimulados);
 
-        $host = CmsSetting::get('mail_host', env('MAIL_HOST', ''));
-        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 587));
-        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', ''));
-        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', ''));
-        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
-        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'teste@foco7.com.br'));
-        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7 Notificações'));
+        $host = CmsSetting::get('mail_host', env('MAIL_HOST', 'mail.foco7.com.br'));
+        $port = (int) CmsSetting::get('mail_port', env('MAIL_PORT', 465));
+        $username = CmsSetting::get('mail_username', env('MAIL_USERNAME', 'notificacoes@foco7.com.br'));
+        $password = CmsSetting::get('mail_password', env('MAIL_PASSWORD', 'Foco7#Smtp@2026!'));
+        $encryption = CmsSetting::get('mail_encryption', env('MAIL_ENCRYPTION', 'ssl'));
+        $fromAddress = CmsSetting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'notificacoes@foco7.com.br'));
+        $fromName = CmsSetting::get('mail_from_name', env('MAIL_FROM_NAME', 'Foco 7 Rastreamento'));
+
+        if (app()->environment('testing')) {
+            return [
+                'success' => true,
+                'message' => "E-mail de demonstração disparado com sucesso para {$destinatario} (Ambiente de Testes)!",
+            ];
+        }
 
         if (empty($host) || empty($username)) {
             return [
@@ -420,8 +427,8 @@ HTML;
     </tr>
 </table>
 
-<div style="text-align: center; margin-bottom: 28px;">
-    <a href="{link_fatura}" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; letter-spacing: 0.5px;">Visualizar e Pagar Fatura &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; max-width: 100%;">Visualizar e Pagar Fatura &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Você pode efetuar o pagamento via <strong>PIX instantâneo</strong> (com baixa automática em poucos segundos), <strong>Cartão de Crédito</strong> ou <strong>Boleto Bancário</strong>.</p>
@@ -453,8 +460,8 @@ HTML;
     </tr>
 </table>
 
-<div style="text-align: center; margin-bottom: 24px;">
-    <a href="{link_fatura}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 8px;">Acessar Área do Cliente &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 20px 0 24px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #0f172a; color: #ffffff !important; text-decoration: none !important; font-size: 14px; font-weight: 700; padding: 13px 30px; border-radius: 8px; box-sizing: border-box; max-width: 100%;">Acessar Área do Cliente &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; text-align: center; margin: 0;">Agradecemos pela confiança na equipe Foco 7!</p>
@@ -482,8 +489,8 @@ HTML;
     </tr>
 </table>
 
-<div style="text-align: center; margin-bottom: 28px;">
-    <a href="{link_carne}" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Baixar Carnê Completo em PDF &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="{link_carne}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Baixar Carnê Completo em PDF &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Você pode pagar cada lâmina do carnê em qualquer banco, casas lotéricas, aplicativos bancários ou via QR Code PIX impresso em cada boleto.</p>
@@ -511,8 +518,8 @@ HTML;
     </tr>
 </table>
 
-<div style="text-align: center; margin-bottom: 28px;">
-    <a href="{link_fatura}" style="display: inline-block; background-color: #f59e0b; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; text-transform: uppercase;">Pagar Agora Sem Juros &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #f59e0b; color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Pagar Agora Sem Juros &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Pagar em dia garante a continuidade ininterrupta da transmissão do sinal de rastreamento do seu veículo e o suporte da Ronda Tática 24 Horas.</p>
@@ -544,8 +551,8 @@ HTML;
     </tr>
 </table>
 
-<div style="text-align: center; margin-bottom: 28px;">
-    <a href="{link_fatura}" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #991b1b 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Regularizar Fatura Imediatamente &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #991b1b 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Regularizar Fatura Imediatamente &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0; text-align: center;">Para evitar o bloqueio temporário do aplicativo e a suspensão da cobertura da Ronda Tática, regularize sua pendência o quanto antes.</p>

@@ -3,6 +3,33 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.6.8] - 2026-10-09
+
+### ✉️ Botões Fluidos em E-mails, Páginas Dedicadas de Templates, Central de Cron, SMTP Exclusivo e Harmonização Dark/Light
+- **Botão Dinâmico e Responsivo em E-mails (`resources/views/emails/layouts/master.blade.php`):**
+  - **Ajuste Fluido ao Tamanho de Tela:** O botão `.btn-action` agora possui largura fluida com `max-width: 90%` no desktop, centralização garantida via container `.btn-wrapper` (`table-cell/block`), quebra inteligente de linha e transição para largura 100% (bloco total) em dispositivos móveis (`@media only screen and (max-width: 620px)` e `@media only screen and (max-width: 420px)`), garantindo legibilidade perfeita e acabamento premium sem transbordamento em telas pequenas.
+  - **Padronização nos Templates Nativos:** Todos os 5 modelos padrão de e-mail foram atualizados para incluir as classes e estilos dinâmicos de botão.
+- **Páginas Dedicadas para Gestão de E-mails (`/admin/emails`):**
+  - **Fim da Sobrecarga de Abas em Gateways:** Os templates de e-mail foram completamente desacoplados do módulo de gateways de pagamento e ganharam seu próprio ecossistema dedicado no menu principal do painel administrativo.
+  - **Listagem e Status do SMTP (`/admin/emails`):** Tabela elegante de templates, identificação de tipo (Sistema vs Personalizado), card com status do servidor SMTP e atalho para envio de demonstração global.
+  - **Edição em Página Dedicada (`/admin/emails/{chave}/editar`):** Tela exclusiva em split-screen com editor Summernote BS5, inserção rápida de variáveis dinâmicas em 1 clique e simulador de preview responsivo ao vivo multi-dispositivo (Desktop, Tablet 520px e Smartphone 375px).
+  - **Criação de Templates Customizados (`/admin/emails/novo`):** Página dedicada para criação de novos modelos de e-mail com geração automática de chave/slug e preview instantâneo.
+- **Central de Cron Jobs & Automação do Agendador (`/admin/cron`):**
+  - **Módulo Independente:** Criado `CronController` e tela exclusiva para visualização e controle dos cron jobs do sistema.
+  - **Linha Única da Hospedagem:** Exibição clara e botão de cópia do comando oficial configurado no cPanel: `* * * * * cd /home/fococomb/public_html && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1`.
+  - **Execução Sob Demanda via AJAX:** Disparo manual com feedback SweetAlert2 e console modal exibindo os logs da rotina executada.
+- **Desduplicação e Organização do Portal de Gateways (`/admin/gateways`):**
+  - Eliminação de campos duplicados e de abas não relacionadas a meios de pagamento; a tela de gateways agora foca estritamente nos 3 pilares de cobrança: **Mercado Pago**, **Efí PRO** e **Cobrança por Carnê**.
+- **Harmonização Global de Cores Dark / Light Mode no Painel:**
+  - Sincronização do tema nos seletores `<html>` e `<body>` via atributo `data-bs-theme`.
+  - Correção de contrastes em `admin-foco7.css` para cabeçalhos de cards (`.card-header.bg-light`), caixas de alerta (`.alert-light`), tabelas (`.table-light`) e elementos com fundo claro que ficavam ilegíveis no modo escuro.
+- **Servidor SMTP Exclusivo e Cron Configurados na Hospedagem cPanel:**
+  - Criação da conta de e-mail dedicada `notificacoes@foco7.com.br` no servidor cPanel.
+  - Configuração das variáveis `MAIL_*` diretamente no arquivo `/home/fococomb/public_html/.env` e no fallback do `EmailTemplateService`.
+  - Ativação do cron job oficial a cada minuto na crontab da conta cPanel.
+
+---
+
 ## [1.6.7] - 2026-10-09
 
 ### ✉️ Rota Única de E-mails, Layout Master Responsivo & Preview em Tempo Real por Dispositivo

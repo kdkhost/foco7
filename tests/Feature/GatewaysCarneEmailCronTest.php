@@ -242,4 +242,60 @@ class GatewaysCarneEmailCronTest extends TestCase
         $resExcluirNativo = $this->actingAs($this->adminUser)->deleteJson('/admin/gateways/excluir-template-email/fatura_gerada');
         $resExcluirNativo->assertStatus(422);
     }
+
+    public function test_admin_acessa_painel_dedicado_de_templates_de_email(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get('/admin/emails');
+
+        $response->assertStatus(200);
+        $response->assertSee('Central de Templates de E-mails');
+        $response->assertSee('Conta SMTP Exclusiva do Sistema');
+        $response->assertSee('Nova Fatura Gerada');
+        $response->assertSee('Lembrete Preventivo de Vencimento');
+    }
+
+    public function test_admin_acessa_pagina_de_edicao_dedicada_de_template_com_editor_e_preview(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get('/admin/emails/fatura_gerada/editar');
+
+        $response->assertStatus(200);
+        $response->assertSee('Editar Template de E-mail');
+        $response->assertSee('Simulador em Tempo Real');
+        $response->assertSee('iframePreviewEmail');
+        $response->assertSee('Layout Master Responsivo');
+    }
+
+    public function test_admin_atualiza_template_em_pagina_dedicada_via_ajax(): void
+    {
+        $payload = [
+            'assunto' => 'Sua fatura #{fatura_id} já está fechada',
+            'corpo' => '<p>Olá {cliente_nome}, seu boleto #{fatura_id} vence dia {data_vencimento}.</p>',
+        ];
+
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/emails/fatura_gerada', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertEquals('Sua fatura #{fatura_id} já está fechada', CmsSetting::get('email_assunto_fatura_gerada'));
+    }
+
+    public function test_admin_acessa_central_dedicada_de_cron_e_executa_rotina(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get('/admin/cron');
+
+        $response->assertStatus(200);
+        $response->assertSee('Central de Cron Jobs');
+        $response->assertSee('schedule:run');
+        $response->assertSee('faturas:enviar-lembretes');
+
+        // Executar rotina pela rota dedicada
+        $execResponse = $this->actingAs($this->adminUser)->postJson('/admin/cron/executar', [
+            'tarefa' => 'enviar_lembretes',
+        ]);
+
+        $execResponse->assertStatus(200);
+        $execResponse->assertJson(['success' => true]);
+        $execResponse->assertJsonStructure(['success', 'message', 'output', 'data_hora']);
+    }
 }

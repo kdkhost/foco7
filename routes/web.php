@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\ConfiguracoesController;
 use App\Http\Controllers\Admin\ServicosEsteticaController;
 use App\Http\Controllers\Admin\ClientesController;
 use App\Http\Controllers\Admin\FaturasController;
+use App\Http\Controllers\Admin\EmailTemplatesController;
+use App\Http\Controllers\Admin\CronController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
@@ -143,17 +145,36 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/', [ManutencaoController::class, 'salvar'])->name('admin.manutencao.salvar');
     });
 
-    // Gateways de Pagamento, Carnê, Templates de E-mails & Central de Cron
+    // Gateways de Pagamento & Cobrança por Carnê
     Route::prefix('gateways')->group(function () {
         Route::get('/', [GatewaysController::class, 'index'])->name('admin.gateways.index');
         Route::post('/', [GatewaysController::class, 'salvar'])->name('admin.gateways.salvar');
         Route::post('/gerar-carne', [GatewaysController::class, 'gerarCarne'])->name('admin.gateways.gerar_carne');
+        // Aliases para retrocompatibilidade
         Route::post('/email-teste', [GatewaysController::class, 'enviarEmailTeste'])->name('admin.gateways.email_teste');
         Route::post('/salvar-email', [GatewaysController::class, 'salvarTemplateEmail'])->name('admin.gateways.salvar_email');
         Route::post('/criar-template-email', [GatewaysController::class, 'criarEmailTemplate'])->name('admin.gateways.criar_email_template');
         Route::delete('/excluir-template-email/{chave}', [GatewaysController::class, 'excluirEmailTemplate'])->name('admin.gateways.excluir_email_template');
         Route::post('/preview-email', [GatewaysController::class, 'previewEmail'])->name('admin.gateways.preview_email');
         Route::post('/executar-cron', [GatewaysController::class, 'executarCron'])->name('admin.gateways.executar_cron');
+    });
+
+    // Templates de E-mails Próprios (Páginas Dedicadas)
+    Route::prefix('emails')->group(function () {
+        Route::get('/', [EmailTemplatesController::class, 'index'])->name('admin.emails.index');
+        Route::get('/novo', [EmailTemplatesController::class, 'create'])->name('admin.emails.create');
+        Route::post('/', [EmailTemplatesController::class, 'store'])->name('admin.emails.store');
+        Route::get('/{chave}/editar', [EmailTemplatesController::class, 'edit'])->name('admin.emails.edit');
+        Route::post('/{chave}', [EmailTemplatesController::class, 'update'])->name('admin.emails.update');
+        Route::delete('/{chave}', [EmailTemplatesController::class, 'destroy'])->name('admin.emails.destroy');
+        Route::post('/preview/render', [EmailTemplatesController::class, 'preview'])->name('admin.emails.preview');
+        Route::post('/teste/enviar', [EmailTemplatesController::class, 'testar'])->name('admin.emails.testar');
+    });
+
+    // Central de Cron Jobs & Automação do Agendador
+    Route::prefix('cron')->group(function () {
+        Route::get('/', [CronController::class, 'index'])->name('admin.cron.index');
+        Route::post('/executar', [CronController::class, 'executar'])->name('admin.cron.executar');
     });
 
     // Meu Perfil de Usuário
