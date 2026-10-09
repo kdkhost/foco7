@@ -5,6 +5,17 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.6.3] - 2026-10-09
+
+### 📐 Layout & Responsividade
+- **Padronização Visual e de Largura dos Cards de Planos e Preços:**
+  - **Distribuição Dinâmica de Colunas:** Ajustada a grade Bootstrap da seção `#planos` para calcular dinamicamente a proporção ideal de acordo com a quantidade de planos cadastrados. Para 3 planos ativos, a grade aplica `col-lg-4 col-md-6 d-flex` (ocupando 100% das 12 colunas da linha de forma balanceada e uniforme), eliminando o aperto e o espaçamento ocioso causado pelo antigo `col-xl-3` (25% por card).
+  - **Largura Uniforme e Altura Consistente:** Aplicada classe `w-100` e propriedades CSS `width: 100%` com `box-sizing: border-box` no `.card-plano`, assegurando que todos os cards preencham suas respectivas colunas de maneira simétrica.
+  - **Equalização de Bordas e Dimensões:** Padronizada a borda de todos os cards para exatamente `2px solid` (`#e2e8f0` nos cards convencionais e `var(--foco-red)` no card em destaque), eliminando qualquer disparidade subpixel de largura.
+  - **Alinhamento Perfeito de Subtítulos e Preços:** Definidas alturas mínimas uniformes para `.plano-subtitulo` (`min-height: 44px`) e `.bloco-preco` (`min-height: 94px`) com centralização flex, garantindo que as listas de recursos e os botões de contratação iniciem e terminem na mesma linha horizontal em todos os cards.
+
+---
+
 ## [1.6.2] - 2026-10-09
 
 ### 🐛 Correção Crítica

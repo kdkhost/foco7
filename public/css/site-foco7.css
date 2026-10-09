@@ -577,10 +577,12 @@ body {
 
 .card-plano {
     background: #ffffff;
-    border: 1.5px solid #e2e8f0;
+    border: 2px solid #e2e8f0;
     border-radius: 22px;
     padding: 2.35rem 1.75rem;
     height: 100%;
+    width: 100%;
+    box-sizing: border-box;
     position: relative;
     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -597,12 +599,12 @@ body {
 .card-plano.destaque {
     border: 2px solid var(--foco-red);
     background: linear-gradient(180deg, #fff8f8 0%, #ffffff 100%);
-    box-shadow: 0 14px 38px rgba(217, 0, 0, 0.12), 0 0 0 1px rgba(217, 0, 0, 0.08);
+    box-shadow: 0 14px 38px rgba(217, 0, 0, 0.12);
 }
 
 .card-plano.destaque:hover {
     transform: translateY(-9px);
-    box-shadow: 0 22px 50px rgba(217, 0, 0, 0.18), 0 0 0 1px var(--foco-red);
+    box-shadow: 0 22px 50px rgba(217, 0, 0, 0.18);
 }
 
 .tag-plano-destaque {
@@ -659,9 +661,12 @@ body {
 .plano-subtitulo {
     font-size: 0.84rem;
     color: var(--foco-muted);
-    min-height: 42px;
+    min-height: 44px;
     line-height: 1.45;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bloco-preco {
@@ -672,6 +677,11 @@ body {
     border: 1px solid var(--foco-border-light);
     text-align: center;
     transition: background-color 0.25s ease;
+    min-height: 94px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .card-plano.destaque .bloco-preco {

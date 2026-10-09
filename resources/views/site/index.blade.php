@@ -348,10 +348,20 @@
                 <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">Escolha o Plano Ideal Para Seu Veículo</h2>
                 <p class="text-secondary fs-5">Sem análise de perfil, sem consulta ao SPC/Serasa e sem fidelidade abusiva.</p>
             </div>
-            <div class="row g-4 justify-content-center">
+            @php
+                $totalPlanos = $planos->count();
+                $colPlano = match(true) {
+                    $totalPlanos === 1 => 'col-lg-6 col-md-8',
+                    $totalPlanos === 2 => 'col-lg-6 col-md-6',
+                    $totalPlanos === 3 => 'col-lg-4 col-md-6',
+                    $totalPlanos === 4 => 'col-xl-3 col-lg-6 col-md-6',
+                    default => 'col-xl-3 col-lg-4 col-md-6',
+                };
+            @endphp
+            <div class="row g-4 justify-content-center align-items-stretch">
                 @foreach($planos as $plano)
-                <div class="col-xl-3 col-lg-6 col-md-6">
-                    <div class="card-plano {{ $plano->destaque ? 'destaque' : '' }}">
+                <div class="{{ $colPlano }} d-flex">
+                    <div class="card-plano w-100 {{ $plano->destaque ? 'destaque' : '' }}">
                         @if($plano->destaque)
                             <div class="tag-plano-destaque">
                                 <i class="fas fa-fire me-1"></i> {{ !empty($plano->tag_destaque) ? $plano->tag_destaque : 'MAIS ESCOLHIDO' }}
