@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Estilos Customizados Foco 7 -->
-    <link rel="stylesheet" href="{{ asset('css/site-foco7.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/site-foco7.css') }}?v={{ time() }}">
 </head>
 <body id="inicio">
 
@@ -63,20 +63,19 @@
     <nav class="navbar navbar-expand-lg foco-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
-                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="48" class="logo-foco7 d-inline-block" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="40" class="logo-foco7 d-inline-block" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco" aria-label="Menu de Navegação">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navFoco">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
                     <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#riscos">Por que Proteger</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#sobre">Quem Somos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#planos">Planos & Preços</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#ronda">Ronda Tática</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#app">Aplicativo</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#depoimentos">Depoimentos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
                     <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                 </ul>
@@ -311,37 +310,41 @@
 
     <!-- 6. PLANOS E PREÇOS COM CHECKOUT TRANSPARENTE -->
     <section id="planos" class="section-planos">
-        <div class="container">
+        <div class="container" style="max-width: 1280px;">
             <div class="text-center max-w-700 mx-auto mb-5">
-                <span class="text-danger fw-bold text-uppercase small">Investimento Inteligente</span>
-                <h2 class="display-6 fw-black mt-2">Escolha o Plano Ideal Para Seu Veículo</h2>
+                <span class="text-danger fw-bold text-uppercase small letter-spacing-1">Investimento Inteligente</span>
+                <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">Escolha o Plano Ideal Para Seu Veículo</h2>
                 <p class="text-secondary fs-5">Sem análise de perfil, sem consulta ao SPC/Serasa e sem fidelidade abusiva.</p>
             </div>
             <div class="row g-4 justify-content-center">
                 @foreach($planos as $plano)
-                <div class="col-lg-3 col-md-6">
+                <div class="col-xl-3 col-lg-6 col-md-6">
                     <div class="card-plano {{ $plano->destaque ? 'destaque' : '' }}">
                         @if($plano->destaque && !empty($plano->tag_destaque))
                             <div class="tag-plano-destaque">{{ $plano->tag_destaque }}</div>
                         @endif
-                        <div class="text-center mb-3">
-                            <i class="fas {{ $plano->icone ?? 'fa-shield-alt' }} text-danger fs-2 mb-2"></i>
-                            <h4 class="fw-bold mb-1">{{ $plano->nome }}</h4>
-                            <p class="small text-secondary mb-0">{{ $plano->subtitulo }}</p>
+                        <div class="text-center">
+                            <div class="icone-plano-box">
+                                <i class="fas {{ $plano->icone ?? 'fa-shield-alt' }}"></i>
+                            </div>
+                            <h4 class="plano-titulo">{{ $plano->nome }}</h4>
+                            <p class="plano-subtitulo">{{ $plano->subtitulo }}</p>
                         </div>
-                        <div class="text-center my-3">
-                            <span class="preco-valor">{{ $plano->preco_formatado }}</span>
-                            <span class="preco-periodo">/mês</span>
+                        <div class="bloco-preco">
+                            <div>
+                                <span class="preco-valor">{{ $plano->preco_formatado }}</span>
+                                <span class="preco-periodo">/mês</span>
+                            </div>
                             @if($plano->taxa_adesao > 0)
-                                <div class="small text-secondary mt-1">Taxa de adesão: {{ $plano->taxa_adesao_formatada }}</div>
+                                <span class="badge-adesao badge-adesao-paga">Adesão: {{ $plano->taxa_adesao_formatada }}</span>
                             @else
-                                <div class="small text-success fw-bold mt-1">ADESÃO GRÁTIS</div>
+                                <span class="badge-adesao badge-adesao-gratis"><i class="fas fa-check-circle me-1"></i> ADESÃO GRÁTIS</span>
                             @endif
                         </div>
                         <ul class="recursos-list">
                             @if(is_array($plano->recursos))
                                 @foreach($plano->recursos as $item)
-                                    <li><i class="fas fa-check"></i> <span>{{ $item }}</span></li>
+                                    <li><i class="fas fa-check-circle"></i> <span>{{ $item }}</span></li>
                                 @endforeach
                             @endif
                         </ul>
@@ -349,7 +352,7 @@
                                 data-plano-id="{{ $plano->id }}"
                                 data-plano-nome="{{ $plano->nome }}"
                                 data-plano-preco="{{ $plano->preco_formatado }}">
-                            <i class="fas fa-lock me-1"></i> CONTRATAR AGORA
+                            <i class="fas fa-shield-alt me-1"></i> CONTRATAR AGORA
                         </button>
                     </div>
                 </div>
@@ -590,24 +593,25 @@
         <div class="container">
             <div class="row g-5">
                 <div class="col-lg-4">
-                    <img src="{{ asset($configs['logo'] ?? '/img/logo-foco7.png') }}" alt="{{ $configs['nome'] }}" height="54" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7.png') }}';">
-                    <p class="mt-3 text-secondary small">
-                        Líder em rastreamento veicular inteligente, bloqueio remoto e ronda tática presencial. Há mais de 10 anos protegendo famílias e frotas corporativas em todo o território nacional.
+                    <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="44" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                    <p class="mt-3 text-secondary small leading-relaxed">
+                        Líder em rastreamento veicular inteligente, bloqueio remoto e ronda tática presencial. Mais de 10 anos protegendo famílias e frotas corporativas em todo o território nacional.
                     </p>
-                    <div class="d-flex gap-2 mt-4">
-                        <span class="badge bg-secondary p-2"><i class="fas fa-lock"></i> SSL Blindado 256-bit</span>
-                        <span class="badge bg-secondary p-2"><i class="fas fa-server"></i> Servidores LiteSpeed 24h</span>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <span class="badge-footer-ssl"><i class="fas fa-lock text-success me-1"></i> SSL Blindado 256-bit</span>
+                        <span class="badge-footer-ssl"><i class="fas fa-server text-danger me-1"></i> LiteSpeed 24h</span>
                     </div>
                 </div>
                 <div class="col-lg-2 col-6">
                     <h5>Navegação</h5>
                     <ul class="list-unstyled small">
                         <li class="mb-2"><a href="#inicio">Início</a></li>
-                        <li class="mb-2"><a href="#riscos">Por que Proteger</a></li>
-                        <li class="mb-2"><a href="#sobre">Quem Somos</a></li>
+                        <li class="mb-2"><a href="#riscos">Benefícios</a></li>
+                        <li class="mb-2"><a href="#sobre">Sobre Nós</a></li>
                         <li class="mb-2"><a href="#planos">Planos & Preços</a></li>
                         <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
-                        <li class="mb-2"><a href="#faq">Dúvidas</a></li>
+                        <li class="mb-2"><a href="#app">Aplicativo</a></li>
+                        <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-6">
@@ -622,12 +626,12 @@
                 <div class="col-lg-3">
                     <h5>Área Segura</h5>
                     <p class="small text-secondary">Acesso exclusivo para clientes e operadores de frota.</p>
-                    <a href="{{ route('login') }}" class="btn btn-outline-danger w-100 py-2 mb-2">
-                        <i class="fas fa-user-lock me-1"></i> Acessar Área do Cliente
+                    <a href="{{ route('login') }}" class="btn btn-outline-danger w-100 py-2 mb-2 fw-semibold">
+                        <i class="fas fa-user-lock me-1"></i> Acessar Painel / Área do Cliente
                     </a>
                 </div>
             </div>
-            <div class="border-top border-secondary mt-5 pt-4 text-center small text-secondary">
+            <div class="border-top border-light-subtle mt-5 pt-4 text-center small text-secondary">
                 &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados.
             </div>
         </div>
