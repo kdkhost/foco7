@@ -5,6 +5,21 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.6.1] - 2026-10-09
+
+### 🎨 Identidade Visual & Consistência de Paleta
+- **Harmonização Completa da Seção de Estética Automotiva com a Marca Foco 7:**
+  - **Eliminação Definitiva do Roxo / Lilás:** Removidas todas as cores roxas (`#6f42c1`) da Landing Page, painel do cliente e painel administrativo.
+  - **Paleta Oficial Aplicada:** 
+    - Badge superior redesenhado com fundo suave e borda vermelha oficial (`#d90000`).
+    - Ícones dos cards com caixa vermelha Foco 7 (`rgba(217, 0, 0, 0.08)` e ícone `#d90000`), transformando-se em gradiente vermelho vibrante com glow no hover.
+    - Tipografia de preços padronizada em vermelho Foco 7 de alto impacto (`#d90000`), consistente com os cards de planos.
+    - Botão *"Agendar Este Serviço"* padronizado com gradiente vermelho oficial (`#d90000` a `#b80000`) e sombra suave de alta conversão.
+    - Cards de diferenciais técnicos com ícones em vermelho (`text-danger`) e bordas responsivas ao hover.
+  - **Consistência nos Painéis:** Agendamentos de estética no calendário do AdminLTE 4 padronizados com tom Grafite Tático Nobre (`#1e293b`), mantendo distinção clara e elegância sem dissonância cromática.
+
+---
+
 ## [1.6.0] - 2026-10-09
 
 ### ✨ Adicionado & Aprimorado

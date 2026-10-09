@@ -31,7 +31,7 @@
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="small fw-bold text-secondary me-1">Categorias:</span>
                 <span class="badge" style="background-color: #28a745;"><i class="fas fa-satellite-dish me-1"></i> Rastreamento</span>
-                <span class="badge" style="background-color: #6f42c1;"><i class="fas fa-spray-can-sparkles me-1"></i> Estética Automotiva</span>
+                <span class="badge" style="background-color: #1e293b;"><i class="fas fa-spray-can-sparkles me-1 text-danger"></i> Estética Automotiva</span>
             </div>
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="small fw-bold text-secondary me-1">Status:</span>

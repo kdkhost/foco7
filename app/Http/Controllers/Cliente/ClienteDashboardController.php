@@ -84,7 +84,7 @@ class ClienteDashboardController extends Controller
             'data_hora_inicio' => $validated['data_hora_inicio'],
             'observacoes' => $validated['observacoes'] ?? 'Solicitado via Painel do Cliente.',
             'status' => 'pendente',
-            'cor_calendario' => $categoria === 'estetica' ? '#6f42c1' : '#28a745',
+            'cor_calendario' => $categoria === 'estetica' ? '#1e293b' : '#28a745',
         ]);
 
         return response()->json([

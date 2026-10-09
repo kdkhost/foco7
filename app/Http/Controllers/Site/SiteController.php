@@ -165,7 +165,7 @@ class SiteController extends Controller
             'data_hora_inicio' => $dataHora,
             'observacoes' => $validated['observacoes'] ?? 'Solicitação realizada via Landing Page.',
             'status' => 'pendente',
-            'cor_calendario' => $categoria === 'estetica' ? '#6f42c1' : '#d90000',
+            'cor_calendario' => $categoria === 'estetica' ? '#1e293b' : '#d90000',
         ]);
 
         $msg = $categoria === 'estetica'

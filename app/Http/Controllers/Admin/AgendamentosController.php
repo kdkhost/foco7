@@ -56,7 +56,7 @@ class AgendamentosController extends Controller
             $isEstetica = $ag->categoria === 'estetica';
 
             $cor = match ($ag->status) {
-                'confirmado' => $isEstetica ? '#6f42c1' : '#28a745',
+                'confirmado' => $isEstetica ? '#1e293b' : '#28a745',
                 'concluido' => '#007bff',
                 'cancelado' => '#dc3545',
                 default => '#ffc107',

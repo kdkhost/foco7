@@ -397,8 +397,8 @@
     <section id="estetica" class="section-estetica">
         <div class="container" style="max-width: 1280px;">
             <div class="text-center max-w-700 mx-auto mb-5">
-                <span class="text-uppercase small fw-bold px-3 py-1 rounded-pill" style="background: rgba(111, 66, 193, 0.1); color: #6f42c1; letter-spacing: 1px;">
-                    <i class="fas fa-sparkles me-1"></i> Cuidado & Valorização Automotiva
+                <span class="badge-estetica-topo text-uppercase small fw-bold px-3 py-1 rounded-pill">
+                    <i class="fas fa-sparkles text-danger me-1"></i> Cuidado & Valorização Automotiva
                 </span>
                 <h2 class="display-6 fw-black mt-3" style="color: var(--foco-title);">{{ $configs['secao_estetica_titulo'] }}</h2>
                 <p class="text-secondary fs-5 mt-2">{{ $configs['secao_estetica_subtitulo'] }}</p>
@@ -433,7 +433,7 @@
                                 <span class="small text-muted fw-semibold">Investimento:</span>
                                 <div class="text-end">
                                     <span class="small text-secondary d-block" style="font-size: 0.75rem;">A partir de</span>
-                                    <span class="preco-estetica-valor" style="color: #6f42c1;">{{ $servico->preco_formatado }}</span>
+                                    <span class="preco-estetica-valor">{{ $servico->preco_formatado }}</span>
                                 </div>
                             </div>
 
@@ -458,7 +458,7 @@
             <div class="row g-3 mt-5 pt-3">
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-award text-purple fs-2" style="color: #6f42c1;"></i>
+                        <i class="fas fa-award text-danger fs-2"></i>
                         <div>
                             <h6 class="fw-bold mb-0 text-dark">Produtos Nobres</h6>
                             <span class="small text-secondary">Vonixx, CarPro e Menzerna</span>
@@ -467,7 +467,7 @@
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-warehouse text-purple fs-2" style="color: #6f42c1;"></i>
+                        <i class="fas fa-warehouse text-danger fs-2"></i>
                         <div>
                             <h6 class="fw-bold mb-0 text-dark">Box Climatizado</h6>
                             <span class="small text-secondary">Sem poeira ou sol direto</span>
@@ -476,7 +476,7 @@
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-certificate text-purple fs-2" style="color: #6f42c1;"></i>
+                        <i class="fas fa-certificate text-danger fs-2"></i>
                         <div>
                             <h6 class="fw-bold mb-0 text-dark">Certificado de Garantia</h6>
                             <span class="small text-secondary">Proteção com laudo técnico</span>
@@ -485,7 +485,7 @@
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <div class="card-diferencial-estetica">
-                        <i class="fas fa-user-clock text-purple fs-2" style="color: #6f42c1;"></i>
+                        <i class="fas fa-user-clock text-danger fs-2"></i>
                         <div>
                             <h6 class="fw-bold mb-0 text-dark">Horário Marcado</h6>
                             <span class="small text-secondary">Entrega pontual sem filas</span>

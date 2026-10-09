@@ -139,7 +139,7 @@
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 @if($ag->categoria === 'estetica')
-                                    <span class="badge" style="background-color: #6f42c1; font-size: 0.75rem;">
+                                    <span class="badge bg-danger text-white" style="font-size: 0.75rem;">
                                         <i class="fas fa-sparkles me-1"></i> Estética
                                     </span>
                                 @else
