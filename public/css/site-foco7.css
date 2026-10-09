@@ -279,21 +279,29 @@ body {
     min-height: 85vh;
     display: flex;
     align-items: center;
-    background: #0b0f19;
+    background-color: #0b0f19;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
-    padding: 60px 0;
+    padding: 0;
 }
 
 #heroCarousel {
     width: 100%;
     position: relative;
     z-index: 3;
+    min-height: 85vh;
+}
+
+.hero-section .carousel-inner {
+    width: 100%;
+    min-height: 85vh;
 }
 
 .hero-section .carousel-item {
     position: relative;
-    min-height: 560px;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
 }
 
 /* Garante que slides inativos fiquem 100% ocultos, eliminando sobreposição de textos */
@@ -304,7 +312,7 @@ body {
 .hero-section .carousel-item.active,
 .hero-section .carousel-item-next,
 .hero-section .carousel-item-prev {
-    display: block;
+    display: flex;
 }
 
 /* Transição cinematográfica cross-fade suave */
@@ -356,7 +364,25 @@ body {
 .hero-slide-content {
     position: relative;
     z-index: 4;
-    padding: 20px 0;
+    padding: 90px 0 60px 0;
+    width: 100%;
+}
+
+@media (max-width: 991.98px) {
+    .hero-section,
+    #heroCarousel,
+    .hero-section .carousel-inner,
+    .hero-section .carousel-item {
+        min-height: auto;
+    }
+
+    .hero-slide-bg {
+        background-position: center center !important;
+    }
+
+    .hero-slide-content {
+        padding: 80px 0 50px 0;
+    }
 }
 
 .hero-badge {

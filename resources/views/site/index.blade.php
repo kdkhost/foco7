@@ -107,17 +107,23 @@
             : '#0b0f19';
         $heroBlur = (int)($configs['hero_bg_blur'] ?? 0);
     @endphp
-    <header class="hero-section" id="inicio">
+    <header class="hero-section" id="inicio" style="@if(!empty($heroBgImagem)) background-image: url('{{ $heroBgImagem }}'); background-size: cover; background-position: center right; background-repeat: no-repeat; @endif">
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="7000">
             <div class="carousel-inner">
                 @forelse($slides as $index => $slide)
                 @php
-                    $slideImg = !empty($slide->imagem) ? asset($slide->imagem) : $heroBgImagem;
+                    $slideImg = '';
+                    $cleanPath = !empty($slide->imagem) ? (parse_url($slide->imagem, PHP_URL_PATH) ?: $slide->imagem) : '';
+                    if (!empty($slide->imagem) && !str_contains($slide->imagem, 'hero-banner-') && file_exists(public_path(ltrim($cleanPath, '/')))) {
+                        $slideImg = asset($slide->imagem);
+                    } elseif (!empty($heroBgImagem)) {
+                        $slideImg = $heroBgImagem;
+                    }
                 @endphp
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                     @if(!empty($slideImg))
                         <!-- Imagem de fundo em tela cheia (100% de ponta a ponta sem corte) -->
-                        <div class="hero-slide-bg" style="background-image: url('{{ $slideImg }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
+                        <div class="hero-slide-bg" style="background-image: url('{{ $slideImg }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
                     @endif
                     <!-- Película degradê profissional em tela cheia para contraste cinematográfico -->
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
@@ -198,7 +204,7 @@
                 @empty
                 <div class="carousel-item active">
                     @if(!empty($heroBgImagem))
-                        <div class="hero-slide-bg" style="background-image: url('{{ $heroBgImagem }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px);" : '' }}"></div>
+                        <div class="hero-slide-bg" style="background-image: url('{{ $heroBgImagem }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
                     @endif
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
                     <div class="container position-relative hero-slide-content">
