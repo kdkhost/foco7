@@ -5,6 +5,17 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [1.6.2] - 2026-10-09
+
+### 🐛 Correção Crítica
+- **Correção da Sobreposição e Encavalamento de Slides no Hero Carousel:**
+  - **Causa Raiz Identificada:** A regra CSS `.hero-section .carousel-item { display: flex; }` forçava todos os slides inativos a ficarem visíveis simultaneamente, sobrepondo os textos e botões de todos os slides no mesmo espaço.
+  - **Correção do Ciclo de Exibição:** Removido o `display: flex` forçado de `.carousel-item`. Slides inativos agora permanecem estritamente com `display: none !important`, permitindo que apenas o slide ativo seja renderizado.
+  - **Transição Cross-Fade Cinematográfica:** Ativada a classe oficial `carousel-fade` no Bootstrap Carousel com animação de opacidade suave (0.7s) entre transições de slides.
+  - **Controles Unificados:** Movido o container de navegação (`.hero-carousel-nav`) para fora do loop de slides, eliminando a duplicação dos indicadores e setas prev/next.
+
+---
+
 ## [1.6.1] - 2026-10-09
 
 ### 🎨 Identidade Visual & Consistência de Paleta

@@ -108,7 +108,7 @@
         $heroBlur = (int)($configs['hero_bg_blur'] ?? 0);
     @endphp
     <header class="hero-section" id="inicio">
-        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="7000">
             <div class="carousel-inner">
                 @forelse($slides as $index => $slide)
                 @php
@@ -193,22 +193,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        @if($slides->count() > 1)
-                        <div class="hero-carousel-nav">
-                            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div class="carousel-indicators">
-                                @foreach($slides as $idx => $s)
-                                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Slide {{ $idx + 1 }}"></button>
-                                @endforeach
-                            </div>
-                            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Próximo Slide" title="Próximo Slide">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                        @endif
                     </div>
                 </div>
                 @empty
@@ -229,6 +213,24 @@
                 </div>
                 @endforelse
             </div>
+
+            @if($slides->count() > 1)
+            <div class="container position-relative hero-nav-container">
+                <div class="hero-carousel-nav">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="carousel-indicators">
+                        @foreach($slides as $idx => $s)
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Slide {{ $idx + 1 }}"></button>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Próximo Slide" title="Próximo Slide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            @endif
         </div>
     </header>
 

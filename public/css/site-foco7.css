@@ -293,9 +293,39 @@ body {
 
 .hero-section .carousel-item {
     position: relative;
-    min-height: 540px;
-    display: flex;
-    align-items: center;
+    min-height: 560px;
+}
+
+/* Garante que slides inativos fiquem 100% ocultos, eliminando sobreposição de textos */
+.hero-section .carousel-item:not(.active):not(.carousel-item-next):not(.carousel-item-prev) {
+    display: none !important;
+}
+
+.hero-section .carousel-item.active,
+.hero-section .carousel-item-next,
+.hero-section .carousel-item-prev {
+    display: block;
+}
+
+/* Transição cinematográfica cross-fade suave */
+.hero-section #heroCarousel.carousel-fade .carousel-item {
+    opacity: 0;
+    transition-duration: .7s;
+    transition-property: opacity;
+}
+
+.hero-section #heroCarousel.carousel-fade .carousel-item.active,
+.hero-section #heroCarousel.carousel-fade .carousel-item-next.carousel-item-start,
+.hero-section #heroCarousel.carousel-fade .carousel-item-prev.carousel-item-end {
+    z-index: 1;
+    opacity: 1;
+}
+
+.hero-section #heroCarousel.carousel-fade .active.carousel-item-start,
+.hero-section #heroCarousel.carousel-fade .active.carousel-item-end {
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0s .7s;
 }
 
 .hero-slide-bg {
@@ -404,11 +434,16 @@ body {
 }
 
 /* Controles do Carrossel Hero */
+.hero-nav-container {
+    position: relative;
+    z-index: 10;
+    margin-top: 10px;
+}
+
 .hero-carousel-nav {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 12px;
-    margin-top: 24px;
 }
 
 #heroCarousel .carousel-control-prev,
