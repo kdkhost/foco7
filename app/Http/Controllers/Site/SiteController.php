@@ -18,11 +18,11 @@ use Illuminate\Support\Facades\Auth;
 class SiteController extends Controller
 {
     /**
-     * Exibe a Landing Page Ãºnica da Foco 7 (Inspirada no SOS Rastreamento)
+     * Exibe a Landing Page única da Foco 7 (Inspirada no SOS Rastreamento)
      */
     public function index()
     {
-        // Consultas otimizadas com cache e Ã­ndices
+        // Consultas otimizadas com cache e índices
         $slides = BannerSlide::ativo()->tipo('hero_slide')->get();
         $planos = Plano::ativo()->get();
         $servicosEstetica = ServicoEstetica::where('ativo', true)->orderBy('ordem')->get();
@@ -83,7 +83,7 @@ class SiteController extends Controller
             'hero_bg_opacidade' => $heroOpacidade,
             'hero_overlay_cor' => $heroOverlayCor,
             'hero_bg_blur' => (int) CmsSetting::get('hero_bg_blur', 0),
-            // Textos das seÃ§Ãµes gerenciados via CMS
+            // Textos das seções gerenciados via CMS
             'secao_sobre_titulo' => CmsSetting::get('secao_sobre_titulo', 'Protegendo seu patrimônio há mais de uma década'),
             'secao_sobre_texto' => CmsSetting::get('secao_sobre_texto', 'A Foco 7 nasceu em Belém com o compromisso de trazer paz de espírito para motoristas, famílias e frotistas.'),
             'secao_riscos_titulo' => CmsSetting::get('secao_riscos_titulo', 'Você sabe o real risco de rodar desprotegido?'),
@@ -390,7 +390,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Permite bypass do modo de manutenÃ§Ã£o via token
+     * Permite bypass do modo de manutenção via token
      */
     public function bypassManutencao(string $token)
     {
@@ -398,9 +398,9 @@ class SiteController extends Controller
 
         if ($token === $tokenOficial) {
             $cookie = cookie('foco7_maintenance_bypass', $token, 60 * 24 * 30); // 30 dias
-            return redirect()->route('site.home')->withCookie($cookie)->with('success', 'Dispositivo autorizado com sucesso para acesso prÃ©vio.');
+            return redirect()->route('site.home')->withCookie($cookie)->with('success', 'Dispositivo autorizado com sucesso para acesso prévio.');
         }
 
-        abort(403, 'Token de autorizaÃ§Ã£o invÃ¡lido.');
+        abort(403, 'Token de autorização inválido.');
     }
 }

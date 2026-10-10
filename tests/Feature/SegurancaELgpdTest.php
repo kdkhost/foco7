@@ -138,4 +138,21 @@ class SegurancaELgpdTest extends TestCase
             'ativo' => true,
         ]);
     }
+
+    /**
+     * Testa o conversor e sanitizador de encoding UTF-8 / Mojibake
+     */
+    public function test_correcao_mojibake_e_integridade_utf8(): void
+    {
+        $corrompido = 'SolicitaÃ§Ã£o realizada via Landing Page.';
+        $corrigido = \App\Console\Commands\CorrigirEncodingCommand::fixMojibake($corrompido);
+
+        $this->assertEquals('Solicitação realizada via Landing Page.', $corrigido);
+
+        $corrompido2 = 'InstalaÃ§Ã£o de rastreador e manutenÃ§Ã£o tÃ©cnica de veÃ­culos com precisÃ£o';
+        $corrigido2 = \App\Console\Commands\CorrigirEncodingCommand::fixMojibake($corrompido2);
+
+        $this->assertEquals('Instalação de rastreador e manutenção técnica de veículos com precisão', $corrigido2);
+    }
 }
+

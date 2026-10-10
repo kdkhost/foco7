@@ -214,8 +214,8 @@ public_html/
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **45 testes executados, 45 aprovados (100% de sucesso), 202 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha e isolamento ACL (Administrador vs Cliente).
+- **46 testes executados, 46 aprovados (100% de sucesso), 204 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
 
 ---
 
@@ -225,7 +225,7 @@ A aplicação conta com uma suíte de testes de integração automatizados (`tes
 - **Isenção de CSRF Segura:** Rotas `/webhook/*` isentas de CSRF para integração com APIs externas (Mercado Pago e Efí PRO).
 - **Bloqueio de Acesso Público:** Diretórios e arquivos sensíveis (`.env`, `.git`, `app/`, `vendor/`, `artisan`) bloqueados no `.htaccess`.
 - **Prevenção de N+1 e Sobrecarga:** Todas as consultas com Eager Loading (`with()`) e índices nas tabelas do MySQL.
-- **UTF-8 Sem BOM:** Arquivos salvos rigorosamente em UTF-8 sem Byte Order Mark.
+- **UTF-8 Estrito Sem BOM & Sanitização de Acentos:** 100% dos arquivos do projeto codificados estritamente em UTF-8 sem Byte Order Mark (BOM). Rotina e comando de auditoria automatizada (`php artisan sistema:corrigir-encoding`) que previne e repara quaisquer ocorrências de mojibake nas tabelas do banco de dados MySQL.
 - **Timezone:** `America/Sao_Paulo`.
 
 
