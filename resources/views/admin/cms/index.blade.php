@@ -5,6 +5,93 @@
 @section('page_description', 'Gerencie a paleta de cores do tema, carrossel de imagens, banners do hero, seções, FAQs e depoimentos.')
 
 @section('content')
+<!-- CARDS KPIS DO CMS & LANDING PAGE -->
+<div class="row g-3 mb-4">
+    <!-- KPI 1: Banners & Slides -->
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid var(--admin-primary) !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-banners');">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-secondary small fw-semibold">Banners & Hero</span>
+                    <div class="bg-danger-subtle text-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fas fa-images"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h3 class="fw-bold mb-0 text-body">{{ $slides->count() }}</h3>
+                    <span class="badge bg-danger-subtle text-danger small">slides</span>
+                </div>
+                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Carrossel principal da home</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI 2: FAQs & Dúvidas -->
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #f59e0b !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-faq');">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-secondary small fw-semibold">FAQs & Dúvidas</span>
+                    <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h3 class="fw-bold mb-0 text-body">{{ $faqs->count() }}</h3>
+                    <span class="badge bg-warning-subtle text-warning small">perguntas</span>
+                </div>
+                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Perguntas frequentes ativas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI 3: Depoimentos -->
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #8b5cf6 !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-depoimentos');">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-secondary small fw-semibold">Depoimentos</span>
+                    <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h3 class="fw-bold mb-0 text-body">{{ $depoimentos->count() }}</h3>
+                    <span class="badge bg-primary-subtle text-primary small">avaliações</span>
+                </div>
+                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Feedbacks de clientes</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI 4: Canais WhatsApp -->
+    @php
+        $whatsappCanaisAtivos = 0;
+        for ($i = 1; $i <= 5; $i++) {
+            if (($settings['whatsapp_canal_' . $i . '_ativo'] ?? '1') == '1') {
+                $whatsappCanaisAtivos++;
+            }
+        }
+    @endphp
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #10b981 !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-whatsapp');">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-secondary small fw-semibold">WhatsApp Flutuante</span>
+                    <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h3 class="fw-bold mb-0 text-body">{{ $whatsappCanaisAtivos }}</h3>
+                    <span class="badge bg-success-subtle text-success small">canais</span>
+                </div>
+                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Central multicanal ativa</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm border-0">
     <div class="card-header bg-transparent p-0 border-bottom">
         <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="cmsTabs" role="tablist">
@@ -1478,16 +1565,42 @@
         }
     }
 
-    // Ativação automática de aba baseada na Hash da URL (#tab-app, #tab-ronda, etc.)
-    $(function() {
+    // Função Global para Ativação Instantânea de Abas do CMS (pelo sidebar ou pelos cards de KPIs)
+    window.ativarAbaCms = function (tabId, event) {
+        if (event && event.preventDefault) {
+            event.preventDefault();
+        }
+        var cleanId = tabId.replace(/^#/, '');
+        var tabBtn = document.querySelector('#cmsTabs button[data-bs-target="#' + cleanId + '"]');
+        if (tabBtn) {
+            var tab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+            tab.show();
+            if (history.replaceState) {
+                history.replaceState(null, null, '#' + cleanId);
+            }
+            var el = document.getElementById('cmsTabs');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    };
+
+    function aplicarAbaPelaHash() {
         var hash = window.location.hash;
         if (hash) {
-            var tabBtn = document.querySelector('[data-bs-target="' + hash + '"]');
+            var cleanId = hash.replace(/^#/, '');
+            var tabBtn = document.querySelector('#cmsTabs button[data-bs-target="#' + cleanId + '"]');
             if (tabBtn) {
-                var tab = new bootstrap.Tab(tabBtn);
+                var tab = bootstrap.Tab.getOrCreateInstance(tabBtn);
                 tab.show();
             }
         }
+    }
+
+    window.addEventListener('hashchange', aplicarAbaPelaHash);
+
+    $(function() {
+        aplicarAbaPelaHash();
 
         // Atualiza a hash na URL ao alternar de aba
         $('#cmsTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -1499,3 +1612,4 @@
     });
 </script>
 @endsection
+

@@ -230,7 +230,7 @@
                         </h6>
                     </div>
                     <div class="card-body p-3">
-                        <form id="formConfigNotificacoes" action="{{ route('admin.notificacoes.salvar_config') }}" method="POST">
+                        <form id="formConfigNotificacoes" action="{{ route('admin.notificacoes.salvar_config') }}" method="POST" class="ajax-form">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold text-secondary">E-mail de Destino do Administrador *</label>
@@ -249,7 +249,7 @@
                             </div>
 
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-outline-danger" id="btnSalvarConfigNotif">
+                                <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnSalvarConfigNotif">
                                     <i class="fas fa-save me-1"></i> Salvar Preferências
                                 </button>
                             </div>
@@ -263,7 +263,7 @@
 </section>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
     // Inicialização do status do Web Push no dispositivo
     function atualizarStatusPermissaoPush() {
@@ -485,4 +485,4 @@
         atualizarStatusPermissaoPush();
     });
 </script>
-@endpush
+@endsection

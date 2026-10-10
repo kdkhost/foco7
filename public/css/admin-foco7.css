@@ -739,39 +739,51 @@ body.dark-mode .input-group-text,
 }
 
 /* ==============================================================================
-   NAVBAR FIXA NO TOPO DO PAINEL ADMIN (ADMINLTE 4 FIXED HEADER)
+   ESTRUTURA DE LAYOUT FIXO E SIDEBAR DO PAINEL ADMIN (ADMINLTE 4)
+   Garante altura 100vh, scroll interno na sidebar e alinhamento perfeito do footer
    ============================================================================== */
-.layout-fixed .app-header {
-    position: fixed !important;
-    top: 0;
-    right: 0;
-    left: var(--lte-sidebar-width, 250px);
-    height: 56px;
-    z-index: 1030;
-    background-color: var(--bs-body-bg) !important;
-    border-bottom: 1px solid var(--bs-border-color) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: left 0.3s ease-in-out, background-color 0.2s ease, border-color 0.2s ease;
+html, body {
+    min-height: 100vh;
 }
 
-/* Quando a barra lateral estiver recolhida (sidebar-collapse) */
-.sidebar-collapse.layout-fixed .app-header {
-    left: var(--lte-sidebar-collapsed-width, 4.6rem);
+.layout-fixed .app-wrapper {
+    min-height: 100vh !important;
+    display: grid !important;
+    grid-template-areas:
+        "lte-app-sidebar lte-app-header"
+        "lte-app-sidebar lte-app-main"
+        "lte-app-sidebar lte-app-footer" !important;
+    grid-template-columns: var(--lte-sidebar-width, 250px) 1fr !important;
+    grid-template-rows: 56px 1fr auto !important;
 }
 
-/* Em dispositivos móveis e tablets (< 992px), o header ocupa a largura total */
+.sidebar-collapse.layout-fixed .app-wrapper {
+    grid-template-columns: var(--lte-sidebar-collapsed-width, 4.6rem) 1fr !important;
+}
+
 @media (max-width: 991.98px) {
-    .layout-fixed .app-header {
-        left: 0 !important;
+    .layout-fixed .app-wrapper {
+        grid-template-areas:
+            "lte-app-header"
+            "lte-app-main"
+            "lte-app-footer" !important;
+        grid-template-columns: 100% !important;
+        grid-template-rows: 56px 1fr auto !important;
     }
 }
 
-/* Garante o espaçamento exato no grid para o conteúdo não ficar sob o header fixo */
-.layout-fixed .app-wrapper {
-    grid-template-rows: 56px 1fr min-content !important;
+/* Navbar fixa e suave no topo */
+.layout-fixed .app-header {
+    grid-area: lte-app-header;
+    position: sticky !important;
+    top: 0;
+    z-index: 1020;
+    height: 56px;
+    background-color: var(--bs-body-bg) !important;
+    border-bottom: 1px solid var(--bs-border-color) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Estilização da navbar fixa no modo escuro */
 [data-bs-theme="dark"] .app-header,
 body.dark-mode .app-header {
     background-color: rgba(18, 23, 34, 0.96) !important;
@@ -780,6 +792,67 @@ body.dark-mode .app-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
+
+/* Sidebar Fixa e com Rolagem Independente (Evita quebras com menus longos) */
+.layout-fixed .app-sidebar {
+    grid-area: lte-app-sidebar;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    position: sticky !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 1030;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    background-color: var(--admin-sidebar-bg, #11141c) !important;
+}
+
+.layout-fixed .app-sidebar .sidebar-brand {
+    flex: 0 0 56px;
+    height: 56px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.layout-fixed .app-sidebar .sidebar-wrapper {
+    flex: 1 1 auto;
+    height: calc(100vh - 56px) !important;
+    max-height: calc(100vh - 56px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar {
+    width: 5px;
+}
+
+.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+/* Área de Conteúdo Principal */
+.layout-fixed .app-main {
+    grid-area: lte-app-main;
+    min-height: calc(100vh - 56px - 56px) !important;
+    flex: 1 1 auto;
+}
+
+/* Rodapé Perfeitamente Posicionado e Integrado */
+.layout-fixed .app-footer {
+    grid-area: lte-app-footer;
+    margin-top: auto;
+    background-color: var(--bs-body-bg) !important;
+    border-top: 1px solid var(--bs-border-color) !important;
+    z-index: 1010;
+}
+
 
 
 

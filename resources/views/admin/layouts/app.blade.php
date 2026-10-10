@@ -200,27 +200,57 @@
                                 </a>
                                 <ul class="nav nav-treeview ps-2">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}" class="nav-link py-1">
-                                            <i class="fas fa-sliders-h nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Geral & Cores</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-cores" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-cores', event); }">
+                                            <i class="fas fa-palette nav-icon text-danger" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Cores & Tema</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link py-1">
+                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-banners', event); }">
+                                            <i class="fas fa-images nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Banners & Hero</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-app', event); }">
                                             <i class="fas fa-mobile-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
                                             <p class="small">Aplicativo Mobile</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link py-1">
+                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-ronda', event); }">
                                             <i class="fas fa-shield-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Ronda Tática (4 Etapas)</p>
+                                            <p class="small">Ronda Tática</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link py-1">
-                                            <i class="fas fa-images nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Banners & Hero</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-secoes" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-secoes', event); }">
+                                            <i class="fas fa-layer-group nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Sobre & Diferenciais</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-faq" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-faq', event); }">
+                                            <i class="fas fa-question-circle nav-icon text-warning" style="font-size: 0.75rem;"></i>
+                                            <p class="small">FAQs & Dúvidas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-depoimentos" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-depoimentos', event); }">
+                                            <i class="fas fa-star nav-icon text-warning" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Depoimentos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-lgpd" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-lgpd', event); }">
+                                            <i class="fas fa-user-shield nav-icon text-danger" style="font-size: 0.75rem;"></i>
+                                            <p class="small">LGPD & Termos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-whatsapp" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-whatsapp', event); }">
+                                            <i class="fab fa-whatsapp nav-icon text-success" style="font-size: 0.75rem;"></i>
+                                            <p class="small">WhatsApp Flutuante</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -235,21 +265,21 @@
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-tags"></i>
+                                    <i class="nav-icon fas fa-tags text-danger"></i>
                                     <p>Planos & Preços</p>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <i class="nav-icon fas fa-calendar-alt text-danger"></i>
                                     <p>Agenda & Ordens</p>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-search"></i>
+                                    <i class="nav-icon fas fa-search text-warning"></i>
                                     <p>SEO & Meta Tags</p>
                                 </a>
                             </li>
@@ -270,20 +300,54 @@
                                 </a>
                             </li>
 
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
-
-                            <li class="nav-item">
+                            <li class="nav-item {{ request()->routeIs('admin.gateways.*') ? 'menu-open' : '' }}">
                                 <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-credit-card text-success"></i>
-                                    <p>Gateways &amp; Carnê</p>
+                                    <p>
+                                        Gateways & Carnê
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
                                 </a>
+                                <ul class="nav nav-treeview ps-2">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.gateways.index') }}" class="nav-link py-1">
+                                            <i class="fas fa-sliders-h nav-icon text-success" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Mercado Pago & EFI</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link py-1">
+                                            <i class="fas fa-book-open nav-icon text-warning" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Gerador de Carnês (PDF)</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
-                            <li class="nav-item">
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
+
+                            <li class="nav-item {{ request()->routeIs('admin.emails.*') ? 'menu-open' : '' }}">
                                 <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-envelope-open-text text-danger"></i>
-                                    <p>Templates de E-mails</p>
+                                    <p>
+                                        Templates de E-mails
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
                                 </a>
+                                <ul class="nav nav-treeview ps-2">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.emails.index') }}" class="nav-link py-1">
+                                            <i class="fas fa-list nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Todos os Modelos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.emails.create') }}" class="nav-link py-1">
+                                            <i class="fas fa-plus-circle nav-icon text-danger" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Novo Modelo</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
                             <li class="nav-item">
@@ -293,23 +357,40 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
+                            <li class="nav-item {{ request()->routeIs('admin.configuracoes.*') ? 'menu-open' : '' }}">
                                 <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-sliders-h text-warning"></i>
-                                    <p>Configurações &amp; SMTP</p>
+                                    <p>
+                                        Configurações & SMTP
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
                                 </a>
+                                <ul class="nav nav-treeview ps-2">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.configuracoes.index') }}" class="nav-link py-1">
+                                            <i class="fas fa-building nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Dados & Logotipos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.configuracoes.index') }}#smtp" class="nav-link py-1">
+                                            <i class="fas fa-server nav-icon text-warning" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Servidor SMTP</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-tools"></i>
+                                    <i class="nav-icon fas fa-tools text-secondary"></i>
                                     <p>Modo Manutenção</p>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-user-circle"></i>
+                                    <i class="nav-icon fas fa-user-circle text-secondary"></i>
                                     <p>Meu Perfil</p>
                                 </a>
                             </li>
@@ -541,5 +622,6 @@
     </script>
 
     @yield('scripts')
+    @stack('scripts')
 </body>
 </html>
