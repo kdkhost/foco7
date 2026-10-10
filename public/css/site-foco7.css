@@ -999,6 +999,20 @@ body {
     padding: 100px 0;
 }
 
+.card-contato-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 .card-contato-form {
     background: #ffffff;
     border: 1px solid var(--foco-border);

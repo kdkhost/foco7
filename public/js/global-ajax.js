@@ -119,7 +119,7 @@
                 var originalHtml = $btn.html();
                 var url = $form.attr('action');
                 var method = ($form.attr('method') || 'POST').toUpperCase();
-                var isFormData = $form.attr('enctype') === 'multipart/form-data';
+                var isFormData = $form.attr('enctype') === 'multipart/form-data' || $form.find('input[type="file"]').length > 0;
 
                 // Sincronização explícita de campos Summernote WYSIWYG
                 if (typeof $.fn.summernote !== 'undefined') {

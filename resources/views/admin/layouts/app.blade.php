@@ -132,11 +132,40 @@
 
                             <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal & Serviços</li>
 
-                            <li class="nav-item">
+                            <li class="nav-item {{ request()->routeIs('admin.cms.*') ? 'menu-open' : '' }}">
                                 <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-laptop-code"></i>
-                                    <p>CMS & Seções do Site</p>
+                                    <p>
+                                        CMS & Landing Page
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
                                 </a>
+                                <ul class="nav nav-treeview ps-2">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}" class="nav-link py-1">
+                                            <i class="fas fa-sliders-h nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Geral & Cores</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link py-1">
+                                            <i class="fas fa-mobile-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Aplicativo Mobile</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link py-1">
+                                            <i class="fas fa-shield-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Ronda Tática (4 Etapas)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link py-1">
+                                            <i class="fas fa-images nav-icon text-secondary" style="font-size: 0.75rem;"></i>
+                                            <p class="small">Banners & Hero</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
                             <li class="nav-item">

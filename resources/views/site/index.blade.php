@@ -518,37 +518,37 @@
     <section id="ronda" class="section-ronda">
         <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">
-                <span class="text-danger fw-bold text-uppercase small">Apoio Presencial Especializado</span>
-                <h2 class="display-6 fw-black mt-2">🛡️ Como Funciona a Ronda Tática Foco 7</h2>
-                <p class="text-secondary fs-5">Tecnologia aliada à ação humana imediata para localizar e recuperar seu patrimônio.</p>
+                <span class="text-danger fw-bold text-uppercase small">{{ $configs['secao_ronda_badge'] ?? 'Apoio Presencial Especializado' }}</span>
+                <h2 class="display-6 fw-black mt-2">🛡️ {{ $configs['secao_ronda_titulo'] ?? 'Como Funciona a Ronda Tática Foco 7' }}</h2>
+                <p class="text-secondary fs-5">{{ $configs['secao_ronda_subtitulo'] ?? 'Tecnologia aliada à ação humana imediata para localizar e recuperar seu patrimônio.' }}</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-3">
                     <div class="etapa-ronda-card">
                         <div class="etapa-numero">1</div>
-                        <h5 class="fw-bold mb-2">Alarme ou Sinistro</h5>
-                        <p class="small text-secondary mb-0">Você aciona o botão de emergência pelo app ou a central detecta movimentação ou bloqueio não autorizado.</p>
+                        <h5 class="fw-bold mb-2">{{ $configs['secao_ronda_etapa1_titulo'] ?? 'Alarme ou Sinistro' }}</h5>
+                        <p class="small text-secondary mb-0">{{ $configs['secao_ronda_etapa1_desc'] ?? 'Você aciona o botão de emergência pelo app ou a central detecta movimentação ou bloqueio não autorizado.' }}</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="etapa-ronda-card">
                         <div class="etapa-numero">2</div>
-                        <h5 class="fw-bold mb-2">Central 24h Aciona</h5>
-                        <p class="small text-secondary mb-0">Nossos operadores isolam o perímetro, realizam o bloqueio progressivo e geram o mapa da rota do veículo.</p>
+                        <h5 class="fw-bold mb-2">{{ $configs['secao_ronda_etapa2_titulo'] ?? 'Central 24h Aciona' }}</h5>
+                        <p class="small text-secondary mb-0">{{ $configs['secao_ronda_etapa2_desc'] ?? 'Nossos operadores isolam o perímetro, realizam o bloqueio progressivo e geram o mapa da rota do veículo.' }}</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="etapa-ronda-card">
                         <div class="etapa-numero">3</div>
-                        <h5 class="fw-bold mb-2">Viatura a Caminho</h5>
-                        <p class="small text-secondary mb-0">A viatura ou moto tática mais próxima é despachada imediatamente com as coordenadas exatas do alvo.</p>
+                        <h5 class="fw-bold mb-2">{{ $configs['secao_ronda_etapa3_titulo'] ?? 'Viatura a Caminho' }}</h5>
+                        <p class="small text-secondary mb-0">{{ $configs['secao_ronda_etapa3_desc'] ?? 'A viatura ou moto tática mais próxima é despachada imediatamente com as coordenadas exatas do alvo.' }}</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="etapa-ronda-card">
                         <div class="etapa-numero">4</div>
-                        <h5 class="fw-bold mb-2">Recuperação & Apoio</h5>
-                        <p class="small text-secondary mb-0">A equipe chega ao local, aciona as autoridades competentes e preserva seu veículo até sua devolução.</p>
+                        <h5 class="fw-bold mb-2">{{ $configs['secao_ronda_etapa4_titulo'] ?? 'Recuperação & Apoio' }}</h5>
+                        <p class="small text-secondary mb-0">{{ $configs['secao_ronda_etapa4_desc'] ?? 'A equipe chega ao local, aciona as autoridades competentes e preserva seu veículo até sua devolução.' }}</p>
                     </div>
                 </div>
             </div>
@@ -594,11 +594,10 @@
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="mockup-app-box text-center">
-                        @if(!empty($configs['secao_app_mockup_imagem']))
-                            <img src="{{ asset($configs['secao_app_mockup_imagem']) }}" alt="{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Foco 7' }}" class="img-fluid rounded-4 mb-3" style="max-height: 280px; object-fit: contain;">
-                        @else
-                            <i class="fas fa-mobile-alt text-danger" style="font-size: 8rem;"></i>
-                        @endif
+                        @php
+                            $appMockupImg = !empty($configs['secao_app_mockup_imagem']) ? $configs['secao_app_mockup_imagem'] : '/img/app-mockup-foco7.jpg';
+                        @endphp
+                        <img src="{{ asset($appMockupImg) }}" alt="{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Foco 7' }}" class="img-fluid rounded-4 mb-3 shadow-lg" style="max-height: 380px; object-fit: contain;">
                         <h4 class="fw-bold mt-4" style="color: var(--foco-title);">{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Oficial Foco 7' }}</h4>
                         <p class="text-secondary small">{{ $configs['secao_app_card_subtitulo'] ?? 'Baixe gratuitamente na App Store e Google Play Store' }}</p>
                         <div class="d-flex justify-content-center gap-3 mt-3">
@@ -688,21 +687,21 @@
                     <p class="text-secondary fs-5 mb-4">Preencha o formulário e receba a ligação da nossa equipe técnica em menos de 10 minutos.</p>
                     <div class="d-flex flex-column gap-3">
                         <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
-                            <div class="bg-danger text-white rounded-circle p-3"><i class="fas fa-phone-alt"></i></div>
+                            <div class="card-contato-icon bg-danger text-white"><i class="fas fa-phone-alt"></i></div>
                             <div>
                                 <span class="small text-secondary">Telefone Central</span>
                                 <h6 class="fw-bold mb-0 text-dark">{{ $configs['telefone'] }}</h6>
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
-                            <div class="bg-success text-white rounded-circle p-3"><i class="fab fa-whatsapp"></i></div>
+                            <div class="card-contato-icon bg-success text-white"><i class="fab fa-whatsapp"></i></div>
                             <div>
                                 <span class="small text-secondary">WhatsApp Direto</span>
                                 <h6 class="fw-bold mb-0 text-dark">{{ $configs['whatsapp_formatado'] }}</h6>
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
-                            <div class="bg-danger text-white rounded-circle p-3"><i class="fas fa-map-marker-alt"></i></div>
+                            <div class="card-contato-icon bg-danger text-white"><i class="fas fa-map-marker-alt"></i></div>
                             <div>
                                 <span class="small text-secondary">Nossa Sede</span>
                                 <h6 class="fw-bold mb-0 text-dark">{{ $configs['endereco'] }}</h6>

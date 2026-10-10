@@ -90,6 +90,19 @@ class SiteController extends Controller
             'secao_tatica_titulo' => CmsSetting::get('secao_tatica_titulo', 'Pronta Resposta Tática 24 Horas em Toda a Região'),
             'secao_tatica_texto' => CmsSetting::get('secao_tatica_texto', 'Equipes armadas e treinadas prontas para agir ao menor sinal de furto ou roubo.'),
 
+            // Seção Ronda Tática (Como Funciona & 4 Etapas)
+            'secao_ronda_badge' => CmsSetting::get('secao_ronda_badge', 'Apoio Presencial Especializado'),
+            'secao_ronda_titulo' => CmsSetting::get('secao_ronda_titulo', 'Como Funciona a Ronda Tática Foco 7'),
+            'secao_ronda_subtitulo' => CmsSetting::get('secao_ronda_subtitulo', 'Tecnologia aliada à ação humana imediata para localizar e recuperar seu patrimônio.'),
+            'secao_ronda_etapa1_titulo' => CmsSetting::get('secao_ronda_etapa1_titulo', 'Alarme ou Sinistro'),
+            'secao_ronda_etapa1_desc' => CmsSetting::get('secao_ronda_etapa1_desc', 'Você aciona o botão de emergência pelo app ou a central detecta movimentação ou bloqueio não autorizado.'),
+            'secao_ronda_etapa2_titulo' => CmsSetting::get('secao_ronda_etapa2_titulo', 'Central 24h Aciona'),
+            'secao_ronda_etapa2_desc' => CmsSetting::get('secao_ronda_etapa2_desc', 'Nossos operadores isolam o perímetro, realizam o bloqueio progressivo e geram o mapa da rota do veículo.'),
+            'secao_ronda_etapa3_titulo' => CmsSetting::get('secao_ronda_etapa3_titulo', 'Viatura a Caminho'),
+            'secao_ronda_etapa3_desc' => CmsSetting::get('secao_ronda_etapa3_desc', 'A viatura ou moto tática mais próxima é despachada imediatamente com as coordenadas exatas do alvo.'),
+            'secao_ronda_etapa4_titulo' => CmsSetting::get('secao_ronda_etapa4_titulo', 'Recuperação & Apoio'),
+            'secao_ronda_etapa4_desc' => CmsSetting::get('secao_ronda_etapa4_desc', 'A equipe chega ao local, aciona as autoridades competentes e preserva seu veículo até sua devolução.'),
+
             // Seção Aplicativo Mobile
             'secao_app_badge' => CmsSetting::get('secao_app_badge', 'Tecnologia Mobile'),
             'secao_app_titulo' => CmsSetting::get('secao_app_titulo', 'Controle Total do Seu Veículo na Palma da Mão'),
@@ -111,7 +124,7 @@ class SiteController extends Controller
             'secao_app_card_subtitulo' => CmsSetting::get('secao_app_card_subtitulo', 'Baixe gratuitamente na App Store e Google Play Store'),
             'secao_app_link_playstore' => CmsSetting::get('secao_app_link_playstore', 'https://play.google.com/store/apps'),
             'secao_app_link_appstore' => CmsSetting::get('secao_app_link_appstore', 'https://www.apple.com/app-store/'),
-            'secao_app_mockup_imagem' => CmsSetting::get('secao_app_mockup_imagem', ''),
+            'secao_app_mockup_imagem' => CmsSetting::get('secao_app_mockup_imagem', '/img/app-mockup-foco7.jpg'),
 
             // Seção Estética Automotiva e Diferenciais Técnicos
             'secao_estetica_titulo' => CmsSetting::get('secao_estetica_titulo', 'Estética Automotiva de Alta Performance'),

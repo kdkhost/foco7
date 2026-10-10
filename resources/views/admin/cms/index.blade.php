@@ -15,12 +15,22 @@
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="banners-tab" data-bs-toggle="tab" data-bs-target="#tab-banners" type="button">
-                    <i class="fas fa-images text-danger me-1"></i> Banners & Slides
+                    <i class="fas fa-images text-danger me-1"></i> Banners & Hero
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="app-tab" data-bs-toggle="tab" data-bs-target="#tab-app" type="button">
+                    <i class="fas fa-mobile-alt text-danger me-1"></i> Aplicativo Mobile
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="ronda-tab" data-bs-toggle="tab" data-bs-target="#tab-ronda" type="button">
+                    <i class="fas fa-shield-alt text-danger me-1"></i> Ronda Tática & Etapas
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
-                    <i class="fas fa-layer-group text-danger me-1"></i> Textos das Seções
+                    <i class="fas fa-layer-group text-danger me-1"></i> Sobre & Diferenciais
                 </button>
             </li>
             <li class="nav-item">
@@ -514,33 +524,23 @@
                         </div>
                     </div>
 
-                    <!-- 4. SEÇÃO RONDA TÁTICA -->
-                    <div class="card border mb-4">
-                        <div class="card-header bg-light py-3">
-                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-motorcycle me-2"></i> Seção Ronda Tática & Apoio Presencial</h6>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Título da Ronda Tática</label>
-                                    <input type="text" name="secao_ronda_titulo" class="form-control" value="{{ $settings['secao_ronda_titulo'] ?? 'Ronda Tática Foco 7: Apoio Presencial Imediato' }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
-                                        <span>Descrição da Atuação Presencial</span>
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
-                                    </label>
-                                    <textarea name="secao_ronda_descricao" id="secao_ronda_descricao" class="form-control summernote" data-height="130">{{ $settings['secao_ronda_descricao'] ?? 'Em caso de roubo ou furto, nossa equipe tática especializada se desloca rapidamente até as coordenadas exatas do veículo para efetuar a recuperação em conjunto com as autoridades policiais.' }}</textarea>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Sobre Nós & Diferenciais
+                        </button>
                     </div>
+                </form>
+            </div>
 
-                    <!-- 5. SEÇÃO APLICATIVO MÓVEL (ANDROID & IOS) -->
+            <!-- ABA 4: APLICATIVO MOBILE (TECNOLOGIA MOBILE & DOWNLOAD) -->
+            <div class="tab-pane fade" id="tab-app" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+                    @csrf
+                    
                     <div class="card border mb-4">
                         <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-mobile-alt me-2"></i> Seção Aplicativo Móvel (Tecnologia Mobile)</h6>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Recursos & Download</span>
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-mobile-alt me-2"></i> Seção do Aplicativo Mobile Foco 7</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Tecnologia & Download</span>
                         </div>
                         <div class="card-body p-4">
                             <!-- CABEÇALHO DO APP -->
@@ -561,7 +561,7 @@
 
                             <!-- 4 CARDS DE RECURSOS DO APP -->
                             <div class="border-top pt-3 mb-4">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Cards de Recursos do Aplicativo</h6>
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Cards de Recursos do Aplicativo (Lado Esquerdo)</h6>
                                 <div class="row g-3">
                                     <!-- RECURSO 1 -->
                                     <div class="col-md-6 col-lg-3">
@@ -638,9 +638,9 @@
                                 </div>
                             </div>
 
-                            <!-- CARD DE DOWNLOAD & MOCKUP DO APP -->
+                            <!-- CARD DE DOWNLOAD & IMAGEM OFICIAL DO APLICATIVO -->
                             <div class="border-top pt-3">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-download text-danger me-2"></i> Card Lateral de Download & Imagem do Aplicativo</h6>
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-download text-danger me-2"></i> Card Lateral de Download & Imagem Oficial do Aplicativo (Lado Direito)</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label small fw-bold">Título do Card de Download</label>
@@ -659,25 +659,138 @@
                                         <input type="text" name="secao_app_link_playstore" class="form-control" value="{{ $settings['secao_app_link_playstore'] ?? 'https://play.google.com/store/apps' }}">
                                     </div>
                                     <div class="col-12 mt-3">
-                                        <label class="form-label small fw-bold"><i class="fas fa-image text-danger me-1"></i> Mockup / Imagem Personalizada do Celular (Opcional)</label>
-                                        <p class="text-secondary small mb-2">Se nenhuma imagem for enviada, o sistema exibe o ícone mobile oficial com gradiente e estilo responsivo.</p>
+                                        <label class="form-label small fw-bold"><i class="fas fa-image text-danger me-1"></i> Imagem Oficial / Mockup do Celular</label>
+                                        <p class="text-secondary small mb-2">Envie a imagem oficial do aplicativo em formato vertical (screenshot do app ou mockup do smartphone). Caso não envie, o sistema utiliza o mockup padrão de alta resolução.</p>
                                         <div class="foco-dropzone"
                                              data-input-name="app_mockup_upload"
-                                             data-ratio="500 × 800 px (Vertical Celular)"
+                                             data-ratio="Vertical Celular (ex: 500 × 800 px ou 9:16)"
                                              data-max-size="5MB"
                                              data-accept="image/png,image/webp,image/jpeg"
-                                             data-current-preview="{{ !empty($settings['secao_app_mockup_imagem']) ? asset($settings['secao_app_mockup_imagem']) : '' }}">
+                                             data-current-preview="{{ !empty($settings['secao_app_mockup_imagem']) ? asset($settings['secao_app_mockup_imagem']) : asset('/img/app-mockup-foco7.jpg') }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="card-footer bg-light p-3 text-end">
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                                <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO APLICATIVO
+                            </button>
+                        </div>
                     </div>
+                </form>
+            </div>
 
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
-                            <i class="fas fa-save me-1"></i> Salvar Textos das Seções
-                        </button>
+            <!-- ABA 5: RONDA TÁTICA (4 ETAPAS DE RESPOSTA) -->
+            <div class="tab-pane fade" id="tab-ronda" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
+                    
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Seção Ronda Tática & Fluxograma de Resposta Presencial</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">4 Etapas de Resposta</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- CABEÇALHO DA SEÇÃO -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge / Tag Superior</label>
+                                    <input type="text" name="secao_ronda_badge" class="form-control" value="{{ $settings['secao_ronda_badge'] ?? 'Apoio Presencial Especializado' }}">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
+                                    <input type="text" name="secao_ronda_titulo" class="form-control" value="{{ $settings['secao_ronda_titulo'] ?? 'Como Funciona a Ronda Tática Foco 7' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Subtítulo / Descrição da Seção</label>
+                                    <input type="text" name="secao_ronda_subtitulo" class="form-control" value="{{ $settings['secao_ronda_subtitulo'] ?? 'Tecnologia aliada à ação humana imediata para localizar e recuperar seu patrimônio.' }}">
+                                </div>
+                            </div>
+
+                            <!-- AS 4 ETAPAS DA RONDA TÁTICA -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-list-ol text-danger me-2"></i> As 4 Etapas do Fluxo da Ronda Tática</h6>
+                                <div class="row g-3">
+                                    <!-- ETAPA 1 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">1</span>
+                                                <span class="fw-bold text-dark">Etapa 1</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título da Etapa</label>
+                                                <input type="text" name="secao_ronda_etapa1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_ronda_etapa1_titulo'] ?? 'Alarme ou Sinistro' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição da Etapa</label>
+                                                <textarea name="secao_ronda_etapa1_desc" rows="3" class="form-control form-control-sm">{{ $settings['secao_ronda_etapa1_desc'] ?? 'Você aciona o botão de emergência pelo app ou a central detecta movimentação ou bloqueio não autorizado.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ETAPA 2 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">2</span>
+                                                <span class="fw-bold text-dark">Etapa 2</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título da Etapa</label>
+                                                <input type="text" name="secao_ronda_etapa2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_ronda_etapa2_titulo'] ?? 'Central 24h Aciona' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição da Etapa</label>
+                                                <textarea name="secao_ronda_etapa2_desc" rows="3" class="form-control form-control-sm">{{ $settings['secao_ronda_etapa2_desc'] ?? 'Nossos operadores isolam o perímetro, realizam o bloqueio progressivo e geram o mapa da rota do veículo.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ETAPA 3 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">3</span>
+                                                <span class="fw-bold text-dark">Etapa 3</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título da Etapa</label>
+                                                <input type="text" name="secao_ronda_etapa3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_ronda_etapa3_titulo'] ?? 'Viatura a Caminho' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição da Etapa</label>
+                                                <textarea name="secao_ronda_etapa3_desc" rows="3" class="form-control form-control-sm">{{ $settings['secao_ronda_etapa3_desc'] ?? 'A viatura ou moto tática mais próxima é despachada imediatamente com as coordenadas exatas do alvo.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ETAPA 4 -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">4</span>
+                                                <span class="fw-bold text-dark">Etapa 4</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título da Etapa</label>
+                                                <input type="text" name="secao_ronda_etapa4_titulo" class="form-control form-control-sm" value="{{ $settings['secao_ronda_etapa4_titulo'] ?? 'Recuperação & Apoio' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição da Etapa</label>
+                                                <textarea name="secao_ronda_etapa4_desc" rows="3" class="form-control form-control-sm">{{ $settings['secao_ronda_etapa4_desc'] ?? 'A equipe chega ao local, aciona as autoridades competentes e preserva seu veículo até sua devolução.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light p-3 text-end">
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                                <i class="fas fa-save me-1"></i> SALVAR RONDA TÁTICA & ETAPAS
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -1011,5 +1124,25 @@
             box.style.filter = val > 0 ? 'blur(' + val + 'px)' : 'none';
         }
     }
+
+    // Ativação automática de aba baseada na Hash da URL (#tab-app, #tab-ronda, etc.)
+    $(function() {
+        var hash = window.location.hash;
+        if (hash) {
+            var tabBtn = document.querySelector('[data-bs-target="' + hash + '"]');
+            if (tabBtn) {
+                var tab = new bootstrap.Tab(tabBtn);
+                tab.show();
+            }
+        }
+
+        // Atualiza a hash na URL ao alternar de aba
+        $('#cmsTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).data('bs-target');
+            if (target && history.replaceState) {
+                history.replaceState(null, null, target);
+            }
+        });
+    });
 </script>
 @endsection
