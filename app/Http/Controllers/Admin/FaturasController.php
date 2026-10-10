@@ -93,6 +93,11 @@ class FaturasController extends Controller
         $fatura->valor = $valorFinal;
         $fatura->data_vencimento = $request->input('data_vencimento');
         $fatura->status = $request->input('status');
+        if ($fatura->status === 'pago' && empty($fatura->data_pagamento)) {
+            $fatura->data_pagamento = now();
+        } elseif ($fatura->status !== 'pago') {
+            $fatura->data_pagamento = null;
+        }
 
         if (!$id) {
             $fatura->codigo_fatura = 'FAT-' . date('Y') . '-' . strtoupper(Str::random(6));
@@ -118,7 +123,15 @@ class FaturasController extends Controller
         ]);
 
         $fatura = Fatura::findOrFail($id);
-        $fatura->status = $request->input('status');
+        $novoStatus = $request->input('status');
+        $fatura->status = $novoStatus;
+
+        if ($novoStatus === 'pago' && empty($fatura->data_pagamento)) {
+            $fatura->data_pagamento = now();
+        } elseif ($novoStatus !== 'pago') {
+            $fatura->data_pagamento = null;
+        }
+
         $fatura->save();
 
         return response()->json([

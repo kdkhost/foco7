@@ -42,21 +42,41 @@ try {
                 } else {
                     Schedule::command($job->comando)
                         ->cron($expr)
-                        ->name("cron-job-artisan-{$job->id}");
+                        ->name("cron-job-artisan-{$job->id}")
+                        ->onSuccess(function () use ($job) {
+                            $job->update([
+                                'ultima_execucao' => now(),
+                                'ultimo_status' => 'sucesso',
+                                'ultimo_output' => 'Executado com sucesso via agendador automático.',
+                            ]);
+                        })
+                        ->onFailure(function () use ($job) {
+                            $job->update([
+                                'ultima_execucao' => now(),
+                                'ultimo_status' => 'erro',
+                                'ultimo_output' => 'Falha na execução pelo agendador automático.',
+                            ]);
+                        });
                 }
             }
         } else {
             Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
             Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
             Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+            Schedule::command('sistema:limpeza-manutencao')->dailyAt('03:00')->name('sistema-limpeza-manutencao');
+            Schedule::command('agendamentos:lembrete-dia')->dailyAt('07:00')->name('agendamentos-lembrete-dia');
         }
     } else {
         Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
         Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
         Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+        Schedule::command('sistema:limpeza-manutencao')->dailyAt('03:00')->name('sistema-limpeza-manutencao');
+        Schedule::command('agendamentos:lembrete-dia')->dailyAt('07:00')->name('agendamentos-lembrete-dia');
     }
 } catch (\Throwable $e) {
     Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
     Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
     Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+    Schedule::command('sistema:limpeza-manutencao')->dailyAt('03:00')->name('sistema-limpeza-manutencao');
+    Schedule::command('agendamentos:lembrete-dia')->dailyAt('07:00')->name('agendamentos-lembrete-dia');
 }

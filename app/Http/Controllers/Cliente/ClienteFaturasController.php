@@ -47,7 +47,7 @@ class ClienteFaturasController extends Controller
                 'descricao' => $fatura->descricao,
                 'valor_formatado' => $fatura->valor_formatado,
                 'status' => $fatura->status,
-                'vencimento' => $fatura->data_vencimento->format('d/m/Y'),
+                'vencimento' => $fatura->data_vencimento ? $fatura->data_vencimento->format('d/m/Y') : 'A definir',
                 'qr_code_pix' => $fatura->qr_code_pix,
                 'qr_code_pix_url' => $fatura->qr_code_pix_url,
                 'linha_digitavel' => $fatura->linha_digitavel_boleto,

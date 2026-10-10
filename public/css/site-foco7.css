@@ -258,6 +258,25 @@ img, svg, video, canvas, audio, iframe, embed, object {
     }
 }
 
+@media (min-width: 992px) and (max-width: 1240px) {
+    .foco-navbar .nav-link {
+        font-size: 0.78rem;
+        padding: 0.32rem 0.45rem;
+    }
+    .foco-navbar .navbar-brand .logo-foco7 {
+        max-height: 32px;
+        height: 32px;
+    }
+    .btn-foco-login-nav {
+        font-size: 0.76rem;
+        padding: 0.35rem 0.6rem;
+    }
+    .btn-foco-whatsapp {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.7rem;
+    }
+}
+
 @media (max-width: 991.98px) {
     .foco-navbar .navbar-toggler {
         display: inline-flex;

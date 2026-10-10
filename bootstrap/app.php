@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ModoManutencao::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'webhook/*',
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\ControleAcesso::class,
             'manutencao' => \App\Http\Middleware\ModoManutencao::class,

@@ -186,18 +186,20 @@ public_html/
 | **Módulo 9** | Estética Automotiva & Agendamento Multi-categoria (Site, Admin e Cliente) | ✅ Concluído & Validado |
 | **Módulo 10**| Gestão Completa de Clientes & Faturas/Financeiro no Admin | ✅ Concluído & Validado |
 | **Módulo 11**| Edição Avançada de Banners, FAQs, Depoimentos e Textos de Seções no CMS | ✅ Concluído & Validado |
+| **Módulo 12**| Auditoria de Fluxos: CSRF Webhooks, Retenção de Leads e Notificações Automáticas | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **24 testes executados, 24 aprovados (100% de sucesso), 84 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online, CRUD de estética, clientes e faturas, edição no CMS e isolamento ACL (Administrador vs Cliente).
+- **39 testes executados, 39 aprovados (100% de sucesso), 175 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS e isolamento ACL (Administrador vs Cliente).
 
 ---
 
 ## 🔒 Segurança e Otimização para cPanel
+- **Isenção de CSRF Segura:** Rotas `/webhook/*` isentas de CSRF para integração com APIs externas (Mercado Pago e Efí PRO).
 - **Bloqueio de Acesso Público:** Diretórios e arquivos sensíveis (`.env`, `.git`, `app/`, `vendor/`, `artisan`) bloqueados no `.htaccess`.
 - **Prevenção de N+1 e Sobrecarga:** Todas as consultas com Eager Loading (`with()`) e índices nas tabelas do MySQL.
 - **UTF-8 Sem BOM:** Arquivos salvos rigorosamente em UTF-8 sem Byte Order Mark.

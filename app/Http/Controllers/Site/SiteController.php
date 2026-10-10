@@ -161,12 +161,27 @@ class SiteController extends Controller
         ], [
             'nome.required' => 'Por favor, informe seu nome completo.',
             'telefone.required' => 'Informe seu telefone ou WhatsApp para retorno.',
-            'mensagem.required' => 'Por favor, digite sua mensagem ou dÃºvida.',
+            'mensagem.required' => 'Por favor, digite sua mensagem ou dúvida.',
+        ]);
+
+        // Grava solicitação como lead no módulo de agendamentos para não perder contatos
+        Agendamento::create([
+            'categoria' => 'rastreamento',
+            'cliente_nome' => $validated['nome'],
+            'cliente_telefone' => $validated['telefone'],
+            'cliente_email' => $validated['email'] ?? null,
+            'tipo_servico' => 'Contato / Dúvida via Landing Page',
+            'veiculo_modelo' => $validated['veiculo'] ?? null,
+            'cidade' => 'Não informada',
+            'data_hora_inicio' => now(),
+            'observacoes' => 'Mensagem do formulário de contato: ' . $validated['mensagem'],
+            'status' => 'pendente',
+            'cor_calendario' => '#f59e0b',
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Obrigado pelo contato! Nossa equipe entrarÃ¡ em contato em instantes.',
+            'message' => 'Obrigado pelo contato! Nossa equipe entrará em contato em instantes.',
         ]);
     }
 

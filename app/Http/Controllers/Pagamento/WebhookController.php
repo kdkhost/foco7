@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pagamento;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Fatura;
+use App\Services\EmailTemplateService;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -31,6 +32,18 @@ class WebhookController extends Controller
                 ]);
 
                 Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Mercado Pago Webhook.");
+
+                // Dispara confirmação imediata por e-mail ao cliente
+                if ($fatura->user && !empty($fatura->user->email)) {
+                    EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
+                        'cliente_nome' => $fatura->user->name,
+                        'cliente_email' => $fatura->user->email,
+                        'fatura_id' => $fatura->codigo_fatura,
+                        'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
+                        'valor' => $fatura->valor_formatado,
+                        'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
+                    ]);
+                }
             }
         }
 
@@ -61,6 +74,18 @@ class WebhookController extends Controller
                     ]);
 
                     Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Efí PRO Webhook.");
+
+                    // Dispara confirmação imediata por e-mail ao cliente
+                    if ($fatura->user && !empty($fatura->user->email)) {
+                        EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
+                            'cliente_nome' => $fatura->user->name,
+                            'cliente_email' => $fatura->user->email,
+                            'fatura_id' => $fatura->codigo_fatura,
+                            'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
+                            'valor' => $fatura->valor_formatado,
+                            'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
+                        ]);
+                    }
                 }
             }
         }

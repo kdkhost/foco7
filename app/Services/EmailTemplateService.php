@@ -51,6 +51,13 @@ class EmailTemplateService
                 'corpo_padrao' => self::getTemplatePadraoFaturaVencida(),
                 'sistema' => true,
             ],
+            'lembrete_agendamento' => [
+                'nome' => 'Lembrete de Agendamento (Rastreamento & Estética)',
+                'descricao' => 'Disparado pelo Cron aos clientes com atendimentos agendados para a data de hoje.',
+                'assunto_padrao' => '🔔 Lembrete: Seu Agendamento Foco 7 é Hoje! ({horario})',
+                'corpo_padrao' => self::getTemplatePadraoLembreteAgendamento(),
+                'sistema' => true,
+            ],
         ];
 
         // Mesclar com templates personalizados cadastrados
@@ -139,6 +146,10 @@ class EmailTemplateService
             '{cliente_email}' => $dados['cliente_email'] ?? 'cliente@email.com',
             '{fatura_id}' => $dados['fatura_id'] ?? 'FAT-20261009-001',
             '{plano_nome}' => $dados['plano_nome'] ?? 'Plano Foco 7 Plus',
+            '{servico}' => $dados['servico'] ?? 'Atendimento Especializado',
+            '{horario}' => $dados['horario'] ?? '09:00',
+            '{endereco}' => $dados['endereco'] ?? 'Sede Foco 7',
+            '{telefone_suporte}' => $dados['telefone_suporte'] ?? '(91) 8051-0736',
             '{valor}' => $dados['valor'] ?? 'R$ 59,90',
             '{data_vencimento}' => $dados['data_vencimento'] ?? date('d/m/Y', strtotime('+3 days')),
             '{link_fatura}' => $dados['link_fatura'] ?? url('/cliente/faturas'),
@@ -150,6 +161,13 @@ class EmailTemplateService
             '{whatsapp_empresa}' => CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736'),
             '{ano_atual}' => date('Y'),
         ];
+
+        // Mapear dinamicamente todas as chaves fornecidas em $dados
+        foreach ($dados as $k => $v) {
+            if (is_scalar($v)) {
+                $tags['{' . $k . '}'] = (string) $v;
+            }
+        }
 
         return str_replace(array_keys($tags), array_values($tags), $texto);
     }
@@ -665,6 +683,47 @@ HTML;
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0; text-align: center;">Para evitar o bloqueio temporário do aplicativo e a suspensão da cobertura da Ronda Tática, regularize sua pendência o quanto antes.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoLembreteAgendamento(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 50px;">AGENDAMENTO HOJE</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 24px;">Lembramos que o seu atendimento de <strong>{servico}</strong> está agendado para <strong>hoje às {horario}</strong> com a equipe especializada Foco 7.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.04);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px;">Serviço / Procedimento</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #0f172a;">{servico}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px;">Horário Marcado</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #1d4ed8;">{horario}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px;">Local / Endereço</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #334155;">{endereco}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="tel:{telefone_empresa}" class="btn-action" style="display: inline-block; background-color: #0f172a; color: #ffffff !important; text-decoration: none !important; font-size: 14px; font-weight: 700; padding: 14px 32px; border-radius: 8px; box-sizing: border-box; max-width: 100%;">Central de Atendimento: {telefone_empresa}</a>
+</div>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin: 0;">Caso precise reagendar ou tenha dúvidas, por favor entre em contato com antecedência.</p>
 HTML;
     }
 }

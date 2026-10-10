@@ -67,7 +67,7 @@ class AgendamentosController extends Controller
             return [
                 'id' => $ag->id,
                 'title' => "{$prefixo}{$ag->tipo_servico}: {$ag->cliente_nome} ({$ag->veiculo_modelo})",
-                'start' => $ag->data_hora_inicio->format('Y-m-d\TH:i:s'),
+                'start' => $ag->data_hora_inicio ? $ag->data_hora_inicio->format('Y-m-d\TH:i:s') : now()->format('Y-m-d\TH:i:s'),
                 'end' => $ag->data_hora_fim ? $ag->data_hora_fim->format('Y-m-d\TH:i:s') : null,
                 'backgroundColor' => $cor,
                 'borderColor' => $cor,
@@ -117,11 +117,15 @@ class AgendamentosController extends Controller
 
         $id = $request->input('agendamento_id');
 
-        // Tratamento do valor se fornecido
-        if (!empty($validated['valor'])) {
-            $vLimpo = str_replace(['R$', ' ', '.'], '', $validated['valor']);
-            $vLimpo = str_replace(',', '.', $vLimpo);
-            $validated['valor'] = is_numeric($vLimpo) ? (float) $vLimpo : null;
+        // Tratamento seguro do valor financeiro
+        if (array_key_exists('valor', $validated)) {
+            if ($validated['valor'] === '' || $validated['valor'] === null) {
+                $validated['valor'] = null;
+            } else {
+                $vLimpo = str_replace(['R$', ' ', '.'], '', (string) $validated['valor']);
+                $vLimpo = str_replace(',', '.', $vLimpo);
+                $validated['valor'] = is_numeric($vLimpo) ? (float) $vLimpo : null;
+            }
         }
 
         if (empty($validated['categoria'])) {

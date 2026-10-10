@@ -119,7 +119,7 @@ class Foco7SystemTest extends TestCase
     }
 
     /**
-     * Testa envio de contato via AJAX
+     * Testa envio de contato via AJAX e persistência como lead no banco
      */
     public function test_envio_de_contato_ajax(): void
     {
@@ -132,5 +132,43 @@ class Foco7SystemTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('agendamentos', [
+            'cliente_nome' => 'Carlos Alberto',
+            'cliente_telefone' => '(91) 98888-7777',
+            'tipo_servico' => 'Contato / Dúvida via Landing Page',
+            'status' => 'pendente',
+        ]);
+    }
+
+    /**
+     * Testa que as rotas de webhook estão isentas de CSRF e respondem com 200
+     */
+    public function test_webhooks_isentos_de_csrf(): void
+    {
+        $responseMp = $this->postJson('/webhook/mercadopago', [
+            'type' => 'payment',
+            'data' => ['id' => '123456789'],
+        ]);
+        $responseMp->assertStatus(200);
+        $responseMp->assertJson(['status' => 'received']);
+
+        $responseEfi = $this->postJson('/webhook/efi', [
+            'pix' => [],
+        ]);
+        $responseEfi->assertStatus(200);
+        $responseEfi->assertJson(['status' => 'received']);
+    }
+
+    /**
+     * Testa que o template de lembrete de agendamento está disponível no EmailTemplateService
+     */
+    public function test_template_lembrete_agendamento_disponivel(): void
+    {
+        $templates = \App\Services\EmailTemplateService::getTemplates();
+        $this->assertArrayHasKey('lembrete_agendamento', $templates);
+
+        $preview = \App\Services\EmailTemplateService::renderPreview('lembrete_agendamento');
+        $this->assertStringContainsString('AGENDAMENTO HOJE', $preview);
     }
 }

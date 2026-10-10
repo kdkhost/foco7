@@ -98,7 +98,7 @@ class ConfiguracoesController extends Controller
             $file->move($uploadPath, $fileName);
             $logoUrl = '/uploads/branding/' . $fileName;
             CmsSetting::set('site_logo', $logoUrl, 'branding');
-            @copy(public_path($logoUrl), public_path('img/logo-foco7.png'));
+            @copy(public_path(ltrim($logoUrl, '/\\')), public_path('img/logo-foco7.png'));
         }
 
         // 3. Upload de Favicon com Drag & Drop
@@ -108,8 +108,8 @@ class ConfiguracoesController extends Controller
             $file->move($uploadPath, $fileName);
             $favUrl = '/uploads/branding/' . $fileName;
             CmsSetting::set('site_favicon', $favUrl, 'branding');
-            @copy(public_path($favUrl), public_path('img/favicon.png'));
-            @copy(public_path($favUrl), public_path('favicon.ico'));
+            @copy(public_path(ltrim($favUrl, '/\\')), public_path('img/favicon.png'));
+            @copy(public_path(ltrim($favUrl, '/\\')), public_path('favicon.ico'));
         }
 
         return response()->json([
