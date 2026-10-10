@@ -128,74 +128,76 @@
                     <!-- Película degradê profissional em tela cheia para contraste cinematográfico -->
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
 
-                    <!-- Conteúdo em container centralizado com alinhamento impecável -->
-                    <div class="container position-relative hero-slide-content">
-                        <div class="row align-items-center min-vh-50">
-                            <div class="col-lg-7">
-                                @if(!empty($slide->badge))
-                                    <div class="hero-badge">
-                                        <i class="fas fa-shield-alt me-2"></i> {{ $slide->badge }}
-                                    </div>
-                                @endif
-                                <h1 class="hero-title">
-                                    {{ $slide->titulo }}
-                                </h1>
-                                <div class="hero-desc">
-                                    {!! $slide->subtitulo !!}
-                                </div>
-                                <div class="d-flex flex-wrap gap-3">
-                                    @if(!empty($slide->texto_botao_1))
-                                        <a href="{{ $slide->link_botao_1 }}" class="btn-foco-primary">
-                                            <i class="fas fa-check-circle"></i> {{ $slide->texto_botao_1 }}
-                                        </a>
+                    <!-- Conteúdo em container centralizado com alinhamento impecável e respiro lateral -->
+                    <div class="hero-slide-content">
+                        <div class="container position-relative">
+                            <div class="row align-items-center min-vh-50">
+                                <div class="col-lg-7">
+                                    @if(!empty($slide->badge))
+                                        <div class="hero-badge">
+                                            <i class="fas fa-shield-alt me-2"></i> {{ $slide->badge }}
+                                        </div>
                                     @endif
-                                    @if(!empty($slide->texto_botao_2))
-                                        <a href="{{ $slide->link_botao_2 }}" class="btn-foco-outline">
-                                            {{ $slide->texto_botao_2 }}
-                                        </a>
-                                    @endif
+                                    <h1 class="hero-title">
+                                        {{ $slide->titulo }}
+                                    </h1>
+                                    <div class="hero-desc">
+                                        {!! $slide->subtitulo !!}
+                                    </div>
+                                    <div class="hero-btn-group d-flex flex-wrap gap-3">
+                                        @if(!empty($slide->texto_botao_1))
+                                            <a href="{{ $slide->link_botao_1 }}" class="btn-foco-primary">
+                                                <i class="fas fa-check-circle"></i> {{ $slide->texto_botao_1 }}
+                                            </a>
+                                        @endif
+                                        @if(!empty($slide->texto_botao_2))
+                                            <a href="{{ $slide->link_botao_2 }}" class="btn-foco-outline">
+                                                {{ $slide->texto_botao_2 }}
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-5 text-center mt-4 mt-lg-0">
-                                <div class="card-simulacao-hero">
-                                    <div class="text-start mb-3">
-                                        <span class="badge bg-danger px-3 py-2 rounded-pill">PROTEÇÃO ATIVA 24H</span>
+                                <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                                    <div class="card-simulacao-hero">
+                                        <div class="text-start mb-3">
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill">PROTEÇÃO ATIVA 24H</span>
+                                        </div>
+                                        <h4 class="fw-bold mb-2 text-start" style="color: var(--foco-title);">Simulação Rápida em 1 Minuto</h4>
+                                        <p class="small text-secondary mb-4 text-start">Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.</p>
+                                        <div class="row g-2 mb-4">
+                                            <div class="col-6">
+                                                <a href="#planos" class="btn-tipo-veiculo">
+                                                    <i class="fas fa-car text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">Carro</span>
+                                                    <span class="small text-secondary">A partir de R$ 69,90</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-6">
+                                                <a href="#planos" class="btn-tipo-veiculo">
+                                                    <i class="fas fa-motorcycle text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">Moto</span>
+                                                    <span class="small text-secondary">A partir de R$ 49,90</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-6">
+                                                <a href="#planos" class="btn-tipo-veiculo">
+                                                    <i class="fas fa-truck text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">Caminhão</span>
+                                                    <span class="small text-secondary">A partir de R$ 99,90</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-6">
+                                                <a href="#planos" class="btn-tipo-veiculo">
+                                                    <i class="fas fa-cubes text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">Frotas</span>
+                                                    <span class="small text-secondary">Condições especiais</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <a href="#planos" class="btn-foco-primary w-100">
+                                            VER TODOS OS PLANOS E RECURSOS
+                                        </a>
                                     </div>
-                                    <h4 class="fw-bold mb-2 text-start" style="color: var(--foco-title);">Simulação Rápida em 1 Minuto</h4>
-                                    <p class="small text-secondary mb-4 text-start">Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.</p>
-                                    <div class="row g-2 mb-4">
-                                        <div class="col-6">
-                                            <a href="#planos" class="btn-tipo-veiculo">
-                                                <i class="fas fa-car text-danger fs-4 d-block mb-1"></i>
-                                                <span class="fw-bold d-block">Carro</span>
-                                                <span class="small text-secondary">A partir de R$ 69,90</span>
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="#planos" class="btn-tipo-veiculo">
-                                                <i class="fas fa-motorcycle text-danger fs-4 d-block mb-1"></i>
-                                                <span class="fw-bold d-block">Moto</span>
-                                                <span class="small text-secondary">A partir de R$ 49,90</span>
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="#planos" class="btn-tipo-veiculo">
-                                                <i class="fas fa-truck text-danger fs-4 d-block mb-1"></i>
-                                                <span class="fw-bold d-block">Caminhão</span>
-                                                <span class="small text-secondary">A partir de R$ 99,90</span>
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="#planos" class="btn-tipo-veiculo">
-                                                <i class="fas fa-cubes text-danger fs-4 d-block mb-1"></i>
-                                                <span class="fw-bold d-block">Frotas</span>
-                                                <span class="small text-secondary">Condições especiais</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <a href="#planos" class="btn-foco-primary w-100">
-                                        VER TODOS OS PLANOS E RECURSOS
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -207,12 +209,16 @@
                         <div class="hero-slide-bg" style="background-image: url('{{ $heroBgImagem }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
                     @endif
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
-                    <div class="container position-relative hero-slide-content">
-                        <div class="row align-items-center">
-                            <div class="col-lg-8">
-                                <h1 class="hero-title">Proteger hoje para que você viva o amanhã com tranquilidade</h1>
-                                <p class="hero-desc">Monitoramento veicular 24h, bloqueio imediato e Ronda Tática presencial.</p>
-                                <a href="#planos" class="btn-foco-primary">PROTEGER MEU VEÍCULO AGORA</a>
+                    <div class="hero-slide-content">
+                        <div class="container position-relative">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <h1 class="hero-title">Proteger hoje para que você viva o amanhã com tranquilidade</h1>
+                                    <p class="hero-desc">Monitoramento veicular 24h, bloqueio imediato e Ronda Tática presencial.</p>
+                                    <div class="hero-btn-group d-flex flex-wrap gap-3">
+                                        <a href="#planos" class="btn-foco-primary">PROTEGER MEU VEÍCULO AGORA</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

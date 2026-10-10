@@ -44,6 +44,9 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 85px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -52,8 +55,21 @@ body {
     color: var(--foco-text);
     margin: 0;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
+    position: relative;
     -webkit-font-smoothing: antialiased;
+}
+
+/* Proteção global contra estouro de largura e corte lateral no mobile */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
 }
 
 /* ==============================================================================
@@ -321,18 +337,24 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
 }
 
 #heroCarousel {
     width: 100%;
+    max-width: 100%;
     position: relative;
     z-index: 3;
     min-height: 85vh;
+    overflow: hidden;
 }
 
 .hero-section .carousel-inner {
     width: 100%;
+    max-width: 100%;
     min-height: 85vh;
+    overflow: hidden;
 }
 
 .hero-section .carousel-item {
@@ -340,6 +362,9 @@ body {
     min-height: 85vh;
     display: flex;
     align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 /* Garante que slides inativos fiquem 100% ocultos, eliminando sobreposição de textos */
@@ -404,6 +429,12 @@ body {
     z-index: 4;
     padding: 90px 0 80px 0;
     width: 100%;
+    max-width: 100%;
+}
+
+.hero-slide-content .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
 }
 
 @media (max-width: 991.98px) {
@@ -419,7 +450,7 @@ body {
     }
 
     .hero-slide-content {
-        padding: 80px 0 80px 0;
+        padding: 55px 0 55px 0;
     }
 }
 
@@ -437,6 +468,8 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.8px;
     backdrop-filter: blur(8px);
+    max-width: 100%;
+    white-space: normal;
 }
 
 .hero-title {
@@ -447,6 +480,9 @@ body {
     color: #ffffff;
     letter-spacing: -0.5px;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .hero-title span {
@@ -460,6 +496,8 @@ body {
     margin-bottom: 2rem;
     max-width: 620px;
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Card da Simulação Rápida no Hero (Contraste premium sobre o fundo escuro) */
@@ -504,8 +542,10 @@ body {
     left: 0;
     right: 0;
     z-index: 10;
-    margin-top: 0;
+    margin: 0 auto;
     pointer-events: none;
+    display: flex;
+    justify-content: center;
 }
 
 .hero-carousel-nav {
@@ -1178,9 +1218,14 @@ body {
 }
 
 /* Responsividade Mobile da Navbar e Menu */
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     .hero-title {
-        font-size: 2.3rem;
+        font-size: 2.15rem;
+        line-height: 1.2;
+    }
+    .hero-desc {
+        font-size: 1.05rem;
+        line-height: 1.55;
     }
     .foco-navbar {
         background: #ffffff !important;
@@ -1237,6 +1282,199 @@ body {
         background: rgba(217, 0, 0, 0.08);
         color: var(--foco-red);
         font-weight: 700;
+    }
+}
+
+/* Responsividade para Tablets Pequenos e Celulares Maiores (<= 767.98px) */
+@media (max-width: 767.98px) {
+    .hero-slide-content {
+        padding: 42px 0 48px 0;
+    }
+    .hero-slide-content .container {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+    }
+    .hero-title {
+        font-size: 1.85rem;
+        line-height: 1.22;
+        margin-bottom: 1rem;
+    }
+    .hero-desc {
+        font-size: 0.98rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    .card-simulacao-hero {
+        padding: 1.75rem 1.25rem;
+        border-radius: 18px;
+    }
+    .card-simulacao-hero h4 {
+        font-size: 1.25rem;
+    }
+    .btn-tipo-veiculo {
+        padding: 0.8rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    .foco-whatsapp-float {
+        width: 52px;
+        height: 52px;
+        font-size: 26px;
+        right: 16px;
+        bottom: 16px;
+    }
+    .foco-whatsapp-float .whatsapp-tooltip {
+        display: none !important;
+    }
+    .foco-btn-topo {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+        right: 20px;
+        bottom: 78px;
+    }
+    .section-risco,
+    .section-sobre,
+    .section-planos,
+    .section-estetica,
+    .section-ronda,
+    .section-app,
+    .section-depoimentos,
+    .section-faq,
+    .section-contato {
+        padding: 55px 0;
+    }
+}
+
+/* Responsividade para Smartphones (<= 575.98px) */
+@media (max-width: 575.98px) {
+    .hero-slide-content {
+        padding: 28px 0 38px 0;
+    }
+    .hero-slide-content .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    .hero-badge {
+        font-size: 0.72rem;
+        padding: 4px 12px;
+        margin-bottom: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    .hero-title {
+        font-size: 1.55rem;
+        line-height: 1.24;
+        letter-spacing: -0.3px;
+        margin-bottom: 0.75rem;
+    }
+    .hero-desc {
+        font-size: 0.9rem;
+        line-height: 1.45;
+        margin-bottom: 1.25rem;
+    }
+    .hero-btn-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.65rem !important;
+    }
+    .hero-btn-group .btn-foco-primary,
+    .hero-btn-group .btn-foco-outline {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    .card-simulacao-hero {
+        padding: 1.25rem 0.95rem !important;
+        border-radius: 16px;
+        margin-top: 1rem;
+    }
+    .card-simulacao-hero h4 {
+        font-size: 1.15rem;
+    }
+    .btn-tipo-veiculo {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.8rem;
+    }
+    .btn-tipo-veiculo i {
+        font-size: 1.2rem !important;
+    }
+    .card-risco {
+        padding: 1.4rem 1.1rem;
+    }
+    .card-plano {
+        padding: 1.7rem 1.15rem;
+        border-radius: 18px;
+    }
+    .preco-valor {
+        font-size: 1.95rem;
+    }
+    .card-estetica {
+        padding: 1.4rem 1.1rem;
+        border-radius: 16px;
+    }
+    .preco-estetica-valor {
+        font-size: 1.4rem;
+    }
+    .card-diferencial-estetica {
+        padding: 0.9rem;
+    }
+    .card-diferenciais {
+        padding: 1.4rem 1.1rem !important;
+    }
+    .card-depoimento {
+        padding: 1.3rem 1.1rem;
+    }
+    .hero-nav-container {
+        bottom: 10px;
+    }
+    #heroCarousel .carousel-control-prev,
+    #heroCarousel .carousel-control-next {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+    .hero-carousel-nav .carousel-indicators [data-bs-target] {
+        width: 18px;
+        height: 4px;
+    }
+    .hero-carousel-nav .carousel-indicators .active {
+        width: 30px;
+    }
+    h2.display-6 {
+        font-size: 1.75rem !important;
+    }
+    .section-risco,
+    .section-sobre,
+    .section-planos,
+    .section-estetica,
+    .section-ronda,
+    .section-app,
+    .section-depoimentos,
+    .section-faq,
+    .section-contato {
+        padding: 45px 0;
+    }
+}
+
+/* Responsividade para Telas Ultracompactas (<= 380px) */
+@media (max-width: 380px) {
+    .hero-title {
+        font-size: 1.35rem;
+        line-height: 1.22;
+    }
+    .hero-desc {
+        font-size: 0.84rem;
+    }
+    .card-simulacao-hero {
+        padding: 1rem 0.75rem !important;
+    }
+    .btn-tipo-veiculo span.small {
+        font-size: 0.7rem;
+    }
+    .btn-foco-primary,
+    .btn-foco-outline {
+        font-size: 0.84rem;
+        padding: 0.7rem 1rem;
     }
 }
 
