@@ -2,7 +2,7 @@
 
 @section('title', 'Portal de Pagamentos & Gateways')
 @section('page_title', 'Gateways de Pagamento & Cobranças')
-@section('page_description', 'Gerencie credenciais de Checkout Transparente (Mercado Pago e Efí PRO), carnês, templates de e-mail e tarefas agendadas.')
+@section('page_description', 'Gerencie credenciais de Checkout Transparente (Mercado Pago e Efí PRO) e emissão de carnês recorrentes.')
 
 @section('content')
 <div class="card shadow-sm border-0">
@@ -25,14 +25,6 @@
                 </button>
             </li>
         </ul>
-        <div class="d-none d-md-flex align-items-center gap-2 pe-3 ms-auto pb-1">
-            <a href="{{ route('admin.emails.index') }}" class="btn btn-sm btn-outline-danger">
-                <i class="fas fa-envelope-open-text me-1"></i> Templates de E-mails
-            </a>
-            <a href="{{ route('admin.cron.index') }}" class="btn btn-sm btn-outline-info">
-                <i class="fas fa-clock me-1"></i> Central de Cron
-            </a>
-        </div>
     </div>
 
     <div class="card-body p-4">

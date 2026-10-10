@@ -32,25 +32,11 @@ class CmsController extends Controller
     {
         $dados = $request->except([
             '_token',
-            'logo_upload',
-            'favicon_upload',
             'hero_bg_upload',
             'remover_hero_bg',
             'app_mockup_upload',
             'remover_app_mockup'
         ]);
-
-        // Upload de Logo se enviado
-        if ($request->hasFile('logo_upload')) {
-            $path = $request->file('logo_upload')->store('uploads/logos', 'public');
-            $dados['site_logo'] = '/storage/' . $path;
-        }
-
-        // Upload de Favicon se enviado
-        if ($request->hasFile('favicon_upload')) {
-            $path = $request->file('favicon_upload')->store('uploads/logos', 'public');
-            $dados['site_favicon'] = '/storage/' . $path;
-        }
 
         // Upload de Imagem de Fundo do Hero se enviada
         if ($request->hasFile('hero_bg_upload')) {

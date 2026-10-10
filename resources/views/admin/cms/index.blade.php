@@ -1,26 +1,26 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Gerenciador do CMS')
-@section('page_title', 'CMS & Identidade Visual')
-@section('page_description', 'Gerencie todos os textos, logotipo, carrossel de imagens, banners, FAQs e depoimentos com editor visual Summernote.')
+@section('page_title', 'CMS & Conteúdo da Landing Page')
+@section('page_description', 'Gerencie a paleta de cores do tema, carrossel de imagens, banners do hero, seções, FAQs e depoimentos.')
 
 @section('content')
 <div class="card shadow-sm border-0">
     <div class="card-header bg-transparent p-0 border-bottom">
         <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="cmsTabs" role="tablist">
             <li class="nav-item">
-                <button class="nav-link active fw-semibold" id="identidade-tab" data-bs-toggle="tab" data-bs-target="#tab-identidade" type="button">
-                    <i class="fas fa-palette text-danger me-1"></i> Identidade & Cores
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link fw-semibold" id="contato-tab" data-bs-toggle="tab" data-bs-target="#tab-contato" type="button">
-                    <i class="fas fa-address-book text-danger me-1"></i> Contatos & Horários
+                <button class="nav-link active fw-semibold" id="cores-tab" data-bs-toggle="tab" data-bs-target="#tab-cores" type="button">
+                    <i class="fas fa-palette text-danger me-1"></i> Cores do Tema
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="banners-tab" data-bs-toggle="tab" data-bs-target="#tab-banners" type="button">
                     <i class="fas fa-images text-danger me-1"></i> Banners & Slides
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
+                    <i class="fas fa-layer-group text-danger me-1"></i> Textos das Seções
                 </button>
             </li>
             <li class="nav-item">
@@ -33,36 +33,44 @@
                     <i class="fas fa-star text-danger me-1"></i> Depoimentos
                 </button>
             </li>
-            <li class="nav-item">
-                <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
-                    <i class="fas fa-layer-group text-danger me-1"></i> Textos das Seções
-                </button>
-            </li>
         </ul>
     </div>
 
     <div class="card-body p-4">
         <div class="tab-content" id="cmsTabsContent">
 
-            <!-- ABA 1: IDENTIDADE & CORES -->
-            <div class="tab-pane fade show active" id="tab-identidade" role="tabpanel">
-                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+            <!-- ABA 1: CORES DO TEMA DA LANDING PAGE (COM CENTRALIZAÇÃO EXPLICADA) -->
+            <div class="tab-pane fade show active" id="tab-cores" role="tabpanel">
+                <!-- BOX INFORMATIVO DE CENTRALIZAÇÃO DO SISTEMA -->
+                <div class="alert alert-light border shadow-sm mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary-subtle text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                <i class="fas fa-sliders-h fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-body">Centralização de Identidade Visual & Dados Oficiais</h6>
+                                <p class="small text-secondary mb-0">
+                                    O <strong>Logotipo Oficial</strong>, <strong>Ícone Favicon</strong>, <strong>Telefones</strong>, <strong>WhatsApp</strong>, <strong>E-mails</strong>, <strong>Horários</strong>, <strong>Endereço</strong> e <strong>Redes Sociais</strong> são gerenciados centralizadamente no módulo de Configurações, eliminando duplicidades cadastrais.
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.configuracoes.index') }}" class="btn btn-outline-danger btn-sm fw-bold">
+                            <i class="fas fa-sliders-h me-1"></i> Ir para Configurações & SMTP
+                        </a>
+                    </div>
+                </div>
+
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
                     @csrf
                     <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Nome Oficial da Empresa</label>
-                            <input type="text" name="site_nome" class="form-control" value="{{ $settings['site_nome'] ?? 'Foco 7 - Rastreamento e Segurança' }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Slogan do Site</label>
-                            <input type="text" name="site_slogan" class="form-control" value="{{ $settings['site_slogan'] ?? '' }}">
-                        </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Cor Primária (Hexadecimal)</label>
                             <div class="input-group">
                                 <input type="color" name="cor_primaria" class="form-control form-control-color" value="{{ $settings['cor_primaria'] ?? '#d90000' }}">
                                 <input type="text" class="form-control" value="{{ $settings['cor_primaria'] ?? '#d90000' }}" readonly>
                             </div>
+                            <small class="text-secondary">Cor dos destaques primários e botões principais da Landing Page.</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Cor Secundária (Fundo Escuro)</label>
@@ -70,87 +78,19 @@
                                 <input type="color" name="cor_secundaria" class="form-control form-control-color" value="{{ $settings['cor_secundaria'] ?? '#111111' }}">
                                 <input type="text" class="form-control" value="{{ $settings['cor_secundaria'] ?? '#111111' }}" readonly>
                             </div>
+                            <small class="text-secondary">Base dos blocos escuros e cabeçalhos táticos.</small>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Cor de Destaque / Botões</label>
+                            <label class="form-label fw-bold">Cor de Destaque / Hover</label>
                             <div class="input-group">
                                 <input type="color" name="cor_destaque" class="form-control form-control-color" value="{{ $settings['cor_destaque'] ?? '#e60000' }}">
                                 <input type="text" class="form-control" value="{{ $settings['cor_destaque'] ?? '#e60000' }}" readonly>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="fas fa-image text-danger me-1"></i> Logotipo Principal</label>
-                            <div class="foco-dropzone"
-                                 data-input-name="logo_upload"
-                                 data-ratio="500 × 120 px (Horizontal Transparente)"
-                                 data-max-size="5MB"
-                                 data-accept="image/png,image/webp,image/jpeg"
-                                 data-current-preview="{{ !empty($settings['site_logo']) ? asset($settings['site_logo']) : asset('/img/logo-foco7.png') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="fas fa-gem text-danger me-1"></i> Ícone Favicon</label>
-                            <div class="foco-dropzone"
-                                 data-input-name="favicon_upload"
-                                 data-ratio="512 × 512 px (1:1 Quadrado)"
-                                 data-max-size="2MB"
-                                 data-accept="image/png,image/x-icon,image/webp"
-                                 data-current-preview="{{ !empty($settings['site_favicon']) ? asset($settings['site_favicon']) : asset('/img/favicon.png') }}">
-                            </div>
+                            <small class="text-secondary">Usada em estados hover e badges luminosos.</small>
                         </div>
                         <div class="col-12 mt-4 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
-                                <i class="fas fa-save me-1"></i> SALVAR IDENTIDADE & CORES
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- ABA 2: CONTATOS & HORÁRIOS -->
-            <div class="tab-pane fade" id="tab-contato" role="tabpanel">
-                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
-                    @csrf
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Telefone da Central</label>
-                            <input type="text" name="contato_telefone" class="form-control mask-telefone" value="{{ $settings['contato_telefone'] ?? '' }}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">WhatsApp Oficial (Com DDI e DDD)</label>
-                            <input type="text" name="contato_whatsapp" class="form-control" value="{{ $settings['contato_whatsapp'] ?? '559180510736' }}" required placeholder="Ex: 559180510736">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">WhatsApp Formatado (Exibição)</label>
-                            <input type="text" name="contato_whatsapp_formatado" class="form-control mask-telefone" value="{{ $settings['contato_whatsapp_formatado'] ?? '(91) 8051-0736' }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">E-mail Comercial</label>
-                            <input type="email" name="contato_email" class="form-control" value="{{ $settings['contato_email'] ?? 'contato@foco7.com.br' }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Horário de Atendimento Exibido no Topo</label>
-                            <input type="text" name="contato_horario" class="form-control" value="{{ $settings['contato_horario'] ?? 'Central 24 Horas | Plantão de Emergência' }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Endereço da Sede</label>
-                            <input type="text" name="contato_endereco" class="form-control" value="{{ $settings['contato_endereco'] ?? 'Tv. Quintino Bocaiúva, 1200 - Nazaré, Belém - PA' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold"><i class="fab fa-instagram text-danger me-1"></i> Instagram</label>
-                            <input type="url" name="social_instagram" class="form-control" value="{{ $settings['social_instagram'] ?? '' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold"><i class="fab fa-facebook text-primary me-1"></i> Facebook</label>
-                            <input type="url" name="social_facebook" class="form-control" value="{{ $settings['social_facebook'] ?? '' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold"><i class="fab fa-youtube text-danger me-1"></i> YouTube</label>
-                            <input type="url" name="social_youtube" class="form-control" value="{{ $settings['social_youtube'] ?? '' }}">
-                        </div>
-                        <div class="col-12 mt-4 text-end">
-                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
-                                <i class="fas fa-save me-1"></i> SALVAR CONTATOS & REDES
+                                <i class="fas fa-save me-1"></i> SALVAR CORES DO TEMA
                             </button>
                         </div>
                     </div>

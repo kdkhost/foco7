@@ -52,18 +52,28 @@ class SiteController extends Controller
         }
         $heroOpacidade = (int) CmsSetting::get('hero_bg_opacidade', 70);
 
+        $enderecoPartes = array_filter([
+            CmsSetting::get('endereco_logradouro'),
+            CmsSetting::get('endereco_numero'),
+            CmsSetting::get('endereco_bairro'),
+            CmsSetting::get('endereco_cidade') ? (CmsSetting::get('endereco_cidade') . ' - ' . CmsSetting::get('endereco_estado')) : null
+        ]);
+        $enderecoFinal = !empty($enderecoPartes) ? implode(', ', $enderecoPartes) : CmsSetting::get('contato_endereco', 'Tv. Quintino Bocaiúva, 1200 - Nazaré, Belém - PA');
+        $horarioFinal = CmsSetting::get('horario_atendimento') ?: CmsSetting::get('contato_horario', 'Central 24 Horas | Plantão de Emergência');
+
         $configs = [
-            'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e SeguranÃ§a'),
-            'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa hÃ¡ mais de 10 anos'),
+            'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
+            'slogan' => CmsSetting::get('site_slogan', 'Protegendo o que realmente importa há mais de 10 anos'),
             'telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
             'whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
             'whatsapp_formatado' => CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736'),
             'email' => CmsSetting::get('contato_email', 'contato@foco7.com.br'),
-            'endereco' => CmsSetting::get('contato_endereco', 'Tv. Quintino BocaiÃºva, 1200 - NazarÃ©, BelÃ©m - PA'),
-            'horario' => CmsSetting::get('contato_horario', 'Central 24 Horas | PlantÃ£o de EmergÃªncia'),
+            'endereco' => $enderecoFinal,
+            'horario' => $horarioFinal,
             'instagram' => CmsSetting::get('social_instagram', ''),
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
+            'linkedin' => CmsSetting::get('social_linkedin', ''),
             'logo' => $logo,
             'logo_dark' => $logoDark,
             'favicon' => $favicon,
