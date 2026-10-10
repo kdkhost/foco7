@@ -58,6 +58,13 @@ class EmailTemplateService
                 'corpo_padrao' => self::getTemplatePadraoLembreteAgendamento(),
                 'sistema' => true,
             ],
+            'recuperacao_senha' => [
+                'nome' => 'Recuperação de Senha & Redefinição Segura',
+                'descricao' => 'Disparado quando o usuário solicita redefinição de sua senha de acesso ao sistema.',
+                'assunto_padrao' => '🔐 Redefinição de Senha de Acesso - Foco 7 Rastreamento',
+                'corpo_padrao' => self::getTemplatePadraoRecuperacaoSenha(),
+                'sistema' => true,
+            ],
         ];
 
         // Mesclar com templates personalizados cadastrados
@@ -724,6 +731,28 @@ HTML;
 </div>
 
 <p style="font-size: 13px; color: #64748b; text-align: center; margin: 0;">Caso precise reagendar ou tenha dúvidas, por favor entre em contato com antecedência.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoRecuperacaoSenha(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 50px;">SEGURANÇA DA CONTA</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {nome}!</h2>
+<p style="text-align: center; margin-bottom: 24px; color: #475569;">Recebemos uma solicitação para redefinir a sua senha de acesso ao portal <strong>Foco 7 Rastreamento</strong>.</p>
+
+<div style="margin: 24px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; text-align: center;">
+    <p style="font-size: 13px; color: #64748b; margin: 0 0 10px 0;">Para criar uma nova senha com total segurança, clique no botão abaixo:</p>
+    <div class="btn-wrapper" style="text-align: center; margin: 16px 0; width: 100%;">
+        <a href="{link_redefinir}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #991b1b 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Redefinir Minha Senha Agora &rarr;</a>
+    </div>
+    <p style="font-size: 12px; color: #94a3b8; margin: 8px 0 0 0;">Este link é intransferível e expira em <strong>60 minutos</strong> por motivos de segurança.</p>
+</div>
+
+<p style="font-size: 12px; color: #94a3b8; text-align: center; margin-bottom: 0;">Se você não solicitou a alteração da sua senha, desconsidere este e-mail. Nenhuma ação será tomada e sua conta permanece totalmente protegida.</p>
 HTML;
     }
 }

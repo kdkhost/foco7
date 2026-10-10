@@ -23,25 +23,38 @@ use App\Http\Controllers\Admin\CronController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
+use App\Http\Controllers\Auth\ResetPasswordController;
+
 /*
 |--------------------------------------------------------------------------
 | Rotas Públicas do Site Foco 7 (Landing Page)
 |--------------------------------------------------------------------------
 */
 Route::get('/', [SiteController::class, 'index'])->name('site.home');
+Route::get('/privacidade', [SiteController::class, 'privacidade'])->name('site.privacidade');
 Route::post('/contato', [SiteController::class, 'contato'])->name('site.contato');
 Route::post('/agendar', [SiteController::class, 'agendar'])->name('site.agendar');
+Route::post('/depoimento/enviar', [SiteController::class, 'enviarDepoimento'])->name('site.depoimento.enviar');
 Route::get('/manutencao/bypass/{token}', [SiteController::class, 'bypassManutencao'])->name('site.manutencao.bypass');
 Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
 
 /*
 |--------------------------------------------------------------------------
-| Rotas de Autenticação (Login Unificado / Logout)
+| Rotas de Autenticação & Recuperação de Senha Segura
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/auth/status', [AuthController::class, 'statusAuth'])->name('auth.status');
+Route::post('/auth/rapido/login', [AuthController::class, 'loginRapidoAjax'])->name('auth.rapido.login');
+Route::post('/auth/rapido/cadastro', [AuthController::class, 'cadastroRapidoAjax'])->name('auth.rapido.cadastro');
+
+// Esqueci minha senha & Redefinição
+Route::get('/esqueci-senha', [ResetPasswordController::class, 'esqueciSenhaForm'])->name('password.request');
+Route::post('/esqueci-senha', [ResetPasswordController::class, 'enviarLinkRecuperacao'])->name('password.email');
+Route::get('/redefinir-senha/{token}', [ResetPasswordController::class, 'redefinirSenhaForm'])->name('password.reset');
+Route::post('/redefinir-senha', [ResetPasswordController::class, 'atualizarSenha'])->name('password.update');
 
 /*
 |--------------------------------------------------------------------------

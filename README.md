@@ -169,6 +169,25 @@ public_html/
 - **Edição Dinâmica via Modal:** Recursos completos para editar banners/slides existentes, perguntas frequentes (FAQs) e depoimentos de clientes.
 - **Aba de Textos das Seções:** Controle total sobre os títulos, subtítulos e textos das seções Sobre Nós, Riscos vs Prevenção, Ronda Tática, Recursos do App e Estética Automotiva.
 
+### Módulo 12: Auditoria de Fluxos: CSRF Webhooks, Retenção de Leads e Notificações Automáticas
+- Blindagem e validação dos endpoints de webhooks e captura de leads.
+
+### Módulo 13: LGPD, Termos de Privacidade, Segurança Avançada e Recuperação de Senha
+- **Painel CMS de Privacidade e LGPD (`/admin/cms`):** Aba dedicada para gerenciar a política de privacidade completa, texto resumido e status do banner flutuante no rodapé público.
+- **Página Pública de Privacidade (`/privacidade`):** Minuta jurídica sob a LGPD (Lei Federal nº 13.709/2018), responsiva, com links rápidos e botão nativo para impressão/download.
+- **Banner Flutuante LGPD:** Notificação moderna no rodapé com aceite salvo localmente em `localStorage` e botão para leitura das diretrizes.
+- **Segurança HTTP Estrita (`SecurityHeaders`):** Middleware global com cabeçalhos `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin` e `Permissions-Policy`.
+- **Proteção contra Força Bruta e Invasão:** Rate limiting estrito no login (`throttle:5,1`) e sanitização de requisições.
+- **Fluxo Completo de Recuperação de Senha:** Telas modernas "Esqueci minha senha" e "Redefinir senha", envio de token seguro com validade de 60 minutos através do `EmailTemplateService` e redefinição instantânea via AJAX com SweetAlert2.
+
+### Módulo 14: Central Multicanal WhatsApp, Avaliação Interativa de Estrelas & Agendamento com Pagamento Flexível
+- **Botão Flutuante do WhatsApp na Paleta Foco 7 (`#d90000`):** Efeito pulsante suave e abertura de pop-up inteligente de suporte multicanal.
+- **Box Multicanal Configurável:** 5 canais pré-definidos (Ronda 24h, Comercial, Suporte Técnico, Estética Automotiva e Financeiro) com controle individual de exibição (ligar/desligar), números de telefone e mensagens automáticas personalizadas via CMS.
+- **Menu Hambúrguer Estilo App Android:** Abertura deslizante da esquerda para a direita, suporte tátil 44x44px e acionamento infalível no mobile e desktop.
+- **Avaliação de Atendimento com Estrelas Dinâmicas:** Efeito visual ao passar o mouse acendendo estrelas parcial e integralmente (1 a 5), seleção ao clique e modal público com envio AJAX e moderação no CMS.
+- **Autenticação Obrigatória no Agendamento:** Visitantes anônimos são convidados a realizar login ou cadastro rápido em modal flutuante sem perder nenhum dado preenchido no agendamento.
+- **Seleção de Pagamento Flexível:** Opção no agendamento entre "Pagamento Online (PIX / Cartão)" e "Pagar no Local (Instalação / Presencial)", sincronizado com o banco de dados e visível no painel administrativo.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -187,18 +206,22 @@ public_html/
 | **Módulo 10**| Gestão Completa de Clientes & Faturas/Financeiro no Admin | ✅ Concluído & Validado |
 | **Módulo 11**| Edição Avançada de Banners, FAQs, Depoimentos e Textos de Seções no CMS | ✅ Concluído & Validado |
 | **Módulo 12**| Auditoria de Fluxos: CSRF Webhooks, Retenção de Leads e Notificações Automáticas | ✅ Concluído & Validado |
+| **Módulo 13**| LGPD, Termos de Privacidade, Segurança Avançada e Recuperação de Senha | ✅ Concluído & Validado |
+| **Módulo 14**| WhatsApp Multicanal CMS, Estrelas Dinâmicas, Auth no Agendamento & Pagamento | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **39 testes executados, 39 aprovados (100% de sucesso), 175 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS e isolamento ACL (Administrador vs Cliente).
+- **45 testes executados, 45 aprovados (100% de sucesso), 202 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha e isolamento ACL (Administrador vs Cliente).
 
 ---
 
 ## 🔒 Segurança e Otimização para cPanel
+- **Cabeçalhos de Segurança Estritos:** Middleware `SecurityHeaders` injeta proteção contra Clickjacking (`X-Frame-Options: SAMEORIGIN`), MIME-Sniffing (`X-Content-Type-Options: nosniff`) e XSS (`X-XSS-Protection`).
+- **Proteção contra Força Bruta:** Limitação de taxa de requisições (*Rate Limiting*) em rotas de login e autenticação sensíveis.
 - **Isenção de CSRF Segura:** Rotas `/webhook/*` isentas de CSRF para integração com APIs externas (Mercado Pago e Efí PRO).
 - **Bloqueio de Acesso Público:** Diretórios e arquivos sensíveis (`.env`, `.git`, `app/`, `vendor/`, `artisan`) bloqueados no `.htaccess`.
 - **Prevenção de N+1 e Sobrecarga:** Todas as consultas com Eager Loading (`with()`) e índices nas tabelas do MySQL.

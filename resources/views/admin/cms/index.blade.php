@@ -43,6 +43,16 @@
                     <i class="fas fa-star text-danger me-1"></i> Depoimentos
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="lgpd-tab" data-bs-toggle="tab" data-bs-target="#tab-lgpd" type="button">
+                    <i class="fas fa-user-shield text-danger me-1"></i> LGPD & Termos
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="whatsapp-tab" data-bs-toggle="tab" data-bs-target="#tab-whatsapp" type="button">
+                    <i class="fab fa-whatsapp text-success me-1"></i> WhatsApp Flutuante
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -795,6 +805,300 @@
                 </form>
             </div>
 
+            <!-- ABA 7: BANNER LGPD & TERMOS DE PRIVACIDADE -->
+            <div class="tab-pane fade" id="tab-lgpd" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-user-shield me-2"></i> Banner de Consentimento LGPD (Cookies) & Termos Legais</h6>
+                                <small class="text-secondary">Controle o banner flutuante do site e gerencie o conteúdo oficial da Política de Privacidade.</small>
+                            </div>
+                            <a href="{{ route('site.privacidade') }}" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                <i class="fas fa-external-link-alt me-1"></i> Visualizar Página de Termos
+                            </a>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- CONTROLE DO BANNER FLUTUANTE -->
+                            <div class="p-3 bg-light rounded-3 border mb-4">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-cookie-bite text-warning me-2"></i> Configurações do Banner de Cookies (LGPD)</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Exibir Banner LGPD no Site?</label>
+                                        <select name="lgpd_ativo" class="form-select">
+                                            <option value="1" {{ ($settings['lgpd_ativo'] ?? '1') == '1' ? 'selected' : '' }}>Sim (Ativo)</option>
+                                            <option value="0" {{ ($settings['lgpd_ativo'] ?? '1') == '0' ? 'selected' : '' }}>Não (Ocultar)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Texto do Botão de Aceitar</label>
+                                        <input type="text" name="lgpd_btn_aceitar" class="form-control" value="{{ $settings['lgpd_btn_aceitar'] ?? 'Aceitar e Continuar' }}">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Texto do Link para os Termos</label>
+                                        <input type="text" name="lgpd_btn_termos" class="form-control" value="{{ $settings['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">Texto Resumido do Banner de Cookies</label>
+                                        <textarea name="lgpd_texto" rows="2" class="form-control">{{ $settings['lgpd_texto'] ?? 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).' }}</textarea>
+                                        <small class="text-secondary">Mensagem explicativa rápida exibida na barra flutuante no rodapé do site.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CONTEÚDO OFICIAL DA PÁGINA DE TERMOS & PRIVACIDADE -->
+                            <div>
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-file-contract text-danger me-2"></i> Página Oficial de Política de Privacidade & Termos de Uso</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold">Título da Página de Privacidade</label>
+                                        <input type="text" name="privacidade_titulo" class="form-control" value="{{ $settings['privacidade_titulo'] ?? 'Termos de Uso e Política de Privacidade de Dados' }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Data de Revisão / Atualização</label>
+                                        <input type="text" name="privacidade_atualizacao" class="form-control" value="{{ $settings['privacidade_atualizacao'] ?? date('d/m/Y') }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                            <span>Conteúdo Completo dos Termos (Texto Legal e Diretrizes LGPD)</span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
+                                        </label>
+                                        <textarea name="privacidade_conteudo" id="privacidade_conteudo" class="form-control summernote" data-height="350">{{ $settings['privacidade_conteudo'] ?? '' }}</textarea>
+                                        <small class="text-secondary">Se deixado em branco, o sistema exibirá automaticamente a minuta jurídica padrão completa com enquadramento da LGPD, telemetria veicular e direitos do titular.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light p-3 text-end">
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                                <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DE LGPD & TERMOS
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA 8: WHATSAPP FLUTUANTE & BOX MULTICANAIS DE SUPORTE -->
+            <div class="tab-pane fade" id="tab-whatsapp" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-success"><i class="fab fa-whatsapp me-2"></i> Botão Flutuante & Box Multicanais de Suporte</h6>
+                                <small class="text-secondary">Configure o botão flutuante oficial e ative ou oculte individualmente cada canal de atendimento dentro do box.</small>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">5 Canais de Atendimento</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- CONFIGURAÇÃO GERAL DO BOX -->
+                            <div class="p-3 bg-light rounded-3 border mb-4">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-sliders-h text-danger me-2"></i> Cabeçalho do Box de Atendimento</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Botão Flutuante Ativo no Site?</label>
+                                        <select name="whatsapp_box_ativo" class="form-select">
+                                            <option value="1" {{ ($settings['whatsapp_box_ativo'] ?? '1') == '1' ? 'selected' : '' }}>Sim (Exibir Botão)</option>
+                                            <option value="0" {{ ($settings['whatsapp_box_ativo'] ?? '1') == '0' ? 'selected' : '' }}>Não (Ocultar)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Título do Box Pop-up</label>
+                                        <input type="text" name="whatsapp_box_titulo" class="form-control" value="{{ $settings['whatsapp_box_titulo'] ?? 'Central de Atendimento Foco 7' }}">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Subtítulo / Mensagem Inicial</label>
+                                        <input type="text" name="whatsapp_box_subtitulo" class="form-control" value="{{ $settings['whatsapp_box_subtitulo'] ?? 'Atendimento Humanizado • Selecione o canal desejado:' }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- OS 5 CANAIS DE SUPORTE GERENCIÁVEIS INDIVIDUALMENTE -->
+                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-headset text-danger me-2"></i> Canais de Atendimento (Exibir / Ocultar Individualmente)</h6>
+                            <div class="row g-4">
+                                
+                                <!-- CANAL 1: RONDA & EMERGÊNCIA 24H -->
+                                <div class="col-md-6">
+                                    <div class="card border border-danger-subtle h-100 shadow-sm">
+                                        <div class="card-header bg-danger-subtle d-flex justify-content-between align-items-center py-2">
+                                            <span class="fw-bold text-danger"><i class="fas fa-shield-halved me-1"></i> Canal 1: Ronda Tática & Emergência 24h</span>
+                                            <div class="form-check form-switch m-0">
+                                                <input type="hidden" name="whatsapp_canal_1_ativo" value="0">
+                                                <input class="form-check-input" type="checkbox" name="whatsapp_canal_1_ativo" value="1" id="swCanal1" {{ ($settings['whatsapp_canal_1_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="swCanal1">Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Nome do Canal</label>
+                                                    <input type="text" name="whatsapp_canal_1_nome" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_1_nome'] ?? 'Plantão Ronda Tática & Emergência 24h' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Número WhatsApp (com DDD)</label>
+                                                    <input type="text" name="whatsapp_canal_1_num" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_1_num'] ?? '559180510736' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Descrição Curta</label>
+                                                    <input type="text" name="whatsapp_canal_1_desc" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_1_desc'] ?? 'Sinistros, roubo, furto ou assistência imediata' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Mensagem Automática</label>
+                                                    <input type="text" name="whatsapp_canal_1_msg" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_1_msg'] ?? 'Emergência Foco 7: Preciso de apoio da Ronda Tática ou Central 24h.' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CANAL 2: COMERCIAL & NOVOS PLANOS -->
+                                <div class="col-md-6">
+                                    <div class="card border border-primary-subtle h-100 shadow-sm">
+                                        <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center py-2">
+                                            <span class="fw-bold text-primary"><i class="fas fa-tags me-1"></i> Canal 2: Comercial & Novos Planos</span>
+                                            <div class="form-check form-switch m-0">
+                                                <input type="hidden" name="whatsapp_canal_2_ativo" value="0">
+                                                <input class="form-check-input" type="checkbox" name="whatsapp_canal_2_ativo" value="1" id="swCanal2" {{ ($settings['whatsapp_canal_2_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="swCanal2">Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Nome do Canal</label>
+                                                    <input type="text" name="whatsapp_canal_2_nome" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_2_nome'] ?? 'Comercial & Novos Planos' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Número WhatsApp (com DDD)</label>
+                                                    <input type="text" name="whatsapp_canal_2_num" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_2_num'] ?? '559180510736' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Descrição Curta</label>
+                                                    <input type="text" name="whatsapp_canal_2_desc" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_2_desc'] ?? 'Cotações de carros, motos, frotas e promoções' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Mensagem Automática</label>
+                                                    <input type="text" name="whatsapp_canal_2_msg" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_2_msg'] ?? 'Olá! Gostaria de uma cotação de rastreamento veicular com a Foco 7.' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CANAL 3: SUPORTE TÉCNICO & APP -->
+                                <div class="col-md-6">
+                                    <div class="card border border-info-subtle h-100 shadow-sm">
+                                        <div class="card-header bg-info-subtle d-flex justify-content-between align-items-center py-2">
+                                            <span class="fw-bold text-dark"><i class="fas fa-headset me-1 text-info"></i> Canal 3: Suporte Técnico & Aplicativo</span>
+                                            <div class="form-check form-switch m-0">
+                                                <input type="hidden" name="whatsapp_canal_3_ativo" value="0">
+                                                <input class="form-check-input" type="checkbox" name="whatsapp_canal_3_ativo" value="1" id="swCanal3" {{ ($settings['whatsapp_canal_3_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="swCanal3">Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Nome do Canal</label>
+                                                    <input type="text" name="whatsapp_canal_3_nome" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_3_nome'] ?? 'Suporte Técnico & Aplicativo' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Número WhatsApp (com DDD)</label>
+                                                    <input type="text" name="whatsapp_canal_3_num" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_3_num'] ?? '559180510736' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Descrição Curta</label>
+                                                    <input type="text" name="whatsapp_canal_3_desc" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_3_desc'] ?? 'Dúvidas sobre o app, bloqueio, login ou sinal GPS' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Mensagem Automática</label>
+                                                    <input type="text" name="whatsapp_canal_3_msg" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_3_msg'] ?? 'Olá! Preciso de suporte técnico sobre o rastreador / aplicativo.' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CANAL 4: ESTÉTICA AUTOMOTIVA -->
+                                <div class="col-md-6">
+                                    <div class="card border border-warning-subtle h-100 shadow-sm">
+                                        <div class="card-header bg-warning-subtle d-flex justify-content-between align-items-center py-2">
+                                            <span class="fw-bold text-dark"><i class="fas fa-spray-can-sparkles me-1 text-warning"></i> Canal 4: Estética Automotiva & Serviços</span>
+                                            <div class="form-check form-switch m-0">
+                                                <input type="hidden" name="whatsapp_canal_4_ativo" value="0">
+                                                <input class="form-check-input" type="checkbox" name="whatsapp_canal_4_ativo" value="1" id="swCanal4" {{ ($settings['whatsapp_canal_4_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="swCanal4">Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Nome do Canal</label>
+                                                    <input type="text" name="whatsapp_canal_4_nome" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_4_nome'] ?? 'Estética Automotiva & Detalhamento' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Número WhatsApp (com DDD)</label>
+                                                    <input type="text" name="whatsapp_canal_4_num" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_4_num'] ?? '559180510736' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Descrição Curta</label>
+                                                    <input type="text" name="whatsapp_canal_4_desc" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_4_desc'] ?? 'Vitrificação, polimento técnico e higienização' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Mensagem Automática</label>
+                                                    <input type="text" name="whatsapp_canal_4_msg" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_4_msg'] ?? 'Olá! Gostaria de agendar um serviço de Estética Automotiva.' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CANAL 5: FINANCEIRO & 2ª VIA -->
+                                <div class="col-12">
+                                    <div class="card border border-success-subtle shadow-sm">
+                                        <div class="card-header bg-success-subtle d-flex justify-content-between align-items-center py-2">
+                                            <span class="fw-bold text-success"><i class="fas fa-file-invoice-dollar me-1"></i> Canal 5: Financeiro & 2ª Via de Boletos</span>
+                                            <div class="form-check form-switch m-0">
+                                                <input type="hidden" name="whatsapp_canal_5_ativo" value="0">
+                                                <input class="form-check-input" type="checkbox" name="whatsapp_canal_5_ativo" value="1" id="swCanal5" {{ ($settings['whatsapp_canal_5_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="swCanal5">Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div class="row g-2">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-bold">Nome do Canal</label>
+                                                    <input type="text" name="whatsapp_canal_5_nome" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_5_nome'] ?? 'Financeiro & 2ª Via de Boletos' }}">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-bold">Número WhatsApp (com DDD)</label>
+                                                    <input type="text" name="whatsapp_canal_5_num" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_5_num'] ?? '559180510736' }}">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label class="form-label small fw-bold">Descrição Curta</label>
+                                                    <input type="text" name="whatsapp_canal_5_desc" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_5_desc'] ?? 'Segunda via de mensalidades, PIX e notas fiscais' }}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Mensagem Automática</label>
+                                                    <input type="text" name="whatsapp_canal_5_msg" class="form-control form-control-sm" value="{{ $settings['whatsapp_canal_5_msg'] ?? 'Olá! Preciso de auxílio com minha fatura/mensalidade Foco 7.' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light p-3 text-end">
+                            <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+                                <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO WHATSAPP & CANAIS
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
@@ -948,12 +1252,19 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Estrelas</label>
-                        <select name="estrelas" id="depoimento_estrelas" class="form-select">
-                            <option value="5" selected>5 Estrelas (Excelente)</option>
-                            <option value="4">4 Estrelas</option>
-                            <option value="3">3 Estrelas</option>
-                        </select>
+                        <label class="form-label small fw-bold d-flex justify-content-between">
+                            <span>Avaliação em Estrelas *</span>
+                            <span id="labelEstrelasAdmin" class="text-warning fw-bold small">5 de 5 estrelas - Excelente!</span>
+                        </label>
+                        <div class="foco-star-rating-box p-2 bg-light border rounded d-flex align-items-center gap-2" id="starPickerAdmin">
+                            <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="1" title="1 Estrela"></i>
+                            <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="2" title="2 Estrelas"></i>
+                            <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="3" title="3 Estrelas"></i>
+                            <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="4" title="4 Estrelas"></i>
+                            <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="5" title="5 Estrelas"></i>
+                        </div>
+                        <input type="hidden" name="estrelas" id="depoimento_estrelas" value="5">
+                        <small class="text-secondary">Passe o mouse para pré-visualizar ou clique na estrela desejada.</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
@@ -1041,9 +1352,51 @@
         if (window.FocoDropzone) {
             window.FocoDropzone.reset('#formDepoimento .foco-dropzone');
         }
+        setEstrelasAdmin(5);
         $('#modalDepoimentoTitulo').text('Novo Depoimento');
         new bootstrap.Modal(document.getElementById('modalDepoimento')).show();
     }
+
+    function setEstrelasAdmin(nota) {
+        nota = parseInt(nota) || 5;
+        $('#depoimento_estrelas').val(nota);
+        var labels = {
+            1: '1 de 5 estrelas - Regular',
+            2: '2 de 5 estrelas - Bom',
+            3: '3 de 5 estrelas - Muito Bom',
+            4: '4 de 5 estrelas - Ótimo',
+            5: '5 de 5 estrelas - Excelente!'
+        };
+        $('#labelEstrelasAdmin').text(labels[nota] || (nota + ' de 5 estrelas'));
+        renderizarEstrelasVisualAdmin(nota);
+    }
+
+    function renderizarEstrelasVisualAdmin(nota) {
+        $('#starPickerAdmin .star-pick-item').each(function () {
+            var r = parseInt($(this).data('rating'));
+            if (r <= nota) {
+                $(this).removeClass('far text-muted').addClass('fas text-warning');
+            } else {
+                $(this).removeClass('fas text-warning').addClass('far text-muted');
+            }
+        });
+    }
+
+    // Hover dinâmico no seletor de estrelas do admin
+    $(document).on('mouseenter', '#starPickerAdmin .star-pick-item', function () {
+        var hoverRating = parseInt($(this).data('rating'));
+        renderizarEstrelasVisualAdmin(hoverRating);
+    });
+
+    $(document).on('mouseleave', '#starPickerAdmin', function () {
+        var currentRating = parseInt($('#depoimento_estrelas').val()) || 5;
+        renderizarEstrelasVisualAdmin(currentRating);
+    });
+
+    $(document).on('click', '#starPickerAdmin .star-pick-item', function () {
+        var clickRating = parseInt($(this).data('rating'));
+        setEstrelasAdmin(clickRating);
+    });
 
     function editarDepoimento(id) {
         $.getJSON('/admin/cms/depoimento/obter/' + id, function(res) {
@@ -1053,7 +1406,7 @@
                 $('#depoimento_nome').val(d.nome_cliente);
                 $('#depoimento_cidade_uf').val(d.cidade_uf);
                 $('#depoimento_veiculo').val(d.veiculo);
-                $('#depoimento_estrelas').val(d.estrelas);
+                setEstrelasAdmin(d.estrelas || 5);
                 window.setSummernoteContent('#depoimento_texto', d.texto || '');
 
                 if (window.FocoDropzone) {

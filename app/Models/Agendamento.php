@@ -28,6 +28,7 @@ class Agendamento extends Model
         'endereco_atendimento',
         'cidade',
         'observacoes',
+        'tipo_pagamento',
         'status',
         'cor_calendario',
     ];
@@ -55,6 +56,14 @@ class Agendamento extends Model
             'concluido' => '<span class="badge bg-primary">Concluído</span>',
             'cancelado' => '<span class="badge bg-danger">Cancelado</span>',
             default => '<span class="badge bg-warning text-dark">Pendente</span>',
+        };
+    }
+
+    public function getTipoPagamentoBadgeAttribute(): string
+    {
+        return match ($this->tipo_pagamento) {
+            'local' => '<span class="badge bg-secondary"><i class="fas fa-hand-holding-dollar me-1"></i> No Local</span>',
+            default => '<span class="badge bg-success"><i class="fas fa-bolt me-1"></i> Online</span>',
         };
     }
 }

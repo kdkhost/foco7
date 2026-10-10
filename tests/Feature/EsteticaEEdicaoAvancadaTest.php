@@ -34,13 +34,13 @@ class EsteticaEEdicaoAvancadaTest extends TestCase
     }
 
     /**
-     * Testa o agendamento público de estética automotiva pelo site
+     * Testa o agendamento de estética automotiva exigindo autenticação obrigatória e tipo_pagamento
      */
     public function test_agendamento_publico_de_estetica_automotiva(): void
     {
         $servico = ServicoEstetica::first();
 
-        $response = $this->postJson('/agendar', [
+        $dados = [
             'cliente_nome' => 'Marcos Vinicius',
             'cliente_telefone' => '(91) 98111-2222',
             'cliente_email' => 'marcos@exemplo.com',
@@ -48,18 +48,29 @@ class EsteticaEEdicaoAvancadaTest extends TestCase
             'servico_estetica_id' => $servico->id,
             'veiculo_modelo' => 'Toyota Hilux 2024',
             'cidade' => 'Belém',
+            'tipo_pagamento' => 'online',
             'data_preferencial' => date('Y-m-d', strtotime('+3 days')),
             'observacoes' => 'Gostaria do polimento completo.',
-        ]);
+        ];
 
-        $response->assertStatus(200);
-        $response->assertJson(['success' => true]);
+        // 1. Visitante não autenticado deve ser barrado com 401 e auth_required
+        $responseNaoAuth = $this->postJson('/agendar', $dados);
+        $responseNaoAuth->assertStatus(401);
+        $responseNaoAuth->assertJson(['success' => false, 'auth_required' => true]);
+
+        // 2. Cliente autenticado realiza o agendamento com sucesso
+        $user = User::factory()->create(['role' => 'cliente']);
+        $responseAuth = $this->actingAs($user)->postJson('/agendar', $dados);
+
+        $responseAuth->assertStatus(200);
+        $responseAuth->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('agendamentos', [
             'cliente_nome' => 'Marcos Vinicius',
             'categoria' => 'estetica',
             'servico_estetica_id' => $servico->id,
             'veiculo_modelo' => 'Toyota Hilux 2024',
+            'tipo_pagamento' => 'online',
         ]);
     }
 

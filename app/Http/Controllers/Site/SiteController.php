@@ -13,6 +13,7 @@ use App\Models\SeoConfig;
 use App\Models\Agendamento;
 use App\Models\ServicoEstetica;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Auth;
 
 class SiteController extends Controller
 {
@@ -142,13 +143,87 @@ class SiteController extends Controller
             'secao_estetica_dif4_icone' => CmsSetting::get('secao_estetica_dif4_icone', 'fa-user-clock'),
             'secao_estetica_dif4_titulo' => CmsSetting::get('secao_estetica_dif4_titulo', 'Horário Marcado'),
             'secao_estetica_dif4_desc' => CmsSetting::get('secao_estetica_dif4_desc', 'Entrega pontual sem filas'),
+
+            // LGPD e Termos de Privacidade
+            'lgpd_ativo' => CmsSetting::get('lgpd_ativo', '1'),
+            'lgpd_texto' => CmsSetting::get('lgpd_texto', 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).'),
+            'lgpd_btn_aceitar' => CmsSetting::get('lgpd_btn_aceitar', 'Aceitar e Continuar'),
+            'lgpd_btn_termos' => CmsSetting::get('lgpd_btn_termos', 'Ler Política de Privacidade'),
+
+            // WhatsApp Flutuante com Box Multicanais
+            'whatsapp_box_ativo' => CmsSetting::get('whatsapp_box_ativo', '1'),
+            'whatsapp_box_titulo' => CmsSetting::get('whatsapp_box_titulo', 'Central de Atendimento Foco 7'),
+            'whatsapp_box_subtitulo' => CmsSetting::get('whatsapp_box_subtitulo', 'Atendimento Humanizado • Selecione o canal desejado:'),
+
+            // Canal 1: Ronda & Emergência 24h
+            'whatsapp_canal_1_ativo' => CmsSetting::get('whatsapp_canal_1_ativo', '1'),
+            'whatsapp_canal_1_nome' => CmsSetting::get('whatsapp_canal_1_nome', 'Plantão Ronda Tática & Emergência 24h'),
+            'whatsapp_canal_1_desc' => CmsSetting::get('whatsapp_canal_1_desc', 'Sinistros, roubo, furto ou assistência imediata'),
+            'whatsapp_canal_1_num' => CmsSetting::get('whatsapp_canal_1_num', '559180510736'),
+            'whatsapp_canal_1_msg' => CmsSetting::get('whatsapp_canal_1_msg', 'Emergência Foco 7: Preciso de apoio da Ronda Tática ou Central 24h.'),
+            'whatsapp_canal_1_icone' => CmsSetting::get('whatsapp_canal_1_icone', 'fa-shield-halved'),
+
+            // Canal 2: Comercial & Planos
+            'whatsapp_canal_2_ativo' => CmsSetting::get('whatsapp_canal_2_ativo', '1'),
+            'whatsapp_canal_2_nome' => CmsSetting::get('whatsapp_canal_2_nome', 'Comercial & Novos Planos'),
+            'whatsapp_canal_2_desc' => CmsSetting::get('whatsapp_canal_2_desc', 'Cotações de carros, motos, frotas e promoções'),
+            'whatsapp_canal_2_num' => CmsSetting::get('whatsapp_canal_2_num', '559180510736'),
+            'whatsapp_canal_2_msg' => CmsSetting::get('whatsapp_canal_2_msg', 'Olá! Gostaria de uma cotação de rastreamento veicular com a Foco 7.'),
+            'whatsapp_canal_2_icone' => CmsSetting::get('whatsapp_canal_2_icone', 'fa-tags'),
+
+            // Canal 3: Suporte Técnico & App
+            'whatsapp_canal_3_ativo' => CmsSetting::get('whatsapp_canal_3_ativo', '1'),
+            'whatsapp_canal_3_nome' => CmsSetting::get('whatsapp_canal_3_nome', 'Suporte Técnico & Aplicativo'),
+            'whatsapp_canal_3_desc' => CmsSetting::get('whatsapp_canal_3_desc', 'Dúvidas sobre o app, bloqueio, login ou sinal GPS'),
+            'whatsapp_canal_3_num' => CmsSetting::get('whatsapp_canal_3_num', '559180510736'),
+            'whatsapp_canal_3_msg' => CmsSetting::get('whatsapp_canal_3_msg', 'Olá! Preciso de suporte técnico sobre o rastreador / aplicativo.'),
+            'whatsapp_canal_3_icone' => CmsSetting::get('whatsapp_canal_3_icone', 'fa-headset'),
+
+            // Canal 4: Estética Automotiva
+            'whatsapp_canal_4_ativo' => CmsSetting::get('whatsapp_canal_4_ativo', '1'),
+            'whatsapp_canal_4_nome' => CmsSetting::get('whatsapp_canal_4_nome', 'Estética Automotiva & Detalhamento'),
+            'whatsapp_canal_4_desc' => CmsSetting::get('whatsapp_canal_4_desc', 'Vitrificação, polimento técnico e higienização'),
+            'whatsapp_canal_4_num' => CmsSetting::get('whatsapp_canal_4_num', '559180510736'),
+            'whatsapp_canal_4_msg' => CmsSetting::get('whatsapp_canal_4_msg', 'Olá! Gostaria de agendar um serviço de Estética Automotiva.'),
+            'whatsapp_canal_4_icone' => CmsSetting::get('whatsapp_canal_4_icone', 'fa-spray-can-sparkles'),
+
+            // Canal 5: Financeiro & 2ª Via
+            'whatsapp_canal_5_ativo' => CmsSetting::get('whatsapp_canal_5_ativo', '1'),
+            'whatsapp_canal_5_nome' => CmsSetting::get('whatsapp_canal_5_nome', 'Financeiro & 2ª Via de Boletos'),
+            'whatsapp_canal_5_desc' => CmsSetting::get('whatsapp_canal_5_desc', 'Segunda via de mensalidades, PIX e notas fiscais'),
+            'whatsapp_canal_5_num' => CmsSetting::get('whatsapp_canal_5_num', '559180510736'),
+            'whatsapp_canal_5_msg' => CmsSetting::get('whatsapp_canal_5_msg', 'Olá! Preciso de auxílio com minha fatura/mensalidade Foco 7.'),
+            'whatsapp_canal_5_icone' => CmsSetting::get('whatsapp_canal_5_icone', 'fa-file-invoice-dollar'),
         ];
 
         return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'seo', 'configs'));
     }
 
     /**
-     * Processa formulÃ¡rio de contato via AJAX
+     * Exibe a página oficial de Termos de Uso e Política de Privacidade (LGPD)
+     */
+    public function privacidade()
+    {
+        $titulo = CmsSetting::get('privacidade_titulo', 'Termos de Uso e Política de Privacidade de Dados');
+        $conteudo = CmsSetting::get('privacidade_conteudo', '');
+        $dataAtualizacao = CmsSetting::get('privacidade_atualizacao', date('d/m/Y'));
+
+        $configs = [
+            'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
+            'logo' => CmsSetting::get('site_logo', '/img/logo-foco7.png'),
+            'logo_dark' => CmsSetting::get('site_logo_dark', '/img/logo-foco7-dark.png'),
+            'favicon' => CmsSetting::get('site_favicon', '/img/favicon.png'),
+            'contato_email' => CmsSetting::get('contato_email', 'contato@foco7.com.br'),
+            'contato_telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
+            'contato_whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
+            'endereco' => CmsSetting::get('endereco_cidade', 'Belém') . ' - ' . CmsSetting::get('endereco_estado', 'PA'),
+        ];
+
+        return view('site.privacidade', compact('titulo', 'conteudo', 'dataAtualizacao', 'configs'));
+    }
+
+    /**
+     * Processa formulário de contato via AJAX
      */
     public function contato(Request $request)
     {
@@ -173,6 +248,7 @@ class SiteController extends Controller
             'tipo_servico' => 'Contato / Dúvida via Landing Page',
             'veiculo_modelo' => $validated['veiculo'] ?? null,
             'cidade' => 'Não informada',
+            'tipo_pagamento' => 'local',
             'data_hora_inicio' => now(),
             'observacoes' => 'Mensagem do formulário de contato: ' . $validated['mensagem'],
             'status' => 'pendente',
@@ -186,13 +262,62 @@ class SiteController extends Controller
     }
 
     /**
-     * Processa solicitaÃ§Ã£o rÃ¡pida de agendamento/cotaÃ§Ã£o via AJAX
+     * Recebe novos depoimentos e avaliações do site público com estrelas dinâmicas
+     */
+    public function enviarDepoimento(Request $request)
+    {
+        $validated = $request->validate([
+            'nome_cliente' => 'required|string|max:120',
+            'cidade_uf' => 'nullable|string|max:100',
+            'veiculo' => 'nullable|string|max:100',
+            'estrelas' => 'required|integer|min:1|max:5',
+            'texto' => 'required|string|min:10|max:1000',
+        ], [
+            'nome_cliente.required' => 'Por favor, informe o seu nome.',
+            'estrelas.required' => 'Selecione uma nota de 1 a 5 estrelas.',
+            'estrelas.min' => 'A nota mínima é de 1 estrela.',
+            'estrelas.max' => 'A nota máxima é de 5 estrelas.',
+            'texto.required' => 'Conte um pouco sobre a sua experiência com a Foco 7.',
+            'texto.min' => 'Seu relato deve conter pelo menos 10 caracteres.',
+        ]);
+
+        $depoimento = Depoimento::create([
+            'nome_cliente' => trim($validated['nome_cliente']),
+            'cidade_uf' => trim($validated['cidade_uf'] ?? 'Belém - PA'),
+            'veiculo' => trim($validated['veiculo'] ?? 'Cliente Foco 7'),
+            'estrelas' => (int) $validated['estrelas'],
+            'texto' => strip_tags(trim($validated['texto'])),
+            'ordem' => 99,
+            'ativo' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Muito obrigado pela sua avaliação! Seu depoimento foi publicado com sucesso.',
+            'depoimento' => $depoimento,
+        ]);
+    }
+
+    /**
+     * Processa solicitação de agendamento/cotação via AJAX
+     * EXIGE AUTENTICAÇÃO OBRIGATÓRIA E SUPORTA PAGAMENTO ONLINE OU LOCAL
      */
     public function agendar(Request $request)
     {
+        // 1. Verificação rigorosa de autenticação exigida pelo usuário
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'auth_required' => true,
+                'message' => 'Para concluir seu agendamento com segurança e acompanhar seu protocolo, é necessário estar conectado à sua conta. Entre ou crie seu cadastro em instantes!',
+            ], 401);
+        }
+
+        $user = Auth::user();
+
         $validated = $request->validate([
-            'cliente_nome' => 'required|string|max:120',
-            'cliente_telefone' => 'required|string|max:30',
+            'cliente_nome' => 'nullable|string|max:120',
+            'cliente_telefone' => 'nullable|string|max:30',
             'cliente_email' => 'nullable|email|max:120',
             'categoria' => 'nullable|string|in:rastreamento,estetica',
             'servico_estetica_id' => 'nullable|exists:servicos_estetica,id',
@@ -200,17 +325,22 @@ class SiteController extends Controller
             'plano_id' => 'nullable|exists:planos,id',
             'veiculo_modelo' => 'required|string|max:100',
             'cidade' => 'required|string|max:100',
+            'tipo_pagamento' => 'required|string|in:online,local',
             'data_preferencial' => 'nullable|date',
             'observacoes' => 'nullable|string|max:500',
         ], [
-            'cliente_nome.required' => 'Informe seu nome.',
-            'cliente_telefone.required' => 'Informe seu WhatsApp.',
-            'veiculo_modelo.required' => 'Informe o modelo do veÃ­culo (ex: Honda Civic, CG 160).',
+            'veiculo_modelo.required' => 'Informe o modelo do veículo (ex: Honda Civic, CG 160).',
             'cidade.required' => 'Informe sua cidade.',
+            'tipo_pagamento.required' => 'Escolha como deseja pagar (Online ou no Local).',
+            'tipo_pagamento.in' => 'Opção de pagamento inválida.',
         ]);
 
+        $clienteNome = !empty($validated['cliente_nome']) ? $validated['cliente_nome'] : $user->name;
+        $clienteTelefone = !empty($validated['cliente_telefone']) ? $validated['cliente_telefone'] : ($user->telefone ?: '(91) 98000-0000');
+        $clienteEmail = !empty($validated['cliente_email']) ? $validated['cliente_email'] : $user->email;
+
         $categoria = $validated['categoria'] ?? (!empty($validated['servico_estetica_id']) ? 'estetica' : 'rastreamento');
-        $tipoServico = $validated['tipo_servico'] ?? ($categoria === 'estetica' ? 'EstÃ©tica Automotiva' : 'InstalaÃ§Ã£o de Rastreador');
+        $tipoServico = $validated['tipo_servico'] ?? ($categoria === 'estetica' ? 'Estética Automotiva' : 'Instalação de Rastreador');
         $valor = null;
 
         if ($categoria === 'estetica' && !empty($validated['servico_estetica_id'])) {
@@ -225,30 +355,37 @@ class SiteController extends Controller
             ? date('Y-m-d 09:00:00', strtotime($validated['data_preferencial']))
             : date('Y-m-d 09:00:00', strtotime('+2 days'));
 
+        $tipoPagamento = $validated['tipo_pagamento'] ?? 'online';
+
         $agendamento = Agendamento::create([
+            'user_id' => $user->id,
             'categoria' => $categoria,
             'servico_estetica_id' => $validated['servico_estetica_id'] ?? null,
-            'cliente_nome' => $validated['cliente_nome'],
-            'cliente_telefone' => $validated['cliente_telefone'],
-            'cliente_email' => $validated['cliente_email'] ?? null,
+            'cliente_nome' => $clienteNome,
+            'cliente_telefone' => $clienteTelefone,
+            'cliente_email' => $clienteEmail,
             'tipo_servico' => $tipoServico,
             'valor' => $valor,
             'veiculo_modelo' => $validated['veiculo_modelo'],
             'cidade' => $validated['cidade'],
+            'tipo_pagamento' => $tipoPagamento,
             'data_hora_inicio' => $dataHora,
-            'observacoes' => $validated['observacoes'] ?? 'SolicitaÃ§Ã£o realizada via Landing Page.',
+            'observacoes' => $validated['observacoes'] ?? 'Solicitação realizada via Landing Page pelo cliente autenticado.',
             'status' => 'pendente',
             'cor_calendario' => $categoria === 'estetica' ? '#1e293b' : '#d90000',
         ]);
 
+        $metodoDescricao = $tipoPagamento === 'online' ? 'com Pagamento Online' : 'com Pagamento no Local';
+
         $msg = $categoria === 'estetica'
-            ? 'SolicitaÃ§Ã£o de agendamento de EstÃ©tica Automotiva enviada com sucesso! Entraremos em contato via WhatsApp para confirmar o horÃ¡rio.'
-            : 'SolicitaÃ§Ã£o de instalaÃ§Ã£o recebida com sucesso! Em atÃ© 30 minutos confirmaremos seu horÃ¡rio.';
+            ? "Solicitação de agendamento de Estética Automotiva ({$metodoDescricao}) confirmada com sucesso! Entraremos em contato via WhatsApp para finalizar a confirmação."
+            : "Solicitação de instalação ({$metodoDescricao}) confirmada com sucesso! Protocolo #{$agendamento->id} gerado com sucesso.";
 
         return response()->json([
             'success' => true,
             'message' => $msg,
             'agendamento_id' => $agendamento->id,
+            'tipo_pagamento' => $tipoPagamento,
         ]);
     }
 

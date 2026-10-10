@@ -144,6 +144,13 @@
                                 <option value="cancelado">Cancelado</option>
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tipo de Pagamento *</label>
+                            <select name="tipo_pagamento" id="tipo_pagamento" class="form-select" required>
+                                <option value="online">Online (PIX / Cartão)</option>
+                                <option value="local">No Local (Instalação / Presencial)</option>
+                            </select>
+                        </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Observações / Detalhes</label>
                             <textarea name="observacoes" id="observacoes" rows="2" class="form-control" placeholder="Instruções para a equipe técnica ou equipe de estética..."></textarea>
@@ -244,6 +251,7 @@
                             $('#endereco_atendimento').val(ag.endereco_atendimento || '');
                             $('#cidade').val(ag.cidade || 'Belém');
                             $('#status').val(ag.status);
+                            $('#tipo_pagamento').val(ag.tipo_pagamento || 'online');
                             $('#observacoes').val(ag.observacoes || '');
                             $('#data_hora_inicio').val(res.inicio_iso || '');
                             $('#data_hora_fim').val(res.fim_iso || '');
@@ -335,6 +343,7 @@
         $('#btnExcluirAgendamento').addClass('d-none');
         $('#modalAgendamentoTitulo').html('<i class="fas fa-calendar-plus me-1 text-danger"></i> Novo Agendamento');
         $('#categoria').val('rastreamento');
+        $('#tipo_pagamento').val('online');
         aoMudarCategoria();
 
         var now = new Date();

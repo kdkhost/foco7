@@ -128,7 +128,7 @@
                     <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
                     <label class="form-check-label small" for="remember">Lembrar acesso</label>
                 </div>
-                <a href="#contato" class="small text-danger text-decoration-none">Esqueceu a senha?</a>
+                <a href="{{ route('password.request') }}" class="small text-danger text-decoration-none">Esqueceu a senha?</a>
             </div>
 
             <button type="submit" class="btn-foco">

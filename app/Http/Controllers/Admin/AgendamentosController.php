@@ -85,6 +85,7 @@ class AgendamentosController extends Controller
                     'cidade' => $ag->cidade,
                     'observacoes' => $ag->observacoes,
                     'status' => $ag->status,
+                    'tipo_pagamento' => $ag->tipo_pagamento ?? 'online',
                 ],
             ];
         });
@@ -105,6 +106,7 @@ class AgendamentosController extends Controller
             'servico_estetica_id' => 'nullable|exists:servicos_estetica,id',
             'tipo_servico' => 'required|string',
             'valor' => 'nullable',
+            'tipo_pagamento' => 'nullable|string|in:online,local',
             'veiculo_modelo' => 'nullable|string|max:100',
             'veiculo_placa' => 'nullable|string|max:20',
             'data_hora_inicio' => 'required|date',

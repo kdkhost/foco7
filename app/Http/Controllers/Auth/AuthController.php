@@ -107,4 +107,128 @@ class AuthController extends Controller
 
         return redirect()->route('login')->with('success', 'Sessão encerrada com sucesso.');
     }
+
+    /**
+     * Retorna o status atual de autenticação e dados básicos do usuário
+     */
+    public function statusAuth(Request $request)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            return response()->json([
+                'authenticated' => true,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'telefone' => $user->telefone,
+                    'role' => $user->role,
+                ],
+            ]);
+        }
+
+        return response()->json(['authenticated' => false]);
+    }
+
+    /**
+     * Login rápido via AJAX para o fluxo de agendamento do site
+     */
+    public function loginRapidoAjax(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ], [
+            'email.required' => 'Informe seu e-mail cadastrado.',
+            'email.email' => 'Informe um formato válido de e-mail.',
+            'password.required' => 'Informe sua senha de acesso.',
+        ]);
+
+        $throttleKey = Str::transliterate(Str::lower($request->input('email')) . '|' . $request->ip());
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                'success' => false,
+                'message' => "Muitas tentativas de login incorretas. Tente novamente em {$seconds} segundos.",
+            ], 429);
+        }
+
+        if (Auth::attempt($request->only('email', 'password'), true)) {
+            RateLimiter::clear($throttleKey);
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            if ($user->status !== 'ativo') {
+                Auth::logout();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sua conta está desativada ou bloqueada.',
+                ], 403);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Autenticado com sucesso!',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'telefone' => $user->telefone,
+                ],
+            ]);
+        }
+
+        RateLimiter::hit($throttleKey);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'E-mail ou senha incorretos.',
+        ], 422);
+    }
+
+    /**
+     * Cadastro rápido de cliente via AJAX para o fluxo de agendamento do site
+     */
+    public function cadastroRapidoAjax(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'required|email|max:120|unique:users,email',
+            'telefone' => 'required|string|max:30',
+            'password' => 'required|string|min:6',
+        ], [
+            'name.required' => 'Informe seu nome completo.',
+            'email.required' => 'Informe seu e-mail.',
+            'email.email' => 'Informe um e-mail válido.',
+            'email.unique' => 'Este e-mail já está cadastrado em nosso sistema. Faça login para continuar.',
+            'telefone.required' => 'Informe seu número de WhatsApp/Telefone.',
+            'password.required' => 'Crie uma senha de acesso.',
+            'password.min' => 'A senha deve conter no mínimo 6 caracteres.',
+        ]);
+
+        $user = \App\Models\User::create([
+            'name' => trim($request->input('name')),
+            'email' => strtolower(trim($request->input('email'))),
+            'telefone' => trim($request->input('telefone')),
+            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
+            'role' => 'cliente',
+            'status' => 'ativo',
+        ]);
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cadastro realizado com sucesso! Você já está conectado.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'telefone' => $user->telefone,
+            ],
+        ]);
+    }
 }

@@ -69,10 +69,8 @@
                 </a>
 
                 <!-- BOTÃO HAMBÚRGUER ESTILO ANDROID (Aciona Gaveta da Esquerda para a Direita) -->
-                <button class="navbar-toggler d-lg-none btn-android-burger" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuDrawerAndroid" aria-controls="menuDrawerAndroid" aria-label="Abrir Menu">
-                    <span class="android-burger-box">
-                        <span class="android-burger-inner"></span>
-                    </span>
+                <button class="navbar-toggler d-lg-none btn-android-burger" type="button" id="btnOpenMenuDrawer" data-bs-toggle="offcanvas" data-bs-target="#menuDrawerAndroid" aria-controls="menuDrawerAndroid" aria-label="Abrir Menu de Navegação">
+                    <i class="fas fa-bars"></i>
                 </button>
 
                 <!-- MENU HORIZONTAL DESKTOP (Apenas Telas Grandes >= 992px) -->
@@ -753,6 +751,11 @@
                 </div>
                 @endforeach
             </div>
+            <div class="text-center mt-5">
+                <button type="button" class="btn btn-outline-danger px-4 py-2 fw-bold rounded-pill shadow-sm" onclick="abrirModalAvaliacaoSite()">
+                    <i class="fas fa-star text-warning me-2"></i> Avaliar Nosso Atendimento / Deixar Depoimento
+                </button>
+            </div>
         </div>
     </section>
 
@@ -1044,6 +1047,34 @@
                                 <label class="form-label small text-secondary fw-semibold">Observações / Detalhes Adicionais</label>
                                 <textarea name="observacoes" id="site_observacoes" rows="2" class="form-control" placeholder="Algum detalhe importante sobre o veículo, mancha, estado da pintura ou horário preferido..."></textarea>
                             </div>
+
+                            <!-- OPÇÃO DE PAGAMENTO: ONLINE OU NO LOCAL -->
+                            <div class="col-12 mt-2">
+                                <label class="form-label small text-dark fw-bold d-block mb-2">
+                                    <i class="fas fa-credit-card text-danger me-1"></i> Escolha a Forma de Pagamento *
+                                </label>
+                                <div class="row g-2">
+                                    <div class="col-sm-6">
+                                        <div class="foco-payment-option selected d-flex align-items-center gap-3" id="optPagamentoOnline" onclick="selecionarTipoPagamentoSite('online')">
+                                            <div class="payment-check"><i class="fas fa-check fa-xs"></i></div>
+                                            <div>
+                                                <strong class="d-block text-dark small"><i class="fas fa-bolt text-danger me-1"></i> Pagamento Online</strong>
+                                                <span class="text-secondary" style="font-size: 0.76rem;">PIX Instantâneo ou Cartão de Crédito</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="foco-payment-option d-flex align-items-center gap-3" id="optPagamentoLocal" onclick="selecionarTipoPagamentoSite('local')">
+                                            <div class="payment-check"><i class="fas fa-check fa-xs" style="display:none;"></i></div>
+                                            <div>
+                                                <strong class="d-block text-dark small"><i class="fas fa-hand-holding-dollar text-success me-1"></i> Pagar no Local</strong>
+                                                <span class="text-secondary" style="font-size: 0.76rem;">Dinheiro, Cartão ou PIX na instalação</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="tipo_pagamento" id="site_tipo_pagamento" value="online">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-top bg-light">
@@ -1057,21 +1088,270 @@
         </div>
     </div>
 
+    <!-- MODAL DE AUTENTICAÇÃO OBRIGATÓRIA PARA AGENDAMENTO (LOGIN OU CADASTRO RÁPIDO) -->
+    <div class="modal fade" id="modalAuthAgendamento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-white text-dark border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-dark text-white p-3 border-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="fas fa-user-lock"></i>
+                        </div>
+                        <div>
+                            <h6 class="modal-title fw-bold mb-0 text-white">Identificação Necessária</h6>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Para prosseguir com o agendamento seguro</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="p-3 bg-light border-bottom">
+                    <p class="small text-secondary mb-0">
+                        <i class="fas fa-shield-alt text-danger me-1"></i> Para sua segurança e vinculação do veículo à sua conta, é necessário estar conectado. Entre com seus dados ou cadastre-se em segundos:
+                    </p>
+                </div>
+
+                <!-- Abas Login / Cadastro -->
+                <div class="p-3 pb-0">
+                    <ul class="nav nav-pills nav-fill bg-light p-1 rounded-3" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-bold btn-sm" id="tab-login-btn" data-bs-toggle="pill" data-bs-target="#pill-login" type="button">
+                                <i class="fas fa-sign-in-alt me-1"></i> Já Tenho Cadastro
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold btn-sm" id="tab-cadastro-btn" data-bs-toggle="pill" data-bs-target="#pill-cadastro" type="button">
+                                <i class="fas fa-user-plus me-1"></i> Criar Conta Rápida
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="modal-body p-4 pt-3">
+                    <div class="tab-content">
+                        <!-- ABA 1: LOGIN RÁPIDO -->
+                        <div class="tab-pane fade show active" id="pill-login" role="tabpanel">
+                            <form id="formLoginRapido" action="{{ route('auth.rapido.login') }}" method="POST">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">E-mail Cadastrado</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope text-muted"></i></span>
+                                        <input type="email" name="email" id="loginRapidoEmail" class="form-control" required placeholder="seu@email.com">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Senha</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                                        <input type="password" name="password" id="loginRapidoPassword" class="form-control" required placeholder="••••••••">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{{ route('password.request') }}" target="_blank" class="small text-danger text-decoration-none">Esqueceu a senha?</a>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100 fw-bold py-2" id="btnLoginRapidoSubmit">
+                                    <i class="fas fa-sign-in-alt me-1"></i> ENTRAR E CONTINUAR AGENDAMENTO
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- ABA 2: CADASTRO RÁPIDO -->
+                        <div class="tab-pane fade" id="pill-cadastro" role="tabpanel">
+                            <form id="formCadastroRapido" action="{{ route('auth.rapido.cadastro') }}" method="POST">
+                                @csrf
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Seu Nome Completo *</label>
+                                    <input type="text" name="name" id="cadRapidoNome" class="form-control form-control-sm" required placeholder="Ex: Roberto Carlos">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">WhatsApp / Telefone *</label>
+                                    <input type="text" name="telefone" id="cadRapidoTelefone" class="form-control form-control-sm mask-telefone" required placeholder="(91) 98000-0000">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">E-mail para Acesso *</label>
+                                    <input type="email" name="email" id="cadRapidoEmail" class="form-control form-control-sm" required placeholder="seu@email.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Criar uma Senha *</label>
+                                    <input type="password" name="password" id="cadRapidoPassword" class="form-control form-control-sm" required minlength="6" placeholder="Mínimo 6 caracteres">
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100 fw-bold py-2" id="btnCadastroRapidoSubmit">
+                                    <i class="fas fa-check-circle me-1"></i> CRIAR CONTA E CONTINUAR
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ENVIO DE NOVO DEPOIMENTO COM ESTRELAS DINÂMICAS -->
+    <div class="modal fade" id="modalNovoDepoimentoSite" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-white text-dark border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0 text-dark">Avalie o Atendimento Foco 7</h5>
+                            <small class="text-secondary">Sua opinião é fundamental para nossa equipe!</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formNovoDepoimentoSite" action="{{ route('site.depoimento.enviar') }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12 text-center py-2 bg-light rounded-3 border">
+                                <label class="form-label small fw-bold text-dark d-block mb-1">Qual a sua nota para a Foco 7?</label>
+                                <div class="foco-star-interactive my-1" id="starRatingSite">
+                                    <i class="fas fa-star star-item active" data-rating="1" title="1 Estrela"></i>
+                                    <i class="fas fa-star star-item active" data-rating="2" title="2 Estrelas"></i>
+                                    <i class="fas fa-star star-item active" data-rating="3" title="3 Estrelas"></i>
+                                    <i class="fas fa-star star-item active" data-rating="4" title="4 Estrelas"></i>
+                                    <i class="fas fa-star star-item active" data-rating="5" title="5 Estrelas"></i>
+                                </div>
+                                <div id="starRatingSiteLabel" class="small fw-bold text-warning mt-1">5 de 5 estrelas - Atendimento Excelente!</div>
+                                <input type="hidden" name="estrelas" id="depoimentoSiteEstrelas" value="5">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Seu Nome *</label>
+                                <input type="text" name="nome_cliente" id="depSiteNome" class="form-control" required placeholder="Ex: Marcelo Oliveira">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Cidade - UF</label>
+                                <input type="text" name="cidade_uf" id="depSiteCidade" class="form-control" value="Belém - PA" placeholder="Belém - PA">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Veículo Protegido ou Atendido (Opcional)</label>
+                                <input type="text" name="veiculo" id="depSiteVeiculo" class="form-control" placeholder="Ex: Corolla Cross, Fan 160, Hilux">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Seu Depoimento / Avaliação *</label>
+                                <textarea name="texto" id="depSiteTexto" rows="3" class="form-control" required placeholder="Conte em poucas palavras como foi sua experiência com a Ronda Tática, Bloqueio ou Atendimento..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold" id="btnEnviarDepoimentoSite">
+                            <i class="fas fa-paper-plane me-1"></i> Publicar Avaliação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANNER LGPD FLUTUANTE (CONSENTIMENTO DE COOKIES) -->
+    @if(($configs['lgpd_ativo'] ?? '1') == '1')
+    <div class="foco-lgpd-banner" id="bannerLgpdFoco7">
+        <div class="foco-lgpd-content">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-danger text-white rounded-circle p-2 d-none d-sm-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <p class="foco-lgpd-text">
+                    {{ $configs['lgpd_texto'] ?? 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).' }}
+                    <a href="{{ route('site.privacidade') }}" target="_blank" class="ms-1">{{ $configs['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}</a>
+                </p>
+            </div>
+            <button type="button" class="foco-lgpd-btn" id="btnAceitarLgpd">
+                <i class="fas fa-check-circle me-1"></i> {{ $configs['lgpd_btn_aceitar'] ?? 'Aceitar e Continuar' }}
+            </button>
+        </div>
+    </div>
+    @endif
+
     <!-- BOTÃO VOLTAR AO TOPO FLUTUANTE -->
     <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- BOTÃO FLUTUANTE DO WHATSAPP OFICIAL -->
-    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1!%20Gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20o%20rastreamento%20Foco%207." 
-       class="foco-whatsapp-float" 
-       target="_blank" 
-       rel="noopener noreferrer" 
-       aria-label="Falar pelo WhatsApp com a Foco 7" 
-       title="Fale Conosco pelo WhatsApp">
-        <span class="whatsapp-tooltip"><i class="fab fa-whatsapp text-success me-1"></i> Fale Conosco: {{ $configs['telefone'] ?? '(91) 8051-0736' }}</span>
+    @if(($configs['whatsapp_box_ativo'] ?? '1') == '1')
+    <!-- BOTÃO FLUTUANTE DO WHATSAPP OFICIAL NA COR DA PALETA -->
+    <button type="button" id="btnFocoWhatsappFloat" class="foco-whatsapp-float" aria-label="Abrir canais de suporte Foco 7" title="Central de Atendimento pelo WhatsApp">
+        <span class="whatsapp-badge-pulse"></span>
         <i class="fab fa-whatsapp"></i>
-    </a>
+    </button>
+
+    <!-- BOX POP-UP MULTICANAIS DE SUPORTE -->
+    <div class="foco-support-popup shadow-lg" id="popupSupportWhatsapp">
+        <div class="foco-support-header">
+            <button type="button" class="btn-close-support" id="btnCloseSupportPopup" aria-label="Fechar box">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="android-pulse-dot" style="background:#22c55e;"></span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0" style="font-size:0.68rem;">Online</span>
+            </div>
+            <h6 class="fw-bold mb-0 text-white">{{ $configs['whatsapp_box_titulo'] ?? 'Central de Atendimento Foco 7' }}</h6>
+            <small class="text-white-50" style="font-size:0.75rem;">{{ $configs['whatsapp_box_subtitulo'] ?? 'Atendimento Humanizado • Selecione o canal desejado:' }}</small>
+        </div>
+        <div class="foco-support-body">
+            @if(($configs['whatsapp_canal_1_ativo'] ?? '1') == '1')
+            <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_1_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_1_msg'] ?? 'Emergência Foco 7: Preciso de apoio da Ronda Tática ou Central 24h.') }}" target="_blank" class="foco-channel-card">
+                <div class="foco-channel-icon text-danger bg-danger-subtle"><i class="fas {{ $configs['whatsapp_canal_1_icone'] ?? 'fa-shield-halved' }}"></i></div>
+                <div class="foco-channel-info">
+                    <p class="foco-channel-title">{{ $configs['whatsapp_canal_1_nome'] ?? 'Plantão Ronda Tática & Emergência 24h' }}</p>
+                    <p class="foco-channel-desc">{{ $configs['whatsapp_canal_1_desc'] ?? 'Sinistros, roubo, furto ou assistência imediata' }}</p>
+                </div>
+                <i class="fas fa-chevron-right foco-channel-arrow"></i>
+            </a>
+            @endif
+
+            @if(($configs['whatsapp_canal_2_ativo'] ?? '1') == '1')
+            <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_2_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_2_msg'] ?? 'Olá! Gostaria de uma cotação de rastreamento veicular com a Foco 7.') }}" target="_blank" class="foco-channel-card">
+                <div class="foco-channel-icon text-primary bg-primary-subtle"><i class="fas {{ $configs['whatsapp_canal_2_icone'] ?? 'fa-tags' }}"></i></div>
+                <div class="foco-channel-info">
+                    <p class="foco-channel-title">{{ $configs['whatsapp_canal_2_nome'] ?? 'Comercial & Novos Planos' }}</p>
+                    <p class="foco-channel-desc">{{ $configs['whatsapp_canal_2_desc'] ?? 'Cotações de carros, motos, frotas e promoções' }}</p>
+                </div>
+                <i class="fas fa-chevron-right foco-channel-arrow"></i>
+            </a>
+            @endif
+
+            @if(($configs['whatsapp_canal_3_ativo'] ?? '1') == '1')
+            <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_3_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_3_msg'] ?? 'Olá! Preciso de suporte técnico sobre o rastreador / aplicativo.') }}" target="_blank" class="foco-channel-card">
+                <div class="foco-channel-icon text-info bg-info-subtle"><i class="fas {{ $configs['whatsapp_canal_3_icone'] ?? 'fa-headset' }}"></i></div>
+                <div class="foco-channel-info">
+                    <p class="foco-channel-title">{{ $configs['whatsapp_canal_3_nome'] ?? 'Suporte Técnico & Aplicativo' }}</p>
+                    <p class="foco-channel-desc">{{ $configs['whatsapp_canal_3_desc'] ?? 'Dúvidas sobre o app, bloqueio, login ou sinal GPS' }}</p>
+                </div>
+                <i class="fas fa-chevron-right foco-channel-arrow"></i>
+            </a>
+            @endif
+
+            @if(($configs['whatsapp_canal_4_ativo'] ?? '1') == '1')
+            <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_4_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_4_msg'] ?? 'Olá! Gostaria de agendar um serviço de Estética Automotiva.') }}" target="_blank" class="foco-channel-card">
+                <div class="foco-channel-icon text-warning bg-warning-subtle"><i class="fas {{ $configs['whatsapp_canal_4_icone'] ?? 'fa-spray-can-sparkles' }}"></i></div>
+                <div class="foco-channel-info">
+                    <p class="foco-channel-title">{{ $configs['whatsapp_canal_4_nome'] ?? 'Estética Automotiva & Detalhamento' }}</p>
+                    <p class="foco-channel-desc">{{ $configs['whatsapp_canal_4_desc'] ?? 'Vitrificação, polimento técnico e higienização' }}</p>
+                </div>
+                <i class="fas fa-chevron-right foco-channel-arrow"></i>
+            </a>
+            @endif
+
+            @if(($configs['whatsapp_canal_5_ativo'] ?? '1') == '1')
+            <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_5_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_5_msg'] ?? 'Olá! Preciso de auxílio com minha fatura/mensalidade Foco 7.') }}" target="_blank" class="foco-channel-card">
+                <div class="foco-channel-icon text-success bg-success-subtle"><i class="fas {{ $configs['whatsapp_canal_5_icone'] ?? 'fa-file-invoice-dollar' }}"></i></div>
+                <div class="foco-channel-info">
+                    <p class="foco-channel-title">{{ $configs['whatsapp_canal_5_nome'] ?? 'Financeiro & 2ª Via de Boletos' }}</p>
+                    <p class="foco-channel-desc">{{ $configs['whatsapp_canal_5_desc'] ?? 'Segunda via de mensalidades, PIX e notas fiscais' }}</p>
+                </div>
+                <i class="fas fa-chevron-right foco-channel-arrow"></i>
+            </a>
+            @endif
+        </div>
+    </div>
+    @endif
 
     <!-- Scripts CDN e Globais -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -1084,6 +1364,9 @@
     <script src="{{ asset('js/global-mascaras.js') }}"></script>
 
     <script>
+        window.usuarioAutenticado = false;
+        window.dadosUsuario = null;
+
         function aoMudarCategoriaSite() {
             var cat = $('#site_categoria').val();
             if (cat === 'estetica') {
@@ -1099,10 +1382,20 @@
             }
         }
 
+        function selecionarTipoPagamentoSite(tipo) {
+            $('#site_tipo_pagamento').val(tipo);
+            if (tipo === 'online') {
+                $('#optPagamentoOnline').addClass('selected').find('.payment-check i').show();
+                $('#optPagamentoLocal').removeClass('selected').find('.payment-check i').hide();
+            } else {
+                $('#optPagamentoLocal').addClass('selected').find('.payment-check i').show();
+                $('#optPagamentoOnline').removeClass('selected').find('.payment-check i').hide();
+            }
+        }
+
         function abrirModalAgendamentoSite(categoria, servicoId, servicoNome) {
             $('#formAgendamentoSite')[0].reset();
-            var modalEl = document.getElementById('modalAgendamentoSite');
-            var modal = new bootstrap.Modal(modalEl);
+            selecionarTipoPagamentoSite('online');
 
             if (categoria) {
                 $('#site_categoria').val(categoria);
@@ -1115,10 +1408,168 @@
                 $('#site_servico_estetica_id').val(servicoId);
             }
 
+            // Se usuário já estiver logado, auto-preenche
+            if (window.usuarioAutenticado && window.dadosUsuario) {
+                $('#site_cliente_nome').val(window.dadosUsuario.name || '');
+                $('#site_cliente_telefone').val(window.dadosUsuario.telefone || '');
+                $('#site_cliente_email').val(window.dadosUsuario.email || '');
+            }
+
+            var modalEl = document.getElementById('modalAgendamentoSite');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         }
 
+        // ==========================================
+        // DEPOIMENTOS COM ESTRELAS DINÂMICAS
+        // ==========================================
+        function abrirModalAvaliacaoSite() {
+            $('#formNovoDepoimentoSite')[0].reset();
+            setEstrelasSite(5);
+            var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNovoDepoimentoSite'));
+            modal.show();
+        }
+
+        function setEstrelasSite(nota) {
+            nota = parseInt(nota) || 5;
+            $('#depoimentoSiteEstrelas').val(nota);
+            var labels = {
+                1: '1 de 5 estrelas - Atendimento Regular',
+                2: '2 de 5 estrelas - Atendimento Bom',
+                3: '3 de 5 estrelas - Atendimento Muito Bom',
+                4: '4 de 5 estrelas - Atendimento Ótimo!',
+                5: '5 de 5 estrelas - Atendimento Excelente!'
+            };
+            $('#starRatingSiteLabel').text(labels[nota] || (nota + ' de 5 estrelas'));
+            renderizarEstrelasVisualSite(nota);
+        }
+
+        function renderizarEstrelasVisualSite(nota) {
+            $('#starRatingSite .star-item').each(function () {
+                var r = parseInt($(this).data('rating'));
+                if (r <= nota) {
+                    $(this).removeClass('far text-muted').addClass('fas active text-warning');
+                } else {
+                    $(this).removeClass('fas active text-warning').addClass('far text-muted');
+                }
+            });
+        }
+
         $(function () {
+            // Checagem prévia de autenticação do cliente
+            $.getJSON('{{ route("auth.status") }}', function (res) {
+                if (res && res.authenticated) {
+                    window.usuarioAutenticado = true;
+                    window.dadosUsuario = res.user;
+                }
+            });
+
+            // Botão Hambúrguer estilo Android (Abre a gaveta deslizante da esquerda para a direita)
+            $('#btnOpenMenuDrawer').on('click', function (e) {
+                e.preventDefault();
+                var drawerEl = document.getElementById('menuDrawerAndroid');
+                if (drawerEl) {
+                    var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
+                    bsOffcanvas.show();
+                }
+            });
+
+            // Banner LGPD com cookie/localStorage
+            var lgpdAceito = localStorage.getItem('foco7_lgpd_aceito');
+            var $bannerLgpd = $('#bannerLgpdFoco7');
+            if (!lgpdAceito && $bannerLgpd.length) {
+                setTimeout(function () {
+                    $bannerLgpd.addClass('show');
+                }, 1200);
+            }
+
+            $('#btnAceitarLgpd').on('click', function () {
+                localStorage.setItem('foco7_lgpd_aceito', '1');
+                $bannerLgpd.fadeOut(300, function () {
+                    $(this).removeClass('show');
+                });
+                if (window.foco7Notify) {
+                    window.foco7Notify.success('Suas preferências de privacidade foram salvas com sucesso.');
+                }
+            });
+
+            // Botão WhatsApp Flutuante na Cor da Paleta & Box Multicanais
+            var $btnWhatsappFloat = $('#btnFocoWhatsappFloat');
+            var $popupSupport = $('#popupSupportWhatsapp');
+            var $btnCloseSupport = $('#btnCloseSupportPopup');
+
+            $btnWhatsappFloat.on('click', function (e) {
+                e.stopPropagation();
+                $popupSupport.toggleClass('show');
+            });
+
+            $btnCloseSupport.on('click', function (e) {
+                e.stopPropagation();
+                $popupSupport.removeClass('show');
+            });
+
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#popupSupportWhatsapp, #btnFocoWhatsappFloat').length) {
+                    $popupSupport.removeClass('show');
+                }
+            });
+
+            // Interação dinâmica das estrelas da avaliação pública
+            $(document).on('mouseenter', '#starRatingSite .star-item', function () {
+                var hoverRating = parseInt($(this).data('rating'));
+                renderizarEstrelasVisualSite(hoverRating);
+            });
+
+            $(document).on('mouseleave', '#starRatingSite', function () {
+                var currentRating = parseInt($('#depoimentoSiteEstrelas').val()) || 5;
+                renderizarEstrelasVisualSite(currentRating);
+            });
+
+            $(document).on('click', '#starRatingSite .star-item', function () {
+                var clickRating = parseInt($(this).data('rating'));
+                setEstrelasSite(clickRating);
+            });
+
+            // Envio do formulário de novo depoimento do site
+            $('#formNovoDepoimentoSite').on('submit', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var $btn = $('#btnEnviarDepoimentoSite');
+                var origText = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Enviando...');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    success: function (res) {
+                        $btn.prop('disabled', false).html(origText);
+                        var modalEl = document.getElementById('modalNovoDepoimentoSite');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Muito Obrigado!',
+                            text: res.message || 'Sua avaliação foi enviada com sucesso.',
+                            confirmButtonColor: '#d90000',
+                            confirmButtonText: 'Fechar'
+                        });
+                    },
+                    error: function (xhr) {
+                        $btn.prop('disabled', false).html(origText);
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro ao enviar avaliação.';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                        }
+                        if (window.foco7Notify) {
+                            window.foco7Notify.error(msg);
+                        }
+                    }
+                });
+            });
+
             // Controle dinâmico do cabeçalho fixo (reduz topbar e adiciona elevação)
             var $headerFoco = $('#focoHeader');
             $(window).on('scroll', function () {
@@ -1129,7 +1580,7 @@
                 }
             });
 
-            // Fechamento automático suave do Drawer Android ao clicar em qualquer item
+            // Fechamento suave do Drawer Android ao clicar em qualquer item
             $('#menuDrawerAndroid .android-nav-item, #menuDrawerAndroid .btn-foco-whatsapp, #menuDrawerAndroid .btn-dark, #menuDrawerAndroid .btn-outline-danger').on('click', function () {
                 var drawerEl = document.getElementById('menuDrawerAndroid');
                 if (drawerEl) {
@@ -1157,7 +1608,7 @@
                 });
             });
 
-            // Modal de contratação
+            // Modal de contratação de planos
             $('.btn-contratar').on('click', function () {
                 var id = $(this).data('plano-id');
                 var nome = $(this).data('plano-nome');
@@ -1174,7 +1625,7 @@
                 modal.show();
             });
 
-            // Resposta personalizada de geração de cobrança
+            // Resposta de geração de cobrança (Checkout rápido)
             $('#formCheckout').on('submit', function (e) {
                 e.preventDefault();
                 var $form = $(this);
@@ -1209,14 +1660,15 @@
                 });
             });
 
-            // Submissão do agendamento do site
-            $('#formAgendamentoSite').on('submit', function (e) {
-                e.preventDefault();
-                var $form = $(this);
+            // ==========================================
+            // FLUXO DE AGENDAMENTO COM AUTH OBRIGATÓRIA
+            // ==========================================
+            function dispararAgendamentoAjax() {
+                var $form = $('#formAgendamentoSite');
                 var $btn = $('#btnEnviarAgendamentoSite');
                 var orig = $btn.html();
 
-                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Enviando...');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Confirmando...');
 
                 $.ajax({
                     url: $form.attr('action'),
@@ -1230,20 +1682,155 @@
                             var modal = bootstrap.Modal.getInstance(modalEl);
                             if (modal) modal.hide();
 
+                            var tipoNome = res.tipo_pagamento === 'online' ? 'Pagamento Online' : 'Pagamento no Local';
+
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Solicitação Enviada!',
-                                text: res.message,
+                                title: 'Agendamento Confirmado!',
+                                html: '<p class="mb-2">' + res.message + '</p><span class="badge bg-danger p-2 px-3 mt-1">' + tipoNome + '</span>',
                                 confirmButtonColor: '#d90000',
                                 confirmButtonText: 'Entendido'
                             });
+                        } else if (res.auth_required) {
+                            exigirAutenticacaoAgendamento();
                         } else {
                             window.foco7Notify.error(res.message || 'Erro ao agendar.');
                         }
                     },
                     error: function (xhr) {
                         $btn.prop('disabled', false).html(orig);
+                        if (xhr.status === 401 || (xhr.responseJSON && xhr.responseJSON.auth_required)) {
+                            exigirAutenticacaoAgendamento();
+                            return;
+                        }
+
                         var msg = 'Erro ao processar agendamento.';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        window.foco7Notify.error(msg);
+                    }
+                });
+            }
+
+            function exigirAutenticacaoAgendamento() {
+                // Preenche o e-mail no login se o visitante já digitou no agendamento
+                var emailDigitado = $('#site_cliente_email').val();
+                if (emailDigitado) {
+                    $('#loginRapidoEmail').val(emailDigitado);
+                    $('#cadRapidoEmail').val(emailDigitado);
+                }
+                var nomeDigitado = $('#site_cliente_nome').val();
+                if (nomeDigitado) {
+                    $('#cadRapidoNome').val(nomeDigitado);
+                }
+                var telDigitado = $('#site_cliente_telefone').val();
+                if (telDigitado) {
+                    $('#cadRapidoTelefone').val(telDigitado);
+                }
+
+                var modalAgendamento = bootstrap.Modal.getInstance(document.getElementById('modalAgendamentoSite'));
+                if (modalAgendamento) modalAgendamento.hide();
+
+                var modalAuth = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAuthAgendamento'));
+                modalAuth.show();
+
+                window.foco7Notify.info('Por favor, entre ou crie sua conta para finalizar o agendamento com segurança.');
+            }
+
+            // Submissão do agendamento do site
+            $('#formAgendamentoSite').on('submit', function (e) {
+                e.preventDefault();
+                if (!window.usuarioAutenticado) {
+                    exigirAutenticacaoAgendamento();
+                    return;
+                }
+                dispararAgendamentoAjax();
+            });
+
+            // Login rápido via AJAX
+            $('#formLoginRapido').on('submit', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var $btn = $('#btnLoginRapidoSubmit');
+                var orig = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Conectando...');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    success: function (res) {
+                        $btn.prop('disabled', false).html(orig);
+                        if (res.success) {
+                            window.usuarioAutenticado = true;
+                            window.dadosUsuario = res.user;
+
+                            $('#site_cliente_nome').val(res.user.name);
+                            $('#site_cliente_telefone').val(res.user.telefone || $('#site_cliente_telefone').val());
+                            $('#site_cliente_email').val(res.user.email);
+
+                            var modalAuth = bootstrap.Modal.getInstance(document.getElementById('modalAuthAgendamento'));
+                            if (modalAuth) modalAuth.hide();
+
+                            var modalAgendamento = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAgendamentoSite'));
+                            modalAgendamento.show();
+
+                            window.foco7Notify.success('Conectado com sucesso! Concluindo agendamento...');
+                            dispararAgendamentoAjax();
+                        } else {
+                            window.foco7Notify.error(res.message || 'Erro ao efetuar login.');
+                        }
+                    },
+                    error: function (xhr) {
+                        $btn.prop('disabled', false).html(orig);
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'E-mail ou senha incorretos.';
+                        window.foco7Notify.error(msg);
+                    }
+                });
+            });
+
+            // Cadastro rápido via AJAX
+            $('#formCadastroRapido').on('submit', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var $btn = $('#btnCadastroRapidoSubmit');
+                var orig = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Criando conta...');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    success: function (res) {
+                        $btn.prop('disabled', false).html(orig);
+                        if (res.success) {
+                            window.usuarioAutenticado = true;
+                            window.dadosUsuario = res.user;
+
+                            $('#site_cliente_nome').val(res.user.name);
+                            $('#site_cliente_telefone').val(res.user.telefone || $('#site_cliente_telefone').val());
+                            $('#site_cliente_email').val(res.user.email);
+
+                            var modalAuth = bootstrap.Modal.getInstance(document.getElementById('modalAuthAgendamento'));
+                            if (modalAuth) modalAuth.hide();
+
+                            var modalAgendamento = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAgendamentoSite'));
+                            modalAgendamento.show();
+
+                            window.foco7Notify.success('Conta criada com sucesso! Concluindo agendamento...');
+                            dispararAgendamentoAjax();
+                        } else {
+                            window.foco7Notify.error(res.message || 'Erro ao realizar cadastro.');
+                        }
+                    },
+                    error: function (xhr) {
+                        $btn.prop('disabled', false).html(orig);
+                        var msg = 'Erro ao cadastrar.';
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
                             msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
                         } else if (xhr.responseJSON && xhr.responseJSON.message) {
