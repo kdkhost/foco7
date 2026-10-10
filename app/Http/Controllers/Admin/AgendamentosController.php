@@ -55,9 +55,10 @@ class AgendamentosController extends Controller
         $eventos = $agendamentos->map(function ($ag) {
             $isEstetica = $ag->categoria === 'estetica';
 
+            $corPrimaria = \App\Models\CmsSetting::get('cor_primaria', '#d90000');
             $cor = match ($ag->status) {
                 'confirmado' => $isEstetica ? '#1e293b' : '#28a745',
-                'concluido' => '#007bff',
+                'concluido' => $corPrimaria,
                 'cancelado' => '#dc3545',
                 default => '#ffc107',
             };

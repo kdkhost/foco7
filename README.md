@@ -195,6 +195,11 @@ public_html/
 - **Sininho Dinâmico na Navbar:** Badge contador de não lidas com atualização em tempo real (*polling* inteligente a cada 25s), lista suspensa rápida e acesso com um clique.
 - **Painel Administrativo da Central (`/admin/notificacoes`):** Métricas consolidadas, filtros por categoria (Contatos, Agendamentos, Depoimentos, Sistema), marcação individual e em lote como lida, exclusão e botão de teste imediato de Push & E-mail.
 
+### Módulo 16: Harmonização da Identidade Visual CMS (Cores & Tema) & Alto Contraste de Alertas Warning
+- **Harmonização Global da Paleta Oficial Foco 7 (`#d90000`):** Eliminação completa de elementos residuais em azul Bootstrap em todo o sistema. Interruptores (*switches*), checkboxes, botões de rádio, links ativos, abas de navegação (*nav-tabs*), botões primários e ícones agora sincronizam dinamicamente com as cores configuradas no CMS (`cor_primaria`, `cor_secundaria` e `cor_destaque`).
+- **Alto Contraste e Legibilidade Perfeita em Alertas Amarelos (`alert-warning`):** Correção de contraste tanto no modo claro (fundo pastel âmbar suave com texto âmbar escuro `#78350f` e títulos em negrito) quanto no modo escuro (fundo âmbar translúcido com texto creme brilhante `#fef3c7`, títulos brancos e ícones dourados `#fbbf24`), eliminando o problema de texto escuro sobre fundo escuro no painel de Gateways e Perfil.
+- **Sincronização Dinâmica em Todas as Camadas:** O `AppServiceProvider` injeta variáveis CSS computadas (`--admin-primary`, `--bs-primary`, `--bs-primary-rgb`, `--foco-red`) nas áreas administrativa, do cliente e no site público, garantindo consistência total da marca.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -216,14 +221,15 @@ public_html/
 | **Módulo 13**| LGPD, Termos de Privacidade, Segurança Avançada e Recuperação de Senha | ✅ Concluído & Validado |
 | **Módulo 14**| WhatsApp Multicanal CMS, Estrelas Dinâmicas, Auth no Agendamento & Pagamento | ✅ Concluído & Validado |
 | **Módulo 15**| Central de Notificações, Web Push no Celular e E-mails Transacionais para o Admin | ✅ Concluído & Validado |
+| **Módulo 16**| Harmonização da Paleta Oficial CMS (`#d90000`) & Alto Contraste de Alertas Warning | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **53 testes executados, 53 aprovados (100% de sucesso), 227 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead e encaminhado à Central de Notificações, alertas push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
+- **54 testes executados, 54 aprovados (100% de sucesso), 234 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead e encaminhado à Central de Notificações, alertas push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, sincronização da paleta visual oficial Foco 7, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
 
 ---
 

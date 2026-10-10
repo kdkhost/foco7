@@ -8,8 +8,29 @@
 :root {
     --admin-primary: #d90000;
     --admin-primary-hover: #b80000;
+    --admin-primary-rgb: 217, 0, 0;
     --admin-sidebar-bg: #11141c;
     --admin-sidebar-active: #d90000;
+
+    /* Sincronização estrita de variáveis Bootstrap 5 */
+    --bs-primary: #d90000;
+    --bs-primary-rgb: 217, 0, 0;
+    --bs-primary-text-emphasis: #d90000;
+    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.12);
+    --bs-primary-border-subtle: rgba(217, 0, 0, 0.3);
+    --bs-link-color: #d90000;
+    --bs-link-hover-color: #b80000;
+    --bs-focus-ring-color: rgba(217, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] {
+    --bs-primary: #d90000;
+    --bs-primary-rgb: 217, 0, 0;
+    --bs-primary-text-emphasis: #ff4d4d;
+    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.18);
+    --bs-primary-border-subtle: rgba(217, 0, 0, 0.4);
+    --bs-link-color: #ff4d4d;
+    --bs-link-hover-color: #ff8080;
 }
 
 /* Marcação da rota ativa na Sidebar */
@@ -26,16 +47,119 @@
     color: #ff4d4d;
 }
 
-/* Botões do Painel */
-.btn-primary {
+/* ==============================================================================
+   REMOÇÃO GLOBAL DE ELEMENTOS AZUIS - HARMONIZAÇÃO COM A PALETA FOCO 7
+   ============================================================================== */
+
+/* Tipografia e Textos Primários */
+.text-primary,
+a.text-primary,
+i.text-primary,
+.card-title.text-primary,
+h1.text-primary, h2.text-primary, h3.text-primary, h4.text-primary, h5.text-primary, h6.text-primary,
+p.text-primary, span.text-primary {
+    color: var(--admin-primary) !important;
+}
+
+/* Fundos e Superfícies Primárias */
+.bg-primary {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.12) !important;
+    color: var(--admin-primary) !important;
+}
+
+.border-primary {
+    border-color: var(--admin-primary) !important;
+}
+
+.border-primary-subtle {
+    border-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.3) !important;
+}
+
+/* Interruptores (Switches), Checkboxes e Radios (Fim do Azul Bootstrap) */
+.form-check-input:checked {
     background-color: var(--admin-primary) !important;
     border-color: var(--admin-primary) !important;
 }
 
+.form-check-input:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.25) !important;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+/* Focus em Campos de Texto e Seleção */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.2) !important;
+}
+
+/* Navegação por Guias (Nav Tabs) e Navegação Pills */
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+    color: var(--admin-primary) !important;
+    border-bottom: 2px solid var(--admin-primary) !important;
+    background-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: var(--admin-primary-hover, #b80000) !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+/* Botões Primários e Outline */
+.btn-primary {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
 .btn-primary:hover,
-.btn-primary:focus {
-    background-color: var(--admin-primary-hover) !important;
-    border-color: var(--admin-primary-hover) !important;
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--admin-primary-hover, #b80000) !important;
+    border-color: var(--admin-primary-hover, #b80000) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-primary {
+    color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+/* Paginação e Dropdowns Ativos */
+.pagination .page-item.active .page-link {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
 }
 
 /* Badges e Status */
@@ -453,10 +577,9 @@ body.dark-mode .card.bg-light {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Botões e badges amarelos / warning: fundo claro/amarelo => texto SEMPRE ESCURO */
+/* Botões e badges amarelos / warning: fundo sólido amarelo => texto SEMPRE ESCURO */
 .btn-warning,
 .badge.bg-warning,
-.alert-warning,
 body.dark-mode .btn-warning,
 body.dark-mode .badge.bg-warning,
 [data-bs-theme="dark"] .btn-warning,
@@ -471,6 +594,80 @@ body.dark-mode .badge.bg-warning *,
 [data-bs-theme="dark"] .btn-warning *,
 [data-bs-theme="dark"] .badge.bg-warning * {
     color: #111827 !important;
+}
+
+/* ==============================================================================
+   ALERTAS DE AVISO (ALERT-WARNING) - CONTRASTE PERFEITO EM AMBOS OS TEMAS
+   ============================================================================== */
+/* Modo Claro (Light Mode): Fundo pastel suave com texto âmbar escuro e nítido */
+.alert-warning {
+    background-color: #fffbeb !important;
+    border: 1px solid #f59e0b !important;
+    color: #78350f !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+
+.alert-warning * {
+    color: #78350f !important;
+}
+
+.alert-warning strong,
+.alert-warning b {
+    color: #451a03 !important;
+    font-weight: 700 !important;
+}
+
+.alert-warning i,
+.alert-warning .text-warning {
+    color: #d97706 !important;
+}
+
+/* Modo Escuro (Dark Mode): Fundo âmbar translúcido com texto creme/dourado brilhante */
+body.dark-mode .alert-warning,
+[data-bs-theme="dark"] .alert-warning {
+    background-color: rgba(245, 158, 11, 0.16) !important;
+    border: 1px solid #f59e0b !important;
+    color: #fef3c7 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .alert-warning *,
+[data-bs-theme="dark"] .alert-warning * {
+    color: #fef3c7 !important;
+}
+
+body.dark-mode .alert-warning strong,
+body.dark-mode .alert-warning b,
+[data-bs-theme="dark"] .alert-warning strong,
+[data-bs-theme="dark"] .alert-warning b {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+body.dark-mode .alert-warning i,
+body.dark-mode .alert-warning .text-warning,
+[data-bs-theme="dark"] .alert-warning i,
+[data-bs-theme="dark"] .alert-warning .text-warning {
+    color: #fbbf24 !important;
+}
+
+/* Cabeçalhos de Card com fundo Warning */
+.card-header.bg-warning,
+.card-header[class*="bg-warning"] {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.card-header.bg-warning .text-dark,
+.card-header[class*="bg-warning"] .text-dark {
+    color: #78350f !important;
+}
+
+body.dark-mode .card-header.bg-warning .text-dark,
+[data-bs-theme="dark"] .card-header.bg-warning .text-dark,
+body.dark-mode .card-header[class*="bg-warning"] .text-dark,
+[data-bs-theme="dark"] .card-header[class*="bg-warning"] .text-dark {
+    color: #fef3c7 !important;
 }
 
 /* Badges e containers brancos no dark mode: texto escuro */

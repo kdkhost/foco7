@@ -21,6 +21,13 @@
     <link rel="stylesheet" href="{{ asset('css/site-foco7.css') }}?v={{ time() }}">
 
     <style>
+        :root {
+            --foco-red: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --foco-red-hover: {{ $cmsCorDestaque ?? '#b30000' }};
+            --foco-red-light: {{ $cmsCorDestaque ?? '#ff2a2a' }};
+            --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
+        }
         .privacidade-hero {
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%), url('{{ asset($configs['hero_bg_imagem'] ?? '/img/og-foco7.jpg') }}') center/cover no-repeat;
             padding: 140px 0 60px 0;

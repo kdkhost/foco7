@@ -11,7 +11,7 @@
         <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="gatewaysTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active fw-semibold" id="mp-tab" data-bs-toggle="tab" data-bs-target="#tab-mercadopago" type="button" role="tab">
-                    <i class="fab fa-cc-mastercard text-primary me-2"></i> Mercado Pago
+                    <i class="fab fa-cc-mastercard text-danger me-2"></i> Mercado Pago
                 </button>
             </li>
             <li class="nav-item">
@@ -39,7 +39,7 @@
                     
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
                         <div>
-                            <h5 class="fw-bold mb-1 text-primary"><i class="fab fa-cc-mastercard me-2"></i> Integração Mercado Pago</h5>
+                            <h5 class="fw-bold mb-1 text-danger"><i class="fab fa-cc-mastercard me-2"></i> Integração Mercado Pago</h5>
                             <p class="text-secondary small mb-0">Checkout Transparente para PIX instantâneo, Cartão de Crédito e Boleto Bancário.</p>
                         </div>
                         <div class="d-flex align-items-center gap-3">

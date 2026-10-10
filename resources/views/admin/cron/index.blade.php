@@ -254,14 +254,14 @@
                             @if($job->sistema)
                                 <span class="badge bg-secondary-subtle text-secondary border" title="Rotina vital do sistema">Sistema</span>
                             @else
-                                <span class="badge bg-info-subtle text-info border">Manual</span>
+                                <span class="badge bg-danger-subtle text-danger border">Manual</span>
                             @endif
                         </div>
                         <small class="text-secondary">{{ $job->descricao ?: 'Sem descrição informada.' }}</small>
                     </td>
                     <td>
                         @if($job->tipo === 'url')
-                            <code class="text-info fw-bold bg-info-subtle px-2 py-1 rounded small" title="{{ $job->comando }}">
+                            <code class="text-danger fw-bold bg-danger-subtle px-2 py-1 rounded small" title="{{ $job->comando }}">
                                 <i class="fas fa-globe me-1"></i> GET URL
                             </code>
                         @else
@@ -328,7 +328,7 @@
 <div class="card border shadow-sm">
     <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
-            <i class="fas fa-file-alt text-info"></i>
+            <i class="fas fa-file-alt text-danger"></i>
             <span class="fw-bold">Histórico de Saída do Agendador (storage/logs/cron.log)</span>
         </div>
         <div>

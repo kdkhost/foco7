@@ -2308,4 +2308,21 @@ img, svg, video, canvas, audio, iframe, embed, object {
     color: #ffffff;
 }
 
+/* Sincronização de Inputs, Radios e Switches com a Paleta Oficial Foco 7 */
+.form-check-input:checked {
+    background-color: var(--foco-red, #d90000) !important;
+    border-color: var(--foco-red, #d90000) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--foco-red, #d90000) !important;
+    box-shadow: 0 0 0 0.25rem var(--foco-red-glow, rgba(217, 0, 0, 0.22)) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--foco-red, #d90000) !important;
+    box-shadow: 0 0 0 0.2rem var(--foco-red-subtle, rgba(217, 0, 0, 0.08)) !important;
+}
+
 

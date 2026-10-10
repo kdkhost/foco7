@@ -32,6 +32,17 @@
 
     <!-- Estilos Customizados Foco 7 -->
     <link rel="stylesheet" href="{{ asset('css/site-foco7.css') }}?v={{ time() }}">
+
+    <!-- Injeção Dinâmica da Paleta Oficial CMS Foco 7 -->
+    <style>
+        :root {
+            --foco-red: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --foco-red-hover: {{ $cmsCorDestaque ?? '#b30000' }};
+            --foco-red-light: {{ $cmsCorDestaque ?? '#ff2a2a' }};
+            --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
+        }
+    </style>
 </head>
 <body id="inicio">
 
@@ -571,7 +582,7 @@
                 @empty
                 <div class="col-12 text-center py-4">
                     <div class="alert alert-light border">
-                        <i class="fas fa-info-circle text-primary me-2"></i> Novos pacotes de estética automotiva sendo adicionados pela equipe.
+                        <i class="fas fa-info-circle text-danger me-2"></i> Novos pacotes de estética automotiva sendo adicionados pela equipe.
                     </div>
                 </div>
                 @endforelse
@@ -954,7 +965,7 @@
                                     </div>
                                     <div class="form-check flex-fill p-2 border rounded bg-light">
                                         <input class="form-check-input" type="radio" name="metodo_pagamento" id="metodoCartao" value="cartao">
-                                        <label class="form-check-label small fw-bold" for="metodoCartao"><i class="fas fa-credit-card text-primary"></i> Cartão</label>
+                                        <label class="form-check-label small fw-bold" for="metodoCartao"><i class="fas fa-credit-card text-danger"></i> Cartão</label>
                                     </div>
                                 </div>
                             </div>
@@ -1309,7 +1320,7 @@
 
             @if(($configs['whatsapp_canal_2_ativo'] ?? '1') == '1')
             <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_2_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_2_msg'] ?? 'Olá! Gostaria de uma cotação de rastreamento veicular com a Foco 7.') }}" target="_blank" class="foco-channel-card">
-                <div class="foco-channel-icon text-primary bg-primary-subtle"><i class="fas {{ $configs['whatsapp_canal_2_icone'] ?? 'fa-tags' }}"></i></div>
+                <div class="foco-channel-icon text-danger bg-danger-subtle"><i class="fas {{ $configs['whatsapp_canal_2_icone'] ?? 'fa-tags' }}"></i></div>
                 <div class="foco-channel-info">
                     <p class="foco-channel-title">{{ $configs['whatsapp_canal_2_nome'] ?? 'Comercial & Novos Planos' }}</p>
                     <p class="foco-channel-desc">{{ $configs['whatsapp_canal_2_desc'] ?? 'Cotações de carros, motos, frotas e promoções' }}</p>
@@ -1320,7 +1331,7 @@
 
             @if(($configs['whatsapp_canal_3_ativo'] ?? '1') == '1')
             <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp_canal_3_num'] ?? '559180510736') }}?text={{ urlencode($configs['whatsapp_canal_3_msg'] ?? 'Olá! Preciso de suporte técnico sobre o rastreador / aplicativo.') }}" target="_blank" class="foco-channel-card">
-                <div class="foco-channel-icon text-info bg-info-subtle"><i class="fas {{ $configs['whatsapp_canal_3_icone'] ?? 'fa-headset' }}"></i></div>
+                <div class="foco-channel-icon text-danger bg-danger-subtle"><i class="fas {{ $configs['whatsapp_canal_3_icone'] ?? 'fa-headset' }}"></i></div>
                 <div class="foco-channel-info">
                     <p class="foco-channel-title">{{ $configs['whatsapp_canal_3_nome'] ?? 'Suporte Técnico & Aplicativo' }}</p>
                     <p class="foco-channel-desc">{{ $configs['whatsapp_canal_3_desc'] ?? 'Dúvidas sobre o app, bloqueio, login ou sinal GPS' }}</p>

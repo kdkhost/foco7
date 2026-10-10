@@ -24,6 +24,28 @@
     <!-- Customização Foco 7 para AdminLTE 4 -->
     <link rel="stylesheet" href="{{ asset('css/admin-foco7.css') }}">
 
+    <!-- Injeção Dinâmica da Paleta Oficial CMS Foco 7 -->
+    <style>
+        :root {
+            --admin-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --admin-primary-hover: {{ $cmsCorDestaque ?? '#b80000' }};
+            --admin-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
+            --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
+            --bs-primary-text-emphasis: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-primary-bg-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.12);
+            --bs-primary-border-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.3);
+            --bs-link-color: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-link-hover-color: {{ $cmsCorDestaque ?? '#b80000' }};
+            --bs-focus-ring-color: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.25);
+        }
+        [data-bs-theme="dark"] {
+            --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
+            --bs-link-color: {{ $cmsCorPrimaria ?? '#d90000' }};
+        }
+    </style>
+
     @yield('styles')
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
@@ -236,7 +258,7 @@
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-users text-info"></i>
+                                    <i class="nav-icon fas fa-users text-danger"></i>
                                     <p>Base de Clientes</p>
                                 </a>
                             </li>
@@ -266,7 +288,7 @@
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-clock text-info"></i>
+                                    <i class="nav-icon fas fa-clock text-danger"></i>
                                     <p>Central de Cron Jobs</p>
                                 </a>
                             </li>

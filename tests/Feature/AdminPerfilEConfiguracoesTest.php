@@ -147,4 +147,22 @@ class AdminPerfilEConfiguracoesTest extends TestCase
         $responseSite->assertSee('hero-bg-overlay');
         $responseSite->assertSee('opacity: 0.75');
     }
+
+    public function test_paleta_cores_cms_e_sincronizada_no_layout_admin_e_alertas_possuem_alto_contraste(): void
+    {
+        CmsSetting::set('cor_primaria', '#e11d48');
+        CmsSetting::set('cor_destaque', '#be123c');
+
+        $responseAdmin = $this->actingAs($this->adminUser)->get('/admin/gateways');
+        $responseAdmin->assertStatus(200);
+        $responseAdmin->assertSee('--admin-primary: #e11d48', false);
+        $responseAdmin->assertSee('--bs-primary: #e11d48', false);
+        $responseAdmin->assertSee('mpAlertSandbox');
+        $responseAdmin->assertSee('alert-warning');
+        $responseAdmin->assertSee('text-danger me-2');
+
+        // Teste de eventos do FullCalendar com status concluído
+        $responseEventos = $this->actingAs($this->adminUser)->getJson('/admin/agendamentos/eventos');
+        $responseEventos->assertStatus(200);
+    }
 }
