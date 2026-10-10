@@ -104,8 +104,8 @@
                         <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
                             <i class="fas fa-user-lock"></i> Área do Cliente
                         </a>
-                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2 text-center justify-content-center">
-                            <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                        <a href="https://foco7.plataforma.app.br/login" target="_blank" rel="noopener noreferrer" class="btn-foco-rastreamento btn-sm px-3 py-2 text-center justify-content-center" title="Acessar Plataforma de Rastreamento Online">
+                            <i class="fas fa-satellite-dish"></i> Rastreamento
                         </a>
                     </div>
                 </div>
@@ -195,6 +195,9 @@
                 </button>
                 <a href="{{ route('login') }}" class="btn btn-dark w-100 py-2 mb-2 d-flex align-items-center justify-content-center gap-2 fw-bold">
                     <i class="fas fa-user-lock"></i> Entrar na Área do Cliente
+                </a>
+                <a href="https://foco7.plataforma.app.br/login" target="_blank" rel="noopener noreferrer" class="btn-foco-rastreamento w-100 py-2 mb-2 text-center justify-content-center fw-bold" title="Acessar Plataforma de Rastreamento Online">
+                    <i class="fas fa-satellite-dish"></i> Plataforma de Rastreamento
                 </a>
                 <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp w-100 py-2 text-center justify-content-center fw-bold">
                     <i class="fab fa-whatsapp"></i> Falar no WhatsApp 24h
