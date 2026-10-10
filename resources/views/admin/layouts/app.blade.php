@@ -57,12 +57,12 @@
             <div class="container-fluid">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" title="Recolher / Expandir Menu" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <i class="fas fa-bars"></i>
                         </a>
                     </li>
                     <li class="nav-item d-none d-md-block">
-                        <a href="{{ route('site.home') }}" target="_blank" class="nav-link">
+                        <a href="{{ route('site.home') }}" target="_blank" class="nav-link" title="Visualizar Landing Page Oficial em Nova Aba" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <i class="fas fa-external-link-alt text-danger me-1"></i> Visualizar Landing Page
                         </a>
                     </li>
@@ -97,7 +97,7 @@
 
                     <!-- Alternador Dark / Light Mode -->
                     <li class="nav-item">
-                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" id="adminThemeToggle" title="Alternar Modo Escuro / Claro">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" id="adminThemeToggle" title="Alternar Modo Escuro / Claro" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <i class="fas fa-moon" id="adminThemeIcon"></i>
                         </button>
                     </li>

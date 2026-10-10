@@ -98,7 +98,76 @@
         window.confirmarAcao(titulo, texto, 'question', onConfirm);
     };
 
-    // 4. CONFIGURAÇÃO DO TOKEN CSRF PARA AJAX JQUERY (se presente)
+    // 4. SISTEMA GLOBAL DE TOOLTIPS BOOTSTRAP 5
+    // Substitui títulos nativos estáticos (title) por tooltips visuais modernos e elegantes
+    window.initTooltips = function (container) {
+        if (typeof bootstrap === 'undefined' || typeof bootstrap.Tooltip === 'undefined') return;
+
+        var root = container || document;
+        if (typeof jQuery !== 'undefined' && container instanceof jQuery) {
+            root = container[0] || document;
+        }
+        if (!root || !root.querySelectorAll) return;
+
+        var selector = '[data-bs-toggle="tooltip"], [title]:not(iframe):not(script):not(style):not(meta):not(link):not(head):not(title)';
+        var elements = root.querySelectorAll(selector);
+
+        Array.prototype.forEach.call(elements, function (el) {
+            if (el.tagName === 'BODY' || el.tagName === 'HTML') return;
+
+            var titleVal = el.getAttribute('title') || el.getAttribute('data-bs-original-title');
+            if (!titleVal || !titleVal.trim()) return;
+
+            var existing = bootstrap.Tooltip.getInstance(el);
+            if (!existing) {
+                try {
+                    new bootstrap.Tooltip(el, {
+                        trigger: 'hover',
+                        boundary: 'clippingParents',
+                        container: 'body',
+                        animation: true
+                    });
+                } catch (e) {
+                    // Silencia caso o elemento não suporte Popper
+                }
+            }
+        });
+    };
+
+    // Oculta tooltip ao clicar no elemento para evitar persistência visual indesejada
+    document.addEventListener('click', function (e) {
+        var trigger = e.target ? e.target.closest('[data-bs-toggle="tooltip"], [data-bs-original-title], [title]') : null;
+        if (trigger && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            var inst = bootstrap.Tooltip.getInstance(trigger);
+            if (inst) inst.hide();
+        }
+    }, true);
+
+    // Auto-inicialização na carga do documento
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+            window.initTooltips();
+            iniciarObserverTooltips();
+        });
+    } else {
+        window.initTooltips();
+        iniciarObserverTooltips();
+    }
+
+    function iniciarObserverTooltips() {
+        if (typeof MutationObserver !== 'undefined' && document.body) {
+            var observerTimer = null;
+            var observer = new MutationObserver(function () {
+                if (observerTimer) clearTimeout(observerTimer);
+                observerTimer = setTimeout(function () {
+                    window.initTooltips();
+                }, 200);
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+    }
+
+    // 5. CONFIGURAÇÃO DO TOKEN CSRF PARA AJAX JQUERY (se presente)
     if (typeof jQuery !== 'undefined') {
         jQuery(function ($) {
             var token = $('meta[name="csrf-token"]').attr('content');
@@ -110,6 +179,13 @@
                     }
                 });
             }
+
+            // Reinicialização de tooltips após cada requisição AJAX
+            $(document).ajaxComplete(function () {
+                setTimeout(function () {
+                    window.initTooltips();
+                }, 100);
+            });
 
             // Manipulador global para submissão de formulários com classe .ajax-form
             $(document).on('submit', 'form.ajax-form', function (e) {

@@ -60,10 +60,10 @@
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     @if(!empty($configs['instagram']))
-                        <a href="{{ $configs['instagram'] }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ $configs['instagram'] }}" target="_blank" title="Siga nosso Instagram" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-instagram"></i></a>
                     @endif
                     @if(!empty($configs['facebook']))
-                        <a href="{{ $configs['facebook'] }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ $configs['facebook'] }}" target="_blank" title="Curta nossa página no Facebook" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-facebook-f"></i></a>
                     @endif
                     <a href="{{ route('login') }}" class="btn-cliente-topo">
                         <i class="fas fa-user-lock me-1"></i> Área do Cliente / Painel
@@ -104,7 +104,7 @@
                         <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
                             <i class="fas fa-user-lock"></i> Área do Cliente
                         </a>
-                        <a href="https://foco7.plataforma.app.br/login" target="_blank" rel="noopener noreferrer" class="btn-foco-rastreamento btn-sm px-3 py-2 text-center justify-content-center" title="Acessar Plataforma de Rastreamento Online">
+                        <a href="https://foco7.plataforma.app.br/login" target="_blank" rel="noopener noreferrer" class="btn-foco-rastreamento btn-sm px-3 py-2 text-center justify-content-center" title="Acessar Plataforma de Rastreamento Online" data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <i class="fas fa-satellite-dish"></i> Rastreamento
                         </a>
                     </div>
@@ -1285,13 +1285,13 @@
     @endif
 
     <!-- BOTÃO VOLTAR AO TOPO FLUTUANTE -->
-    <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo">
+    <button type="button" id="btnVoltarAoTopo" class="foco-btn-topo" aria-label="Voltar ao início da página" title="Voltar ao Topo" data-bs-toggle="tooltip" data-bs-placement="left">
         <i class="fas fa-arrow-up"></i>
     </button>
 
     @if(($configs['whatsapp_box_ativo'] ?? '1') == '1')
     <!-- BOTÃO FLUTUANTE DO WHATSAPP OFICIAL NA COR DA PALETA -->
-    <button type="button" id="btnFocoWhatsappFloat" class="foco-whatsapp-float" aria-label="Abrir canais de suporte Foco 7" title="Central de Atendimento pelo WhatsApp">
+    <button type="button" id="btnFocoWhatsappFloat" class="foco-whatsapp-float" aria-label="Abrir canais de suporte Foco 7" title="Central de Atendimento pelo WhatsApp" data-bs-toggle="tooltip" data-bs-placement="left">
         <span class="whatsapp-badge-pulse"></span>
         <i class="fab fa-whatsapp"></i>
     </button>

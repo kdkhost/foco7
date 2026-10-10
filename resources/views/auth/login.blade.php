@@ -87,13 +87,27 @@
             justify-content: center;
             cursor: pointer;
         }
+        .tooltip { font-size: 0.8125rem; pointer-events: none; z-index: 1090; }
+        .tooltip-inner {
+            background: #0f121a;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before { border-left-color: #0f121a; }
+        .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before { border-right-color: #0f121a; }
+        .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before { border-top-color: #0f121a; }
+        .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before { border-bottom-color: #0f121a; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
         <!-- Alternador Dark / Light Mode -->
-        <button type="button" class="theme-toggle-btn" id="themeToggle" title="Alternar Modo Escuro / Claro">
+        <button type="button" class="theme-toggle-btn" id="themeToggle" title="Alternar Modo Escuro / Claro" data-bs-toggle="tooltip" data-bs-placement="left">
             <i class="fas fa-moon" id="themeIcon"></i>
         </button>
 

@@ -882,6 +882,57 @@ body.dark-mode .app-header {
     z-index: 1010;
 }
 
+/* ==============================================================================
+   TOOLTIPS BOOTSTRAP 5 PERSONALIZADOS FOCO 7
+   Substituição dos títulos nativos do navegador por microtooltips elegantes
+   ============================================================================== */
+.tooltip {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    pointer-events: none;
+    z-index: 1090;
+    opacity: 0;
+    transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+.tooltip-inner {
+    background: #0f121a;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    max-width: 280px;
+    text-align: center;
+}
+
+.bs-tooltip-top .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+    border-top-color: #0f121a;
+}
+
+.bs-tooltip-bottom .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+    border-bottom-color: #0f121a;
+}
+
+.bs-tooltip-start .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+    border-left-color: #0f121a;
+}
+
+.bs-tooltip-end .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+    border-right-color: #0f121a;
+}
+
 
 
 
