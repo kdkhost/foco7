@@ -311,7 +311,13 @@
                     <!-- Mini QR Code PIX -->
                     <div class="pix-mini-box">
                         <div style="font-size: 8px; font-weight: bold; color: #047857;">PIX DIRETO NA PARCELA</div>
-                        <img src="{{ $fat->qr_code_pix_url }}" alt="PIX" style="width: 65px; height: 65px; margin: 2px 0;">
+                        @if(extension_loaded('gd') && !empty($fat->qr_code_pix_url))
+                            <img src="{{ $fat->qr_code_pix_url }}" alt="PIX" style="width: 65px; height: 65px; margin: 2px 0;">
+                        @else
+                            <div style="font-size: 8px; font-weight: bold; padding: 12px 2px; border: 1px dashed #047857; background: #ecfdf5; color: #047857; text-align: center; margin: 4px 0;">
+                                PAGAMENTO PIX<br><span style="font-size: 7px; color: #334155;">{{ $fat->codigo_fatura }}</span>
+                            </div>
+                        @endif
                         <div style="font-size: 7px; color: #065f46;">Aponte a câmera do banco</div>
                     </div>
                 </td>
