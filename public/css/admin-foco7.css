@@ -279,55 +279,162 @@ body.dark-mode .modal-content,
     border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
+/* ==============================================================================
+   SUMMERNOTE WYSIWYG - INTEGRAÇÃO VISUAL FOCO 7 (BOOTSTRAP 5 & DARK MODE)
+   ============================================================================== */
 /* Estilo do Summernote no Dark Mode do AdminLTE 4 */
-body.dark-mode .note-editor.note-frame {
+body.dark-mode .note-editor.note-frame,
+[data-bs-theme="dark"] .note-editor.note-frame {
     border-color: rgba(255, 255, 255, 0.15) !important;
     background-color: #121722 !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-toolbar {
+body.dark-mode .note-editor.note-frame .note-toolbar,
+[data-bs-theme="dark"] .note-editor.note-frame .note-toolbar {
     background-color: #161c28 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-editing-area .note-editable {
-    background-color: #1a202c !important;
-    color: #f1f5f9 !important;
+body.dark-mode .note-editor.note-frame .note-editing-area .note-editable,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editing-area .note-editable {
+    background-color: #161c28 !important;
+    color: #f8fafc !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-btn {
+/* 1. Elementos diretamente sobre o fundo escuro do editor: títulos e textos CLAROS */
+body.dark-mode .note-editor.note-frame .note-editable h1,
+body.dark-mode .note-editor.note-frame .note-editable h2,
+body.dark-mode .note-editor.note-frame .note-editable h3,
+body.dark-mode .note-editor.note-frame .note-editable h4,
+body.dark-mode .note-editor.note-frame .note-editable h5,
+body.dark-mode .note-editor.note-frame .note-editable h6,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h1,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h2,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h3,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h4,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h5,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable h6 {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-editable > p,
+body.dark-mode .note-editor.note-frame .note-editable > ul,
+body.dark-mode .note-editor.note-frame .note-editable > ol,
+body.dark-mode .note-editor.note-frame .note-editable > li,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable > p,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable > ul,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable > ol,
+[data-bs-theme="dark"] .note-editor.note-frame .note-editable > li {
+    color: #e2e8f0 !important;
+}
+
+/* 2. Containers / Cards com fundo claro dentro do editor: texto SEMPRE ESCURO para alto contraste */
+.note-editor.note-frame .note-editable [style*="background-color: #f8fafc"],
+.note-editor.note-frame .note-editable [style*="background-color: #ffffff"],
+.note-editor.note-frame .note-editable [style*="background-color: #fff"],
+.note-editor.note-frame .note-editable [style*="background-color: #f0fdf4"],
+.note-editor.note-frame .note-editable [style*="background-color: #fffbeb"],
+.note-editor.note-frame .note-editable [style*="background-color: #fef2f2"],
+.note-editor.note-frame .note-editable [style*="background-color:#f8fafc"],
+.note-editor.note-frame .note-editable [style*="background-color:#ffffff"],
+.note-editor.note-frame .note-editable [style*="background-color:#fff"],
+.note-editor.note-frame .note-editable [style*="background-color:#f0fdf4"],
+.note-editor.note-frame .note-editable [style*="background-color:#fffbeb"],
+.note-editor.note-frame .note-editable [style*="background-color:#fef2f2"],
+.note-editor.note-frame .note-editable [style*="background: #f8fafc"],
+.note-editor.note-frame .note-editable [style*="background: #ffffff"],
+.note-editor.note-frame .note-editable [style*="background: #fff"],
+.note-editor.note-frame .note-editable [style*="background:#f8fafc"],
+.note-editor.note-frame .note-editable [style*="background:#ffffff"],
+.note-editor.note-frame .note-editable [style*="background:#fff"],
+.note-editor.note-frame .note-editable .info-card,
+.note-editor.note-frame .note-editable .data-card,
+.note-editor.note-frame .note-editable .invoice-summary-card,
+.note-editor.note-frame .note-editable .highlight-box {
+    color: #0f172a !important;
+}
+
+.note-editor.note-frame .note-editable [style*="background-color: #f8fafc"] td,
+.note-editor.note-frame .note-editable [style*="background-color: #ffffff"] td,
+.note-editor.note-frame .note-editable [style*="background-color: #fff"] td,
+.note-editor.note-frame .note-editable [style*="background-color: #f0fdf4"] td,
+.note-editor.note-frame .note-editable [style*="background-color: #fffbeb"] td,
+.note-editor.note-frame .note-editable [style*="background-color: #fef2f2"] td,
+.note-editor.note-frame .note-editable [style*="background-color:#f8fafc"] td,
+.note-editor.note-frame .note-editable [style*="background-color:#ffffff"] td,
+.note-editor.note-frame .note-editable [style*="background-color:#fff"] td,
+.note-editor.note-frame .note-editable [style*="background: #f8fafc"] td,
+.note-editor.note-frame .note-editable [style*="background: #ffffff"] td,
+.note-editor.note-frame .note-editable [style*="background: #fff"] td {
+    color: #1e293b !important;
+}
+
+/* Rótulos secundários dentro do card claro */
+.note-editor.note-frame .note-editable [style*="background-color"] td[style*="color: #64748b"],
+.note-editor.note-frame .note-editable [style*="background-color"] span[style*="color: #64748b"],
+.note-editor.note-frame .note-editable [style*="background"] td[style*="color: #64748b"],
+.note-editor.note-frame .note-editable [style*="background"] span[style*="color: #64748b"] {
+    color: #64748b !important;
+}
+
+.note-editor.note-frame .note-editable [style*="background-color"] td[style*="color: #0f172a"],
+.note-editor.note-frame .note-editable [style*="background-color"] span[style*="color: #0f172a"],
+.note-editor.note-frame .note-editable [style*="background"] td[style*="color: #0f172a"],
+.note-editor.note-frame .note-editable [style*="background"] span[style*="color: #0f172a"] {
+    color: #0f172a !important;
+}
+
+/* Botões de Ação no editor: texto SEMPRE branco em qualquer tema */
+.note-editor.note-frame .note-editable .btn-action,
+.note-editor.note-frame .note-editable a[style*="background: linear-gradient"],
+.note-editor.note-frame .note-editable a[style*="background-color: #d90000"],
+.note-editor.note-frame .note-editable a[style*="background-color:#d90000"],
+.note-editor.note-frame .note-editable a[style*="background-color: #0f172a"],
+.note-editor.note-frame .note-editable a[style*="background-color: #f59e0b"] {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+body.dark-mode .note-editor.note-frame .note-btn,
+[data-bs-theme="dark"] .note-editor.note-frame .note-btn {
     background-color: #232a3b !important;
     color: #e2e8f0 !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-btn:hover {
+body.dark-mode .note-editor.note-frame .note-btn:hover,
+[data-bs-theme="dark"] .note-editor.note-frame .note-btn:hover {
     background-color: #2d3748 !important;
     color: #ff4d4d !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-btn.active {
+body.dark-mode .note-editor.note-frame .note-btn.active,
+[data-bs-theme="dark"] .note-editor.note-frame .note-btn.active {
     background-color: rgba(217, 0, 0, 0.25) !important;
     color: #ffffff !important;
     border-color: var(--admin-primary) !important;
 }
 
-body.dark-mode .note-editor.note-frame .note-statusbar {
+body.dark-mode .note-editor.note-frame .note-statusbar,
+[data-bs-theme="dark"] .note-editor.note-frame .note-statusbar {
     background-color: #161c28 !important;
     border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-body.dark-mode .note-dropdown-menu {
+body.dark-mode .note-dropdown-menu,
+[data-bs-theme="dark"] .note-dropdown-menu {
     background-color: #161c28 !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     color: #f1f5f9 !important;
 }
 
-body.dark-mode .note-dropdown-menu a {
+body.dark-mode .note-dropdown-menu a,
+[data-bs-theme="dark"] .note-dropdown-menu a {
     color: #e2e8f0 !important;
 }
 
-body.dark-mode .note-dropdown-menu a:hover {
+body.dark-mode .note-dropdown-menu a:hover,
+[data-bs-theme="dark"] .note-dropdown-menu a:hover {
     background-color: #232a3b !important;
     color: #ffffff !important;
 }
@@ -346,9 +453,48 @@ body.dark-mode .card.bg-light {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-bs-theme="dark"] .text-dark,
-body.dark-mode .text-dark {
-    color: #f1f5f9 !important;
+/* Botões e badges amarelos / warning: fundo claro/amarelo => texto SEMPRE ESCURO */
+.btn-warning,
+.badge.bg-warning,
+.alert-warning,
+body.dark-mode .btn-warning,
+body.dark-mode .badge.bg-warning,
+[data-bs-theme="dark"] .btn-warning,
+[data-bs-theme="dark"] .badge.bg-warning {
+    color: #111827 !important;
+}
+
+.btn-warning *,
+.badge.bg-warning *,
+body.dark-mode .btn-warning *,
+body.dark-mode .badge.bg-warning *,
+[data-bs-theme="dark"] .btn-warning *,
+[data-bs-theme="dark"] .badge.bg-warning * {
+    color: #111827 !important;
+}
+
+/* Badges e containers brancos no dark mode: texto escuro */
+body.dark-mode .badge.bg-light,
+[data-bs-theme="dark"] .badge.bg-light,
+body.dark-mode .bg-white.text-dark,
+[data-bs-theme="dark"] .bg-white.text-dark {
+    color: #111827 !important;
+}
+
+/* Textos muted e secondary no Dark Mode: cinza claro de alto contraste */
+body.dark-mode .text-muted,
+body.dark-mode small.text-muted,
+body.dark-mode .text-secondary,
+[data-bs-theme="dark"] .text-muted,
+[data-bs-theme="dark"] small.text-muted,
+[data-bs-theme="dark"] .text-secondary {
+    color: #94a3b8 !important;
+}
+
+/* Text-dark solto em Dark Mode vira claro (exceto se em fundo amarelo/claro) */
+body.dark-mode .text-dark:not(.btn-warning):not(.bg-warning):not(.badge.bg-warning):not(.badge.bg-light):not(.bg-white):not([class*="bg-warning"]),
+[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.bg-warning):not(.badge.bg-warning):not(.badge.bg-light):not(.bg-white):not([class*="bg-warning"]) {
+    color: #f8fafc !important;
 }
 
 [data-bs-theme="dark"] .card-header .text-dark,
@@ -379,6 +525,20 @@ body.dark-mode .form-control.bg-light {
     background-color: #131926 !important;
     color: #f8fafc !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark-mode .form-label,
+body.dark-mode .form-check-label,
+[data-bs-theme="dark"] .form-label,
+[data-bs-theme="dark"] .form-check-label {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .input-group-text,
+[data-bs-theme="dark"] .input-group-text {
+    background-color: #161c28 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #e2e8f0 !important;
 }
 
 

@@ -121,7 +121,12 @@ class EmailTemplateService
     {
         $templates = self::getTemplates();
         $padrao = $templates[$chave]['corpo_padrao'] ?? '<p>Olá, {cliente_nome}.</p>';
-        return CmsSetting::get("email_corpo_{$chave}", $padrao);
+        $corpo = CmsSetting::get("email_corpo_{$chave}", $padrao);
+
+        // Remove estilos inline de cor escura fixa (#0f172a, #1e293b, #334155) em títulos h1-h6 para contraste perfeito dark/light
+        $corpo = preg_replace('/<h([1-6])([^>]*?)style="([^"]*?)color:\s*(#0f172a|#1e293b|#334155|#000000|#111111|rgb\(15,\s*23,\s*42\));?([^"]*?)"/i', '<h$1$2style="$3$5"', $corpo);
+
+        return $corpo;
     }
 
     /**
@@ -418,7 +423,7 @@ HTML;
     private static function getTemplatePadraoFaturaGerada(): string
     {
         return <<<HTML
-<h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 20px;">Sua fatura referente ao serviço <strong>{plano_nome}</strong> foi gerada com sucesso e já está disponível para pagamento.</p>
 
 <div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);">
@@ -459,7 +464,7 @@ HTML;
     <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; max-width: 100%;">Visualizar e Pagar Fatura &rarr;</a>
 </div>
 
-<p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Você pode efetuar o pagamento via <strong>PIX instantâneo</strong> (com baixa automática em poucos segundos), <strong>Cartão de Crédito</strong> ou <strong>Boleto Bancário</strong>.</p>
+<p style="font-size: 13px; margin-bottom: 0;">Você pode efetuar o pagamento via <strong>PIX instantâneo</strong> (com baixa automática em poucos segundos), <strong>Cartão de Crédito</strong> ou <strong>Boleto Bancário</strong>.</p>
 HTML;
     }
 
@@ -470,7 +475,7 @@ HTML;
     <span style="display: inline-block; background-color: #dcfce7; color: #15803d; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 50px;">PAGAMENTO CONFIRMADO</span>
 </div>
 
-<h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Tudo Certo, {cliente_nome}!</h2>
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Tudo Certo, {cliente_nome}!</h2>
 <p style="text-align: center; margin-bottom: 24px;">Identificamos o pagamento da sua fatura <strong>#{fatura_id}</strong> no valor de <strong>{valor}</strong>. Seus serviços de monitoramento e proteção veicular estão 100% ativos.</p>
 
 <div style="margin: 24px 0 28px 0; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(22, 101, 52, 0.04);">
@@ -518,7 +523,7 @@ HTML;
     private static function getTemplatePadraoCarneGerado(): string
     {
         return <<<HTML
-<h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 18px;">Seu <strong>Carnê de Mensalidades Foco 7 (Efí PRO)</strong> foi gerado e já está disponível para consulta e download das lâminas de pagamento.</p>
 
 <div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);">
@@ -566,7 +571,7 @@ HTML;
     private static function getTemplatePadraoLembreteVencimento(): string
     {
         return <<<HTML
-<h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 18px;">Este é um lembrete preventivo de que sua fatura <strong>#{fatura_id}</strong> da Foco 7 está próxima do vencimento.</p>
 
 <div style="margin: 24px 0 28px 0; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.04);">
@@ -618,7 +623,7 @@ HTML;
     <span style="display: inline-block; background-color: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 50px;">FATURA EM ATRASO</span>
 </div>
 
-<h2 style="color: #991b1b; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Atenção, {cliente_nome}!</h2>
+<h2 style="color: #dc2626; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Atenção, {cliente_nome}!</h2>
 <p style="text-align: center; margin-bottom: 24px;">Constatamos que a fatura <strong>#{fatura_id}</strong> no valor de <strong>{valor}</strong> venceu em <strong>{data_vencimento}</strong> e ainda não teve o pagamento compensado.</p>
 
 <div style="margin: 24px 0 28px 0; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(185, 28, 28, 0.04);">
