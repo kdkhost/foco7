@@ -41,6 +41,11 @@
     --foco-transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 85px;
+}
+
 body {
     font-family: 'Outfit', 'Roboto', sans-serif;
     background-color: var(--foco-bg-body);
@@ -48,7 +53,6 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -100,21 +104,31 @@ body {
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--foco-border);
     box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
-    padding: 8px 0;
+    padding: 10px 0;
     transition: var(--foco-transition);
     z-index: 1040;
 }
 
 .foco-navbar.scrolled {
-    padding: 5px 0;
+    padding: 8px 0;
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07);
 }
 
+.foco-navbar .navbar-brand {
+    padding: 4px 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
 .logo-foco7 {
-    max-height: 40px;
+    max-height: 38px;
+    height: 38px;
     width: auto;
     object-fit: contain;
-    display: inline-block;
+    display: block;
+    padding: 2px 0;
     transition: var(--foco-transition);
 }
 
@@ -212,13 +226,37 @@ body {
 }
 
 .foco-navbar .navbar-toggler {
-    border: 1px solid var(--foco-border);
-    padding: 5px 8px;
-    color: #0f172a;
+    border: 1.5px solid rgba(217, 0, 0, 0.3);
+    border-radius: 9px;
+    padding: 6px 10px;
+    background: #ffffff;
+    color: var(--foco-red);
+    outline: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foco-navbar .navbar-toggler:hover {
+    background: rgba(217, 0, 0, 0.05);
+    border-color: var(--foco-red);
+}
+
+.foco-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(217, 0, 0, 0.12) !important;
+}
+
+.foco-navbar .navbar-toggler[aria-expanded="true"] {
+    background: rgba(217, 0, 0, 0.08);
+    border-color: var(--foco-red);
 }
 
 .foco-navbar .navbar-toggler-icon {
-    filter: invert(0.8);
+    width: 22px;
+    height: 22px;
+    background-size: 100%;
 }
 
 /* ==============================================================================
@@ -1125,24 +1163,66 @@ body {
     box-shadow: 0 6px 20px var(--foco-red-glow);
 }
 
-/* Responsividade Mobile */
+/* Responsividade Mobile da Navbar e Menu */
 @media (max-width: 991px) {
     .hero-title {
         font-size: 2.3rem;
     }
     .foco-navbar {
-        background: #ffffff;
+        background: #ffffff !important;
+        padding: 10px 0 !important;
+    }
+    .foco-navbar.scrolled {
+        padding: 8px 0 !important;
+    }
+    .foco-navbar .navbar-brand {
+        padding: 3px 0 !important;
+    }
+    .logo-foco7 {
+        max-height: 36px !important;
+        height: 36px !important;
+        padding: 2px 0 !important;
     }
     .foco-navbar .nav-link::after {
         display: none;
     }
     .foco-navbar .navbar-collapse {
         background: #ffffff;
-        border-radius: 12px;
-        padding: 1rem;
-        margin-top: 0.5rem;
-        box-shadow: var(--foco-shadow-md);
-        border: 1px solid var(--foco-border);
+        border-radius: 16px;
+        padding: 1.25rem 1rem;
+        margin-top: 0.75rem;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        max-height: calc(100vh - 85px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .foco-navbar .navbar-collapse::-webkit-scrollbar {
+        width: 4px;
+    }
+    .foco-navbar .navbar-collapse::-webkit-scrollbar-thumb {
+        background: rgba(217, 0, 0, 0.25);
+        border-radius: 4px;
+    }
+    .foco-navbar .nav-link {
+        padding: 0.65rem 0.95rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+        border-radius: 8px;
+        margin-bottom: 2px;
+        transition: all 0.2s ease;
+    }
+    .foco-navbar .nav-link:hover,
+    .foco-navbar .nav-link:active {
+        background: rgba(217, 0, 0, 0.05);
+        color: var(--foco-red);
+        transform: translateX(3px);
+    }
+    .foco-navbar .nav-link.active {
+        background: rgba(217, 0, 0, 0.08);
+        color: var(--foco-red);
+        font-weight: 700;
     }
 }
 

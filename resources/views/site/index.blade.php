@@ -63,7 +63,7 @@
     <nav class="navbar navbar-expand-lg foco-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
-                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="40" class="logo-foco7 d-inline-block" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="38" class="logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco" aria-label="Menu de Navegação">
                 <span class="navbar-toggler-icon"></span>
@@ -80,18 +80,18 @@
                     <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                 </ul>
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex flex-column flex-lg-row gap-2 align-items-stretch align-items-lg-center mt-3 mt-lg-0">
                     <button type="button" class="btn btn-sm btn-outline-danger d-none d-xl-inline-flex align-items-center gap-1" onclick="abrirModalAgendamentoSite()">
                         <i class="fas fa-calendar-check"></i> Agendar
                     </button>
                     <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
                         <i class="fas fa-user-lock"></i> Área do Cliente
                     </a>
-                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2">
+                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2 text-center justify-content-center">
                         <i class="fab fa-whatsapp"></i> Falar no WhatsApp
                     </a>
-                    <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm d-lg-none">
-                        <i class="fas fa-lock"></i> Entrar
+                    <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm d-lg-none text-center justify-content-center py-2">
+                        <i class="fas fa-lock me-1"></i> Entrar na Área do Cliente
                     </a>
                 </div>
             </div>
@@ -1013,6 +1013,27 @@
         }
 
         $(function () {
+            // Controle dinâmico da navbar
+            var $navbar = $('.foco-navbar');
+            $(window).on('scroll', function () {
+                if ($(this).scrollTop() > 30) {
+                    $navbar.addClass('scrolled');
+                } else {
+                    $navbar.removeClass('scrolled');
+                }
+            });
+
+            // Fechamento automático elegante do menu mobile ao clicar em itens/links
+            $('#navFoco a').on('click', function () {
+                if ($(window).width() < 992) {
+                    var collapseEl = document.getElementById('navFoco');
+                    if (collapseEl && collapseEl.classList.contains('show')) {
+                        var bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+                        bsCollapse.hide();
+                    }
+                }
+            });
+
             // Controle dinâmico do botão Voltar ao Topo
             var $btnTopo = $('#btnVoltarAoTopo');
             $(window).on('scroll', function () {
