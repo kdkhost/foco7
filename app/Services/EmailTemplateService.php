@@ -195,12 +195,21 @@ class EmailTemplateService
         $whatsapp = CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736');
         $assunto = $dados['assunto'] ?? ($dados['titulo'] ?? $nomeEmpresa);
 
+        // Logo oficial gravada no banco de dados (CmsSetting::get('site_logo'))
+        $logoPath = CmsSetting::get('site_logo') ?: '/img/logo-foco7.png';
+        if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+            $logoUrl = $logoPath;
+        } else {
+            $logoUrl = url(ltrim($logoPath, '/'));
+        }
+
         if (view()->exists('emails.layouts.master')) {
             return view('emails.layouts.master', [
                 'corpo' => $corpoProcessado,
                 'nomeEmpresa' => $nomeEmpresa,
                 'whatsapp' => $whatsapp,
                 'assunto' => $assunto,
+                'logoUrl' => $logoUrl,
             ])->render();
         }
 
@@ -218,14 +227,14 @@ class EmailTemplateService
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 25px 10px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
+                <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
                     <tr>
                         <td style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 24px 28px; text-align: center; border-bottom: 4px solid #d90000;">
-                            <div style="font-size: 26px; font-weight: 900; color: #ffffff;"><span style="color: #d90000;">FOCO</span> 7</div>
+                            <img src="{$logoUrl}" alt="{$nomeEmpresa}" height="46" style="height: 46px; max-height: 52px; width: auto; max-width: 220px; border: 0; display: block; margin: 0 auto;" />
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 32px 28px; font-size: 15px; line-height: 1.65; color: #334155;">
+                        <td style="padding: 34px 30px; font-size: 15px; line-height: 1.65; color: #334155;">
                             {$corpoProcessado}
                         </td>
                     </tr>
@@ -403,7 +412,7 @@ HTML;
     }
 
     // =========================================================================
-    // TEMPLATES HTML PADRÕES RICOS E ELEGANTES
+    // TEMPLATES HTML PADRÕES RICOS, BOLEADOS E ELEGANTES
     // =========================================================================
 
     private static function getTemplatePadraoFaturaGerada(): string
@@ -412,23 +421,42 @@ HTML;
 <h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 20px;">Sua fatura referente ao serviço <strong>{plano_nome}</strong> foi gerada com sucesso e já está disponível para pagamento.</p>
 
-<table width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Fatura Número:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #0f172a;">#{fatura_id}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Data de Vencimento:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #d90000;">{data_vencimento}</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px 0 0 0; font-size: 16px; font-weight: 800; color: #0f172a; border-top: 1px dashed #cbd5e1;">Valor a Pagar:</td>
-        <td style="padding: 8px 0 0 0; font-size: 20px; font-weight: 900; text-align: right; color: #d90000; border-top: 1px dashed #cbd5e1;">{valor}</td>
-    </tr>
-</table>
+<div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Fatura Número</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">#{fatura_id}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Data de Vencimento</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #d90000;">{data_vencimento}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #0f172a; vertical-align: middle;">
+                            <span style="display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">Total a Liquidar</span>
+                            Valor a Pagar:
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #d90000; letter-spacing: -0.5px; line-height: 1;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
 
-<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
-    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; max-width: 100%;">Visualizar e Pagar Fatura &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; max-width: 100%;">Visualizar e Pagar Fatura &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Você pode efetuar o pagamento via <strong>PIX instantâneo</strong> (com baixa automática em poucos segundos), <strong>Cartão de Crédito</strong> ou <strong>Boleto Bancário</strong>.</p>
@@ -445,23 +473,42 @@ HTML;
 <h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Tudo Certo, {cliente_nome}!</h2>
 <p style="text-align: center; margin-bottom: 24px;">Identificamos o pagamento da sua fatura <strong>#{fatura_id}</strong> no valor de <strong>{valor}</strong>. Seus serviços de monitoramento e proteção veicular estão 100% ativos.</p>
 
-<table width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Serviço / Plano:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #0f172a;">{plano_nome}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Valor Liquidado:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #15803d;">{valor}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Status da Conta:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #15803d;">PROTEGIDO 24H</td>
-    </tr>
-</table>
+<div style="margin: 24px 0 28px 0; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(22, 101, 52, 0.04);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Serviço / Plano</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #0f172a;">{plano_nome}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Status da Proteção</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #15803d;">PROTEGIDO 24H</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #bbf7d0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #0f172a; vertical-align: middle;">
+                            <span style="display: block; font-size: 11px; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">Pagamento Aprovado</span>
+                            Valor Liquidado:
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #15803d; letter-spacing: -0.5px; line-height: 1;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
 
-<div class="btn-wrapper" style="text-align: center; margin: 20px 0 24px 0; width: 100%;">
-    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #0f172a; color: #ffffff !important; text-decoration: none !important; font-size: 14px; font-weight: 700; padding: 13px 30px; border-radius: 8px; box-sizing: border-box; max-width: 100%;">Acessar Área do Cliente &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #0f172a; color: #ffffff !important; text-decoration: none !important; font-size: 14px; font-weight: 700; padding: 14px 32px; border-radius: 8px; box-sizing: border-box; max-width: 100%;">Acessar Área do Cliente &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; text-align: center; margin: 0;">Agradecemos pela confiança na equipe Foco 7!</p>
@@ -474,23 +521,42 @@ HTML;
 <h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 18px;">Seu <strong>Carnê de Mensalidades Foco 7 (Efí PRO)</strong> foi gerado e já está disponível para consulta e download das lâminas de pagamento.</p>
 
-<table width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Plano Contratado:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #0f172a;">{plano_nome}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Primeiro Vencimento:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #d90000;">{data_vencimento}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Valor da Parcela:</td>
-        <td style="padding: 6px 0; font-size: 16px; font-weight: 800; text-align: right; color: #d90000;">{valor}</td>
-    </tr>
-</table>
+<div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Plano Contratado</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #0f172a;">{plano_nome}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Primeiro Vencimento</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #d90000;">{data_vencimento}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #0f172a; vertical-align: middle;">
+                            <span style="display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">Mensalidade Fixa</span>
+                            Valor da Parcela:
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #d90000; letter-spacing: -0.5px; line-height: 1;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
 
-<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
-    <a href="{link_carne}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Baixar Carnê Completo em PDF &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_carne}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Baixar Carnê Completo em PDF &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Você pode pagar cada lâmina do carnê em qualquer banco, casas lotéricas, aplicativos bancários ou via QR Code PIX impresso em cada boleto.</p>
@@ -503,23 +569,42 @@ HTML;
 <h2 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px;">Olá, {cliente_nome}!</h2>
 <p style="margin-bottom: 18px;">Este é um lembrete preventivo de que sua fatura <strong>#{fatura_id}</strong> da Foco 7 está próxima do vencimento.</p>
 
-<table width="100%" style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #92400e;">Serviço:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #78350f;">{plano_nome}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #92400e;">Data de Vencimento:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #b45309;">{data_vencimento}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #92400e;">Valor:</td>
-        <td style="padding: 6px 0; font-size: 18px; font-weight: 900; text-align: right; color: #b45309;">{valor}</td>
-    </tr>
-</table>
+<div style="margin: 24px 0 28px 0; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.04);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Serviço</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #78350f;">{plano_nome}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Data de Vencimento</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #b45309;">{data_vencimento}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #fde68a;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #78350f; vertical-align: middle;">
+                            <span style="display: block; font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">Pagamento Preventivo</span>
+                            Valor Sem Juros:
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #b45309; letter-spacing: -0.5px; line-height: 1;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
 
-<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
-    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #f59e0b; color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Pagar Agora Sem Juros &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background-color: #f59e0b; color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Pagar Agora Sem Juros &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">Pagar em dia garante a continuidade ininterrupta da transmissão do sinal de rastreamento do seu veículo e o suporte da Ronda Tática 24 Horas.</p>
@@ -536,23 +621,42 @@ HTML;
 <h2 style="color: #991b1b; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Atenção, {cliente_nome}!</h2>
 <p style="text-align: center; margin-bottom: 24px;">Constatamos que a fatura <strong>#{fatura_id}</strong> no valor de <strong>{valor}</strong> venceu em <strong>{data_vencimento}</strong> e ainda não teve o pagamento compensado.</p>
 
-<table width="100%" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #991b1b;">Fatura:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #7f1d1d;">#{fatura_id}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #991b1b;">Vencimento Original:</td>
-        <td style="padding: 6px 0; font-size: 14px; font-weight: 700; text-align: right; color: #dc2626;">{data_vencimento}</td>
-    </tr>
-    <tr>
-        <td style="padding: 6px 0; font-size: 14px; color: #991b1b;">Valor com Encargos:</td>
-        <td style="padding: 6px 0; font-size: 18px; font-weight: 900; text-align: right; color: #dc2626;">{valor}</td>
-    </tr>
-</table>
+<div style="margin: 24px 0 28px 0; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(185, 28, 28, 0.04);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #991b1b; text-transform: uppercase; letter-spacing: 0.5px;">Identificador Fatura</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #7f1d1d; font-family: monospace, sans-serif;">#{fatura_id}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #991b1b; text-transform: uppercase; letter-spacing: 0.5px;">Vencimento Original</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #dc2626;">{data_vencimento}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #fecaca;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #7f1d1d; vertical-align: middle;">
+                            <span style="display: block; font-size: 11px; font-weight: 700; color: #991b1b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">Regularização Pendente</span>
+                            Total a Regularizar:
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #dc2626; letter-spacing: -0.5px; line-height: 1;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
 
-<div class="btn-wrapper" style="text-align: center; margin: 24px 0 28px 0; width: 100%;">
-    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #991b1b 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 14px 34px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Regularizar Fatura Imediatamente &rarr;</a>
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #991b1b 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase; box-sizing: border-box; max-width: 100%;">Regularizar Fatura Imediatamente &rarr;</a>
 </div>
 
 <p style="font-size: 13px; color: #64748b; margin-bottom: 0; text-align: center;">Para evitar o bloqueio temporário do aplicativo e a suspensão da cobertura da Ronda Tática, regularize sua pendência o quanto antes.</p>

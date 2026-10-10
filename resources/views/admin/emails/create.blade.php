@@ -110,7 +110,12 @@
 @endsection
 
 @section('scripts')
+@php
+    $logoPath = \App\Models\CmsSetting::get('site_logo') ?: '/img/logo-foco7.png';
+    $logoOficialUrl = (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) ? $logoPath : asset(ltrim($logoPath, '/'));
+@endphp
 <script>
+    const LOGO_OFICIAL_URL = "{{ $logoOficialUrl }}";
     const DADOS_SIMULADOS = {
         '{cliente_nome}': 'Carlos Alberto Silva (Demonstração)',
         '{cliente_email}': 'carlos.silva@exemplo.com.br',
@@ -140,12 +145,13 @@
     <title>${assuntoProc}</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table { border-collapse: separate; }
         body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
         p { margin: 0 0 16px 0; line-height: 1.65; color: #334155; font-size: 15px; }
         h1, h2, h3, h4, h5, h6 { margin: 0 0 14px 0; color: #0f172a; font-weight: 800; }
         a { color: #d90000; text-decoration: underline; font-weight: 600; }
         .btn-action { display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; padding: 14px 32px; font-size: 15px; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 12px rgba(217, 0, 0, 0.25); text-align: center; margin: 12px auto 20px auto; max-width: 100%; box-sizing: border-box; }
-        .info-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #d90000; border-radius: 8px; padding: 16px 20px; margin: 16px 0 20px 0; }
+        .info-card, .data-card, .invoice-summary-card, .highlight-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px !important; overflow: hidden !important; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); margin: 22px 0 26px 0; }
         @media only screen and (max-width: 620px) {
             .wrapper-table { width: 100% !important; max-width: 100% !important; border-radius: 0 !important; border: none !important; }
             .header-cell { padding: 22px 18px !important; }
@@ -160,9 +166,10 @@
             <td align="center">
                 <table role="presentation" class="wrapper-table" width="100%" style="max-width: 620px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td class="header-cell" style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 28px 30px; text-align: center; border-bottom: 4px solid #d90000;">
-                            <div style="font-size: 26px; font-weight: 900; color: #ffffff; line-height: 1.1;"><span style="color: #d90000;">FOCO</span> 7</div>
-                            <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 2.5px; margin-top: 6px; font-weight: 600;">Rastreamento &bull; Bloqueio 24h &bull; Ronda Tática</div>
+                        <td class="header-cell" style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 26px 30px; text-align: center; border-bottom: 4px solid #d90000;">
+                            <a href="#" style="text-decoration: none; display: inline-block;">
+                                <img src="${LOGO_OFICIAL_URL}" alt="Foco 7 Rastreamento" height="48" style="height: 48px; max-height: 54px; width: auto; max-width: 230px; border: 0; outline: none; display: block; margin: 0 auto;" />
+                            </a>
                         </td>
                     </tr>
                     <tr>

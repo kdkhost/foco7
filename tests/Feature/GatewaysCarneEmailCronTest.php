@@ -185,7 +185,7 @@ class GatewaysCarneEmailCronTest extends TestCase
         // Deve conter os elementos mandatórios do layout responsivo master
         $this->assertStringContainsString('Marcos Vinicius', $html);
         $this->assertStringContainsString('R$ 89,90', $html);
-        $this->assertStringContainsString('FOCO</span> 7', $html);
+        $this->assertStringContainsString('logo-foco7.png', $html);
         $this->assertStringContainsString('max-width: 620px', $html);
         $this->assertStringContainsString('@media only screen and (max-width: 620px)', $html);
         $this->assertStringContainsString('Suporte', $html);

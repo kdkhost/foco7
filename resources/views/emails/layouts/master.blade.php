@@ -12,7 +12,8 @@
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-        table { border-collapse: collapse !important; }
+        table { border-collapse: separate; }
+        .collapse-table { border-collapse: collapse !important; }
         body { margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
         
         /* ESTILOS DE ELEMENTOS DO CORPO */
@@ -50,14 +51,14 @@
             width: 100%;
         }
 
-        /* CAIXAS DE DESTAQUE / CARDS */
-        .info-card {
+        /* CAIXAS DE DESTAQUE / CARDS BOLEADOS E ESPAÇADOS */
+        .info-card, .data-card, .invoice-summary-card, .highlight-box {
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #d90000;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 16px 0 20px 0;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            margin: 22px 0 26px 0;
         }
         
         .badge-status {
@@ -97,7 +98,7 @@
                 border: none !important;
             }
             .header-cell {
-                padding: 24px 18px !important;
+                padding: 22px 18px !important;
             }
             .content-cell {
                 padding: 26px 18px !important;
@@ -105,9 +106,6 @@
             }
             .footer-cell {
                 padding: 22px 18px !important;
-            }
-            .brand-name {
-                font-size: 24px !important;
             }
             .btn-action {
                 display: block !important;
@@ -147,18 +145,15 @@
                 <!-- CARD PRINCIPAL DO EMAIL -->
                 <table role="presentation" class="wrapper-table" width="100%" style="max-width: 620px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0" border="0">
                     
-                    <!-- CABEÇALHO OFICIAL FOCO 7 -->
+                    <!-- CABEÇALHO OFICIAL FOCO 7 COM LOGOTIPO OFICIAL DO BANCO DE DADOS -->
                     <tr>
-                        <td class="header-cell" style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 30px 32px; text-align: center; border-bottom: 4px solid #d90000;">
+                        <td class="header-cell" style="background: linear-gradient(135deg, #0b0f19 0%, #1e293b 100%); padding: 26px 32px; text-align: center; border-bottom: 4px solid #d90000;">
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                 <tr>
                                     <td align="center">
-                                        <div class="brand-name" style="font-size: 28px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; line-height: 1.1;">
-                                            <span style="color: #d90000;">FOCO</span> 7
-                                        </div>
-                                        <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 2.5px; margin-top: 6px; font-weight: 600;">
-                                            Rastreamento &bull; Bloqueio 24h &bull; Ronda Tática
-                                        </div>
+                                        <a href="{{ url('/') }}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                            <img src="{{ $logoUrl ?? asset('/img/logo-foco7.png') }}" alt="{{ $nomeEmpresa ?? 'Foco 7 Rastreamento' }}" height="48" style="height: 48px; max-height: 54px; width: auto; max-width: 230px; border: 0; outline: none; text-decoration: none; display: block; margin: 0 auto;" />
+                                        </a>
                                     </td>
                                 </tr>
                             </table>
@@ -175,7 +170,7 @@
                     <!-- BANNER DE SUPORTE WHATSAPP 24H -->
                     <tr>
                         <td style="padding: 0 36px 20px 36px; background-color: #ffffff;">
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 14px 18px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 14px 18px;">
                                 <tr>
                                     <td align="center" style="font-size: 13px; color: #475569; line-height: 1.5;">
                                         <span style="display: inline-block; margin-right: 6px; font-weight: 700; color: #0f172a;">Precisa de Ajuda ou Suporte?</span>
