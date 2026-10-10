@@ -97,10 +97,14 @@
             <i class="fas fa-moon" id="themeIcon"></i>
         </button>
 
-        <!-- Logomarca Oficial Transparente -->
+        <!-- Logomarca Oficial Transparente Dinâmica -->
         <div class="text-center mb-4">
             <a href="{{ route('site.home') }}">
-                <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="68" class="mb-2">
+                <img id="loginBrandLogo"
+                     src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}"
+                     data-logo-dark="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}"
+                     data-logo-light="{{ asset(\App\Models\CmsSetting::getLogo('claro')) }}"
+                     alt="Foco 7" height="68" class="mb-2">
             </a>
             <p class="small text-secondary mt-1 mb-0">Portal de Gestão & Área do Cliente</p>
         </div>

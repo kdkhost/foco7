@@ -119,7 +119,8 @@
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
             <div class="sidebar-brand d-flex align-items-center justify-content-start px-3 py-3 border-bottom border-secondary">
                 <a href="{{ route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
-                    <img src="{{ asset('img/logo-foco7.png') }}" alt="Foco 7" height="34" class="brand-image">
+                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image logo-fundo-escuro">
+                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('claro')) }}" alt="Foco 7" height="34" class="brand-image logo-fundo-claro">
                     <span class="badge bg-primary ms-auto small">CLIENTE</span>
                 </a>
             </div>

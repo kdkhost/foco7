@@ -47,6 +47,26 @@
     color: #ff4d4d;
 }
 
+/* Alternância Automática de Logotipo por Fundo / Tema (Claro vs Escuro) */
+[data-bs-theme="dark"] .logo-fundo-claro,
+body.dark-mode .logo-fundo-claro {
+    display: none !important;
+}
+[data-bs-theme="dark"] .logo-fundo-escuro,
+body.dark-mode .logo-fundo-escuro {
+    display: inline-block !important;
+}
+
+[data-bs-theme="light"] .logo-fundo-escuro,
+body:not(.dark-mode) .logo-fundo-escuro {
+    display: none !important;
+}
+[data-bs-theme="light"] .logo-fundo-claro,
+body:not(.dark-mode) .logo-fundo-claro {
+    display: inline-block !important;
+}
+
+
 /* ==============================================================================
    REMOÇÃO GLOBAL DE ELEMENTOS AZUIS - HARMONIZAÇÃO COM A PALETA FOCO 7
    ============================================================================== */

@@ -67,4 +67,28 @@ class CmsSetting extends Model
             return [];
         }
     }
+
+    /**
+     * Retorna a URL do logotipo oficial baseada no fundo (claro/branco ou escuro/preto)
+     * @param string $fundo 'escuro' | 'claro' | 'branco' | 'preto'
+     */
+    public static function getLogo(string $fundo = 'escuro'): string
+    {
+        if (in_array(strtolower($fundo), ['claro', 'branco', 'light', 'white'])) {
+            $logoClaro = self::get('site_logo_clara', self::get('site_logo_light', '/img/logo-foco7-dark.png'));
+            $cleanPath = parse_url($logoClaro, PHP_URL_PATH) ?: $logoClaro;
+            if (empty($logoClaro) || !file_exists(public_path(ltrim($cleanPath, '/\\')))) {
+                return '/img/logo-foco7-dark.png';
+            }
+            return $logoClaro;
+        }
+
+        $logoEscuro = self::get('site_logo', '/img/logo-foco7.png');
+        $cleanPath = parse_url($logoEscuro, PHP_URL_PATH) ?: $logoEscuro;
+        if (empty($logoEscuro) || !file_exists(public_path(ltrim($cleanPath, '/\\')))) {
+            return '/img/logo-foco7.png';
+        }
+        return $logoEscuro;
+    }
 }
+

@@ -141,7 +141,7 @@
         <nav class="navbar navbar-expand-lg foco-navbar">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('site.home') }}">
-                    <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="38" class="logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                    <img src="{{ asset($configs['logo_fundo_claro'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="38" class="logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
                 </a>
 
                 <!-- BOTÃO HAMBÚRGUER (APENAS MOBILE E TABLET < 992px) -->
@@ -181,7 +181,7 @@
     <div class="offcanvas offcanvas-start drawer-android" tabindex="-1" id="menuDrawerAndroid" aria-labelledby="menuDrawerAndroidLabel">
         <div class="offcanvas-header drawer-android-header">
             <div class="d-flex align-items-center gap-2">
-                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="32" class="drawer-logo" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                <img src="{{ asset($configs['logo_fundo_claro'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="32" class="drawer-logo" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
             </div>
             <button type="button" class="btn-close-android" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
         </div>
@@ -336,7 +336,7 @@
         <div class="container">
             <div class="row g-5">
                 <div class="col-lg-4">
-                    <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="44" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                    <img src="{{ asset($configs['logo_fundo_claro'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] ?? 'Foco 7' }}" height="44" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
                     <p class="mt-3 text-secondary small leading-relaxed">
                         Líder em rastreamento veicular inteligente, bloqueio remoto e ronda tática presencial. Mais de 10 anos protegendo famílias e frotas corporativas em todo o território nacional.
                     </p>

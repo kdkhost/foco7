@@ -106,41 +106,94 @@
                     </div>
                 </div>
 
-                <!-- ABA 2: IDENTIDADE VISUAL COM ARRASTA E SOLTA -->
+                <!-- ABA 2: IDENTIDADE VISUAL COM ARRASTA E SOLTA (FUNDO PRETO & FUNDO BRANCO) -->
                 <div class="tab-pane fade" id="tab-branding" role="tabpanel">
+                    <div class="alert alert-light border shadow-sm mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary-subtle text-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                                <i class="fas fa-palette fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-body">Gerenciamento Dinâmico de Logotipos por Fundo</h6>
+                                <p class="small text-secondary mb-0">
+                                    O sistema alterna automaticamente o logotipo exibido de acordo com a tonalidade do fundo da página ou seção: a <strong>versão para fundo escuro</strong> é aplicada no rodapé institucional e menus escuros, enquanto a <strong>versão para fundo claro</strong> é renderizada no topo da Landing Page, páginas de termos e documentos com fundo branco.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="card bg-dark border-secondary p-3 h-100">
-                                <label class="form-label fw-bold text-white mb-2">
-                                    <i class="fas fa-image text-danger me-1"></i> Logotipo Principal da Marca
-                                </label>
+                        <!-- 1. LOGO PARA FUNDO PRETO / ESCURO -->
+                        <div class="col-lg-4">
+                            <div class="card bg-dark border-secondary p-3 h-100 shadow-sm text-white">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold text-white mb-0">
+                                        <i class="fas fa-moon text-warning me-1"></i> Logo Fundo Preto
+                                    </label>
+                                    <span class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">Fundo Escuro</span>
+                                </div>
+                                <p class="small text-secondary mb-2" style="font-size: 0.78rem;">
+                                    Letras brancas/claras. Exibido no rodapé do site, na barra lateral do painel admin e temas escuros.
+                                </p>
                                 <div class="foco-dropzone"
                                      data-input-name="logo_upload"
-                                     data-ratio="500 × 120 px (Horizontal Transparente)"
+                                     data-ratio="Horizontal (PNG/WEBP Transparente)"
                                      data-max-size="5MB"
                                      data-accept="image/png,image/webp,image/jpeg"
                                      data-current-preview="{{ asset($configs['site_logo']) }}">
                                 </div>
                                 <div class="small text-secondary mt-2">
-                                    <i class="fas fa-info-circle me-1"></i> Recomendado fundo transparente (PNG ou WEBP) para perfeita visualização nos modos claro e escuro.
+                                    <i class="fas fa-info-circle me-1"></i> Preview sobre fundo escuro simulado.
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="card bg-dark border-secondary p-3 h-100">
-                                <label class="form-label fw-bold text-white mb-2">
-                                    <i class="fas fa-gem text-danger me-1"></i> Ícone Favicon do Navegador
-                                </label>
+                        <!-- 2. LOGO PARA FUNDO BRANCO / CLARO (SECUNDÁRIA) -->
+                        <div class="col-lg-4">
+                            <div class="card bg-white border border-2 p-3 h-100 shadow-sm text-dark">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold text-dark mb-0">
+                                        <i class="fas fa-sun text-warning me-1"></i> Logo Fundo Branco
+                                    </label>
+                                    <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.7rem;">Fundo Claro</span>
+                                </div>
+                                <p class="small text-muted mb-2" style="font-size: 0.78rem;">
+                                    Letras pretas/escuras. Exibido no topo/navbar da Landing Page, termos de privacidade e páginas claras.
+                                </p>
+                                <div class="foco-dropzone"
+                                     data-input-name="logo_light_upload"
+                                     data-ratio="Horizontal (PNG/WEBP Transparente)"
+                                     data-max-size="5MB"
+                                     data-accept="image/png,image/webp,image/jpeg"
+                                     data-current-preview="{{ asset($configs['site_logo_clara']) }}">
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    <i class="fas fa-info-circle me-1"></i> Preview sobre fundo branco simulado.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. ÍCONE FAVICON -->
+                        <div class="col-lg-4">
+                            <div class="card bg-dark border-secondary p-3 h-100 shadow-sm text-white">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold text-white mb-0">
+                                        <i class="fas fa-gem text-danger me-1"></i> Ícone Favicon
+                                    </label>
+                                    <span class="badge bg-danger font-monospace" style="font-size: 0.7rem;">Aba / Celular</span>
+                                </div>
+                                <p class="small text-secondary mb-2" style="font-size: 0.78rem;">
+                                    Proporção 1:1 quadrado (PNG ou ICO). Exibido na aba do navegador e no ícone de atalho mobile.
+                                </p>
                                 <div class="foco-dropzone"
                                      data-input-name="favicon_upload"
-                                     data-ratio="512 × 512 px (Proporção 1:1 Quadrado)"
+                                     data-ratio="512 × 512 px (Quadrado)"
                                      data-max-size="2MB"
                                      data-accept="image/png,image/x-icon,image/webp"
                                      data-current-preview="{{ asset($configs['site_favicon']) }}">
                                 </div>
                                 <div class="small text-secondary mt-2">
-                                    <i class="fas fa-info-circle me-1"></i> Exibido na aba do navegador, favoritos e atalhos de celular.
+                                    <i class="fas fa-info-circle me-1"></i> Exibido nas abas dos navegadores.
                                 </div>
                             </div>
                         </div>

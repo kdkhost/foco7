@@ -32,22 +32,14 @@ class SiteController extends Controller
         $depoimentos = Depoimento::ativo()->get();
         $seo = SeoConfig::paraPagina('home');
 
-        $logo = CmsSetting::get('site_logo', '/img/logo-foco7.png');
-        $cleanLogoPath = parse_url($logo, PHP_URL_PATH) ?: $logo;
-        if (empty($logo) || !file_exists(public_path(ltrim($cleanLogoPath, '/')))) {
-            $logo = '/img/logo-foco7.png';
-        }
-
+        $logoFundoEscuro = CmsSetting::getLogo('escuro');
+        $logoFundoClaro = CmsSetting::getLogo('claro');
         $favicon = CmsSetting::get('site_favicon', '/img/favicon.png');
         $cleanFavPath = parse_url($favicon, PHP_URL_PATH) ?: $favicon;
-        if (empty($favicon) || !file_exists(public_path(ltrim($cleanFavPath, '/')))) {
+        if (empty($favicon) || !file_exists(public_path(ltrim($cleanFavPath, '/\\')))) {
             $favicon = '/img/favicon.png';
         }
 
-        $logoDark = '/img/logo-foco7-dark.png';
-        if (!file_exists(public_path('img/logo-foco7-dark.png'))) {
-            $logoDark = $logo;
-        }
 
         $heroOverlayCor = CmsSetting::get('hero_overlay_cor', '#0b0f19');
         if (empty($heroOverlayCor) || strtolower($heroOverlayCor) === '#ffffff') {
@@ -77,8 +69,10 @@ class SiteController extends Controller
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
             'linkedin' => CmsSetting::get('social_linkedin', ''),
-            'logo' => $logo,
-            'logo_dark' => $logoDark,
+            'logo' => $logoFundoEscuro,
+            'logo_dark' => $logoFundoClaro,
+            'logo_fundo_escuro' => $logoFundoEscuro,
+            'logo_fundo_claro' => $logoFundoClaro,
             'favicon' => $favicon,
             'cor_primaria' => CmsSetting::get('cor_primaria', '#d90000'),
             'hero_bg_imagem' => CmsSetting::get('hero_bg_imagem', ''),
@@ -219,8 +213,10 @@ class SiteController extends Controller
             'horario' => CmsSetting::get('horario_atendimento') ?: CmsSetting::get('contato_horario', 'Central 24 Horas | Plantão de Emergência'),
             'instagram' => CmsSetting::get('rede_instagram', ''),
             'facebook' => CmsSetting::get('rede_facebook', ''),
-            'logo' => CmsSetting::get('site_logo', '/img/logo-foco7.png'),
-            'logo_dark' => CmsSetting::get('site_logo', '/img/logo-foco7-dark.png'),
+            'logo' => CmsSetting::getLogo('escuro'),
+            'logo_dark' => CmsSetting::getLogo('claro'),
+            'logo_fundo_escuro' => CmsSetting::getLogo('escuro'),
+            'logo_fundo_claro' => CmsSetting::getLogo('claro'),
             'favicon' => CmsSetting::get('site_favicon', '/img/favicon.png'),
             'hero_bg_imagem' => CmsSetting::get('hero_bg_imagem', '/img/og-foco7.jpg'),
             'politica_privacidade' => $conteudo,

@@ -35,8 +35,9 @@ class ConfiguracoesController extends Controller
             'endereco_cep' => CmsSetting::get('endereco_cep', '66000-000'),
             'horario_atendimento' => CmsSetting::get('horario_atendimento', 'Central 24 Horas / Comercial Seg a Sex 08h às 18h'),
 
-            // Identidade Visual
-            'site_logo' => CmsSetting::get('site_logo', '/img/logo-foco7.png'),
+            // Identidade Visual (Fundo Escuro e Fundo Claro)
+            'site_logo' => CmsSetting::getLogo('escuro'),
+            'site_logo_clara' => CmsSetting::getLogo('claro'),
             'site_favicon' => CmsSetting::get('site_favicon', '/img/favicon.png'),
 
             // Servidor de E-mail SMTP
@@ -91,17 +92,28 @@ class ConfiguracoesController extends Controller
             File::makeDirectory($uploadPath, 0755, true, true);
         }
 
-        // 2. Upload de Logotipo Principal com Drag & Drop
+        // 2. Upload de Logotipo Principal (Fundo Escuro / Preto) com Drag & Drop
         if ($request->hasFile('logo_upload')) {
             $file = $request->file('logo_upload');
-            $fileName = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'logo_dark_bg_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadPath, $fileName);
             $logoUrl = '/uploads/branding/' . $fileName;
             CmsSetting::set('site_logo', $logoUrl, 'branding');
             @copy(public_path(ltrim($logoUrl, '/\\')), public_path('img/logo-foco7.png'));
         }
 
-        // 3. Upload de Favicon com Drag & Drop
+        // 3. Upload de Logotipo Secundário (Fundo Claro / Branco) com Drag & Drop
+        if ($request->hasFile('logo_light_upload')) {
+            $file = $request->file('logo_light_upload');
+            $fileName = 'logo_light_bg_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $fileName);
+            $logoLightUrl = '/uploads/branding/' . $fileName;
+            CmsSetting::set('site_logo_clara', $logoLightUrl, 'branding');
+            CmsSetting::set('site_logo_light', $logoLightUrl, 'branding');
+            @copy(public_path(ltrim($logoLightUrl, '/\\')), public_path('img/logo-foco7-dark.png'));
+        }
+
+        // 4. Upload de Favicon com Drag & Drop
         if ($request->hasFile('favicon_upload')) {
             $file = $request->file('favicon_upload');
             $fileName = 'favicon_' . time() . '.' . $file->getClientOriginalExtension();
