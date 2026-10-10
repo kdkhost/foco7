@@ -47,22 +47,31 @@
     color: #ff4d4d;
 }
 
-/* Alternância Automática de Logotipo por Fundo / Tema (Claro vs Escuro) */
+/* Logotipo da Sidebar do Painel (Barra lateral com fundo escuro permanente) */
+.app-sidebar .brand-image,
+.sidebar-brand .brand-image {
+    display: inline-block !important;
+    max-height: 34px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Alternância Automática de Logotipo por Fundo / Tema (Claro vs Escuro) no Conteúdo Geral */
 [data-bs-theme="dark"] .logo-fundo-claro,
-body.dark-mode .logo-fundo-claro {
+body.dark-mode .app-content .logo-fundo-claro {
     display: none !important;
 }
 [data-bs-theme="dark"] .logo-fundo-escuro,
-body.dark-mode .logo-fundo-escuro {
+body.dark-mode .app-content .logo-fundo-escuro {
     display: inline-block !important;
 }
 
-[data-bs-theme="light"] .logo-fundo-escuro,
-body:not(.dark-mode) .logo-fundo-escuro {
+[data-bs-theme="light"] .app-content .logo-fundo-escuro,
+body:not(.dark-mode) .app-content .logo-fundo-escuro {
     display: none !important;
 }
-[data-bs-theme="light"] .logo-fundo-claro,
-body:not(.dark-mode) .logo-fundo-claro {
+[data-bs-theme="light"] .app-content .logo-fundo-claro,
+body:not(.dark-mode) .app-content .logo-fundo-claro {
     display: inline-block !important;
 }
 
