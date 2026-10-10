@@ -107,7 +107,7 @@
             : '#0b0f19';
         $heroBlur = (int)($configs['hero_bg_blur'] ?? 0);
     @endphp
-    <header class="hero-section" id="inicio" style="@if(!empty($heroBgImagem)) background-image: url('{{ $heroBgImagem }}'); background-size: cover; background-position: center right; background-repeat: no-repeat; @endif">
+    <header class="hero-section" id="inicio">
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="7000">
             <div class="carousel-inner">
                 @forelse($slides as $index => $slide)
