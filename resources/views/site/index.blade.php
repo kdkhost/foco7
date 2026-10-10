@@ -82,7 +82,7 @@
                         <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
                         <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
                         <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
-                        <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-wand-magic-sparkles text-danger me-1"></i>Estética</a></li>
+                        <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética</a></li>
                         <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
                         <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
@@ -152,7 +152,7 @@
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 <a href="#estetica" class="android-nav-item">
-                    <div class="android-item-icon text-danger"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <div class="android-item-icon text-danger"><i class="fas fa-spray-can-sparkles"></i></div>
                     <span class="android-item-text">Estética Automotiva</span>
                     <span class="badge bg-danger rounded-pill px-2 me-1" style="font-size: 0.65rem;">Novo</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
