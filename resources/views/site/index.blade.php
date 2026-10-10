@@ -35,68 +35,169 @@
 </head>
 <body id="inicio">
 
-    <!-- 1. TOPBAR FIXO DE CONTATO E ÁREA DO CLIENTE -->
-    <div class="foco-topbar d-none d-md-block">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-4">
-                <span><i class="fas fa-headset text-danger me-1"></i> {{ $configs['horario'] }}</span>
-                <span><i class="fas fa-phone-alt text-danger me-1"></i> {{ $configs['telefone'] }}</span>
-                <a href="https://wa.me/{{ $configs['whatsapp'] }}" target="_blank">
-                    <i class="fab fa-whatsapp text-success me-1"></i> {{ $configs['whatsapp_formatado'] }}
-                </a>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                @if(!empty($configs['instagram']))
-                    <a href="{{ $configs['instagram'] }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-                @endif
-                @if(!empty($configs['facebook']))
-                    <a href="{{ $configs['facebook'] }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                @endif
-                <a href="{{ route('login') }}" class="btn-cliente-topo">
-                    <i class="fas fa-user-lock me-1"></i> Área do Cliente / Painel
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. NAVBAR NAVEGAÇÃO SUAVE -->
-    <nav class="navbar navbar-expand-lg foco-navbar sticky-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
-                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="38" class="logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navFoco" aria-label="Menu de Navegação">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navFoco">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
-                    <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
-                    <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-sparkles text-danger me-1"></i>Estética</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-                </ul>
-                <div class="d-flex flex-column flex-lg-row gap-2 align-items-stretch align-items-lg-center mt-3 mt-lg-0">
-                    <button type="button" class="btn btn-sm btn-outline-danger d-none d-xl-inline-flex align-items-center gap-1" onclick="abrirModalAgendamentoSite()">
-                        <i class="fas fa-calendar-check"></i> Agendar
-                    </button>
-                    <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
-                        <i class="fas fa-user-lock"></i> Área do Cliente
+    <!-- 1. CABEÇALHO FIXO GLOBAL (TOPBAR + NAVBAR) -->
+    <header class="foco-header-fixed" id="focoHeader">
+        <!-- TOPBAR FIXO DE CONTATO E ÁREA DO CLIENTE -->
+        <div class="foco-topbar d-none d-md-block">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-4">
+                    <span><i class="fas fa-headset text-danger me-1"></i> {{ $configs['horario'] }}</span>
+                    <span><i class="fas fa-phone-alt text-danger me-1"></i> {{ $configs['telefone'] }}</span>
+                    <a href="https://wa.me/{{ $configs['whatsapp'] }}" target="_blank">
+                        <i class="fab fa-whatsapp text-success me-1"></i> {{ $configs['whatsapp_formatado'] }}
                     </a>
-                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2 text-center justify-content-center">
-                        <i class="fab fa-whatsapp"></i> Falar no WhatsApp
-                    </a>
-                    <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm d-lg-none text-center justify-content-center py-2">
-                        <i class="fas fa-lock me-1"></i> Entrar na Área do Cliente
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    @if(!empty($configs['instagram']))
+                        <a href="{{ $configs['instagram'] }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    @endif
+                    @if(!empty($configs['facebook']))
+                        <a href="{{ $configs['facebook'] }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    @endif
+                    <a href="{{ route('login') }}" class="btn-cliente-topo">
+                        <i class="fas fa-user-lock me-1"></i> Área do Cliente / Painel
                     </a>
                 </div>
             </div>
         </div>
-    </nav>
+
+        <!-- 2. NAVBAR NAVEGAÇÃO SUAVE -->
+        <nav class="navbar navbar-expand-lg foco-navbar">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
+                    <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="38" class="logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                </a>
+
+                <!-- BOTÃO HAMBÚRGUER ESTILO ANDROID (Aciona Gaveta da Esquerda para a Direita) -->
+                <button class="navbar-toggler d-lg-none btn-android-burger" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuDrawerAndroid" aria-controls="menuDrawerAndroid" aria-label="Abrir Menu">
+                    <span class="android-burger-box">
+                        <span class="android-burger-inner"></span>
+                    </span>
+                </button>
+
+                <!-- MENU HORIZONTAL DESKTOP (Apenas Telas Grandes >= 992px) -->
+                <div class="collapse navbar-collapse d-none d-lg-flex" id="navDesktopFoco">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                        <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
+                        <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-wand-magic-sparkles text-danger me-1"></i>Estética</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+                    </ul>
+                    <div class="d-flex flex-column flex-lg-row gap-2 align-items-stretch align-items-lg-center mt-3 mt-lg-0">
+                        <button type="button" class="btn btn-sm btn-outline-danger d-none d-xl-inline-flex align-items-center gap-1" onclick="abrirModalAgendamentoSite()">
+                            <i class="fas fa-calendar-check"></i> Agendar
+                        </button>
+                        <a href="{{ route('login') }}" class="btn-foco-login-nav d-none d-lg-inline-flex">
+                            <i class="fas fa-user-lock"></i> Área do Cliente
+                        </a>
+                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp btn-sm px-3 py-2 text-center justify-content-center">
+                            <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MENU GAVETA DESLIZANTE NATIVO ANDROID (DESLIZA DA ESQUERDA PARA A DIREITA) -->
+    <div class="offcanvas offcanvas-start foco-android-drawer" tabindex="-1" id="menuDrawerAndroid" aria-labelledby="menuDrawerLabel">
+        <!-- Cabeçalho do App Android -->
+        <div class="offcanvas-header android-drawer-header">
+            <div class="d-flex align-items-center gap-2">
+                <img src="{{ asset($configs['logo_dark'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="32" class="drawer-logo" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+            </div>
+            <button type="button" class="btn-android-close" data-bs-dismiss="offcanvas" aria-label="Fechar menu">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+
+        <!-- Cartão de Status do App Android -->
+        <div class="android-drawer-card-status">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="android-pulse-dot"></span>
+                    <span class="small fw-bold text-dark">Central 24 Horas Ativa</span>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1" style="font-size: 0.72rem;">Online</span>
+            </div>
+            <p class="small text-muted mb-0 mt-1" style="font-size: 0.75rem;">Rastreamento, Bloqueio Imediato & Estética</p>
+        </div>
+
+        <!-- Lista de Navegação Estilo Android (Gaveta Deslizante com Animações Suaves) -->
+        <div class="offcanvas-body android-drawer-body p-0">
+            <nav class="android-nav-list">
+                <a href="#inicio" class="android-nav-item active">
+                    <div class="android-item-icon"><i class="fas fa-house"></i></div>
+                    <span class="android-item-text">Início</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#riscos" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-shield-halved"></i></div>
+                    <span class="android-item-text">Benefícios & Proteção</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#sobre" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-building-circle-check"></i></div>
+                    <span class="android-item-text">Sobre a Foco 7</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#planos" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-tags"></i></div>
+                    <span class="android-item-text">Planos & Preços</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#estetica" class="android-nav-item">
+                    <div class="android-item-icon text-danger"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <span class="android-item-text">Estética Automotiva</span>
+                    <span class="badge bg-danger rounded-pill px-2 me-1" style="font-size: 0.65rem;">Novo</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#ronda" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-motorcycle"></i></div>
+                    <span class="android-item-text">Ronda Tática 24h</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#app" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-mobile-screen-button"></i></div>
+                    <span class="android-item-text">Aplicativo Foco 7</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#faq" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-circle-question"></i></div>
+                    <span class="android-item-text">Dúvidas Frequentes</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#contato" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-envelope-open-text"></i></div>
+                    <span class="android-item-text">Fale Conosco</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+            </nav>
+
+            <!-- Ações Rápidas no Rodapé da Gaveta Android -->
+            <div class="android-drawer-actions">
+                <button type="button" class="btn btn-outline-danger w-100 py-2 mb-2 d-flex align-items-center justify-content-center gap-2 fw-bold" onclick="abrirModalAgendamentoSite()">
+                    <i class="fas fa-calendar-check"></i> Agendar Atendimento
+                </button>
+                <a href="{{ route('login') }}" class="btn btn-dark w-100 py-2 mb-2 d-flex align-items-center justify-content-center gap-2 fw-bold">
+                    <i class="fas fa-user-lock"></i> Entrar na Área do Cliente
+                </a>
+                <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['whatsapp'] ?? '559180510736') }}?text=Ol%C3%A1,%20gostaria%20de%20proteger%20meu%20ve%C3%ADculo%20com%20a%20Foco%207!" target="_blank" class="btn-foco-whatsapp w-100 py-2 text-center justify-content-center fw-bold">
+                    <i class="fab fa-whatsapp"></i> Falar no WhatsApp 24h
+                </a>
+
+                <div class="android-drawer-info text-center mt-3 pt-2 border-top">
+                    <div class="small text-muted mb-1"><i class="fas fa-phone-alt me-1 text-danger"></i> {{ $configs['telefone'] }}</div>
+                    <div class="text-secondary" style="font-size: 0.72rem;">Central Operacional Belém / PA • Foco 7</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 3. HERO SECTION COM CARROSSEL DE ALTA CONVERSÃO & PELÍCULA CINEMATOGRÁFICA -->
     @php
@@ -1018,23 +1119,23 @@
         }
 
         $(function () {
-            // Controle dinâmico da navbar
-            var $navbar = $('.foco-navbar');
+            // Controle dinâmico do cabeçalho fixo (reduz topbar e adiciona elevação)
+            var $headerFoco = $('#focoHeader');
             $(window).on('scroll', function () {
-                if ($(this).scrollTop() > 30) {
-                    $navbar.addClass('scrolled');
+                if ($(this).scrollTop() > 25) {
+                    $headerFoco.addClass('scrolled');
                 } else {
-                    $navbar.removeClass('scrolled');
+                    $headerFoco.removeClass('scrolled');
                 }
             });
 
-            // Fechamento automático elegante do menu mobile ao clicar em itens/links
-            $('#navFoco a').on('click', function () {
-                if ($(window).width() < 992) {
-                    var collapseEl = document.getElementById('navFoco');
-                    if (collapseEl && collapseEl.classList.contains('show')) {
-                        var bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
-                        bsCollapse.hide();
+            // Fechamento automático suave do Drawer Android ao clicar em qualquer item
+            $('#menuDrawerAndroid .android-nav-item, #menuDrawerAndroid .btn-foco-whatsapp, #menuDrawerAndroid .btn-dark, #menuDrawerAndroid .btn-outline-danger').on('click', function () {
+                var drawerEl = document.getElementById('menuDrawerAndroid');
+                if (drawerEl) {
+                    var bsOffcanvas = bootstrap.Offcanvas.getInstance(drawerEl);
+                    if (bsOffcanvas) {
+                        bsOffcanvas.hide();
                     }
                 }
             });
