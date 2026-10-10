@@ -250,9 +250,20 @@ img, svg, video, canvas, audio, iframe, embed, object {
     outline: none !important;
     box-shadow: none !important;
     transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+}
+
+@media (min-width: 992px) {
+    .foco-navbar .navbar-toggler {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .foco-navbar .navbar-toggler {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .foco-navbar .navbar-toggler:hover {
