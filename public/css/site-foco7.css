@@ -1912,34 +1912,47 @@ img, svg, video, canvas, audio, iframe, embed, object {
 }
 
 /* ==========================================================================
-   BOTÃO HAMBÚRGUER ESTILO ANDROID
+   BOTÃO HAMBÚRGUER ESTILO ANDROID (Apenas Mobile e Tablets < 992px)
    ========================================================================== */
-.btn-android-burger {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1.5px solid rgba(217, 0, 0, 0.35) !important;
-    background: rgba(217, 0, 0, 0.06) !important;
-    border-radius: 10px;
-    color: var(--foco-red, #d90000) !important;
-    font-size: 1.25rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    outline: none !important;
-    cursor: pointer;
+@media (max-width: 991.98px) {
+    .btn-android-burger {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 1.5px solid rgba(217, 0, 0, 0.35) !important;
+        background: rgba(217, 0, 0, 0.06) !important;
+        border-radius: 10px;
+        color: var(--foco-red, #d90000) !important;
+        font-size: 1.25rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        outline: none !important;
+        cursor: pointer;
+    }
+
+    .btn-android-burger:hover,
+    .btn-android-burger:active,
+    .btn-android-burger:focus {
+        background: var(--foco-red, #d90000) !important;
+        color: #ffffff !important;
+        border-color: var(--foco-red, #d90000) !important;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(217, 0, 0, 0.3);
+    }
 }
 
-.btn-android-burger:hover,
-.btn-android-burger:active,
-.btn-android-burger:focus {
-    background: var(--foco-red, #d90000) !important;
-    color: #ffffff !important;
-    border-color: var(--foco-red, #d90000) !important;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(217, 0, 0, 0.3);
+@media (min-width: 992px) {
+    .btn-android-burger,
+    button.btn-android-burger,
+    #btnOpenMenuDrawer {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
 }
 
 /* ==========================================================================

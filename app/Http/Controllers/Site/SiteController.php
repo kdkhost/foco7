@@ -204,18 +204,24 @@ class SiteController extends Controller
      */
     public function privacidade()
     {
-        $titulo = CmsSetting::get('privacidade_titulo', 'Termos de Uso e Política de Privacidade de Dados');
-        $conteudo = CmsSetting::get('privacidade_conteudo', '');
+        $titulo = CmsSetting::get('privacidade_titulo', 'Termos de Uso e Política de Privacidade de Dados (LGPD)');
+        $conteudo = CmsSetting::get('privacidade_conteudo', '') ?: CmsSetting::get('politica_privacidade', '');
         $dataAtualizacao = CmsSetting::get('privacidade_atualizacao', date('d/m/Y'));
 
         $configs = [
-            'nome' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
+            'nome' => CmsSetting::get('site_nome', 'Foco 7 Rastreamento'),
+            'telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
+            'whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
+            'whatsapp_formatado' => CmsSetting::get('whatsapp_formatado', '(91) 8051-0736'),
+            'email' => CmsSetting::get('contato_email', 'contato@foco7.com.br'),
+            'horario' => CmsSetting::get('horario_atendimento') ?: CmsSetting::get('contato_horario', 'Central 24 Horas | Plantão de Emergência'),
+            'instagram' => CmsSetting::get('rede_instagram', ''),
+            'facebook' => CmsSetting::get('rede_facebook', ''),
             'logo' => CmsSetting::get('site_logo', '/img/logo-foco7.png'),
-            'logo_dark' => CmsSetting::get('site_logo_dark', '/img/logo-foco7-dark.png'),
+            'logo_dark' => CmsSetting::get('site_logo', '/img/logo-foco7-dark.png'),
             'favicon' => CmsSetting::get('site_favicon', '/img/favicon.png'),
-            'contato_email' => CmsSetting::get('contato_email', 'contato@foco7.com.br'),
-            'contato_telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
-            'contato_whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
+            'hero_bg_imagem' => CmsSetting::get('hero_bg_imagem', '/img/og-foco7.jpg'),
+            'politica_privacidade' => $conteudo,
             'endereco' => CmsSetting::get('endereco_cidade', 'Belém') . ' - ' . CmsSetting::get('endereco_estado', 'PA'),
         ];
 

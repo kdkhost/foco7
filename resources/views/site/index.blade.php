@@ -883,6 +883,7 @@
                         <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
                         <li class="mb-2"><a href="#app">Aplicativo</a></li>
                         <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
+                        <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos & LGPD</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-6">
@@ -903,7 +904,7 @@
                 </div>
             </div>
             <div class="border-top border-light-subtle mt-5 pt-4 text-center small text-secondary">
-                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados.
+                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade & Termos (LGPD)</a>
             </div>
         </div>
     </footer>
@@ -1259,7 +1260,7 @@
                 </div>
                 <p class="foco-lgpd-text">
                     {{ $configs['lgpd_texto'] ?? 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).' }}
-                    <a href="{{ route('site.privacidade') }}" target="_blank" class="ms-1">{{ $configs['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}</a>
+                    <a href="{{ route('site.privacidade') }}" class="ms-1">{{ $configs['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}</a>
                 </p>
             </div>
             <button type="button" class="foco-lgpd-btn" id="btnAceitarLgpd">
