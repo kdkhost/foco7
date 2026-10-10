@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ClientesController;
 use App\Http\Controllers\Admin\FaturasController;
 use App\Http\Controllers\Admin\EmailTemplatesController;
 use App\Http\Controllers\Admin\CronController;
+use App\Http\Controllers\Admin\NotificacoesController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
@@ -208,6 +209,17 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [ConfiguracoesController::class, 'index'])->name('admin.configuracoes.index');
         Route::post('/salvar', [ConfiguracoesController::class, 'salvar'])->name('admin.configuracoes.salvar');
         Route::post('/testar-smtp', [ConfiguracoesController::class, 'testarSmtp'])->name('admin.configuracoes.testar_smtp');
+    });
+
+    // Central de Notificações (Web Push, E-mails e Alertas em Tempo Real)
+    Route::prefix('notificacoes')->group(function () {
+        Route::get('/', [NotificacoesController::class, 'index'])->name('admin.notificacoes.index');
+        Route::get('/ultimas-ajax', [NotificacoesController::class, 'ultimasAjax'])->name('admin.notificacoes.ultimas_ajax');
+        Route::post('/marcar-todas', [NotificacoesController::class, 'marcarTodasLidas'])->name('admin.notificacoes.marcar_todas');
+        Route::post('/salvar-config', [NotificacoesController::class, 'salvarConfiguracoes'])->name('admin.notificacoes.salvar_config');
+        Route::post('/teste', [NotificacoesController::class, 'dispararTeste'])->name('admin.notificacoes.teste');
+        Route::post('/{notificacao}/lida', [NotificacoesController::class, 'marcarLida'])->name('admin.notificacoes.marcar_lida');
+        Route::delete('/{notificacao}', [NotificacoesController::class, 'excluir'])->name('admin.notificacoes.excluir');
     });
 });
 

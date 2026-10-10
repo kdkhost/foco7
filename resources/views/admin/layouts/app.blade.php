@@ -47,6 +47,32 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    @if(auth()->user()->role === 'admin')
+                    <!-- Central de Notificações com Sininho e Badges em Tempo Real -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link position-relative d-flex align-items-center justify-content-center p-2 text-body" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownSinoNotificacoes" title="Central de Notificações">
+                            <i class="fas fa-bell fs-5"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-notificacoes-count" style="display: none; font-size: 0.65rem;">
+                                0
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg p-0 border-0" style="width: 330px; max-width: 90vw;">
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light rounded-top">
+                                <span class="fw-bold small text-body"><i class="fas fa-bell text-danger me-1"></i> Notificações</span>
+                                <span class="badge bg-danger badge-notificacoes-count" style="display: none;">0 novas</span>
+                            </div>
+                            <div class="list-group list-group-flush" id="dropdownNotificacoesLista" style="max-height: 280px; overflow-y: auto;">
+                                <div class="p-3 text-center text-muted small">Carregando notificações...</div>
+                            </div>
+                            <div class="p-2 border-top text-center bg-light rounded-bottom">
+                                <a href="{{ route('admin.notificacoes.index') }}" class="small text-danger fw-semibold text-decoration-none">
+                                    Ver Todas as Notificações <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    @endif
+
                     <!-- Alternador Dark / Light Mode -->
                     <li class="nav-item">
                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" id="adminThemeToggle" title="Alternar Modo Escuro / Claro">
@@ -127,6 +153,16 @@
                                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>Dashboard</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.notificacoes.index') }}" class="nav-link {{ request()->routeIs('admin.notificacoes.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-bell text-danger"></i>
+                                    <p>
+                                        Notificações
+                                        <span class="badge bg-danger ms-auto badge-notificacoes-count" style="display: none;">0</span>
+                                    </p>
                                 </a>
                             </li>
 
@@ -376,6 +412,108 @@
             @endif
             @if(session('info'))
                 window.foco7Notify.info("{{ session('info') }}");
+            @endif
+
+            // SINTETIZADOR DE SOM DE ALERTA SUAVE (Web Audio API nativo)
+            function tocarSomNotificacao() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } catch (e) {}
+            }
+
+            // POLLING INTELIGENTE DA CENTRAL DE NOTIFICAÇÕES (Navbar, Badges e Web Push)
+            @if(auth()->user()->role === 'admin')
+            function sincronizarNotificacoesAdmin() {
+                $.ajax({
+                    url: '{{ route("admin.notificacoes.ultimas_ajax") }}',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (res) {
+                        if (!res.success) return;
+
+                        // Atualiza Badges
+                        const count = res.nao_lidas_count;
+                        $('.badge-notificacoes-count').text(count);
+                        if (count > 0) {
+                            $('.badge-notificacoes-count').show();
+                        } else {
+                            $('.badge-notificacoes-count').hide();
+                        }
+
+                        // Atualiza Dropdown do Sininho
+                        const $lista = $('#dropdownNotificacoesLista');
+                        if ($lista.length) {
+                            if (res.ultimas.length === 0) {
+                                $lista.html('<div class="p-3 text-center text-muted small"><i class="fas fa-check-circle text-success me-1"></i> Nenhuma notificação recente.</div>');
+                            } else {
+                                let html = '';
+                                res.ultimas.forEach(function (n) {
+                                    const bgClass = !n.lida ? 'bg-light bg-opacity-75' : '';
+                                    const dot = !n.lida ? '<span class="badge bg-danger rounded-pill" style="font-size:0.6rem;">Nova</span>' : '';
+                                    html += `
+                                        <a href="${n.link_acao || '{{ route("admin.notificacoes.index") }}'}" class="list-group-item list-group-item-action p-2 d-flex align-items-start gap-2 border-bottom ${bgClass}">
+                                            <div class="bg-${n.cor} bg-opacity-10 text-${n.cor} rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
+                                                <i class="${n.icone}" style="font-size: 0.85rem;"></i>
+                                            </div>
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span class="fw-semibold small text-truncate" style="max-width: 170px;">${n.titulo}</span>
+                                                    ${dot}
+                                                </div>
+                                                <p class="small text-secondary mb-1 text-truncate" style="font-size: 0.78rem;">${n.mensagem}</p>
+                                                <span class="text-muted" style="font-size: 0.7rem;"><i class="far fa-clock me-1"></i>${n.tempo_relativo}</span>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                $lista.html(html);
+                            }
+                        }
+
+                        // Se houver nova notificação recebida em tempo real
+                        if (res.nova_notificacao_push) {
+                            tocarSomNotificacao();
+                            toastr.info(res.nova_notificacao_push.mensagem, res.nova_notificacao_push.titulo, {
+                                timeOut: 8000,
+                                onclick: function () {
+                                    window.location.href = res.nova_notificacao_push.link_acao;
+                                }
+                            });
+
+                            // Notificação Push nativa no celular / computador
+                            if ("Notification" in window && Notification.permission === 'granted') {
+                                try {
+                                    const pushObj = new Notification(res.nova_notificacao_push.titulo, {
+                                        body: res.nova_notificacao_push.mensagem,
+                                        icon: res.nova_notificacao_push.icone,
+                                        tag: 'foco7-push-' + res.nova_notificacao_push.id,
+                                        data: { url: res.nova_notificacao_push.link_acao }
+                                    });
+                                    pushObj.onclick = function (e) {
+                                        e.preventDefault();
+                                        window.focus();
+                                        window.location.href = res.nova_notificacao_push.link_acao;
+                                    };
+                                } catch (err) {}
+                            }
+                        }
+                    }
+                });
+            }
+
+            sincronizarNotificacoesAdmin();
+            setInterval(sincronizarNotificacoesAdmin, 25000);
             @endif
         });
     </script>

@@ -188,6 +188,13 @@ public_html/
 - **Autenticação Obrigatória no Agendamento:** Visitantes anônimos são convidados a realizar login ou cadastro rápido em modal flutuante sem perder nenhum dado preenchido no agendamento.
 - **Seleção de Pagamento Flexível:** Opção no agendamento entre "Pagamento Online (PIX / Cartão)" e "Pagar no Local (Instalação / Presencial)", sincronizado com o banco de dados e visível no painel administrativo.
 
+### Módulo 15: Central de Notificações, Web Push no Celular & Alertas por E-mail
+- **Fluxo Unificado de Notificações:** Todas as mensagens do formulário de contato, solicitações de agendamento online e novos depoimentos com avaliação em estrelas são automaticamente encaminhados para a tabela `notificacoes`.
+- **Alertas por E-mail Transacional:** Disparo imediato com o `EmailTemplateService` e SMTP autenticado para o e-mail do administrador, com tabelas de detalhes e botões de ação direta.
+- **Web Push Notifications no Celular e Desktop:** Integração com a API de Notificações do navegador (`Notification API`), permitindo ao administrador autorizar o recebimento de alertas sonoros (sintetizador Web Audio API) e pop-ups nativos no celular mesmo em segundo plano.
+- **Sininho Dinâmico na Navbar:** Badge contador de não lidas com atualização em tempo real (*polling* inteligente a cada 25s), lista suspensa rápida e acesso com um clique.
+- **Painel Administrativo da Central (`/admin/notificacoes`):** Métricas consolidadas, filtros por categoria (Contatos, Agendamentos, Depoimentos, Sistema), marcação individual e em lote como lida, exclusão e botão de teste imediato de Push & E-mail.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -208,14 +215,15 @@ public_html/
 | **Módulo 12**| Auditoria de Fluxos: CSRF Webhooks, Retenção de Leads e Notificações Automáticas | ✅ Concluído & Validado |
 | **Módulo 13**| LGPD, Termos de Privacidade, Segurança Avançada e Recuperação de Senha | ✅ Concluído & Validado |
 | **Módulo 14**| WhatsApp Multicanal CMS, Estrelas Dinâmicas, Auth no Agendamento & Pagamento | ✅ Concluído & Validado |
+| **Módulo 15**| Central de Notificações, Web Push no Celular e E-mails Transacionais para o Admin | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **46 testes executados, 46 aprovados (100% de sucesso), 204 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
+- **53 testes executados, 53 aprovados (100% de sucesso), 227 asserções**.
+- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead e encaminhado à Central de Notificações, alertas push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
 
 ---
 

@@ -12,8 +12,10 @@ use App\Models\Depoimento;
 use App\Models\SeoConfig;
 use App\Models\Agendamento;
 use App\Models\ServicoEstetica;
+use App\Models\Notificacao;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SiteController extends Controller
 {
@@ -245,8 +247,7 @@ class SiteController extends Controller
             'mensagem.required' => 'Por favor, digite sua mensagem ou dúvida.',
         ]);
 
-        // Grava solicitação como lead no módulo de agendamentos para não perder contatos
-        Agendamento::create([
+        $lead = Agendamento::create([
             'categoria' => 'rastreamento',
             'cliente_nome' => $validated['nome'],
             'cliente_telefone' => $validated['telefone'],
@@ -260,6 +261,23 @@ class SiteController extends Controller
             'status' => 'pendente',
             'cor_calendario' => '#f59e0b',
         ]);
+
+        // Direciona para a Central de Notificações da Foco 7 com e-mail ao administrador e push
+        Notificacao::registrar(
+            tipo: 'contato',
+            titulo: 'Nova Mensagem de Contato do Site',
+            mensagem: "{$validated['nome']} ({$validated['telefone']}) enviou uma mensagem: \"" . Str::limit($validated['mensagem'], 110) . "\"",
+            linkAcao: route('admin.agendamentos.index'),
+            dados: [
+                'origem' => 'Formulário de Contato da Landing Page',
+                'cliente' => $validated['nome'],
+                'telefone' => $validated['telefone'],
+                'email' => $validated['email'] ?? 'Não informado',
+                'veiculo' => $validated['veiculo'] ?? 'Não informado',
+                'mensagem' => $validated['mensagem'],
+            ],
+            notificarEmail: true
+        );
 
         return response()->json([
             'success' => true,
@@ -296,6 +314,22 @@ class SiteController extends Controller
             'ordem' => 99,
             'ativo' => true,
         ]);
+
+        // Direciona para a Central de Notificações
+        Notificacao::registrar(
+            tipo: 'depoimento',
+            titulo: "Novo Depoimento ({$validated['estrelas']} Estrelas)",
+            mensagem: "{$validated['nome_cliente']} avaliou o serviço com {$validated['estrelas']} estrelas: \"" . Str::limit($validated['texto'], 110) . "\"",
+            linkAcao: route('admin.cms.index'),
+            dados: [
+                'origem' => 'Avaliação do Site Público',
+                'cliente' => $validated['nome_cliente'],
+                'estrelas' => $validated['estrelas'] . ' de 5 estrelas',
+                'veiculo' => $validated['veiculo'] ?? 'Não informado',
+                'depoimento' => $validated['texto'],
+            ],
+            notificarEmail: true
+        );
 
         return response()->json([
             'success' => true,
@@ -382,6 +416,27 @@ class SiteController extends Controller
         ]);
 
         $metodoDescricao = $tipoPagamento === 'online' ? 'com Pagamento Online' : 'com Pagamento no Local';
+
+        // Direciona para a Central de Notificações com alerta push e e-mail
+        Notificacao::registrar(
+            tipo: 'agendamento',
+            titulo: "Novo Agendamento: {$tipoServico}",
+            mensagem: "Cliente {$clienteNome} ({$clienteTelefone}) realizou agendamento para " . date('d/m/Y H:i', strtotime($dataHora)) . " ({$metodoDescricao}).",
+            linkAcao: route('admin.agendamentos.index'),
+            dados: [
+                'origem' => 'Agendamento Online da Landing Page',
+                'protocolo' => '#' . $agendamento->id,
+                'cliente' => $clienteNome,
+                'telefone' => $clienteTelefone,
+                'email' => $clienteEmail,
+                'servico' => $tipoServico,
+                'veiculo' => $validated['veiculo_modelo'],
+                'cidade' => $validated['cidade'],
+                'pagamento' => $tipoPagamento === 'online' ? 'Online (PIX / Cartão)' : 'Presencial (No Local)',
+                'data_hora' => date('d/m/Y H:i', strtotime($dataHora)),
+            ],
+            notificarEmail: true
+        );
 
         $msg = $categoria === 'estetica'
             ? "Solicitação de agendamento de Estética Automotiva ({$metodoDescricao}) confirmada com sucesso! Entraremos em contato via WhatsApp para finalizar a confirmação."
