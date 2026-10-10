@@ -31,7 +31,7 @@
     <div class="app-wrapper">
 
         <!-- NAVBAR SUPERIOR -->
-        <nav class="app-header navbar navbar-expand bg-body">
+        <nav class="app-header navbar navbar-expand bg-body sticky-top">
             <div class="container-fluid">
                 <ul class="navbar-nav">
                     <li class="nav-item">
