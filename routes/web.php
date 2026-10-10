@@ -38,6 +38,8 @@ Route::post('/agendar', [SiteController::class, 'agendar'])->name('site.agendar'
 Route::post('/depoimento/enviar', [SiteController::class, 'enviarDepoimento'])->name('site.depoimento.enviar');
 Route::get('/manutencao/bypass/{token}', [SiteController::class, 'bypassManutencao'])->name('site.manutencao.bypass');
 Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
+Route::get('/checkout/calcular-taxas', [CheckoutController::class, 'calcularTaxas'])->name('checkout.calcular_taxas');
+Route::get('/faturas/carne/{codigo}/pdf', [CheckoutController::class, 'downloadCarnePdf'])->name('faturas.carne.pdf');
 
 /*
 |--------------------------------------------------------------------------

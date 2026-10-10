@@ -190,6 +190,16 @@ class SiteController extends Controller
             'whatsapp_canal_5_num' => CmsSetting::get('whatsapp_canal_5_num', '559180510736'),
             'whatsapp_canal_5_msg' => CmsSetting::get('whatsapp_canal_5_msg', 'Olá! Preciso de auxílio com minha fatura/mensalidade Foco 7.'),
             'whatsapp_canal_5_icone' => CmsSetting::get('whatsapp_canal_5_icone', 'fa-file-invoice-dollar'),
+
+            // Configurações de Pagamento & Checkout Transparente Efí PRO / MP
+            'gateway_padrao' => CmsSetting::get('gateway_padrao', 'efi'),
+            'efi_aceita_pix' => CmsSetting::get('efi_aceita_pix', '1') == '1',
+            'efi_aceita_boleto' => CmsSetting::get('efi_aceita_boleto', '1') == '1',
+            'efi_aceita_cartao' => CmsSetting::get('efi_aceita_cartao', '1') == '1',
+            'efi_aceita_carne' => CmsSetting::get('efi_aceita_carne', '1') == '1',
+            'carne_max_parcelas' => (int) CmsSetting::get('carne_max_parcelas', '12'),
+            'repassar_taxas_cliente' => CmsSetting::get('repassar_taxas_cliente', '0') == '1',
+            'pix_desconto' => (float) CmsSetting::get('pix_desconto', '5'),
         ];
 
         return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'seo', 'configs'));

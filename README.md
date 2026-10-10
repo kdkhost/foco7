@@ -200,6 +200,13 @@ public_html/
 - **Alto Contraste e Legibilidade Perfeita em Alertas Amarelos (`alert-warning`):** Correção de contraste tanto no modo claro (fundo pastel âmbar suave com texto âmbar escuro `#78350f` e títulos em negrito) quanto no modo escuro (fundo âmbar translúcido com texto creme brilhante `#fef3c7`, títulos brancos e ícones dourados `#fbbf24`), eliminando o problema de texto escuro sobre fundo escuro no painel de Gateways e Perfil.
 - **Sincronização Dinâmica em Todas as Camadas:** O `AppServiceProvider` injeta variáveis CSS computadas (`--admin-primary`, `--bs-primary`, `--bs-primary-rgb`, `--foco-red`) nas áreas administrativa, do cliente e no site público, garantindo consistência total da marca.
 
+### Módulo 17: Checkout Transparente Efí Bank (Gerencianet), Emissão de Carnê em PDF & Repasse de Taxas
+- **Isolamento Absoluto do Mercado Pago:** O gateway Mercado Pago foi integralmente preservado em sua estrutura original sem qualquer interferência ou quebra de fluxo.
+- **Efí Bank Totalmente Funcional:** Suporte nativo à API oficial Efí Bank (Gerencianet) para PIX instantâneo com mTLS (certificado `.pem`) e fallback BACEN EMVCo com CRC16 válido, Boletos registrados com linha digitável e Cartão de crédito transparente.
+- **Emissão de Carnê de Mensalidades em PDF (A4):** Geração de carnês profissionais parcelados via `barryvdh/laravel-dompdf`, incluindo capa institucional, resumo geral de parcelas, canhotos destacáveis do sacado e ficha de compensação com QR Code Pix em cada lâmina.
+- **Repasse de Taxas Operacionais & Tarifas Bancárias:** Parametrização dinâmica no painel administrativo (`/admin/gateways`) para repassar custos ao cliente de forma transparente. Cálculo em tempo real no checkout via AJAX (`/checkout/calcular-taxas`) discriminando subtotal do plano, custos operacionais e desconto à vista.
+- **Área do Cliente com Acesso ao Carnê PDF:** Na tela de faturas do cliente (`/cliente/faturas`), parcelas vinculadas a carnês exibem selo distintivo e botão para download imediato do Carnê completo em PDF.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -222,14 +229,15 @@ public_html/
 | **Módulo 14**| WhatsApp Multicanal CMS, Estrelas Dinâmicas, Auth no Agendamento & Pagamento | ✅ Concluído & Validado |
 | **Módulo 15**| Central de Notificações, Web Push no Celular e E-mails Transacionais para o Admin | ✅ Concluído & Validado |
 | **Módulo 16**| Harmonização da Paleta Oficial CMS (`#d90000`) & Alto Contraste de Alertas Warning | ✅ Concluído & Validado |
+| **Módulo 17**| Checkout Transparente Efí Bank, Emissão de Carnê em PDF e Repasse de Taxas | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **54 testes executados, 54 aprovados (100% de sucesso), 234 asserções**.
-- Cobertura de rotas públicas, fluxo de agendamento online com autenticação obrigatória e tipo de pagamento, formulário de contato persistido como lead e encaminhado à Central de Notificações, alertas push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail automatizados, CRUD de estética, clientes e faturas, edição no CMS, sincronização da paleta visual oficial Foco 7, cabeçalhos de segurança HTTP, recuperação de senha, sanitização de acentuação/encoding UTF-8 e isolamento ACL (Administrador vs Cliente).
+- **57 testes executados, 57 aprovados (100% de sucesso), 256 asserções**.
+- Cobertura de rotas públicas, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
 

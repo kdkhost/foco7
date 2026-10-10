@@ -298,4 +298,95 @@ class GatewaysCarneEmailCronTest extends TestCase
         $execResponse->assertJson(['success' => true]);
         $execResponse->assertJsonStructure(['success', 'message', 'output', 'data_hora']);
     }
+
+    public function test_calcular_taxas_com_repasse_de_custos_ao_cliente(): void
+    {
+        CmsSetting::set('repassar_taxas_cliente', '1', 'financeiro');
+        CmsSetting::set('taxa_boleto_fixo', '3.50', 'financeiro');
+        CmsSetting::set('taxa_carne_parcela_fixo', '2.50', 'financeiro');
+
+        // Teste de cálculo de boleto
+        $resBoleto = $this->getJson("/checkout/calcular-taxas?plano_id={$this->plano->id}&metodo_pagamento=boleto");
+        $resBoleto->assertStatus(200);
+        $resBoleto->assertJson(['success' => true]);
+        $this->assertEquals(3.50, $resBoleto->json('taxas.taxa_repassada'));
+
+        // Teste de cálculo de carnê 12x (taxa repassada por parcela)
+        $resCarne = $this->getJson("/checkout/calcular-taxas?plano_id={$this->plano->id}&metodo_pagamento=carne&parcelas=12");
+        $resCarne->assertStatus(200);
+        $resCarne->assertJson(['success' => true]);
+        $this->assertEquals(2.50, $resCarne->json('taxas.taxa_repassada'));
+    }
+
+    public function test_checkout_transparente_efi_gerando_carne_parcelado_e_pdf(): void
+    {
+        $payload = [
+            'plano_id' => $this->plano->id,
+            'nome' => 'Marcos Vinicius',
+            'email' => 'marcos.vinicius@teste.com',
+            'telefone' => '(91) 98888-9999',
+            'cpf_cnpj' => '123.456.789-00',
+            'metodo_pagamento' => 'carne',
+            'parcelas' => 12,
+        ];
+
+        $response = $this->postJson('/checkout/gerar', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'metodo' => 'carne',
+        ]);
+        $response->assertJsonStructure([
+            'carne' => ['codigo', 'total_parcelas', 'valor_parcela', 'pdf_url']
+        ]);
+
+        $codigoCarne = $response->json('carne.codigo');
+        $this->assertNotEmpty($codigoCarne);
+
+        // Testa download do PDF do Carnê
+        $pdfResponse = $this->get("/faturas/carne/{$codigoCarne}/pdf");
+        $pdfResponse->assertStatus(200);
+        $this->assertEquals('application/pdf', $pdfResponse->headers->get('Content-Type'));
+    }
+
+    public function test_cliente_visualiza_faturas_e_link_carne_pdf(): void
+    {
+        // Cria uma fatura do tipo carnê para o cliente
+        $fatura = Fatura::create([
+            'user_id' => $this->cliente->id,
+            'plano_id' => $this->plano->id,
+            'codigo_fatura' => 'FAT-CARNE-01',
+            'descricao' => 'Parcela 1/12 Carnê',
+            'valor' => 92.40,
+            'valor_original' => 89.90,
+            'taxa_repassada' => 2.50,
+            'gateway' => 'efi',
+            'metodo_pagamento' => 'carne',
+            'codigo_carne' => 'CARNE-TESTE-99',
+            'numero_parcela' => 1,
+            'total_parcelas' => 12,
+            'status' => 'pendente',
+            'data_vencimento' => now()->addDays(10),
+        ]);
+
+        $response = $this->actingAs($this->cliente)->get('/cliente/faturas');
+        $response->assertStatus(200);
+        $response->assertSee('FAT-CARNE-01');
+        $response->assertSee('Carnê 1/12');
+        $response->assertSee('Carnê PDF');
+
+        // Detalhes da fatura via JSON
+        $detalhes = $this->actingAs($this->cliente)->getJson('/cliente/faturas/FAT-CARNE-01');
+        $detalhes->assertStatus(200);
+        $detalhes->assertJson([
+            'success' => true,
+            'fatura' => [
+                'is_carne' => true,
+                'codigo_carne' => 'CARNE-TESTE-99',
+                'numero_parcela' => 1,
+                'total_parcelas' => 12,
+            ]
+        ]);
+    }
 }

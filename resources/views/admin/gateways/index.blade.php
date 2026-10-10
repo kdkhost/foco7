@@ -24,6 +24,11 @@
                     <i class="fas fa-book text-success me-2"></i> Cobrança por Carnê
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="taxas-tab" data-bs-toggle="tab" data-bs-target="#tab-taxas" type="button" role="tab">
+                    <i class="fas fa-percentage text-primary me-2"></i> Gateway Padrão & Repasse de Taxas
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -555,6 +560,153 @@
                 </div>
             </div>
 
+            <!-- ===================================================================
+                 GUIA 4: GATEWAY PADRÃO & REPASSE DE TAXAS AO CLIENTE
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-taxas" role="tabpanel">
+                <form action="{{ route('admin.gateways.salvar') }}" method="POST" class="ajax-form">
+                    @csrf
+                    
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-primary"><i class="fas fa-percentage me-2"></i> Gateway Principal & Repasse de Taxas</h5>
+                            <p class="text-secondary small mb-0">Defina o provedor preferencial para o Checkout Transparente e configure o repasse de taxas operacionais aos clientes.</p>
+                        </div>
+                    </div>
+
+                    <!-- ESCOLHA DO GATEWAY PADRÃO -->
+                    <div class="card border mb-4 shadow-sm">
+                        <div class="card-header bg-body-tertiary py-3">
+                            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-crown text-warning me-2"></i> Gateway Padrão Ativo no Checkout Transparente</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="card h-100 p-3 border cursor-pointer {{ $configs['gateway_padrao'] === 'efi' ? 'border-primary bg-primary bg-opacity-10' : '' }}" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" name="gateway_padrao" value="efi" class="form-check-input me-3 mt-0" {{ $configs['gateway_padrao'] === 'efi' ? 'checked' : '' }}>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-warning"><i class="fas fa-bolt me-1"></i> Efí PRO (Gerencianet)</h6>
+                                                <p class="small text-muted mb-0">API Oficial BACEN para PIX instantâneo, Carnê em PDF de alta qualidade e Boletos com baixa taxa.</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="card h-100 p-3 border cursor-pointer {{ $configs['gateway_padrao'] === 'mercadopago' ? 'border-danger bg-danger bg-opacity-10' : '' }}" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" name="gateway_padrao" value="mercadopago" class="form-check-input me-3 mt-0" {{ $configs['gateway_padrao'] === 'mercadopago' ? 'checked' : '' }}>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-danger"><i class="fab fa-cc-mastercard me-1"></i> Mercado Pago</h6>
+                                                <p class="small text-muted mb-0">Gateway internacional Mercado Pago para Cartão de Crédito e PIX.</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD DE REPASSE DE TAXAS -->
+                    <div class="card border mb-4 shadow-sm">
+                        <div class="card-header bg-body-tertiary py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-receipt text-primary me-2"></i> Repasse de Taxas Operacionais ao Cliente</h6>
+                            <div class="form-check form-switch fs-5 mb-0">
+                                <input class="form-check-input" type="checkbox" name="repassar_taxas_cliente" id="repassar_taxas_cliente" value="1" {{ $configs['repassar_taxas_cliente'] ? 'checked' : '' }}>
+                                <label class="form-check-label fs-6 fw-bold text-dark" for="repassar_taxas_cliente">Ativar Repasse de Custos</label>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="alert alert-info border-info d-flex align-items-center mb-4">
+                                <i class="fas fa-info-circle fs-3 me-3 text-info"></i>
+                                <div class="small">
+                                    <strong>Como funciona o Repasse Transparente:</strong> Quando ativado, os custos operacionais e tarifas bancárias configuradas abaixo serão calculados em tempo real no checkout e somados ao total a pagar do cliente, discriminando claramente o subtotal e a taxa de emissão no carnê e faturas.
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <!-- PIX -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-qrcode text-success me-1"></i> Taxa do PIX</h6>
+                                        <p class="text-muted small mb-3">Defina se haverá tarifa operacional sobre pagamentos via PIX.</p>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Tipo de Taxa</label>
+                                                <select name="taxa_pix_tipo" class="form-select form-select-sm">
+                                                    <option value="percentual" {{ $configs['taxa_pix_tipo'] === 'percentual' ? 'selected' : '' }}>Percentual (%)</option>
+                                                    <option value="fixo" {{ $configs['taxa_pix_tipo'] === 'fixo' ? 'selected' : '' }}>Fixo (R$)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Valor da Taxa</label>
+                                                <input type="number" step="0.01" name="taxa_pix_valor" class="form-control form-control-sm" value="{{ $configs['taxa_pix_valor'] }}" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BOLETO BANCÁRIO -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-barcode text-primary me-1"></i> Taxa de Emissão de Boleto</h6>
+                                        <p class="text-muted small mb-3">Tarifa fixa por boleto bancário emitido repassada ao cliente.</p>
+                                        <label class="form-label small fw-bold">Valor Fixo por Boleto (R$)</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">R$</span>
+                                            <input type="number" step="0.01" name="taxa_boleto_fixo" class="form-control form-control-sm" value="{{ $configs['taxa_boleto_fixo'] }}" placeholder="2.99">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CARNÊ DE MENSALIDADES -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-book text-success me-1"></i> Taxa por Parcela do Carnê</h6>
+                                        <p class="text-muted small mb-3">Tarifa bancária por cada lâmina/parcela do carnê Efí PRO.</p>
+                                        <label class="form-label small fw-bold">Valor Fixo por Parcela (R$)</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">R$</span>
+                                            <input type="number" step="0.01" name="taxa_carne_parcela_fixo" class="form-control form-control-sm" value="{{ $configs['taxa_carne_parcela_fixo'] }}" placeholder="2.99">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CARTÃO DE CRÉDITO -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-credit-card text-danger me-1"></i> Taxa do Cartão de Crédito</h6>
+                                        <p class="text-muted small mb-3">Tarifa de processamento da operadora somada ao valor cobrado.</p>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Taxa (%)</label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.01" name="taxa_cartao_valor" class="form-control form-control-sm" value="{{ $configs['taxa_cartao_valor'] }}" placeholder="3.49">
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Fixo por Transação</label>
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text">R$</span>
+                                                    <input type="number" step="0.01" name="taxa_cartao_fixo" class="form-control form-control-sm" value="{{ $configs['taxa_cartao_fixo'] }}" placeholder="0.49">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Gateway Padrão & Repasse de Taxas
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
@@ -610,5 +762,53 @@
             window.foco7Notify.success('Copiado com sucesso para a área de transferência!');
         }
     }
+
+    // Emissão de Carnê via AJAX com SweetAlert2 e Botão de Download PDF
+    $(document).on('submit', '#formGerarCarne', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        var $form = $(this);
+        var $btn = $form.find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Gerando Carnê...');
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(res) {
+                $btn.prop('disabled', false).html(originalText);
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Carnê Emitido com Sucesso!',
+                        html: '<p class="text-muted mb-3">' + res.message + '</p>' +
+                              '<div class="p-3 bg-light rounded text-start small mb-3 border">' +
+                              '<strong>Código do Carnê:</strong> ' + res.codigo_carne + '<br>' +
+                              '<strong>Parcelamento:</strong> ' + res.total_parcelas + ' parcelas de ' + res.valor_parcela + '<br>' +
+                              '<strong>Plataforma:</strong> Efí PRO (Gerencianet)' +
+                              '</div>',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-file-pdf me-1"></i> Baixar Carnê em PDF',
+                        cancelButtonText: 'Fechar',
+                        confirmButtonColor: '#198754'
+                    }).then((result) => {
+                        if (result.isConfirmed && res.pdf_url) {
+                            window.open(res.pdf_url, '_blank');
+                        }
+                    });
+                    $form[0].reset();
+                } else {
+                    Swal.fire('Erro!', res.message || 'Erro ao gerar carnê.', 'error');
+                }
+            },
+            error: function(xhr) {
+                $btn.prop('disabled', false).html(originalText);
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao conectar com o servidor.';
+                Swal.fire('Atenção', msg, 'warning');
+            }
+        });
+    });
 </script>
 @endsection

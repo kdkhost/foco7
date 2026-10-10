@@ -925,68 +925,225 @@
 
     <!-- MODAL DE CHECKOUT TRANSPARENTE -->
     <div class="modal fade" id="modalCheckout" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content bg-white text-dark border-0 shadow-lg rounded-4">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold" style="color: var(--foco-title);"><i class="fas fa-shield-alt text-danger me-2"></i> Contratar Plano</h5>
+                <div class="modal-header border-bottom py-3">
+                    <h5 class="modal-title fw-bold" style="color: var(--foco-title);"><i class="fas fa-shield-alt text-danger me-2"></i> Contratar Plano & Ativação Imediata</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div id="checkoutStep1">
-                        <div class="p-3 rounded-3 mb-3 border" style="background: #f8fafc;">
-                            <span class="small text-secondary">Plano Selecionado:</span>
-                            <h5 class="fw-bold mb-0 text-danger" id="checkoutPlanoNome">Plano</h5>
-                            <span class="fw-bold text-dark fs-5" id="checkoutPlanoPreco">R$ 0,00</span>
+                        <!-- RESUMO DO PLANO -->
+                        <div class="p-3 rounded-3 mb-3 border bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="small text-secondary d-block">Plano Escolhido:</span>
+                                <h5 class="fw-bold mb-0 text-danger" id="checkoutPlanoNome">Plano</h5>
+                            </div>
+                            <div class="text-end">
+                                <span class="small text-secondary d-block">Mensalidade Base:</span>
+                                <span class="fw-bold text-dark fs-5" id="checkoutPlanoPreco">R$ 0,00</span>
+                            </div>
                         </div>
-                        <form id="formCheckout" action="{{ route('checkout.gerar') }}" method="POST" class="ajax-form">
+
+                        <form id="formCheckout" action="{{ route('checkout.gerar') }}" method="POST">
                             @csrf
                             <input type="hidden" name="plano_id" id="checkoutPlanoId">
-                            <div class="mb-3">
-                                <label class="form-label small text-secondary fw-semibold">Nome Completo *</label>
-                                <input type="text" name="nome" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small text-secondary fw-semibold">E-mail *</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
-                            <div class="row g-2 mb-3">
-                                <div class="col-6">
+                            <input type="hidden" name="parcelas" id="checkoutParcelasHidden" value="1">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-secondary fw-semibold">Nome Completo *</label>
+                                    <input type="text" name="nome" class="form-control" required placeholder="Seu nome completo">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-secondary fw-semibold">E-mail *</label>
+                                    <input type="email" name="email" class="form-control" required placeholder="seu@email.com">
+                                </div>
+                                <div class="col-md-6">
                                     <label class="form-label small text-secondary fw-semibold">WhatsApp *</label>
-                                    <input type="text" name="telefone" class="form-control mask-telefone" required>
+                                    <input type="text" name="telefone" class="form-control mask-telefone" required placeholder="(91) 99999-9999">
                                 </div>
-                                <div class="col-6">
+                                <div class="col-md-6">
                                     <label class="form-label small text-secondary fw-semibold">CPF ou CNPJ *</label>
-                                    <input type="text" name="cpf_cnpj" class="form-control mask-cpf-cnpj" required>
+                                    <input type="text" name="cpf_cnpj" class="form-control mask-cpf-cnpj" required placeholder="000.000.000-00">
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label small text-secondary fw-semibold">Forma de Pagamento *</label>
-                                <div class="d-flex gap-2">
-                                    <div class="form-check flex-fill p-2 border rounded bg-light">
-                                        <input class="form-check-input" type="radio" name="metodo_pagamento" id="metodoPix" value="pix" checked>
-                                        <label class="form-check-label small fw-bold" for="metodoPix"><i class="fab fa-pix text-success"></i> PIX Imediato</label>
+
+                            <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
+                            <div class="mb-3">
+                                <label class="form-label small text-secondary fw-semibold mb-2">Forma de Pagamento Preferencial *</label>
+                                <div class="row g-2" id="gridMetodosPagamento">
+                                    <!-- PIX -->
+                                    <div class="col-6 col-md-3">
+                                        <label class="card h-100 p-2 text-center border cursor-pointer metodo-card active" style="cursor: pointer;">
+                                            <input class="form-check-input d-none radio-metodo-pagamento" type="radio" name="metodo_pagamento" id="metodoPix" value="pix" checked>
+                                            <i class="fab fa-pix text-success fs-3 my-1"></i>
+                                            <span class="small fw-bold d-block text-dark">PIX Imediato</span>
+                                            <span class="badge bg-success-subtle text-success small mt-1">Liberação 24h</span>
+                                        </label>
                                     </div>
-                                    <div class="form-check flex-fill p-2 border rounded bg-light">
-                                        <input class="form-check-input" type="radio" name="metodo_pagamento" id="metodoCartao" value="cartao">
-                                        <label class="form-check-label small fw-bold" for="metodoCartao"><i class="fas fa-credit-card text-danger"></i> Cartão</label>
+
+                                    <!-- BOLETO BANCÁRIO -->
+                                    <div class="col-6 col-md-3">
+                                        <label class="card h-100 p-2 text-center border cursor-pointer metodo-card" style="cursor: pointer;">
+                                            <input class="form-check-input d-none radio-metodo-pagamento" type="radio" name="metodo_pagamento" id="metodoBoleto" value="boleto">
+                                            <i class="fas fa-barcode text-primary fs-3 my-1"></i>
+                                            <span class="small fw-bold d-block text-dark">Boleto Bancário</span>
+                                            <span class="badge bg-secondary-subtle text-secondary small mt-1">3 dias úteis</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- CARNÊ EFÍ -->
+                                    <div class="col-6 col-md-3">
+                                        <label class="card h-100 p-2 text-center border cursor-pointer metodo-card" style="cursor: pointer;">
+                                            <input class="form-check-input d-none radio-metodo-pagamento" type="radio" name="metodo_pagamento" id="metodoCarne" value="carne">
+                                            <i class="fas fa-book text-warning fs-3 my-1"></i>
+                                            <span class="small fw-bold d-block text-dark">Carnê em PDF</span>
+                                            <span class="badge bg-warning-subtle text-dark small mt-1">Até 12x s/ cartão</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- CARTÃO DE CRÉDITO -->
+                                    <div class="col-6 col-md-3">
+                                        <label class="card h-100 p-2 text-center border cursor-pointer metodo-card" style="cursor: pointer;">
+                                            <input class="form-check-input d-none radio-metodo-pagamento" type="radio" name="metodo_pagamento" id="metodoCartao" value="cartao">
+                                            <i class="fas fa-credit-card text-danger fs-3 my-1"></i>
+                                            <span class="small fw-bold d-block text-dark">Cartão de Crédito</span>
+                                            <span class="badge bg-danger-subtle text-danger small mt-1">Até 12x</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn-foco-primary w-100 py-3">
-                                <i class="fas fa-arrow-right me-1"></i> GERAR COBRANÇA & ATIVAR
+
+                            <!-- PARCELAMENTO DO CARNÊ -->
+                            <div id="boxCarneParcelas" class="mb-3 p-3 bg-light border rounded-3 d-none">
+                                <label class="form-label small fw-bold text-dark mb-1"><i class="fas fa-layer-group text-warning me-1"></i> Parcelamento do Carnê de Mensalidade</label>
+                                <select id="selectCarneParcelas" class="form-select form-select-sm">
+                                    <option value="2">2x parcelas mensais</option>
+                                    <option value="3">3x parcelas mensais</option>
+                                    <option value="6">6x parcelas mensais</option>
+                                    <option value="12" selected>12x parcelas anuais (Recomendado)</option>
+                                </select>
+                                <small class="text-muted mt-1 d-block">Será gerado um carnê em PDF de alta qualidade com QR Code Pix em cada lâmina para quitação.</small>
+                            </div>
+
+                            <!-- CAMPOS DO CARTÃO DE CRÉDITO -->
+                            <div id="boxCartaoCampos" class="mb-3 p-3 bg-light border rounded-3 d-none">
+                                <h6 class="fw-bold small text-danger mb-2"><i class="fas fa-lock me-1"></i> Dados Seguros do Cartão (Criptografia Efí Transparente)</h6>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label small text-secondary mb-1">Número do Cartão</label>
+                                        <input type="text" name="card_numero" id="cardNumero" class="form-control form-control-sm" placeholder="0000 0000 0000 0000" maxlength="19">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small text-secondary mb-1">Nome Impresso no Cartão</label>
+                                        <input type="text" name="card_titular" id="cardTitular" class="form-control form-control-sm" placeholder="NOME COMO NO CARTÃO">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary mb-1">Validade (MM/AA)</label>
+                                        <input type="text" name="card_expiracao" id="cardExpiracao" class="form-control form-control-sm" placeholder="MM/AA" maxlength="5">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary mb-1">Código CVV</label>
+                                        <input type="password" name="card_cvv" id="cardCvv" class="form-control form-control-sm" placeholder="123" maxlength="4">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small text-secondary mb-1">Parcelas no Cartão</label>
+                                        <select id="selectCartaoParcelas" class="form-select form-select-sm">
+                                            <option value="1" selected>1x à vista</option>
+                                            <option value="2">2x parcelas</option>
+                                            <option value="3">3x parcelas</option>
+                                            <option value="6">6x parcelas</option>
+                                            <option value="12">12x parcelas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RESUMO FINANCEIRO TRANSPARENTE DE VALORES & TAXAS REPASSADAS -->
+                            <div class="p-3 rounded-3 mb-4 border" style="background: #f1f5f9;">
+                                <div class="d-flex justify-content-between small text-secondary mb-1">
+                                    <span>Valor Original do Plano:</span>
+                                    <span id="resumoValorOriginal" class="fw-semibold">R$ 0,00</span>
+                                </div>
+                                <div id="linhaTaxaRepassada" class="d-flex justify-content-between small text-secondary mb-1 d-none">
+                                    <span>Taxa Bancária / Emissão Repassada:</span>
+                                    <span id="resumoTaxaRepassada" class="fw-semibold text-danger">+ R$ 0,00</span>
+                                </div>
+                                <div id="linhaDescontoPix" class="d-flex justify-content-between small text-secondary mb-1 d-none">
+                                    <span>Desconto PIX Especial:</span>
+                                    <span id="resumoDescontoPix" class="fw-semibold text-success">- R$ 0,00</span>
+                                </div>
+                                <hr class="my-2 border-secondary-subtle">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="text-dark">Total a Pagar:</strong>
+                                    <span id="resumoValorFinal" class="fs-4 fw-black text-danger">R$ 0,00</span>
+                                </div>
+                                <div id="resumoDetalhe" class="small text-muted mt-1 text-end"></div>
+                            </div>
+
+                            <button type="submit" id="btnSubmitCheckout" class="btn-foco-primary w-100 py-3 shadow-sm">
+                                <i class="fas fa-lock me-1"></i> FINALIZAR CONTRATAÇÃO & ATIVAR
                             </button>
                         </form>
                     </div>
 
-                    <div id="checkoutStep2" class="d-none text-center">
-                        <div class="alert alert-success py-2 mb-3">Cobrança PIX Gerada com Sucesso!</div>
-                        <img id="pixQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white mb-3 shadow-sm" style="max-width: 200px;">
-                        <p class="small text-secondary mb-2">Escaneie o QR Code no app do seu banco ou use a chave Copia e Cola:</p>
-                        <div class="input-group mb-3">
-                            <input type="text" id="pixCopiaCola" class="form-control bg-light small" readonly>
-                            <button class="btn btn-danger" type="button" id="btnCopiarPix">Copiar</button>
+                    <!-- STEP 2: RESULTADO DO CHECKOUT TRANSPARENTE -->
+                    <div id="checkoutStep2" class="d-none">
+                        <!-- SUCESSO PIX -->
+                        <div id="resPixBox" class="text-center d-none">
+                            <div class="alert alert-success py-2 mb-3"><i class="fas fa-check-circle me-1"></i> Cobrança PIX Gerada com Sucesso!</div>
+                            <img id="pixQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white mb-3 shadow-sm" style="max-width: 210px;">
+                            <p class="small text-secondary mb-2">Escaneie o QR Code no app do seu banco ou copie o código abaixo:</p>
+                            <div class="input-group mb-3">
+                                <input type="text" id="pixCopiaCola" class="form-control bg-light small font-monospace" readonly>
+                                <button class="btn btn-danger" type="button" id="btnCopiarPix"><i class="fas fa-copy me-1"></i> Copiar</button>
+                            </div>
                         </div>
-                        <div class="small text-secondary">Após a confirmação do pagamento, entraremos em contato para agendar sua instalação!</div>
+
+                        <!-- SUCESSO BOLETO -->
+                        <div id="resBoletoBox" class="text-start d-none">
+                            <div class="alert alert-success py-2 mb-3 text-center"><i class="fas fa-barcode me-1"></i> Boleto Bancário Emitido!</div>
+                            <div class="p-3 bg-light rounded border mb-3">
+                                <label class="small fw-bold text-secondary mb-1">Linha Digitável:</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" id="boletoLinhaDigitavel" class="form-control form-control-sm font-monospace bg-white" readonly>
+                                    <button class="btn btn-outline-secondary btn-sm" type="button" id="btnCopiarBoleto"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <div class="text-center">
+                                    <a href="#" id="btnAbrirBoleto" target="_blank" class="btn btn-primary btn-lg w-100 fw-bold">
+                                        <i class="fas fa-print me-1"></i> Imprimir / Visualizar Boleto Bancário
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUCESSO CARNÊ EM PDF -->
+                        <div id="resCarneBox" class="text-center d-none">
+                            <div class="alert alert-success py-2 mb-3"><i class="fas fa-book me-1"></i> Carnê Emitido com Sucesso!</div>
+                            <div class="p-4 bg-light rounded border mb-3 text-start">
+                                <h6 class="fw-bold text-success mb-2"><i class="fas fa-file-invoice-dollar me-2"></i> Carnê de Mensalidades Efí Bank</h6>
+                                <p class="small text-muted mb-2" id="resCarneInfo">Carnê com 12 parcelas mensais.</p>
+                                <div class="d-grid gap-2 mt-3">
+                                    <a href="#" id="btnBaixarCarnePdf" target="_blank" class="btn btn-success btn-lg fw-bold shadow-sm">
+                                        <i class="fas fa-file-pdf me-2"></i> BAIXAR CARNÊ COMPLETO EM PDF (A4)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUCESSO CARTÃO -->
+                        <div id="resCartaoBox" class="text-center d-none">
+                            <div class="alert alert-success py-3 mb-3">
+                                <i class="fas fa-check-circle fs-1 text-success d-block mb-2"></i>
+                                <h5 class="fw-bold mb-1">Pagamento com Cartão Aprovado!</h5>
+                                <p class="small mb-0">Sua contratação foi processada e confirmada instantaneamente.</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border small text-secondary text-center mt-3 mb-0">
+                            <i class="fas fa-headset text-danger me-1"></i> Nossa central entrará em contato via WhatsApp para o agendamento da instalação do seu rastreador.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1623,6 +1780,96 @@
                 });
             });
 
+            // ==========================================
+            // FLUXO DE CHECKOUT TRANSPARENTE EFÍ PRO
+            // ==========================================
+            function atualizarResumoTaxas() {
+                var planoId = $('#checkoutPlanoId').val();
+                if (!planoId) return;
+
+                var metodo = $('input[name="metodo_pagamento"]:checked').val() || 'pix';
+                var parcelas = 1;
+                if (metodo === 'carne') {
+                    parcelas = parseInt($('#selectCarneParcelas').val()) || 12;
+                    $('#checkoutParcelasHidden').val(parcelas);
+                } else if (metodo === 'cartao') {
+                    parcelas = parseInt($('#selectCartaoParcelas').val()) || 1;
+                    $('#checkoutParcelasHidden').val(parcelas);
+                } else {
+                    $('#checkoutParcelasHidden').val(1);
+                }
+
+                $.ajax({
+                    url: '{{ route("checkout.calcular_taxas") }}',
+                    type: 'GET',
+                    data: {
+                        plano_id: planoId,
+                        metodo_pagamento: metodo,
+                        parcelas: parcelas
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.success && res.taxas) {
+                            var t = res.taxas;
+                            $('#resumoValorOriginal').text(t.valor_original_formatado);
+
+                            if (t.taxa_repassada > 0) {
+                                $('#linhaTaxaRepassada').removeClass('d-none');
+                                $('#resumoTaxaRepassada').text('+ ' + t.taxa_repassada_formatada);
+                            } else {
+                                $('#linhaTaxaRepassada').addClass('d-none');
+                            }
+
+                            if (t.desconto > 0) {
+                                $('#linhaDescontoPix').removeClass('d-none');
+                                $('#resumoDescontoPix').text('- ' + t.desconto_formatado);
+                            } else {
+                                $('#linhaDescontoPix').addClass('d-none');
+                            }
+
+                            $('#resumoValorFinal').text(t.valor_final_formatado);
+                            $('#resumoDetalhe').text(t.detalhe || '');
+                        }
+                    }
+                });
+            }
+
+            // Seleção visual das formas de pagamento
+            $(document).on('click', '.metodo-card', function () {
+                var $card = $(this);
+                $('.metodo-card').removeClass('active');
+                $card.addClass('active');
+
+                var $radio = $card.find('.radio-metodo-pagamento');
+                $radio.prop('checked', true);
+                var metodo = $radio.val();
+
+                // Alternar campos contextuais
+                if (metodo === 'carne') {
+                    $('#boxCarneParcelas').removeClass('d-none');
+                    $('#boxCartaoCampos').addClass('d-none');
+                    $('#btnSubmitCheckout').html('<i class="fas fa-file-pdf me-1"></i> EMITIR CARNÊ EM PDF & ATIVAR');
+                } else if (metodo === 'cartao') {
+                    $('#boxCarneParcelas').addClass('d-none');
+                    $('#boxCartaoCampos').removeClass('d-none');
+                    $('#btnSubmitCheckout').html('<i class="fas fa-credit-card me-1"></i> PAGAR COM CARTÃO & ATIVAR');
+                } else if (metodo === 'boleto') {
+                    $('#boxCarneParcelas').addClass('d-none');
+                    $('#boxCartaoCampos').addClass('d-none');
+                    $('#btnSubmitCheckout').html('<i class="fas fa-barcode me-1"></i> GERAR BOLETO BANCÁRIO & ATIVAR');
+                } else {
+                    $('#boxCarneParcelas').addClass('d-none');
+                    $('#boxCartaoCampos').addClass('d-none');
+                    $('#btnSubmitCheckout').html('<i class="fab fa-pix me-1"></i> GERAR QR CODE PIX & ATIVAR');
+                }
+
+                atualizarResumoTaxas();
+            });
+
+            $('#selectCarneParcelas, #selectCartaoParcelas').on('change', function () {
+                atualizarResumoTaxas();
+            });
+
             // Modal de contratação de planos
             $('.btn-contratar').on('click', function () {
                 var id = $(this).data('plano-id');
@@ -1633,8 +1880,19 @@
                 $('#checkoutPlanoNome').text(nome);
                 $('#checkoutPlanoPreco').text(preco);
 
+                // Reset do estado do modal
                 $('#checkoutStep1').removeClass('d-none');
                 $('#checkoutStep2').addClass('d-none');
+                $('#resPixBox, #resBoletoBox, #resCarneBox, #resCartaoBox').addClass('d-none');
+
+                // Garante que o Pix esteja selecionado como padrão
+                $('#metodoPix').prop('checked', true);
+                $('.metodo-card').removeClass('active');
+                $('#metodoPix').closest('.metodo-card').addClass('active');
+                $('#boxCarneParcelas, #boxCartaoCampos').addClass('d-none');
+                $('#btnSubmitCheckout').html('<i class="fab fa-pix me-1"></i> GERAR QR CODE PIX & ATIVAR');
+
+                atualizarResumoTaxas();
 
                 var modal = new bootstrap.Modal(document.getElementById('modalCheckout'));
                 modal.show();
@@ -1644,10 +1902,10 @@
             $('#formCheckout').on('submit', function (e) {
                 e.preventDefault();
                 var $form = $(this);
-                var $btn = $form.find('[type="submit"]');
+                var $btn = $('#btnSubmitCheckout');
                 var orig = $btn.html();
 
-                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Gerando...');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processando Checkout Seguro...');
 
                 $.ajax({
                     url: $form.attr('action'),
@@ -1656,23 +1914,69 @@
                     dataType: 'json',
                     success: function (res) {
                         $btn.prop('disabled', false).html(orig);
-                        if (res.success && res.fatura) {
+                        if (res.success) {
                             window.foco7Notify.success(res.message);
-                            $('#pixQrImg').attr('src', res.fatura.qr_code_pix_url);
-                            $('#pixCopiaCola').val(res.fatura.qr_code_pix);
+
                             $('#checkoutStep1').addClass('d-none');
                             $('#checkoutStep2').removeClass('d-none');
+                            $('#resPixBox, #resBoletoBox, #resCarneBox, #resCartaoBox').addClass('d-none');
+
+                            if (res.metodo === 'pix' && res.fatura) {
+                                $('#resPixBox').removeClass('d-none');
+                                $('#pixQrImg').attr('src', res.fatura.qr_code_pix_url);
+                                $('#pixCopiaCola').val(res.fatura.qr_code_pix);
+                            } else if (res.metodo === 'boleto' && res.fatura) {
+                                $('#resBoletoBox').removeClass('d-none');
+                                $('#boletoLinhaDigitavel').val(res.fatura.linha_digitavel || '');
+                                $('#btnAbrirBoleto').attr('href', res.fatura.url_boleto || '#');
+                            } else if (res.metodo === 'carne' && res.carne) {
+                                $('#resCarneBox').removeClass('d-none');
+                                $('#resCarneInfo').text('Carnê (' + res.carne.codigo + ') com ' + res.carne.total_parcelas + ' parcelas de ' + res.carne.valor_parcela);
+                                $('#btnBaixarCarnePdf').attr('href', res.carne.pdf_url);
+                            } else if (res.metodo === 'cartao') {
+                                $('#resCartaoBox').removeClass('d-none');
+                            }
                         } else {
-                            window.foco7Notify.error(res.message || 'Erro ao gerar cobrança.');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atenção',
+                                text: res.message || 'Erro ao processar cobrança.'
+                            });
                         }
                     },
                     error: function (xhr) {
                         $btn.prop('disabled', false).html(orig);
                         var msg = 'Erro ao processar dados de cobrança.';
                         if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
-                        window.foco7Notify.error(msg);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Falha no Checkout',
+                            text: msg
+                        });
                     }
                 });
+            });
+
+            // Botão Copiar PIX
+            $('#btnCopiarPix').on('click', function () {
+                var copyText = document.getElementById("pixCopiaCola");
+                if (copyText) {
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(copyText.value);
+                    window.foco7Notify.success('Código PIX copiado com sucesso!');
+                }
+            });
+
+            // Botão Copiar Boleto
+            $('#btnCopiarBoleto').on('click', function () {
+                var copyText = document.getElementById("boletoLinhaDigitavel");
+                if (copyText) {
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(copyText.value);
+                    window.foco7Notify.success('Linha digitável copiada!');
+                }
             });
 
             // ==========================================

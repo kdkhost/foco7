@@ -2403,4 +2403,29 @@ img, svg, video, canvas, audio, iframe, embed, object {
     border-right-color: #0f121a;
 }
 
+/* ==============================================================================
+   CHECKOUT TRANSPARENTE EFÍ PRO - CARDS INTERATIVOS DE PAGAMENTO
+   ============================================================================== */
+.metodo-card {
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1.5px solid var(--foco-border);
+    user-select: none;
+}
+
+.metodo-card:hover {
+    border-color: var(--foco-red) !important;
+    background: #fff8f8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(217, 0, 0, 0.08);
+}
+
+.metodo-card.active {
+    border-color: var(--foco-red) !important;
+    background: #fff5f5 !important;
+    box-shadow: 0 0 0 3px rgba(217, 0, 0, 0.15), 0 4px 12px rgba(217, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
 

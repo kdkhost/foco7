@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Plano;
 use App\Models\Fatura;
 use App\Services\EmailTemplateService;
+use App\Services\EfiPaymentService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
@@ -23,6 +24,9 @@ class GatewaysController extends Controller
     public function index()
     {
         $configs = [
+            // Gateway Padrão Ativo
+            'gateway_padrao' => CmsSetting::get('gateway_padrao', 'efi'),
+
             // ==========================================
             // 1. MERCADO PAGO
             // ==========================================
@@ -79,6 +83,15 @@ class GatewaysController extends Controller
             'multa_atraso' => CmsSetting::get('multa_atraso', '2.0'),
             'juros_diario' => CmsSetting::get('juros_diario', '0.033'),
             'instrucoes_cobranca' => CmsSetting::get('instrucoes_cobranca', 'Não receber após 30 dias do vencimento. Sujeito a inclusão nos órgãos de proteção ao crédito.'),
+
+            // Parâmetros de Repasse de Taxas ao Cliente
+            'repassar_taxas_cliente' => CmsSetting::get('repassar_taxas_cliente', '0') == '1',
+            'taxa_pix_tipo' => CmsSetting::get('taxa_pix_tipo', 'percentual'),
+            'taxa_pix_valor' => CmsSetting::get('taxa_pix_valor', '0.00'),
+            'taxa_boleto_fixo' => CmsSetting::get('taxa_boleto_fixo', '2.99'),
+            'taxa_carne_parcela_fixo' => CmsSetting::get('taxa_carne_parcela_fixo', '2.99'),
+            'taxa_cartao_valor' => CmsSetting::get('taxa_cartao_valor', '3.49'),
+            'taxa_cartao_fixo' => CmsSetting::get('taxa_cartao_fixo', '0.49'),
 
             // ==========================================
             // 3. COBRANÇA POR CARNÊ (EFÍ PRO)
@@ -300,7 +313,19 @@ class GatewaysController extends Controller
         CmsSetting::set('efi_aceita_cartao', $request->boolean('efi_aceita_cartao') ? '1' : '0', 'gateways');
         CmsSetting::set('efi_aceita_carne', $request->boolean('efi_aceita_carne') ? '1' : '0', 'gateways');
 
-        // 3. REGRAS FINANCEIRAS
+        // 3. REGRAS FINANCEIRAS & REPASSE DE TAXAS
+        if ($request->has('gateway_padrao')) {
+            CmsSetting::set('gateway_padrao', $request->input('gateway_padrao', 'efi'), 'gateways');
+        }
+
+        CmsSetting::set('repassar_taxas_cliente', $request->boolean('repassar_taxas_cliente') ? '1' : '0', 'financeiro');
+        CmsSetting::set('taxa_pix_tipo', $request->input('taxa_pix_tipo', 'percentual'), 'financeiro');
+        CmsSetting::set('taxa_pix_valor', $request->input('taxa_pix_valor', '0.00'), 'financeiro');
+        CmsSetting::set('taxa_boleto_fixo', $request->input('taxa_boleto_fixo', '2.99'), 'financeiro');
+        CmsSetting::set('taxa_carne_parcela_fixo', $request->input('taxa_carne_parcela_fixo', '2.99'), 'financeiro');
+        CmsSetting::set('taxa_cartao_valor', $request->input('taxa_cartao_valor', '3.49'), 'financeiro');
+        CmsSetting::set('taxa_cartao_fixo', $request->input('taxa_cartao_fixo', '0.49'), 'financeiro');
+
         CmsSetting::set('pix_desconto', $request->input('pix_desconto', '0'), 'financeiro');
         CmsSetting::set('pix_expiracao_minutos', $request->input('pix_expiracao_minutos', '30'), 'financeiro');
         CmsSetting::set('cartao_max_parcelas', $request->input('cartao_max_parcelas', '12'), 'financeiro');
@@ -322,7 +347,7 @@ class GatewaysController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Configurações do Portal de Pagamentos salvas com sucesso!',
+            'message' => 'Configurações do Portal de Pagamentos e Repasse de Taxas salvas com sucesso!',
         ]);
     }
 
@@ -470,46 +495,30 @@ class GatewaysController extends Controller
             ], 422);
         }
 
-        $codigoCarne = 'CARNE-' . date('Ymd') . '-' . Str::upper(Str::random(6));
-        $faturasGeradas = [];
+        $plano = $planoId ? Plano::find($planoId) : null;
 
-        for ($i = 1; $i <= $numParcelas; $i++) {
-            $dataVenc = (clone $primeiroVenc)->addMonths($i - 1);
-            $codFatura = "{$codigoCarne}-" . str_pad($i, 2, '0', STR_PAD_LEFT);
+        $resultadoCarne = EfiPaymentService::criarCarne(
+            cliente: $cliente,
+            valorParcelaBase: $valorParcela,
+            totalParcelas: $numParcelas,
+            primeiroVencimento: $primeiroVenc,
+            descricao: $descricao,
+            plano: $plano
+        );
 
-            $fatura = Fatura::create([
-                'user_id' => $cliente->id,
-                'plano_id' => $planoId,
-                'codigo_fatura' => $codFatura,
-                'descricao' => "{$descricao} (Parcela {$i}/{$numParcelas})",
-                'valor' => $valorParcela,
-                'gateway' => 'efi',
-                'metodo_pagamento' => 'carne',
-                'status' => 'pendente',
-                'data_vencimento' => $dataVenc,
-            ]);
-
-            $faturasGeradas[] = $fatura;
-        }
-
-        // Se configurado, dispara e-mail do carnê
-        if (CmsSetting::get('carne_envio_email', '1') == '1' && !empty($cliente->email)) {
-            EmailTemplateService::enviar($cliente->email, 'carne_gerado', [
-                'cliente_nome' => $cliente->name,
-                'cliente_email' => $cliente->email,
-                'fatura_id' => $codigoCarne,
-                'plano_nome' => $descricao,
-                'valor' => 'R$ ' . number_format($valorParcela, 2, ',', '.') . ' (x' . $numParcelas . ')',
-                'data_vencimento' => $primeiroVenc->format('d/m/Y'),
-                'link_carne' => url("/cliente/faturas"),
-            ]);
+        $msg = "Carnê ({$resultadoCarne['codigo_carne']}) com {$numParcelas} parcelas de {$resultadoCarne['valor_parcela_formatado']} gerado com sucesso para {$cliente->name}!";
+        if ($resultadoCarne['repasse_ativo'] && $resultadoCarne['taxa_repassada_por_parcela'] > 0) {
+            $msg .= " (Taxa de emissão bancária de R$ " . number_format($resultadoCarne['taxa_repassada_por_parcela'], 2, ',', '.') . " repassada por parcela).";
         }
 
         return response()->json([
             'success' => true,
-            'message' => "Carnê ({$codigoCarne}) com {$numParcelas} parcelas gerado com sucesso para {$cliente->name}!",
-            'codigo_carne' => $codigoCarne,
+            'message' => $msg,
+            'codigo_carne' => $resultadoCarne['codigo_carne'],
             'total_parcelas' => $numParcelas,
+            'valor_parcela' => $resultadoCarne['valor_parcela_formatado'],
+            'pdf_url' => $resultadoCarne['pdf_url'],
+            'pdf_efi_url' => $resultadoCarne['pdf_efi_url'],
         ]);
     }
 

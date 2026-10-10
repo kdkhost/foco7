@@ -52,6 +52,14 @@ class ClienteFaturasController extends Controller
                 'qr_code_pix_url' => $fatura->qr_code_pix_url,
                 'linha_digitavel' => $fatura->linha_digitavel_boleto,
                 'url_boleto' => $fatura->url_boleto,
+                'is_carne' => $fatura->isCarne(),
+                'codigo_carne' => $fatura->codigo_carne,
+                'numero_parcela' => $fatura->numero_parcela,
+                'total_parcelas' => $fatura->total_parcelas,
+                'pdf_carne_url' => $fatura->isCarne() ? route('faturas.carne.pdf', $fatura->codigo_carne) : null,
+                'taxa_repassada' => (float) $fatura->taxa_repassada,
+                'taxa_repassada_formatada' => $fatura->taxa_repassada_formatada,
+                'valor_original_formatado' => $fatura->valor_original_formatada,
             ],
         ]);
     }
