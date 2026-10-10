@@ -500,5 +500,8 @@ class DatabaseSeeder extends Seeder
         foreach ($servicosEstetica as $serv) {
             ServicoEstetica::updateOrCreate(['slug' => $serv['slug']], $serv);
         }
+
+        // 11. Rotinas Oficiais da Central de Cron
+        $this->call(CronJobsSeeder::class);
     }
 }

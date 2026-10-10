@@ -176,6 +176,10 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [CronController::class, 'index'])->name('admin.cron.index');
         Route::get('/status', [CronController::class, 'status'])->name('admin.cron.status');
         Route::post('/executar', [CronController::class, 'executar'])->name('admin.cron.executar');
+        Route::post('/salvar', [CronController::class, 'store'])->name('admin.cron.store');
+        Route::put('/atualizar/{id}', [CronController::class, 'update'])->name('admin.cron.update');
+        Route::post('/toggle/{id}', [CronController::class, 'toggle'])->name('admin.cron.toggle');
+        Route::delete('/excluir/{id}', [CronController::class, 'destroy'])->name('admin.cron.destroy');
     });
 
     // Meu Perfil de Usuário

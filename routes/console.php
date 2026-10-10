@@ -15,6 +15,48 @@ Schedule::call(function () {
     \App\Models\CmsSetting::set('cron_heartbeat_datahora', date('d/m/Y H:i:s'), 'cron');
 })->everyMinute()->name('cron-heartbeat');
 
-Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
-Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
-Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+// Carregamento dinâmico de tarefas ativas cadastradas no banco de dados
+try {
+    if (\Illuminate\Support\Facades\Schema::hasTable('cron_jobs')) {
+        $jobs = \App\Models\CronJob::where('ativo', true)->get();
+        if ($jobs->isNotEmpty()) {
+            foreach ($jobs as $job) {
+                $expr = trim($job->expressao_cron ?: '* * * * *');
+                if ($job->tipo === 'url') {
+                    Schedule::call(function () use ($job) {
+                        try {
+                            $response = \Illuminate\Support\Facades\Http::timeout(15)->get($job->comando);
+                            $job->update([
+                                'ultima_execucao' => now(),
+                                'ultimo_status' => $response->successful() ? 'sucesso' : 'erro',
+                                'ultimo_output' => "Status HTTP {$response->status()}: " . substr($response->body(), 0, 500),
+                            ]);
+                        } catch (\Throwable $e) {
+                            $job->update([
+                                'ultima_execucao' => now(),
+                                'ultimo_status' => 'erro',
+                                'ultimo_output' => 'Falha na requisição URL: ' . $e->getMessage(),
+                            ]);
+                        }
+                    })->cron($expr)->name("cron-job-url-{$job->id}");
+                } else {
+                    Schedule::command($job->comando)
+                        ->cron($expr)
+                        ->name("cron-job-artisan-{$job->id}");
+                }
+            }
+        } else {
+            Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
+            Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
+            Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+        }
+    } else {
+        Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
+        Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
+        Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+    }
+} catch (\Throwable $e) {
+    Schedule::command('faturas:verificar-vencidas')->dailyAt('06:00')->name('faturas-verificar-vencidas');
+    Schedule::command('faturas:enviar-lembretes')->dailyAt('08:00')->name('faturas-enviar-lembretes');
+    Schedule::command('gateways:sincronizar-pagamentos')->everyFifteenMinutes()->name('gateways-sincronizar-pagamentos');
+}

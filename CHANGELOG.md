@@ -3,6 +3,31 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.7.0] - 2026-10-09
+
+### ⚙️ Gestão Dinâmica de Tarefas Cron, Cadastro Manual, 5 Rotinas Oficiais & Animações no Botão
+- **Crontab Principal Confirmado e Monitorado no cPanel:**
+  - Linha mestra `* * * * * cd /home/fococomb/public_html && /usr/local/bin/php artisan schedule:run >> /home/fococomb/public_html/storage/logs/cron.log 2>&1` ativa e monitorada por batimento cardíaco (*pulse dot* verde neon) a cada 60 segundos.
+- **Tabela e Model de Tarefas Cron Dinâmicas (`cron_jobs`):**
+  - Criação da migration `2026_10_09_000011_create_cron_jobs_table` e model `CronJob` para gerenciamento em banco de dados com suporte a comandos Artisan e requisições HTTP URL.
+  - Orquestração dinâmica em `routes/console.php`: qualquer tarefa ativa criada pelo administrador passa a ser executada automaticamente pelo agendador do Laravel de acordo com sua expressão cron.
+- **5 Rotinas Oficiais Pré-Cadastradas no Sistema:**
+  1. `Verificação de Faturas Vencidas` (`faturas:verificar-vencidas`): Diariamente às 06:00
+  2. `Lembrete Preventivo de Vencimento` (`faturas:enviar-lembretes`): Diariamente às 08:00
+  3. `Sincronização de Pagamentos dos Gateways` (`gateways:sincronizar-pagamentos`): A cada 15 minutos
+  4. `Limpeza e Manutenção do Sistema` (`sistema:limpeza-manutencao`): Diariamente às 03:00 (limpeza de tokens expirados e poda preventiva de logs)
+  5. `Lembrete de Agendamentos e Instalações` (`agendamentos:lembrete-dia`): Diariamente às 07:00 (lembrete de serviços de rastreamento e estética agendados para a data)
+- **Cadastro e Gestão Completa de Tarefas Personalizadas (CRUD):**
+  - Modal interativo para cadastro de novas tarefas manuais (`+ Cadastrar Outra Tarefa`) com seletor de frequências pré-definidas (a cada minuto, 5 min, 15 min, 30 min, 1 hora, diário, semanal ou expressão customizada).
+  - Suporte a edição de horários e exclusão de rotinas manuais com proteção contra remoção acidental de rotinas nativas de sistema.
+  - Switches em tempo real para ativar ou pausar qualquer tarefa via AJAX sem recarregar a página.
+- **Micro-Animações no Botão do Cron:**
+  - Efeito *shimmer* reflexivo com elevação suave (`transform: translateY(-2px)`).
+  - Ícone de play animado no hover (`animation: cronIconPulse`).
+  - Efeito radar com rotação contínua de engrenagem (`animation: cronSpin` e `cronRadarGlow`) durante a execução sob demanda com modal informativo SweetAlert2.
+
+---
+
 ## [1.6.9] - 2026-10-09
 
 ### ⏱️ Monitoramento em Tempo Real do Cron, Batimento Cardíaco (Heartbeat) & Registro Persistente

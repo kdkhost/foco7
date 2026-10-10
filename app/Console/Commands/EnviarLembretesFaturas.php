@@ -26,8 +26,15 @@ class EnviarLembretesFaturas extends Command
 
         $total = $faturas->count();
         if ($total === 0) {
-            $this->info("Nenhuma fatura localizada para a data informada.");
-            CmsSetting::set('cron_last_run_enviar_lembretes', date('d/m/Y H:i:s'), 'cron');
+            $msg = "Nenhuma fatura localizada para a data informada.";
+            $this->info($msg);
+            $agora = now();
+            CmsSetting::set('cron_last_run_enviar_lembretes', $agora->format('d/m/Y H:i:s'), 'cron');
+            \App\Models\CronJob::where('comando', 'faturas:enviar-lembretes')->update([
+                'ultima_execucao' => $agora,
+                'ultimo_status' => 'sucesso',
+                'ultimo_output' => $msg,
+            ]);
             return Command::SUCCESS;
         }
 
@@ -50,8 +57,15 @@ class EnviarLembretesFaturas extends Command
             }
         }
 
-        $this->info("Concluído: {$enviados} lembrete(s) preventivo(s) enviado(s) aos clientes.");
-        CmsSetting::set('cron_last_run_enviar_lembretes', date('d/m/Y H:i:s'), 'cron');
+        $msg = "Concluído: {$enviados} lembrete(s) preventivo(s) enviado(s) aos clientes.";
+        $this->info($msg);
+        $agora = now();
+        CmsSetting::set('cron_last_run_enviar_lembretes', $agora->format('d/m/Y H:i:s'), 'cron');
+        \App\Models\CronJob::where('comando', 'faturas:enviar-lembretes')->update([
+            'ultima_execucao' => $agora,
+            'ultimo_status' => 'sucesso',
+            'ultimo_output' => $msg,
+        ]);
         return Command::SUCCESS;
     }
 }

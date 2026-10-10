@@ -24,8 +24,15 @@ class VerificarFaturasVencidas extends Command
 
         $total = $faturas->count();
         if ($total === 0) {
-            $this->info("Nenhuma fatura vencida pendente de processamento.");
-            CmsSetting::set('cron_last_run_verificar_vencidas', date('d/m/Y H:i:s'), 'cron');
+            $msg = "Nenhuma fatura vencida pendente de processamento.";
+            $this->info($msg);
+            $agora = now();
+            CmsSetting::set('cron_last_run_verificar_vencidas', $agora->format('d/m/Y H:i:s'), 'cron');
+            \App\Models\CronJob::where('comando', 'faturas:verificar-vencidas')->update([
+                'ultima_execucao' => $agora,
+                'ultimo_status' => 'sucesso',
+                'ultimo_output' => $msg,
+            ]);
             return Command::SUCCESS;
         }
 
@@ -48,8 +55,15 @@ class VerificarFaturasVencidas extends Command
             }
         }
 
-        $this->info("Concluído: {$processadas} fatura(s) atualizada(s) para status 'vencida'.");
-        CmsSetting::set('cron_last_run_verificar_vencidas', date('d/m/Y H:i:s'), 'cron');
+        $msg = "Concluído: {$processadas} fatura(s) atualizada(s) para status 'vencida'.";
+        $this->info($msg);
+        $agora = now();
+        CmsSetting::set('cron_last_run_verificar_vencidas', $agora->format('d/m/Y H:i:s'), 'cron');
+        \App\Models\CronJob::where('comando', 'faturas:verificar-vencidas')->update([
+            'ultima_execucao' => $agora,
+            'ultimo_status' => 'sucesso',
+            'ultimo_output' => $msg,
+        ]);
         return Command::SUCCESS;
     }
 }

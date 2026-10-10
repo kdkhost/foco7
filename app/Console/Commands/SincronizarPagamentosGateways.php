@@ -25,8 +25,15 @@ class SincronizarPagamentosGateways extends Command
 
         $total = $faturas->count();
         if ($total === 0) {
-            $this->info("Nenhuma fatura pendente com ID de transação para sincronizar no momento.");
-            CmsSetting::set('cron_last_run_sincronizar_pagamentos', date('d/m/Y H:i:s'), 'cron');
+            $msg = "Nenhuma fatura pendente com ID de transação para sincronizar no momento.";
+            $this->info($msg);
+            $agora = now();
+            CmsSetting::set('cron_last_run_sincronizar_pagamentos', $agora->format('d/m/Y H:i:s'), 'cron');
+            \App\Models\CronJob::where('comando', 'gateways:sincronizar-pagamentos')->update([
+                'ultima_execucao' => $agora,
+                'ultimo_status' => 'sucesso',
+                'ultimo_output' => $msg,
+            ]);
             return Command::SUCCESS;
         }
 
@@ -75,8 +82,15 @@ class SincronizarPagamentosGateways extends Command
             }
         }
 
-        $this->info("Sincronização finalizada: {$baixadas} de {$total} fatura(s) compensada(s).");
-        CmsSetting::set('cron_last_run_sincronizar_pagamentos', date('d/m/Y H:i:s'), 'cron');
+        $msg = "Sincronização finalizada: {$baixadas} de {$total} fatura(s) compensada(s).";
+        $this->info($msg);
+        $agora = now();
+        CmsSetting::set('cron_last_run_sincronizar_pagamentos', $agora->format('d/m/Y H:i:s'), 'cron');
+        \App\Models\CronJob::where('comando', 'gateways:sincronizar-pagamentos')->update([
+            'ultima_execucao' => $agora,
+            'ultimo_status' => 'sucesso',
+            'ultimo_output' => $msg,
+        ]);
         return Command::SUCCESS;
     }
 }
