@@ -26,6 +26,7 @@ class SincronizarPagamentosGateways extends Command
         $total = $faturas->count();
         if ($total === 0) {
             $this->info("Nenhuma fatura pendente com ID de transação para sincronizar no momento.");
+            CmsSetting::set('cron_last_run_sincronizar_pagamentos', date('d/m/Y H:i:s'), 'cron');
             return Command::SUCCESS;
         }
 
@@ -75,6 +76,7 @@ class SincronizarPagamentosGateways extends Command
         }
 
         $this->info("Sincronização finalizada: {$baixadas} de {$total} fatura(s) compensada(s).");
+        CmsSetting::set('cron_last_run_sincronizar_pagamentos', date('d/m/Y H:i:s'), 'cron');
         return Command::SUCCESS;
     }
 }

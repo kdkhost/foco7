@@ -3,6 +3,25 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.6.9] - 2026-10-09
+
+### ⏱️ Monitoramento em Tempo Real do Cron, Batimento Cardíaco (Heartbeat) & Registro Persistente
+- **Batimento Cardíaco a Cada Minuto (`routes/console.php`):**
+  - Implementação da rotina `cron-heartbeat` disparada a cada 60 segundos pelo agendador do Laravel no cPanel, atualizando continuamente o timestamp de atividade do servidor.
+- **Monitoramento em Tempo Real no Painel (`/admin/cron`):**
+  - **Status Visual do Agendador:** Card com indicador pulsante (*pulse dot*) verde neon, status de integridade (*Ativo & Operacional*), temporizador do último pulso e sincronização contínua via AJAX sem recarregamento de página.
+  - **Console Terminal de Logs (`storage/logs/cron.log`):** Visualizador incorporado em tema escuro exibindo as últimas saídas do `php artisan schedule:run` com botão de recarga instantânea.
+- **Registro Persistente de Execução nos Comandos Artisan:**
+  - `VerificarFaturasVencidas` (`faturas:verificar-vencidas`): Grava o horário da última execução no banco de dados (`cms_settings`).
+  - `EnviarLembretesFaturas` (`faturas:enviar-lembretes`): Grava o horário da última execução no banco de dados.
+  - `SincronizarPagamentosGateways` (`gateways:sincronizar-pagamentos`): Grava o horário da última execução no banco de dados.
+  - Exibição de checkmark verde e data/hora oficial em todas as rotinas após execução automática ou manual.
+- **Sincronização de Horários e Endpoints AJAX:**
+  - Alinhamento dos horários agendados em `routes/console.php` (`06:00` e `08:00`) com as frequências descritas na interface.
+  - Nova rota `/admin/cron/status` para consumo de status e logs via AJAX.
+
+---
+
 ## [1.6.8] - 2026-10-09
 
 ### ✉️ Botões Fluidos em E-mails, Páginas Dedicadas de Templates, Central de Cron, SMTP Exclusivo e Harmonização Dark/Light

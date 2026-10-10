@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Fatura;
+use App\Models\CmsSetting;
 use App\Services\EmailTemplateService;
 
 class VerificarFaturasVencidas extends Command
@@ -24,6 +25,7 @@ class VerificarFaturasVencidas extends Command
         $total = $faturas->count();
         if ($total === 0) {
             $this->info("Nenhuma fatura vencida pendente de processamento.");
+            CmsSetting::set('cron_last_run_verificar_vencidas', date('d/m/Y H:i:s'), 'cron');
             return Command::SUCCESS;
         }
 
@@ -47,6 +49,7 @@ class VerificarFaturasVencidas extends Command
         }
 
         $this->info("Concluído: {$processadas} fatura(s) atualizada(s) para status 'vencida'.");
+        CmsSetting::set('cron_last_run_verificar_vencidas', date('d/m/Y H:i:s'), 'cron');
         return Command::SUCCESS;
     }
 }

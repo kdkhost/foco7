@@ -174,6 +174,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     // Central de Cron Jobs & Automação do Agendador
     Route::prefix('cron')->group(function () {
         Route::get('/', [CronController::class, 'index'])->name('admin.cron.index');
+        Route::get('/status', [CronController::class, 'status'])->name('admin.cron.status');
         Route::post('/executar', [CronController::class, 'executar'])->name('admin.cron.executar');
     });
 

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Fatura;
+use App\Models\CmsSetting;
 use App\Services\EmailTemplateService;
 
 class EnviarLembretesFaturas extends Command
@@ -26,6 +27,7 @@ class EnviarLembretesFaturas extends Command
         $total = $faturas->count();
         if ($total === 0) {
             $this->info("Nenhuma fatura localizada para a data informada.");
+            CmsSetting::set('cron_last_run_enviar_lembretes', date('d/m/Y H:i:s'), 'cron');
             return Command::SUCCESS;
         }
 
@@ -49,6 +51,7 @@ class EnviarLembretesFaturas extends Command
         }
 
         $this->info("Concluído: {$enviados} lembrete(s) preventivo(s) enviado(s) aos clientes.");
+        CmsSetting::set('cron_last_run_enviar_lembretes', date('d/m/Y H:i:s'), 'cron');
         return Command::SUCCESS;
     }
 }

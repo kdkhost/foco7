@@ -2,31 +2,108 @@
 
 @section('title', 'Central de Cron Jobs & Automação')
 @section('page_title', 'Central de Tarefas Cron')
-@section('page_description', 'Acompanhe as rotinas agendadas no servidor cPanel e execute tarefas sob demanda.')
+@section('page_description', 'Acompanhe as rotinas agendadas no servidor cPanel e execute tarefas sob demanda com monitoramento em tempo real.')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-    <div>
-        <p class="text-secondary small mb-0">
-            <i class="fas fa-check-circle text-success me-1"></i> A linha única de agendamento está instalada e ativa no crontab do servidor cPanel.
-        </p>
+<style>
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        background-color: #198754;
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+        animation: pulseAnimation 2s infinite;
+    }
+    .pulse-dot-amber {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        background-color: #ffc107;
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        animation: pulseAnimationAmber 2s infinite;
+    }
+    @keyframes pulseAnimation {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(25, 135, 84, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    }
+    @keyframes pulseAnimationAmber {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    }
+    .terminal-container {
+        background-color: #121212;
+        color: #00ff66;
+        font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 13px;
+        border-radius: 8px;
+        padding: 16px;
+        max-height: 280px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        border: 1px solid #2d2d2d;
+    }
+</style>
+
+<!-- STATUS HEADER / HEARTBEAT CARD -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-lg-8">
+        <div class="card border shadow-sm h-100">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 rounded-circle bg-light border d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i id="heartbeatIcon" class="fas fa-heartbeat fs-3 {{ $cronAtivo ? 'text-danger' : 'text-secondary' }}"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span id="heartbeatDot" class="{{ $cronAtivo ? 'pulse-dot' : 'pulse-dot-amber' }}"></span>
+                            <strong id="heartbeatTitle" class="fs-6 text-body">
+                                {{ $cronAtivo ? 'Agendador cPanel: Ativo & Operacional' : 'Agendador cPanel: Aguardando Próximo Pulso' }}
+                            </strong>
+                        </div>
+                        <div class="text-secondary small">
+                            <span>Último pulso do servidor: </span>
+                            <strong id="heartbeatDate" class="text-body font-monospace">{{ $ultimoBatimento }}</strong>
+                            <span id="heartbeatAgo" class="badge {{ $cronAtivo ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} ms-1">
+                                {{ $cronAtivo ? 'Pulsação contínua (1m)' : 'Aguardando' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="atualizarStatusCron(true)">
+                        <i class="fas fa-sync-alt me-1" id="iconSync"></i> Atualizar Status
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <span class="badge bg-info-subtle text-info border border-info-subtle p-2">
-            <i class="fas fa-server me-1"></i> Horário do Servidor: {{ date('d/m/Y H:i:s') }}
-        </span>
+
+    <div class="col-12 col-lg-4">
+        <div class="card border shadow-sm h-100">
+            <div class="card-body p-3 d-flex flex-column justify-content-center">
+                <span class="text-secondary small mb-1"><i class="fas fa-clock me-1"></i> Horário Atual do Servidor</span>
+                <h5 id="serverTime" class="mb-0 fw-bold text-body font-monospace">{{ date('d/m/Y H:i:s') }}</h5>
+                <small class="text-secondary mt-1">Sincronizado com o agendador Laravel</small>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- COMANDO OFICIAL PARA CPANEL (LINHA ÚNICA) -->
 <div class="card border shadow-sm mb-4">
-    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span class="fw-bold"><i class="fas fa-terminal text-warning me-2"></i> Linha Única do Agendador (Instalada na Hospedagem cPanel)</span>
-        <span class="badge bg-success">EXECUTANDO A CADA MINUTO (* * * * *)</span>
+        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> EXECUTANDO A CADA MINUTO (* * * * *)</span>
     </div>
     <div class="card-body p-4 bg-body-tertiary">
         <p class="small text-secondary mb-2">
-            O Laravel gerencia todas as rotinas internas através de um único ponto de entrada disparado a cada minuto pelo cPanel:
+            O Laravel gerencia automaticamente todas as tarefas internas e horários através de um único comando disparado a cada minuto pelo cPanel:
         </p>
         <div class="input-group">
             <input type="text" class="form-control font-monospace bg-dark text-white border-0 py-2 fs-6" id="cronCmdLinha" value="{{ $comandoCpanel }}" readonly>
@@ -38,9 +115,10 @@
 </div>
 
 <!-- ROTINAS AGENDADAS COM DISPARO SOB DEMANDA -->
-<div class="card border shadow-sm">
-    <div class="card-header bg-transparent py-3 border-bottom">
+<div class="card border shadow-sm mb-4">
+    <div class="card-header bg-transparent py-3 border-bottom d-flex justify-content-between align-items-center">
         <h6 class="fw-bold mb-0 text-body"><i class="fas fa-tasks text-danger me-2"></i> Rotinas Agendadas do Sistema Foco 7</h6>
+        <span class="text-secondary small"><i class="fas fa-info-circle me-1"></i> Executadas automaticamente conforme a frequência</span>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -71,7 +149,7 @@
                             @if($rotina['ultima_execucao'] !== 'Nunca executado')
                                 <i class="fas fa-check text-success me-1"></i> {{ $rotina['ultima_execucao'] }}
                             @else
-                                <span class="text-muted">Nunca executado</span>
+                                <span class="text-muted"><i class="fas fa-hourglass-start me-1"></i> Aguardando horário programado</span>
                             @endif
                         </span>
                     </td>
@@ -84,6 +162,24 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- CONSOLE DE LOGS EM TEMPO REAL -->
+<div class="card border shadow-sm">
+    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-file-alt text-info"></i>
+            <span class="fw-bold">Histórico de Saída do Agendador (storage/logs/cron.log)</span>
+        </div>
+        <div>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="atualizarStatusCron(true)">
+                <i class="fas fa-sync-alt me-1"></i> Recarregar Logs
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-3 bg-dark">
+        <div class="terminal-container" id="terminalLog">{{ $logRecente ?: 'Aguardando primeiro registro de log no arquivo storage/logs/cron.log...' }}</div>
     </div>
 </div>
 @endsection
@@ -99,8 +195,75 @@
         }
     }
 
+    function atualizarStatusCron(mostrarNotificacao = false) {
+        var $btnIcon = $('#iconSync');
+        $btnIcon.addClass('fa-spin');
+
+        $.ajax({
+            url: '{{ route("admin.cron.status") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                if (res.success) {
+                    if (res.cron_ativo) {
+                        $('#heartbeatDot').attr('class', 'pulse-dot');
+                        $('#heartbeatIcon').attr('class', 'fas fa-heartbeat fs-3 text-danger');
+                        $('#heartbeatTitle').text('Agendador cPanel: Ativo & Operacional');
+                        $('#heartbeatAgo').attr('class', 'badge bg-success-subtle text-success ms-1').text('Pulsação contínua (1m)');
+                    } else {
+                        $('#heartbeatDot').attr('class', 'pulse-dot-amber');
+                        $('#heartbeatIcon').attr('class', 'fas fa-heartbeat fs-3 text-secondary');
+                        $('#heartbeatTitle').text('Agendador cPanel: Aguardando Próximo Pulso');
+                        $('#heartbeatAgo').attr('class', 'badge bg-warning-subtle text-warning ms-1').text('Aguardando');
+                    }
+
+                    $('#heartbeatDate').text(res.ultimo_batimento);
+                    $('#serverTime').text(res.horario_servidor);
+
+                    if (res.rotinas) {
+                        $.each(res.rotinas, function(chave, valor) {
+                            if (valor !== 'Nunca executado') {
+                                $('#lastRun_' + chave).html('<i class="fas fa-check text-success me-1"></i> ' + valor);
+                            } else {
+                                $('#lastRun_' + chave).html('<span class="text-muted"><i class="fas fa-hourglass-start me-1"></i> Aguardando horário programado</span>');
+                            }
+                        });
+                    }
+
+                    if (res.log_recente) {
+                        $('#terminalLog').text(res.log_recente);
+                    }
+
+                    if (mostrarNotificacao) {
+                        window.foco7Notify.success('Status do agendador e logs atualizados!');
+                    }
+                }
+            },
+            error: function() {
+                if (mostrarNotificacao) {
+                    window.foco7Notify.error('Não foi possível atualizar o status no momento.');
+                }
+            },
+            complete: function() {
+                $btnIcon.removeClass('fa-spin');
+            }
+        });
+    }
+
     function executarCronManual(tarefa, nome) {
-        window.foco7Confirm('Executar ' + nome + '?', 'Deseja disparar esta rotina em segundo plano agora?', function() {
+        Swal.fire({
+            title: 'Executar ' + nome + '?',
+            text: 'Deseja disparar esta rotina no servidor agora?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, executar agora!',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
             Swal.fire({
                 title: 'Executando Rotina...',
                 html: '<div class="spinner-border text-danger" role="status"></div><p class="mt-3">Processando rotina <strong>' + nome + '</strong>...</p>',
@@ -126,6 +289,7 @@
                             confirmButtonText: 'Fechar'
                         });
                         window.foco7Notify.success(res.message);
+                        atualizarStatusCron(false);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -147,5 +311,10 @@
             });
         });
     }
+
+    // Atualização automática em segundo plano a cada 30 segundos
+    setInterval(function() {
+        atualizarStatusCron(false);
+    }, 30000);
 </script>
 @endsection

@@ -15,7 +15,22 @@ class CronController extends Controller
      */
     public function index()
     {
-        $comandoCpanel = '* * * * * cd /home/fococomb/public_html && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1';
+        $comandoCpanel = '* * * * * cd /home/fococomb/public_html && /usr/local/bin/php artisan schedule:run >> /home/fococomb/public_html/storage/logs/cron.log 2>&1';
+
+        $heartbeatTs = (int) CmsSetting::get('cron_heartbeat_timestamp', 0);
+        $ultimoBatimento = CmsSetting::get('cron_heartbeat_datahora', 'Aguardando primeiro batimento...');
+        $diffEmSegundos = $heartbeatTs > 0 ? (now()->timestamp - $heartbeatTs) : 999999;
+        $cronAtivo = ($heartbeatTs > 0 && $diffEmSegundos <= 180);
+
+        $logFile = storage_path('logs/cron.log');
+        $logRecente = '';
+        if (file_exists($logFile)) {
+            $linhas = @file($logFile);
+            if (!empty($linhas)) {
+                $ultimasLinhas = array_slice($linhas, -35);
+                $logRecente = trim(implode('', $ultimasLinhas));
+            }
+        }
 
         $rotinas = [
             'verificar_vencidas' => [
@@ -41,7 +56,42 @@ class CronController extends Controller
             ],
         ];
 
-        return view('admin.cron.index', compact('comandoCpanel', 'rotinas'));
+        return view('admin.cron.index', compact('comandoCpanel', 'rotinas', 'cronAtivo', 'ultimoBatimento', 'diffEmSegundos', 'logRecente'));
+    }
+
+    /**
+     * Retorna o status em tempo real do agendador e dos logs via AJAX
+     */
+    public function status()
+    {
+        $heartbeatTs = (int) CmsSetting::get('cron_heartbeat_timestamp', 0);
+        $ultimoBatimento = CmsSetting::get('cron_heartbeat_datahora', 'Aguardando primeiro batimento...');
+        $diffEmSegundos = $heartbeatTs > 0 ? (now()->timestamp - $heartbeatTs) : 999999;
+        $cronAtivo = ($heartbeatTs > 0 && $diffEmSegundos <= 180);
+
+        $logFile = storage_path('logs/cron.log');
+        $logRecente = '';
+        if (file_exists($logFile)) {
+            $linhas = @file($logFile);
+            if (!empty($linhas)) {
+                $ultimasLinhas = array_slice($linhas, -35);
+                $logRecente = trim(implode('', $ultimasLinhas));
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'cron_ativo' => $cronAtivo,
+            'ultimo_batimento' => $ultimoBatimento,
+            'diff_segundos' => $diffEmSegundos,
+            'horario_servidor' => date('d/m/Y H:i:s'),
+            'log_recente' => $logRecente ?: 'Nenhum registro encontrado no arquivo storage/logs/cron.log',
+            'rotinas' => [
+                'verificar_vencidas' => CmsSetting::get('cron_last_run_verificar_vencidas', 'Nunca executado'),
+                'enviar_lembretes' => CmsSetting::get('cron_last_run_enviar_lembretes', 'Nunca executado'),
+                'sincronizar_pagamentos' => CmsSetting::get('cron_last_run_sincronizar_pagamentos', 'Nunca executado'),
+            ]
+        ]);
     }
 
     /**

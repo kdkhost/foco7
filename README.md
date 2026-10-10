@@ -20,7 +20,7 @@ Sistema integrado de alta performance composto por uma **Landing Page (Single Pa
 | **Gateways de Pagamento**| Efí PRO (Gerencianet) & Mercado Pago | Checkout Transparente (PIX, Cartão e Boleto) com Webhooks |
 | **Uploads de Arquivos** | FocoDropzone (Arrasta e Solta Global) | **100% dos uploads via drag & drop** com preview imediato, specs de proporção e remoção AJAX |
 | **Central de E-mails**  | EmailTemplateService + Páginas Dedicadas | **Rota única obrigatória**, botões fluidos responsivos, simulador multi-dispositivo ao vivo e SMTP exclusivo (`notificacoes@foco7.com.br`) |
-| **Central de Cron**     | Agendador Laravel + Crontab cPanel | Linha única (`schedule:run`) ativa a cada minuto na hospedagem com interface de execução sob demanda |
+| **Central de Cron**     | Agendador Laravel + Crontab cPanel | Linha única (`schedule:run`) ativa a cada minuto na hospedagem com **monitoramento por batimento cardíaco (Heartbeat)**, terminal de logs ao vivo e execução sob demanda |
 | **Ambiente de Hospedagem**| cPanel / LiteSpeed (`public_html`) | `.htaccess` raiz blindando arquivos sensíveis e roteando para `public/` |
 | **Fuso Horário & Locale**| `America/Sao_Paulo` / `pt_BR` | Formatação estrita de Moeda (R$), CPF/CNPJ, CEP, Datas e Horas |
 

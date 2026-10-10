@@ -94,6 +94,10 @@
         });
     };
 
+    window.foco7Confirm = function (titulo, texto, onConfirm) {
+        window.confirmarAcao(titulo, texto, 'question', onConfirm);
+    };
+
     // 4. CONFIGURAÇÃO DO TOKEN CSRF PARA AJAX JQUERY (se presente)
     if (typeof jQuery !== 'undefined') {
         jQuery(function ($) {
