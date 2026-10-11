@@ -41,6 +41,8 @@ class NotificacoesController extends Controller
             ?: CmsSetting::get('contato_email')
             ?: 'contato@foco7.com.br';
 
+        $onesignalConfig = \App\Services\OneSignalService::getConfig();
+
         return view('admin.notificacoes.index', compact(
             'notificacoes',
             'status',
@@ -50,7 +52,8 @@ class NotificacoesController extends Controller
             'totalContatos',
             'totalAgendamentos',
             'totalDepoimentos',
-            'adminEmail'
+            'adminEmail',
+            'onesignalConfig'
         ));
     }
 
@@ -216,50 +219,77 @@ class NotificacoesController extends Controller
     }
 
     /**
-     * Salva as preferências de notificação do administrador
+     * Salva as preferências de notificação do administrador (E-mail e OneSignal Push)
      */
-    public function salvarConfiguracoes(Request $request)
-    {
-        $validated = $request->validate([
-            'admin_email_notificacoes' => 'required|email|max:150',
-            'notificacoes_push_ativas' => 'nullable|in:0,1',
-            'notificar_email_contatos' => 'nullable|in:0,1',
-            'notificar_email_agendamentos' => 'nullable|in:0,1',
-        ]);
+     public function salvarConfiguracoes(Request $request)
+     {
+         $validated = $request->validate([
+             'admin_email_notificacoes' => 'required|email|max:150',
+             'notificacoes_push_ativas' => 'nullable|in:0,1',
+             'notificar_email_contatos' => 'nullable|in:0,1',
+             'notificar_email_agendamentos' => 'nullable|in:0,1',
+             'onesignal_app_id' => 'nullable|string|max:120',
+             'onesignal_rest_api_key' => 'nullable|string|max:150',
+             'onesignal_ativo' => 'nullable|in:0,1',
+             'onesignal_imagem_padrao' => 'nullable|string|max:500',
+         ]);
 
-        CmsSetting::set('admin_email_notificacoes', $validated['admin_email_notificacoes']);
-        CmsSetting::set('notificacoes_push_ativas', $request->has('notificacoes_push_ativas') ? '1' : '0');
-        CmsSetting::set('notificar_email_contatos', $request->has('notificar_email_contatos') ? '1' : '0');
-        CmsSetting::set('notificar_email_agendamentos', $request->has('notificar_email_agendamentos') ? '1' : '0');
+         CmsSetting::set('admin_email_notificacoes', $validated['admin_email_notificacoes']);
+         CmsSetting::set('notificacoes_push_ativas', $request->has('notificacoes_push_ativas') ? '1' : '0');
+         CmsSetting::set('notificar_email_contatos', $request->has('notificar_email_contatos') ? '1' : '0');
+         CmsSetting::set('notificar_email_agendamentos', $request->has('notificar_email_agendamentos') ? '1' : '0');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Preferências da Central de Notificações salvas com sucesso!',
-        ]);
-    }
+         // Configurações do OneSignal com imagem
+         if ($request->has('onesignal_app_id')) {
+             CmsSetting::set('onesignal_app_id', trim($request->input('onesignal_app_id', '')));
+         }
+         if ($request->has('onesignal_rest_api_key')) {
+             CmsSetting::set('onesignal_rest_api_key', trim($request->input('onesignal_rest_api_key', '')));
+         }
+         CmsSetting::set('onesignal_ativo', $request->has('onesignal_ativo') ? '1' : '0');
+         if ($request->has('onesignal_imagem_padrao')) {
+             CmsSetting::set('onesignal_imagem_padrao', trim($request->input('onesignal_imagem_padrao', '')));
+         }
+
+         return response()->json([
+             'success' => true,
+             'message' => 'Preferências da Central de Notificações e OneSignal salvas com sucesso!',
+             'onesignal_config' => \App\Services\OneSignalService::getConfig(),
+         ]);
+     }
 
     /**
-     * Envia uma notificação Push de teste para o celular/navegador do administrador
+     * Envia uma notificação Push de teste para o celular/navegador do administrador via OneSignal e Web Push
      */
     public function dispararTeste()
     {
+        $imagemPush = CmsSetting::get('onesignal_imagem_padrao') ?: asset('img/og-foco7.jpg');
+
         $notif = Notificacao::registrar(
             tipo: 'sistema',
             titulo: 'Teste de Notificação Push & E-mail',
-            mensagem: 'A Central de Notificações da Foco 7 está 100% ativa e conectada ao seu dispositivo móvel!',
+            mensagem: 'A Central de Notificações da Foco 7 está 100% ativa e conectada ao seu dispositivo móvel com OneSignal!',
             linkAcao: route('admin.notificacoes.index'),
             dados: [
                 'origem' => 'Disparo Manual de Teste',
                 'hora' => date('d/m/Y H:i:s'),
                 'dispositivo' => request()->userAgent() ?: 'Dispositivo Móvel',
+                'imagem_push' => $imagemPush,
             ],
             notificarEmail: true
         );
 
+        $onesignalAtivo = \App\Services\OneSignalService::isAtivo();
+        $msgAdicional = $onesignalAtivo 
+            ? ' Push disparado via OneSignal com imagem!'
+            : ' (Para receber via OneSignal com imagem, ative e configure seu App ID e API Key ao lado).';
+
         return response()->json([
             'success' => true,
-            'message' => 'Notificação de teste disparada com sucesso! Verifique seu e-mail e as notificações na tela.',
+            'message' => 'Notificação de teste gerada com sucesso!' . $msgAdicional,
             'notificacao' => $notif,
+            'onesignal_ativo' => $onesignalAtivo,
+            'imagem_push' => $imagemPush,
         ]);
     }
 }

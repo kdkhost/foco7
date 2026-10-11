@@ -553,3 +553,148 @@ span.rounded-circle {
 .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
     border-right-color: #0f121a;
 }
+
+/* ==============================================================================
+   PADRONIZAÇÃO OFICIAL ADMINLTE 4: SMALL BOX & INFO BOX
+   ============================================================================== */
+.small-box {
+    border-radius: var(--bs-border-radius, 0.375rem);
+    position: relative;
+    display: block;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 2px 4px rgba(0,0,0,.15);
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.small-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.small-box > .inner {
+    padding: 1.1rem 1.25rem;
+    position: relative;
+    z-index: 2;
+}
+
+.small-box > .inner h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    padding: 0;
+    line-height: 1.1;
+}
+
+.small-box > .inner p {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.95;
+}
+
+.small-box .small-box-icon {
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+    font-size: 4.2rem;
+    opacity: 0.22;
+    transition: transform .3s linear, opacity .3s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.small-box:hover .small-box-icon {
+    transform: scale(1.1);
+    opacity: 0.32;
+}
+
+.small-box-footer {
+    background-color: rgba(0,0,0,.15);
+    color: rgba(255,255,255,.9) !important;
+    display: block;
+    padding: 0.45rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 10;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.small-box-footer:hover {
+    background-color: rgba(0,0,0,.25);
+    color: #ffffff !important;
+}
+
+.small-box.text-bg-warning .small-box-footer {
+    background-color: rgba(0,0,0,.1);
+    color: rgba(0,0,0,.85) !important;
+}
+
+.small-box.text-bg-warning .small-box-footer:hover {
+    background-color: rgba(0,0,0,.18);
+    color: #000000 !important;
+}
+
+/* ==============================================================================
+   ALTERNÂNCIA AUTOMÁTICA DE LOGO / FAVICON NA SIDEBAR COMPACTADA (ADMINLTE 4)
+   ============================================================================== */
+.logo-sidebar-full {
+    display: inline-block !important;
+    max-height: 34px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.logo-sidebar-favicon {
+    display: none !important;
+    max-height: 32px;
+    max-width: 32px;
+    object-fit: contain;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Quando a sidebar está compactada pelo botão hambúrguer (body com .sidebar-collapse) */
+body.sidebar-collapse .sidebar-brand {
+    justify-content: center !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    text-align: center !important;
+}
+
+body.sidebar-collapse .sidebar-brand .brand-link {
+    justify-content: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+
+body.sidebar-collapse .sidebar-brand .logo-sidebar-full,
+body.sidebar-collapse .sidebar-brand .brand-badge {
+    display: none !important;
+}
+
+body.sidebar-collapse .sidebar-brand .logo-sidebar-favicon {
+    display: inline-block !important;
+    margin: 0 auto !important;
+    animation: fadeInFavicon 0.2s ease-in-out;
+}
+
+@keyframes fadeInFavicon {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+

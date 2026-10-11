@@ -107,7 +107,38 @@ class Notificacao extends Model
             self::enviarEmailAdmin($notificacao);
         }
 
+        // Disparo automático via OneSignal com imagem se estiver configurado e ativo
+        if (\App\Services\OneSignalService::isAtivo()) {
+            self::dispararPushOneSignal($notificacao);
+        }
+
         return $notificacao;
+    }
+
+    /**
+     * Dispara notificação Web Push via OneSignal com imagem
+     */
+    public static function dispararPushOneSignal(self $notificacao): void
+    {
+        try {
+            $imagemUrl = $notificacao->dados['imagem_push'] ?? null;
+            $resultado = \App\Services\OneSignalService::enviarNotificacao(
+                titulo: $notificacao->titulo,
+                mensagem: $notificacao->mensagem,
+                linkAcao: $notificacao->link_acao,
+                imagemUrl: $imagemUrl,
+                dadosExtras: [
+                    'notificacao_id' => $notificacao->id,
+                    'tipo' => $notificacao->tipo,
+                ]
+            );
+
+            if (!empty($resultado['success'])) {
+                $notificacao->update(['notificado_push' => true]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Falha ao disparar push OneSignal: " . $e->getMessage());
+        }
     }
 
     /**

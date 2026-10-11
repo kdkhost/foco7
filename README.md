@@ -231,6 +231,11 @@ public_html/
 - **Ação Rápida 'Marcar como Lida' Sem Leitura:** Preserva o botão direto 'Marcar como Lida' na listagem com controle de propagação (`event.stopPropagation()`), permitindo ao usuário marcar diretamente sem precisar abrir o modal.
 - **Transição Suave no Fechamento:** Na aba de filtro 'Não Lidas', o item é mantido em tela durante a leitura e é removido suavemente com fadeOut apenas ao fechar o modal (`hidden.bs.modal`).
 
+### Módulo 25: Notificações Push via OneSignal com Imagem, Small Boxes AdminLTE 4 & Logo Compacta com Favicon
+- **Web Push via OneSignal com Imagem:** Implementação da camada `OneSignalService` com integração à API REST v1 oficial do OneSignal (`/api/v1/notifications`), disparando notificações instantâneas com imagem de banner (`chrome_web_image` e `big_picture`), ícone oficial da Foco 7 e links de redirecionamento. Painel administrativo em `/admin/notificacoes` com gestão de App ID, REST API Key, switch de ativação, preview em tempo real da imagem do push e botão de inscrição de dispositivo via OneSignal SDK v16.
+- **Padronização Oficial AdminLTE 4 (`small-box`):** Substituição dos cards da Central de Notificações pelos componentes oficiais `small-box` do AdminLTE 4 (`text-bg-danger`, `text-bg-warning`, `text-bg-primary`, `text-bg-success`), garantindo tipografia legível, ícones translúcidos no background e barra inferior de ação rápida para filtragem.
+- **Alternância Automática de Logo por Favicon na Sidebar:** Quando a barra lateral é compactada (classe `sidebar-collapse` no body via botão hambúrguer ou resolução adaptativa), a logo completa horizontal é substituída automaticamente pelo favicon quadrado da Foco 7 de forma centralizada e sem distorções, retornando à logo completa com transição suave ao expandir.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -261,13 +266,14 @@ public_html/
 | **Módulo 22**| Gestão Universal de Ícones de Planos (FontAwesome 6, Flaticon UIcons, Bootstrap Icons & SVG Livre com Preview ao Vivo) | ✅ Concluído & Validado |
 | **Módulo 23**| Limpeza Automática da Central de Notificações & Reset Universal de Formulários | ✅ Concluído & Validado |
 | **Módulo 24**| Modal de Leitura Detalhada de Notificações com Marcação Automática e Ação Rápida Direta | ✅ Concluído & Validado |
+| **Módulo 25**| Push OneSignal com Imagem, Small Boxes AdminLTE 4 & Alternância de Logo/Favicon na Sidebar | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **67 testes executados, 67 aprovados (100% de sucesso), 302 asserções**.
+- **69 testes executados, 69 aprovados (100% de sucesso), 313 asserções**.
 - Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 - Cobertura de rotas públicas, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 

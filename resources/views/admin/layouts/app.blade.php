@@ -60,6 +60,27 @@
         }
     </style>
 
+    @php
+        $oneSignalAppId = \App\Models\CmsSetting::get('onesignal_app_id');
+        $oneSignalAtivo = \App\Models\CmsSetting::get('onesignal_ativo', '0') == '1';
+    @endphp
+    @if($oneSignalAtivo && !empty($oneSignalAppId))
+    <!-- OneSignal Web Push SDK v16 Oficial -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "{{ $oneSignalAppId }}",
+                notifyButton: {
+                    enable: false,
+                },
+                allowLocalhostAsSecureOrigin: true,
+            });
+        });
+    </script>
+    @endif
+
     @yield('styles')
 </head>
 <body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
@@ -179,8 +200,13 @@
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
             <div class="sidebar-brand d-flex align-items-center justify-content-between px-3 py-3 border-bottom border-secondary">
                 <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2">
-                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image">
-                    <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-1 small">
+                    <!-- Logo Oficial Completa (Exibida no modo expandido) -->
+                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image logo-sidebar-full" id="sidebarLogoFull">
+
+                    <!-- Favicon Oficial da Foco 7 (Exibido automaticamente quando a sidebar for compactada) -->
+                    <img src="{{ asset('img/favicon.png') }}" alt="Foco 7" height="32" width="32" class="brand-image logo-sidebar-favicon" id="sidebarLogoFavicon" style="display: none; object-fit: contain;">
+
+                    <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-1 small brand-badge">
                         {{ auth()->user()->role === 'admin' ? 'ADMIN' : 'CLIENTE' }}
                     </span>
                 </a>
@@ -693,6 +719,37 @@
             sincronizarNotificacoesAdmin();
             setInterval(sincronizarNotificacoesAdmin, 25000);
             @endif
+
+            // Sincronização e Alternância Automática de Logo Completa para Favicon quando a Sidebar for Compactada
+            function sincronizarLogoSidebar() {
+                const isCollapsed = document.body.classList.contains('sidebar-collapse');
+                const logoFull = document.getElementById('sidebarLogoFull');
+                const logoFavicon = document.getElementById('sidebarLogoFavicon');
+                const brandBadge = document.querySelector('.sidebar-brand .brand-badge');
+
+                if (logoFull && logoFavicon) {
+                    if (isCollapsed) {
+                        logoFull.style.setProperty('display', 'none', 'important');
+                        logoFavicon.style.setProperty('display', 'inline-block', 'important');
+                        if (brandBadge) brandBadge.style.setProperty('display', 'none', 'important');
+                    } else {
+                        logoFull.style.setProperty('display', 'inline-block', 'important');
+                        logoFavicon.style.setProperty('display', 'none', 'important');
+                        if (brandBadge) brandBadge.style.setProperty('display', 'inline-block', 'important');
+                    }
+                }
+            }
+
+            const sidebarObserver = new MutationObserver(function() {
+                sincronizarLogoSidebar();
+            });
+            sidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            $(document).on('click', '[data-lte-toggle="sidebar"]', function() {
+                setTimeout(sincronizarLogoSidebar, 40);
+                setTimeout(sincronizarLogoSidebar, 200);
+            });
+            sincronizarLogoSidebar();
         });
     </script>
 

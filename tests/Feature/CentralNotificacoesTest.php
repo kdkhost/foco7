@@ -194,4 +194,60 @@ class CentralNotificacoesTest extends TestCase
             'lida' => true,
         ]);
     }
+
+    /**
+     * Testa obter notificação via AJAX para o modal de leitura marcando como lida automaticamente
+     */
+    public function test_obter_notificacao_via_ajax_para_modal_marca_como_lida_automaticamente(): void
+    {
+        $notif = Notificacao::registrar(
+            tipo: 'contato',
+            titulo: 'Visualização Modal',
+            mensagem: 'Mensagem detalhada do cliente',
+            linkAcao: route('admin.notificacoes.index'),
+            notificarEmail: false
+        );
+
+        $this->assertFalse($notif->lida);
+
+        $response = $this->actingAs($this->adminUser)->getJson("/admin/notificacoes/{$notif->id}/obter");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'notificacao' => [
+                'id' => $notif->id,
+                'titulo' => 'Visualização Modal',
+                'lida' => true,
+            ],
+            'foi_marcada_agora' => true,
+        ]);
+
+        $this->assertTrue($notif->fresh()->lida);
+    }
+
+    /**
+     * Testa salvar configurações da Central de Notificações incluindo OneSignal com imagem
+     */
+    public function test_salvar_configuracoes_onesignal_e_email(): void
+    {
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/notificacoes/salvar-config', [
+            'admin_email_notificacoes' => 'gestao@foco7.com.br',
+            'notificar_email_contatos' => '1',
+            'notificar_email_agendamentos' => '1',
+            'onesignal_ativo' => '1',
+            'onesignal_app_id' => 'test-app-id-12345',
+            'onesignal_rest_api_key' => 'test-api-key-67890',
+            'onesignal_imagem_padrao' => 'https://foco7.com.br/img/og-foco7.jpg',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertEquals('gestao@foco7.com.br', \App\Models\CmsSetting::get('admin_email_notificacoes'));
+        $this->assertEquals('test-app-id-12345', \App\Models\CmsSetting::get('onesignal_app_id'));
+        $this->assertEquals('test-api-key-67890', \App\Models\CmsSetting::get('onesignal_rest_api_key'));
+        $this->assertEquals('1', \App\Models\CmsSetting::get('onesignal_ativo'));
+        $this->assertEquals('https://foco7.com.br/img/og-foco7.jpg', \App\Models\CmsSetting::get('onesignal_imagem_padrao'));
+    }
 }
