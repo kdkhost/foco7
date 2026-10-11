@@ -232,6 +232,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/salvar-config', [NotificacoesController::class, 'salvarConfiguracoes'])->name('admin.notificacoes.salvar_config');
         Route::post('/teste', [NotificacoesController::class, 'dispararTeste'])->name('admin.notificacoes.teste');
         Route::post('/{notificacao}/lida', [NotificacoesController::class, 'marcarLida'])->name('admin.notificacoes.marcar_lida');
+        Route::get('/{notificacao}/obter', [NotificacoesController::class, 'obter'])->name('admin.notificacoes.obter');
         Route::get('/{notificacao}/abrir', [NotificacoesController::class, 'abrirERedirecionar'])->name('admin.notificacoes.abrir');
         Route::delete('/{notificacao}', [NotificacoesController::class, 'excluir'])->name('admin.notificacoes.excluir');
     });

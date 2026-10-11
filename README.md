@@ -225,6 +225,12 @@ public_html/
   3. *Motor Anti-Injeção*: Expressões regulares ativas contra SQL Injection e injeções de script XSS;
   4. *Sanitização Completa*: Limpeza e remoção de tags de risco antes do registro na Central de Notificações.
 
+### Módulo 24: Modal Interativo de Leitura de Notificações com Marcação Automática & Ação Rápida Sem Leitura
+- **Abertura em Modal Interativo:** Ao clicar na linha da notificação em `/admin/notificacoes` ou no botão de ação 'Ler', abre um modal responsivo exibindo cabeçalho estilizado, corpo completo da mensagem, data/hora formatada, tabela com metadados estruturados (origem, hora, telefone, dispositivo, etc.) e link para o módulo de destino.
+- **Marcação Automática como Lida na Leitura:** Ao abrir o modal, os dados completos são carregados via AJAX (`GET /admin/notificacoes/{id}/obter`), marcando a notificação automaticamente como lida no backend e sincronizando os contadores em tempo real.
+- **Ação Rápida 'Marcar como Lida' Sem Leitura:** Preserva o botão direto 'Marcar como Lida' na listagem com controle de propagação (`event.stopPropagation()`), permitindo ao usuário marcar diretamente sem precisar abrir o modal.
+- **Transição Suave no Fechamento:** Na aba de filtro 'Não Lidas', o item é mantido em tela durante a leitura e é removido suavemente com fadeOut apenas ao fechar o modal (`hidden.bs.modal`).
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -254,6 +260,7 @@ public_html/
 | **Módulo 21**| Padronização Profissional Dark/Light Mode (Contraste dinâmico, fim do borrão vermelho) | ✅ Concluído & Validado |
 | **Módulo 22**| Gestão Universal de Ícones de Planos (FontAwesome 6, Flaticon UIcons, Bootstrap Icons & SVG Livre com Preview ao Vivo) | ✅ Concluído & Validado |
 | **Módulo 23**| Limpeza Automática da Central de Notificações & Reset Universal de Formulários | ✅ Concluído & Validado |
+| **Módulo 24**| Modal de Leitura Detalhada de Notificações com Marcação Automática e Ação Rápida Direta | ✅ Concluído & Validado |
 
 ---
 

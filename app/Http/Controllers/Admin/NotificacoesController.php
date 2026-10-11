@@ -115,6 +115,38 @@ class NotificacoesController extends Controller
     }
 
     /**
+     * Retorna os detalhes completos de uma notificação para leitura em modal e marca como lida automaticamente
+     */
+    public function obter(Notificacao $notificacao)
+    {
+        $foiMarcadaAgora = false;
+        if (!$notificacao->lida) {
+            $notificacao->marcarComoLida();
+            $foiMarcadaAgora = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'notificacao' => [
+                'id' => $notificacao->id,
+                'tipo' => $notificacao->tipo,
+                'tipo_formatado' => ucfirst($notificacao->tipo),
+                'titulo' => $notificacao->titulo,
+                'mensagem' => $notificacao->mensagem,
+                'icone' => $notificacao->icone,
+                'cor' => $notificacao->cor,
+                'link_acao' => $notificacao->link_acao,
+                'dados' => $notificacao->dados,
+                'lida' => true,
+                'data_formatada' => $notificacao->created_at ? $notificacao->created_at->format('d/m/Y H:i') : '',
+                'tempo_relativo' => $notificacao->created_at ? $notificacao->created_at->diffForHumans() : '',
+            ],
+            'foi_marcada_agora' => $foiMarcadaAgora,
+            'nao_lidas_count' => Notificacao::naoLidas()->count(),
+        ]);
+    }
+
+    /**
      * Marca como lida ao clicar e redireciona para a página de destino da notificação
      */
     public function abrirERedirecionar(Request $request, Notificacao $notificacao)
