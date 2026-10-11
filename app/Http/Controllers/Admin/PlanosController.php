@@ -29,7 +29,7 @@ class PlanosController extends Controller
             'subtitulo' => 'nullable|string|max:255',
             'preco_mensal' => 'required',
             'taxa_adesao' => 'nullable',
-            'icone' => 'nullable|string|max:100',
+            'icone' => 'nullable|string',
             'texto_botao' => 'nullable|string|max:100',
             'destaque' => 'nullable|boolean',
             'tag_destaque' => 'nullable|string|max:50',
