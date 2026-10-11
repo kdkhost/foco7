@@ -26,6 +26,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Swiper 11 Slider (Carrosséis Touch e Drag) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
     <!-- Toastr & SweetAlert2 (Global) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -794,36 +797,66 @@
 
     <!-- 9. DEPOIMENTOS DE CLIENTES (PROVA SOCIAL) -->
     <section id="depoimentos" class="section-depoimentos">
-        <div class="container">
+        <div class="container position-relative">
             <div class="text-center max-w-700 mx-auto mb-5">
                 <span class="text-danger fw-bold text-uppercase small">Quem Já Dorme Tranquilo</span>
                 <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">Depoimentos Reais de Nossos Clientes</h2>
             </div>
-            <div class="row g-4">
-                @foreach($depoimentos as $dep)
-                <div class="col-md-6 col-lg-3">
-                    <div class="card-depoimento h-100">
-                        <div>
-                            <div class="text-warning mb-3">
-                                @for($i = 0; $i < $dep->estrelas; $i++)
-                                    <i class="fas fa-star"></i>
-                                @endfor
+
+            <!-- CARROSSEL TOUCH & DRAG DE DEPOIMENTOS -->
+            <div class="depoimentos-carousel-container position-relative">
+                <!-- Botão Anterior -->
+                <button type="button" class="swiper-btn-depoimentos swiper-btn-prev" id="btnDepoimentosPrev" aria-label="Depoimento Anterior" title="Depoimento Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Container Principal Swiper -->
+                <div class="swiper swiper-depoimentos">
+                    <div class="swiper-wrapper">
+                        @foreach($depoimentos as $dep)
+                        <div class="swiper-slide h-auto">
+                            <div class="card-depoimento h-100">
+                                <div>
+                                    <div class="text-warning mb-3">
+                                        @for($i = 0; $i < $dep->estrelas; $i++)
+                                            <i class="fas fa-star"></i>
+                                        @endfor
+                                    </div>
+                                    <div class="text-secondary small fst-italic card-depoimento-texto">"{!! $dep->texto !!}"</div>
+                                </div>
+                                <div class="mt-4 pt-3 border-top border-light-subtle d-flex align-items-center gap-3">
+                                    <div class="depoimento-avatar-wrapper">
+                                        @if(!empty($dep->foto))
+                                            <img src="{{ asset($dep->foto) }}" alt="{{ $dep->nome_cliente }}" class="depoimento-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none');">
+                                            <div class="depoimento-avatar-inicial d-none">
+                                                {{ mb_strtoupper(mb_substr($dep->nome_cliente, 0, 1, 'UTF-8')) }}
+                                            </div>
+                                        @else
+                                            <div class="depoimento-avatar-inicial">
+                                                {{ mb_strtoupper(mb_substr($dep->nome_cliente, 0, 1, 'UTF-8')) }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="depoimento-info min-w-0 flex-grow-1">
+                                        <h6 class="fw-bold mb-0 text-dark text-truncate" title="{{ $dep->nome_cliente }}">{{ $dep->nome_cliente }}</h6>
+                                        <span class="small text-secondary text-truncate d-block" title="{{ $dep->cidade_uf }} - {{ $dep->veiculo }}">{{ $dep->cidade_uf }} - {{ $dep->veiculo }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-secondary small fst-italic">"{!! $dep->texto !!}"</div>
                         </div>
-                        <div class="mt-3 pt-3 border-top border-light-subtle d-flex align-items-center gap-3">
-                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
-                                {{ substr($dep->nome_cliente, 0, 1) }}
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark">{{ $dep->nome_cliente }}</h6>
-                                <span class="small text-secondary">{{ $dep->cidade_uf }} - {{ $dep->veiculo }}</span>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
+
+                    <!-- Indicadores de Paginação (Bullets) -->
+                    <div class="swiper-pagination swiper-pagination-depoimentos mt-4 position-relative"></div>
                 </div>
-                @endforeach
+
+                <!-- Botão Próximo -->
+                <button type="button" class="swiper-btn-depoimentos swiper-btn-next" id="btnDepoimentosNext" aria-label="Próximo Depoimento" title="Próximo Depoimento">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
+
             <div class="text-center mt-5">
                 <button type="button" class="btn btn-outline-danger px-4 py-2 fw-bold rounded-pill shadow-sm" onclick="abrirModalAvaliacaoSite()">
                     <i class="fas fa-star text-warning me-2"></i> Avaliar Nosso Atendimento / Deixar Depoimento
@@ -1657,6 +1690,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <!-- Scripts Globais Foco 7 -->
     <script src="{{ asset('js/global-ajax.js') }}"></script>
@@ -2370,6 +2404,57 @@
                 navigator.clipboard.writeText(copyText.value);
                 window.foco7Notify.success('Código PIX copiado para a área de transferência!');
             });
+
+            // ========================================================
+            // CARROSSEL DE DEPOIMENTOS: TOUCH, MOUSE DRAG & RESPONSIVO
+            // ========================================================
+            if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-depoimentos')) {
+                var swiperDepoimentos = new Swiper('.swiper-depoimentos', {
+                    slidesPerView: 1, // 1 depoimento por vez por padrão (mobile / telas menores)
+                    spaceBetween: 16,
+                    grabCursor: true, // Cursor de mãozinha e grabbing ao clicar e arrastar
+                    simulateTouch: true, // Permite clicar e arrastar com o mouse no computador
+                    touchRatio: 1.2, // Resposta física rápida ao toque/arrasto
+                    threshold: 5,
+                    watchOverflow: true,
+                    speed: 600,
+                    autoplay: {
+                        delay: 5500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-depoimentos',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '#btnDepoimentosNext',
+                        prevEl: '#btnDepoimentosPrev',
+                    },
+                    breakpoints: {
+                        // Telas menores que 768px (smartphones): exatamente 1 por vez na tela
+                        0: {
+                            slidesPerView: 1,
+                            spaceBetween: 16,
+                        },
+                        // Tablets (>= 768px): 2 por vez na tela
+                        768: {
+                            slidesPerView: 2,
+                            spaceBetween: 20,
+                        },
+                        // Desktops (>= 1024px): 3 por vez na tela
+                        1024: {
+                            slidesPerView: 3,
+                            spaceBetween: 24,
+                        },
+                        // Telas widescreen (>= 1280px): 4 por vez na tela
+                        1280: {
+                            slidesPerView: 4,
+                            spaceBetween: 24,
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

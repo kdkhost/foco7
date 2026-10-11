@@ -5,30 +5,58 @@
  * ==============================================================================
  */
 
-:root {
+:root,
+[data-bs-theme="light"] {
     --admin-primary: #d90000;
     --admin-primary-hover: #b80000;
     --admin-primary-rgb: 217, 0, 0;
 
-    /* Sincronização estrita de variáveis Bootstrap 5 para AdminLTE 4 */
+    /* Sincronização estrita de variáveis Bootstrap 5 para AdminLTE 4 no Modo Claro */
     --bs-primary: #d90000;
     --bs-primary-rgb: 217, 0, 0;
     --bs-primary-text-emphasis: #d90000;
-    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.12);
-    --bs-primary-border-subtle: rgba(217, 0, 0, 0.3);
-    --bs-link-color: #d90000;
-    --bs-link-hover-color: #b80000;
+    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.1);
+    --bs-primary-border-subtle: rgba(217, 0, 0, 0.25);
+    --bs-link-color: #c40000;
+    --bs-link-hover-color: #990000;
     --bs-focus-ring-color: rgba(217, 0, 0, 0.25);
+
+    /* Superfícies e Textos do Tema Claro */
+    --admin-bg-base: #f4f6f9;
+    --admin-bg-card: #ffffff;
+    --admin-text-main: #0f172a;
+    --admin-text-secondary: #64748b;
 }
 
-[data-bs-theme="dark"] {
+[data-bs-theme="dark"],
+body.dark-mode {
+    --admin-primary: #ff5252;
+    --admin-primary-hover: #ff7676;
+    --admin-primary-rgb: 255, 82, 82;
+
+    /* No Tema Escuro: Cores semânticas profissionais de alto contraste */
     --bs-primary: #d90000;
     --bs-primary-rgb: 217, 0, 0;
-    --bs-primary-text-emphasis: #ff4d4d;
-    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.18);
-    --bs-primary-border-subtle: rgba(217, 0, 0, 0.4);
-    --bs-link-color: #ff4d4d;
-    --bs-link-hover-color: #ff8080;
+    --bs-primary-text-emphasis: #ff7676;
+    --bs-primary-bg-subtle: rgba(255, 82, 82, 0.16);
+    --bs-primary-border-subtle: rgba(255, 82, 82, 0.35);
+
+    /* LINKS NO MODO ESCURO: Claros, nítidos, NUNCA vermelho borrado */
+    --bs-link-color: #f1f5f9;
+    --bs-link-hover-color: #ffffff;
+    --bs-focus-ring-color: rgba(255, 82, 82, 0.3);
+
+    /* Superfícies e Textos do Tema Escuro (Profundo, moderno e legível) */
+    --admin-bg-base: #0b0f19;
+    --admin-bg-surface: #111827;
+    --admin-bg-card: #162032;
+    --admin-text-main: #f8fafc;
+    --admin-text-secondary: #94a3b8;
+    --bs-body-bg: #0b0f19;
+    --bs-body-color: #f1f5f9;
+    --bs-tertiary-bg: #162032;
+    --bs-secondary-bg: #111827;
+    --bs-border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ==============================================================================
@@ -46,7 +74,7 @@
 
 /* Marcação do item ativo nativo na Sidebar (Sem pílulas gigantes nem box-shadow excessivo) */
 .app-sidebar .sidebar-menu .nav-link.active {
-    background-color: var(--bs-primary) !important;
+    background-color: #d90000 !important;
     color: #ffffff !important;
     font-weight: 600;
 }
@@ -81,36 +109,234 @@
 }
 
 /* ==============================================================================
-   REMOÇÃO GLOBAL DE ELEMENTOS AZUIS - HARMONIZAÇÃO COM A PALETA FOCO 7
+   PADRONIZAÇÃO PROFISSIONAL: CONTRASTE DINÂMICO & PREVENÇÃO DE CONFLITO DARK/LIGHT
+   Garante que o texto seja SEMPRE o oposto da cor de fundo em ambos os temas
    ============================================================================== */
 
-/* Tipografia e Textos Primários */
-.text-primary,
-a.text-primary,
-i.text-primary,
-.card-title.text-primary,
-h1.text-primary, h2.text-primary, h3.text-primary, h4.text-primary, h5.text-primary, h6.text-primary,
-p.text-primary, span.text-primary {
-    color: var(--admin-primary) !important;
+/* --- NO TEMA CLARO (LIGHT) --- */
+[data-bs-theme="light"] .text-dark,
+[data-bs-theme="light"] .text-black,
+[data-bs-theme="light"] h1, [data-bs-theme="light"] h2, [data-bs-theme="light"] h3,
+[data-bs-theme="light"] h4, [data-bs-theme="light"] h5, [data-bs-theme="light"] h6,
+[data-bs-theme="light"] .card-title,
+[data-bs-theme="light"] .form-label {
+    color: #0f172a !important; /* Escuro sobre fundo claro */
+}
+
+[data-bs-theme="light"] .text-secondary,
+[data-bs-theme="light"] .text-muted {
+    color: #64748b !important;
+}
+
+/* Tipografia Primária no Tema Claro */
+[data-bs-theme="light"] .text-primary,
+[data-bs-theme="light"] a.text-primary,
+[data-bs-theme="light"] i.text-primary,
+[data-bs-theme="light"] .card-title.text-primary,
+[data-bs-theme="light"] .text-danger,
+[data-bs-theme="light"] a.text-danger,
+[data-bs-theme="light"] i.text-danger {
+    color: #d90000 !important;
+}
+
+/* --- NO TEMA ESCURO (DARK) - INVERSÃO RIGOROSA: TEXTOS SEMPRE CLAROS --- */
+[data-bs-theme="dark"] .text-dark,
+[data-bs-theme="dark"] .text-black,
+[data-bs-theme="dark"] h1:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] h2:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] h3:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] h4:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] h5:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] h6:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
+[data-bs-theme="dark"] .card-title:not(.text-danger):not(.text-primary),
+[data-bs-theme="dark"] .card-header:not([class*="bg-danger"]):not([class*="bg-primary"]),
+[data-bs-theme="dark"] .form-label,
+[data-bs-theme="dark"] .form-check-label,
+[data-bs-theme="dark"] strong:not([class*="text-"]),
+[data-bs-theme="dark"] label:not(.btn):not(.badge) {
+    color: #f8fafc !important; /* Claros no Dark - Oposto do fundo, NUNCA somem */
+}
+
+/* Textos secundários e legendas no Dark: Cinza claro luminoso, 100% legível */
+[data-bs-theme="dark"] .text-secondary,
+[data-bs-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .form-text,
+[data-bs-theme="dark"] small.text-secondary {
+    color: #94a3b8 !important;
+}
+
+/* ELIMINAÇÃO TOTAL DO "BORRÃO VERMELHO" NO TEMA ESCURO: */
+/* Links e Botões de Link no Tema Escuro: Tons Claros / Coral de Alto Contraste */
+[data-bs-theme="dark"] a:not(.btn):not(.badge):not(.nav-link-active) {
+    color: #f1f5f9;
+}
+[data-bs-theme="dark"] a:not(.btn):not(.badge):hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Links intencionais com .text-danger ou .text-primary no Dark: Coral luminoso legível */
+[data-bs-theme="dark"] a.text-danger,
+[data-bs-theme="dark"] a.text-primary,
+[data-bs-theme="dark"] .btn-link.text-danger,
+[data-bs-theme="dark"] .btn-link.text-primary {
+    color: #ff6b6b !important;
+    font-weight: 600;
+}
+[data-bs-theme="dark"] a.text-danger:hover,
+[data-bs-theme="dark"] a.text-primary:hover,
+[data-bs-theme="dark"] .btn-link.text-danger:hover,
+[data-bs-theme="dark"] .btn-link.text-primary:hover {
+    color: #ff9999 !important;
+    text-decoration: underline;
+}
+
+/* Ícones de destaque vermelho no Tema Escuro: Luminosos e nítidos (sem aberração de foco) */
+[data-bs-theme="dark"] i.text-danger,
+[data-bs-theme="dark"] i.text-primary,
+[data-bs-theme="dark"] .fas.text-danger,
+[data-bs-theme="dark"] .fas.text-primary {
+    color: #ff5c5c !important;
+}
+
+/* Títulos com .text-danger no Tema Escuro */
+[data-bs-theme="dark"] h1.text-danger, [data-bs-theme="dark"] h2.text-danger,
+[data-bs-theme="dark"] h3.text-danger, [data-bs-theme="dark"] h4.text-danger,
+[data-bs-theme="dark"] h5.text-danger, [data-bs-theme="dark"] h6.text-danger {
+    color: #ff6b6b !important;
+}
+
+/* SUPERFÍCIES NO TEMA ESCURO: Previne caixas brancas cegantes */
+[data-bs-theme="dark"] .bg-white,
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .card-body.bg-white,
+[data-bs-theme="dark"] .card.bg-white {
+    background-color: var(--admin-bg-card, #162032) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--admin-bg-card, #162032) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .app-header {
+    background-color: var(--admin-bg-surface, #111827) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-bs-theme="dark"] .app-header .nav-link {
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .app-header .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Dropdowns e Menus no Tema Escuro */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--admin-bg-card, #162032) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: #e2e8f0 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+}
+
+/* Modais no Tema Escuro */
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--admin-bg-card, #162032) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Formulários e Inputs no Tema Escuro */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #0b0f19 !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #0b0f19 !important;
+    border-color: #ff6b6b !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.2) !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #64748b !important;
+}
+
+/* Tabelas no Tema Escuro */
+[data-bs-theme="dark"] .table {
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .table th {
+    color: #cbd5e1 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-bs-theme="dark"] .table td {
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-bs-theme="dark"] .table-hover>tbody>tr:hover>* {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+}
+
+/* Exceções legítimas de contraste: Textos dentro de Fundos Amarelos (Warning) */
+[data-bs-theme="dark"] .bg-warning.text-dark,
+[data-bs-theme="dark"] .badge.bg-warning,
+[data-bs-theme="dark"] .btn-warning,
+[data-bs-theme="dark"] .alert-warning {
+    color: #111827 !important; /* Mantém escuro apenas quando o fundo for amarelo claro */
 }
 
 /* Fundos e Superfícies Primárias */
 .bg-primary {
-    background-color: var(--admin-primary) !important;
+    background-color: #d90000 !important;
     color: #ffffff !important;
 }
 
 .bg-primary-subtle {
-    background-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.12) !important;
-    color: var(--admin-primary) !important;
+    background-color: rgba(217, 0, 0, 0.12) !important;
+    color: #d90000 !important;
+}
+
+[data-bs-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(255, 82, 82, 0.18) !important;
+    color: #ff7676 !important;
 }
 
 .border-primary {
-    border-color: var(--admin-primary) !important;
+    border-color: #d90000 !important;
 }
 
 .border-primary-subtle {
-    border-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.3) !important;
+    border-color: rgba(217, 0, 0, 0.3) !important;
 }
 
 /* Interruptores (Switches), Checkboxes e Radios */

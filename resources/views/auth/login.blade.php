@@ -34,28 +34,56 @@
         }
         body.light-theme {
             background-color: #f4f6f9;
-            color: #212529;
+            color: #0f172a;
         }
         body.light-theme .login-card {
             background: #ffffff;
             border-color: #e2e8f0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            color: #212529;
+            color: #0f172a;
+        }
+        body.light-theme .login-card .form-label {
+            color: #0f172a !important;
         }
         body.light-theme .form-control {
-            background-color: #f8fafc;
-            border-color: #cbd5e1;
-            color: #0f172a;
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-theme .input-group-text {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-theme .link-esqueceu-senha {
+            color: #c40000 !important;
+        }
+        body.light-theme .link-esqueceu-senha:hover {
+            color: #990000 !important;
+            text-decoration: underline !important;
+        }
+        .link-esqueceu-senha {
+            color: #ff7676;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .link-esqueceu-senha:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
         .login-card {
             max-width: 440px;
             width: 100%;
-            background: #121722;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 35px 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             position: relative;
+            color: #f8fafc;
+        }
+        .login-card .form-label {
+            color: #f8fafc;
         }
         .btn-foco {
             background: var(--foco-red);
@@ -146,7 +174,7 @@
                     <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
                     <label class="form-check-label small" for="remember">Lembrar acesso</label>
                 </div>
-                <a href="{{ route('password.request') }}" class="small text-danger text-decoration-none">Esqueceu a senha?</a>
+                <a href="{{ route('password.request') }}" class="small link-esqueceu-senha text-decoration-none">Esqueceu a senha?</a>
             </div>
 
             <button type="submit" class="btn-foco">

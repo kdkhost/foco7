@@ -248,6 +248,8 @@ public_html/
 | **Módulo 17**| Checkout Transparente Efí Bank, Emissão de Carnê em PDF e Repasse de Taxas | ✅ Concluído & Validado |
 | **Módulo 18**| Sidebar Treeview Responsivo, Rolagem Mobile/Tablet e Notificações Dedicadas | ✅ Concluído & Validado |
 | **Módulo 19**| Página de Depoimentos & Moderação e reCAPTCHA v3 Dinâmico Anti-Spam | ✅ Concluído & Validado |
+| **Módulo 20**| Carrossel Touch & Drag de Depoimentos (1 por tela no mobile, avatares circulares 1:1) | ✅ Concluído & Validado |
+| **Módulo 21**| Padronização Profissional Dark/Light Mode (Contraste dinâmico, fim do borrão vermelho) | ✅ Concluído & Validado |
 
 ---
 

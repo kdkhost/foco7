@@ -42,7 +42,10 @@
         [data-bs-theme="dark"] {
             --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
             --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
-            --bs-link-color: {{ $cmsCorPrimaria ?? '#d90000' }};
+            --bs-link-color: #f1f5f9;
+            --bs-link-hover-color: #ffffff;
+            --bs-body-bg: #0b0f19;
+            --bs-body-color: #f1f5f9;
         }
     </style>
 
@@ -472,10 +475,12 @@
             function applyAdminTheme(t) {
                 if (t === 'dark') {
                     document.documentElement.setAttribute('data-bs-theme', 'dark');
-                    $('#adminThemeIcon').removeClass('fa-sun').addClass('fa-moon');
+                    $('body').addClass('dark-mode').attr('data-bs-theme', 'dark');
+                    $('#adminThemeIcon').removeClass('fa-moon').addClass('fa-sun');
                 } else {
                     document.documentElement.setAttribute('data-bs-theme', 'light');
-                    $('#adminThemeIcon').removeClass('fa-moon').addClass('fa-sun');
+                    $('body').removeClass('dark-mode').attr('data-bs-theme', 'light');
+                    $('#adminThemeIcon').removeClass('fa-sun').addClass('fa-moon');
                 }
             }
 
