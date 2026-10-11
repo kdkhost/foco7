@@ -29,7 +29,8 @@
 }
 
 [data-bs-theme="dark"],
-body.dark-mode {
+body.dark-mode,
+html[data-bs-theme="dark"] {
     --admin-primary: #ff5252;
     --admin-primary-hover: #ff7676;
     --admin-primary-rgb: 255, 82, 82;
@@ -57,6 +58,14 @@ body.dark-mode {
     --bs-tertiary-bg: #162032;
     --bs-secondary-bg: #111827;
     --bs-border-color: rgba(255, 255, 255, 0.1);
+
+    /* Sincronização estrita de variáveis de luz/contraste do Bootstrap no Dark Mode */
+    --bs-light: #162032;
+    --bs-light-rgb: 22, 32, 50;
+    --bs-light-bg-subtle: #162032;
+    --bs-dark: #f8fafc;
+    --bs-dark-rgb: 248, 250, 252;
+    --bs-dark-bg-subtle: rgba(255, 255, 255, 0.05);
 }
 
 /* ==============================================================================
@@ -140,8 +149,12 @@ body.dark-mode {
 }
 
 /* --- NO TEMA ESCURO (DARK) - INVERSÃO RIGOROSA: TEXTOS SEMPRE CLAROS --- */
-[data-bs-theme="dark"] .text-dark,
-[data-bs-theme="dark"] .text-black,
+[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+body.dark-mode .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+html[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+[data-bs-theme="dark"] .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+body.dark-mode .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+html[data-bs-theme="dark"] .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
 [data-bs-theme="dark"] h1:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
 [data-bs-theme="dark"] h2:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
 [data-bs-theme="dark"] h3:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
@@ -152,14 +165,18 @@ body.dark-mode {
 [data-bs-theme="dark"] .card-header:not([class*="bg-danger"]):not([class*="bg-primary"]),
 [data-bs-theme="dark"] .form-label,
 [data-bs-theme="dark"] .form-check-label,
-[data-bs-theme="dark"] strong:not([class*="text-"]),
-[data-bs-theme="dark"] label:not(.btn):not(.badge) {
+[data-bs-theme="dark"] strong:not([class*="text-"]):not(.text-warning):not(.text-danger),
+[data-bs-theme="dark"] label:not(.btn):not(.badge),
+body.dark-mode strong:not([class*="text-"]):not(.text-warning):not(.text-danger),
+body.dark-mode label:not(.btn):not(.badge) {
     color: #f8fafc !important; /* Claros no Dark - Oposto do fundo, NUNCA somem */
 }
 
 /* Textos secundários e legendas no Dark: Cinza claro luminoso, 100% legível */
 [data-bs-theme="dark"] .text-secondary,
+body.dark-mode .text-secondary,
 [data-bs-theme="dark"] .text-muted,
+body.dark-mode .text-muted,
 [data-bs-theme="dark"] .form-text,
 [data-bs-theme="dark"] small.text-secondary {
     color: #94a3b8 !important;
@@ -206,17 +223,64 @@ body.dark-mode {
     color: #ff6b6b !important;
 }
 
-/* SUPERFÍCIES NO TEMA ESCURO: Previne caixas brancas cegantes */
-[data-bs-theme="dark"] .bg-white,
+/* SUPERFÍCIES NO TEMA ESCURO: Previne totalmente caixas brancas cegantes */
+[data-bs-theme="dark"] .bg-white:not(.qr-code-white),
+body.dark-mode .bg-white:not(.qr-code-white),
+html[data-bs-theme="dark"] .bg-white:not(.qr-code-white),
 [data-bs-theme="dark"] .bg-light,
+body.dark-mode .bg-light,
+html[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .bg-light-subtle,
+body.dark-mode .bg-light-subtle,
+html[data-bs-theme="dark"] .bg-light-subtle,
+[data-bs-theme="dark"] .alert-light,
+body.dark-mode .alert-light,
+html[data-bs-theme="dark"] .alert-light,
+[data-bs-theme="dark"] .card-header.bg-light,
+body.dark-mode .card-header.bg-light,
+[data-bs-theme="dark"] .card-footer.bg-light,
+body.dark-mode .card-footer.bg-light,
+[data-bs-theme="dark"] .modal-footer.bg-light,
+body.dark-mode .modal-footer.bg-light,
+[data-bs-theme="dark"] .table-light,
+body.dark-mode .table-light,
 [data-bs-theme="dark"] .card-body.bg-white,
 [data-bs-theme="dark"] .card.bg-white {
     background-color: var(--admin-bg-card, #162032) !important;
     color: #f8fafc !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-[data-bs-theme="dark"] .card {
+/* Suporte específico para opacidades do Bootstrap no Modo Escuro */
+[data-bs-theme="dark"] .bg-light.bg-opacity-50,
+body.dark-mode .bg-light.bg-opacity-50,
+html[data-bs-theme="dark"] .bg-light.bg-opacity-50,
+[data-bs-theme="dark"] .bg-light.bg-opacity-75,
+body.dark-mode .bg-light.bg-opacity-75,
+html[data-bs-theme="dark"] .bg-light.bg-opacity-75 {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #f1f5f9 !important;
+}
+
+/* List Groups no Modo Escuro */
+[data-bs-theme="dark"] .list-group-item,
+body.dark-mode .list-group-item,
+html[data-bs-theme="dark"] .list-group-item {
+    background-color: var(--admin-bg-card, #162032) !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .list-group-item.bg-light,
+body.dark-mode .list-group-item.bg-light,
+[data-bs-theme="dark"] .list-group-item.bg-light-subtle,
+body.dark-mode .list-group-item.bg-light-subtle {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .card,
+body.dark-mode .card {
     background-color: var(--admin-bg-card, #162032) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
     color: #f1f5f9 !important;

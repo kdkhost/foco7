@@ -149,7 +149,7 @@
             <!-- ABA 1: CORES DO TEMA DA LANDING PAGE (COM CENTRALIZAÇÃO EXPLICADA) -->
             <div class="tab-pane fade show active" id="tab-cores" role="tabpanel">
                 <!-- BOX INFORMATIVO DE CENTRALIZAÇÃO DO SISTEMA -->
-                <div class="alert alert-light border shadow-sm mb-4">
+                <div class="alert alert-secondary border border-secondary border-opacity-25 shadow-sm mb-4">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div class="d-flex align-items-center gap-3">
                             <div class="bg-primary-subtle text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
@@ -246,7 +246,7 @@
                                 
                                 <div class="col-lg-6">
                                     <!-- Controle Deslizante de Opacidade -->
-                                    <div class="p-3 rounded-3 bg-light border mb-3">
+                                    <div class="p-3 rounded-3 bg-body-secondary border border-secondary border-opacity-25 mb-3">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <label for="hero_bg_opacidade" class="form-label fw-bold mb-0">
                                                 <i class="fas fa-adjust text-danger me-1"></i> Opacidade da Camada de Sobreposição:

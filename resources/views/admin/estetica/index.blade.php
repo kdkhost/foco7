@@ -130,7 +130,7 @@
 
 <!-- DIFERENCIAIS E SELOS DE GARANTIA DA ESTÉTICA NO SITE -->
 <div class="card shadow-sm border-0 mt-5">
-    <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+    <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold mb-0 text-danger">
             <i class="fas fa-certificate me-2"></i> Diferenciais Técnicos e Selos de Garantia (Exibidos no Site)
         </h5>
@@ -145,7 +145,7 @@
             <div class="row g-3">
                 <!-- DIFERENCIAL 1 -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="p-3 bg-light rounded-3 border h-100">
+                    <div class="p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25 h-100">
                         <span class="badge bg-danger mb-2">Diferencial 1</span>
                         <div class="mb-2">
                             <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -163,7 +163,7 @@
                 </div>
                 <!-- DIFERENCIAL 2 -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="p-3 bg-light rounded-3 border h-100">
+                    <div class="p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25 h-100">
                         <span class="badge bg-danger mb-2">Diferencial 2</span>
                         <div class="mb-2">
                             <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -181,7 +181,7 @@
                 </div>
                 <!-- DIFERENCIAL 3 -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="p-3 bg-light rounded-3 border h-100">
+                    <div class="p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25 h-100">
                         <span class="badge bg-danger mb-2">Diferencial 3</span>
                         <div class="mb-2">
                             <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -199,7 +199,7 @@
                 </div>
                 <!-- DIFERENCIAL 4 -->
                 <div class="col-md-6 col-xl-3">
-                    <div class="p-3 bg-light rounded-3 border h-100">
+                    <div class="p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25 h-100">
                         <span class="badge bg-danger mb-2">Diferencial 4</span>
                         <div class="mb-2">
                             <label class="form-label small fw-bold">Ícone FontAwesome</label>

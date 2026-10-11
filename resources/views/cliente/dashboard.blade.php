@@ -159,7 +159,7 @@
                         <div class="text-end">
                             {!! $ag->status_badge !!}
                             @if($ag->valor)
-                                <div class="small fw-bold text-dark mt-1">R$ {{ number_format($ag->valor, 2, ',', '.') }}</div>
+                                <div class="small fw-bold text-body mt-1">R$ {{ number_format($ag->valor, 2, ',', '.') }}</div>
                             @endif
                         </div>
                     </div>
@@ -252,7 +252,7 @@
                 <h6 id="pixFaturaDescricao" class="fw-bold mb-1">Mensalidade</h6>
                 <h4 id="pixFaturaValor" class="text-success fw-black mb-3">R$ 0,00</h4>
 
-                <img id="pixImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white mb-3" style="max-width: 220px;">
+                <img id="pixImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white qr-code-white mb-3" style="max-width: 220px;">
 
                 <p class="small text-secondary mb-2">Código PIX Copia e Cola:</p>
                 <div class="input-group mb-3">

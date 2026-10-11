@@ -115,7 +115,7 @@
             <div class="card-body p-0">
                 @if($depoimentos->isEmpty())
                     <div class="text-center py-5">
-                        <div class="bg-light d-inline-block rounded-circle p-4 mb-3">
+                        <div class="bg-body-secondary d-inline-block rounded-circle p-4 mb-3">
                             <i class="fas fa-star-half-alt text-muted fs-1"></i>
                         </div>
                         <h5 class="fw-bold text-secondary">Nenhum depoimento encontrado</h5>
@@ -293,7 +293,7 @@
                         </div>
 
                         <div class="col-12">
-                            <div class="form-check form-switch p-2 bg-light rounded-3 border">
+                            <div class="form-check form-switch p-2 bg-body-secondary rounded-3 border border-secondary border-opacity-25">
                                 <input class="form-check-input ms-0 me-2" type="checkbox" name="ativo" id="dep_ativo" value="1" checked>
                                 <label class="form-check-label fw-semibold small" for="dep_ativo">
                                     Aprovado e publicado imediatamente no site
@@ -304,7 +304,7 @@
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light">
+                <div class="modal-footer bg-body-tertiary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnSalvarDepoimento">
                         <i class="fas fa-save me-1"></i> Salvar Depoimento

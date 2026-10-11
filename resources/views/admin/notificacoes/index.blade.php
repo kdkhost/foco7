@@ -121,7 +121,7 @@
                     <div class="card-body p-0">
                         @if($notificacoes->isEmpty())
                             <div class="text-center py-5">
-                                <div class="bg-light d-inline-block rounded-circle p-4 mb-3">
+                                <div class="bg-body-secondary d-inline-block rounded-circle p-4 mb-3">
                                     <i class="fas fa-bell-slash text-muted fs-1"></i>
                                 </div>
                                 <h5 class="fw-bold text-secondary">Nenhuma notificação encontrada</h5>
@@ -130,28 +130,28 @@
                         @else
                             <div class="list-group list-group-flush" id="listaNotificacoesContainer">
                                 @foreach($notificacoes as $notif)
-                                    <div class="list-group-item p-3 d-flex align-items-start gap-3 border-bottom {{ !$notif->lida ? 'bg-light bg-opacity-50' : '' }}" id="notif-row-{{ $notif->id }}">
+                                    <div class="list-group-item p-3 d-flex align-items-start gap-3 border-bottom {{ !$notif->lida ? 'bg-body-tertiary' : '' }}" id="notif-row-{{ $notif->id }}">
                                         <div class="bg-{{ $notif->cor }} bg-opacity-10 text-{{ $notif->cor }} rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
                                             <i class="{{ $notif->icone }} fs-5"></i>
                                         </div>
 
                                         <div class="flex-grow-1">
                                             <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
-                                                <h6 class="fw-bold mb-0 {{ !$notif->lida ? 'text-dark' : 'text-secondary' }}">
+                                                <h6 class="fw-bold mb-0 {{ !$notif->lida ? 'text-body' : 'text-body-secondary' }}">
                                                     {{ $notif->titulo }}
                                                     @if(!$notif->lida)
                                                         <span class="badge bg-danger ms-1" style="font-size: 0.65rem;">Nova</span>
                                                     @endif
                                                 </h6>
-                                                <small class="text-muted">
+                                                <small class="text-body-secondary">
                                                     <i class="far fa-clock me-1"></i> {{ $notif->created_at->diffForHumans() }}
                                                 </small>
                                             </div>
 
-                                            <p class="mb-2 text-secondary small leading-relaxed">{{ $notif->mensagem }}</p>
+                                            <p class="mb-2 text-body-secondary small leading-relaxed">{{ $notif->mensagem }}</p>
 
                                             @if(!empty($notif->dados) && is_array($notif->dados))
-                                                <div class="bg-light p-2 rounded-2 mb-2 border small">
+                                                <div class="bg-body-secondary p-2 rounded-2 mb-2 border border-secondary border-opacity-25 small text-body">
                                                     <div class="row g-2">
                                                         @foreach($notif->dados as $key => $val)
                                                             @if(is_scalar($val) && $key !== 'mensagem')
@@ -204,12 +204,12 @@
                         </h6>
                     </div>
                     <div class="card-body p-3">
-                        <div class="p-3 rounded-3 mb-3 bg-light border">
+                        <div class="p-3 rounded-3 mb-3 bg-body-secondary border border-secondary border-opacity-25">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="small fw-semibold text-secondary">Status no seu Navegador / Celular:</span>
+                                <span class="small fw-semibold text-body-secondary">Status no seu Navegador / Celular:</span>
                                 <span id="badgePermissaoPush" class="badge bg-secondary">Verificando...</span>
                             </div>
-                            <p class="small text-muted mb-0">
+                            <p class="small text-body-secondary mb-0">
                                 Permite receber alertas instantâneos no topo da tela do celular ou computador sempre que um cliente enviar mensagem ou fizer agendamento.
                             </p>
                         </div>
@@ -341,8 +341,8 @@
             success: function (res) {
                 if (res.success) {
                     toastr.success(res.message);
-                    $(`#notif-row-${id}`).removeClass('bg-light bg-opacity-50');
-                    $(`#notif-row-${id} h6`).removeClass('text-dark').addClass('text-secondary');
+                    $(`#notif-row-${id}`).removeClass('bg-body-tertiary bg-light bg-opacity-50');
+                    $(`#notif-row-${id} h6`).removeClass('text-dark text-body').addClass('text-body-secondary');
                     $(`#notif-row-${id} .badge.bg-danger`).remove();
                     $(`#notif-row-${id} button:contains("Marcar como Lida")`).remove();
                     atualizarBadgesContador(res.nao_lidas_count);
@@ -357,8 +357,8 @@
     // Ao clicar em Acessar Módulo, atualiza a interface antes de navegar
     $(document).on('click', '.btn-abrir-modulo', function () {
         const id = $(this).data('id');
-        $(`#notif-row-${id}`).removeClass('bg-light bg-opacity-50');
-        $(`#notif-row-${id} h6`).removeClass('text-dark').addClass('text-secondary');
+        $(`#notif-row-${id}`).removeClass('bg-body-tertiary bg-light bg-opacity-50');
+        $(`#notif-row-${id} h6`).removeClass('text-dark text-body').addClass('text-body-secondary');
         $(`#notif-row-${id} .badge.bg-danger`).remove();
         $(`#notif-row-${id} button:contains("Marcar como Lida")`).remove();
         let cur = parseInt($('#cardCountNaoLidas').text()) || 0;

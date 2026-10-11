@@ -92,9 +92,9 @@
 
                 <div class="card-body p-3 bg-secondary-subtle d-flex flex-column align-items-center justify-content-start overflow-hidden flex-grow-1" style="min-height: 580px;">
                     <div id="previewFrameWrapper" class="device-frame-wrapper w-100 shadow rounded bg-white overflow-hidden" style="transition: max-width 0.35s ease, border 0.35s ease, border-radius 0.35s ease; max-width: 100%; border: 1px solid #cbd5e1;">
-                        <div class="device-top-bar bg-light py-1 px-3 border-bottom d-flex justify-content-between align-items-center text-secondary" style="font-size: 11px;">
+                        <div class="device-top-bar bg-body-secondary py-1 px-3 border-bottom d-flex justify-content-between align-items-center text-body-secondary" style="font-size: 11px;">
                             <span id="deviceModeLabel" class="font-monospace text-truncate"><i class="fas fa-desktop text-danger me-1"></i> Modo: Desktop (100%)</span>
-                            <span class="badge bg-light text-dark border">Layout Master Responsivo</span>
+                            <span class="badge bg-body-tertiary text-body border">Layout Master Responsivo</span>
                         </div>
                         <iframe id="iframePreviewEmail" class="w-100 border-0" style="height: 520px; display: block; background: #f1f5f9;" sandbox="allow-same-origin allow-scripts"></iframe>
                     </div>

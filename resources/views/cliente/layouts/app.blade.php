@@ -8,6 +8,13 @@
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
+    <script>
+        (function() {
+            var t = localStorage.getItem('foco7_admin_theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', t);
+        })();
+    </script>
+
     <!-- Bootstrap 5.3 & FontAwesome 6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -20,7 +27,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Customização Foco 7 para AdminLTE 4 -->
-    <link rel="stylesheet" href="{{ asset('css/admin-foco7.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-foco7.css') }}?v={{ file_exists(public_path('css/admin-foco7.css')) ? filemtime(public_path('css/admin-foco7.css')) : time() }}">
 
     <!-- Injeção Dinâmica da Paleta Oficial CMS Foco 7 -->
     <style>
@@ -37,13 +44,19 @@
             --bs-link-hover-color: {{ $cmsCorDestaque ?? '#b80000' }};
             --bs-focus-ring-color: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.25);
         }
-        [data-bs-theme="dark"] {
+        [data-bs-theme="dark"], body.dark-mode {
             --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
             --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
             --bs-link-color: #f1f5f9;
             --bs-link-hover-color: #ffffff;
             --bs-body-bg: #0b0f19;
             --bs-body-color: #f1f5f9;
+            --bs-tertiary-bg: #162032;
+            --bs-secondary-bg: #111827;
+            --bs-light: #162032;
+            --bs-light-rgb: 22, 32, 50;
+            --bs-light-bg-subtle: #162032;
+            --bs-border-color: rgba(255, 255, 255, 0.12);
         }
     </style>
 

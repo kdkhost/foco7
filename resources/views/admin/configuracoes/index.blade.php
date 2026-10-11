@@ -113,7 +113,7 @@
 
                 <!-- ABA 2: IDENTIDADE VISUAL COM ARRASTA E SOLTA (FUNDO PRETO & FUNDO BRANCO) -->
                 <div class="tab-pane fade" id="tab-branding" role="tabpanel">
-                    <div class="alert alert-light border shadow-sm mb-4">
+                    <div class="alert alert-secondary border border-secondary border-opacity-25 shadow-sm mb-4">
                         <div class="d-flex align-items-center gap-3">
                             <div class="bg-primary-subtle text-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
                                 <i class="fas fa-palette fa-lg"></i>
@@ -155,12 +155,12 @@
 
                         <!-- 2. LOGO PARA FUNDO BRANCO / CLARO (SECUNDÁRIA) -->
                         <div class="col-lg-4">
-                            <div class="card bg-white border border-2 p-3 h-100 shadow-sm text-dark">
+                            <div class="card bg-white preview-fundo-branco border border-2 p-3 h-100 shadow-sm text-dark">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <label class="form-label fw-bold text-dark mb-0">
                                         <i class="fas fa-sun text-warning me-1"></i> Logo Fundo Branco
                                     </label>
-                                    <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.7rem;">Fundo Claro</span>
+                                    <span class="badge bg-secondary-subtle text-dark border font-monospace" style="font-size: 0.7rem;">Fundo Claro</span>
                                 </div>
                                 <p class="small text-muted mb-2" style="font-size: 0.78rem;">
                                     Letras pretas/escuras. Exibido no topo/navbar da Landing Page, termos de privacidade e páginas claras.

@@ -30,7 +30,7 @@
                     @forelse($faturas as $fat)
                     <tr>
                         <td>
-                            <span class="fw-bold text-dark">{{ $fat->codigo_fatura }}</span>
+                            <span class="fw-bold text-body">{{ $fat->codigo_fatura }}</span>
                             @if($fat->isCarne())
                                 <br><span class="badge bg-success-subtle text-success border border-success-subtle small mt-1">
                                     <i class="fas fa-book me-1"></i> Carnê {{ $fat->numero_parcela }}/{{ $fat->total_parcelas }}
@@ -116,7 +116,7 @@
 
                 <!-- QR CODE PIX -->
                 <div id="modalFatPixBox">
-                    <img id="modalFatQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white mb-3" style="max-width: 220px;">
+                    <img id="modalFatQrImg" src="" alt="QR Code PIX" class="img-fluid rounded border p-2 bg-white qr-code-white mb-3" style="max-width: 220px;">
 
                     <p class="small text-secondary mb-2">Código PIX Copia e Cola:</p>
                     <div class="input-group mb-3">

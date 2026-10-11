@@ -25,7 +25,7 @@
 </div>
 
 <!-- VARIÁVEIS DINÂMICAS DISPONÍVEIS -->
-<div class="alert alert-light border mb-4 shadow-sm">
+<div class="alert alert-secondary border border-secondary border-opacity-25 mb-4 shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <span class="small fw-bold text-body"><i class="fas fa-tags text-danger me-1"></i> Variáveis Dinâmicas do Sistema:</span>
         <span class="small text-muted" style="font-size: 11px;"><i class="fas fa-mouse-pointer me-1"></i> Clique em qualquer tag para inserir no cursor do editor</span>
@@ -124,9 +124,9 @@
                 <!-- MOLDURA SIMULADORA RESPONSIVA -->
                 <div id="previewFrameWrapper" class="device-frame-wrapper w-100 shadow rounded bg-white overflow-hidden" style="transition: max-width 0.35s ease, border 0.35s ease, border-radius 0.35s ease; max-width: 100%; border: 1px solid #cbd5e1;">
                     <!-- BARRA SUPERIOR DO DISPOSITIVO -->
-                    <div class="device-top-bar bg-light py-1 px-3 border-bottom d-flex justify-content-between align-items-center text-secondary" style="font-size: 11px;">
+                    <div class="device-top-bar bg-body-secondary py-1 px-3 border-bottom d-flex justify-content-between align-items-center text-body-secondary" style="font-size: 11px;">
                         <span id="deviceModeLabel" class="font-monospace text-truncate"><i class="fas fa-desktop text-danger me-1"></i> Modo: Desktop (100%)</span>
-                        <span class="badge bg-light text-dark border">Layout Master Responsivo</span>
+                        <span class="badge bg-body-tertiary text-body border">Layout Master Responsivo</span>
                     </div>
                     <!-- IFRAME DO E-MAIL RENDERIZADO -->
                     <iframe id="iframePreviewEmail" class="w-100 border-0" style="height: 520px; display: block; background: #f1f5f9;" sandbox="allow-same-origin allow-scripts"></iframe>

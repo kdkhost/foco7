@@ -158,7 +158,7 @@
         <div class="card border shadow-sm h-100">
             <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="p-3 rounded-circle bg-light border d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <div class="p-3 rounded-circle bg-body-secondary border border-secondary border-opacity-25 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
                         <i id="heartbeatIcon" class="fas fa-heartbeat fs-3 {{ $cronAtivo ? 'text-danger' : 'text-secondary' }}"></i>
                     </div>
                     <div>
