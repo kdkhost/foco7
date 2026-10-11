@@ -29,7 +29,7 @@
     <!-- Customização Foco 7 para AdminLTE 4 -->
     <link rel="stylesheet" href="{{ asset('css/admin-foco7.css') }}?v={{ file_exists(public_path('css/admin-foco7.css')) ? filemtime(public_path('css/admin-foco7.css')) : time() }}">
 
-    <!-- Injeção Dinâmica da Paleta Oficial CMS Foco 7 -->
+    <!-- Injeção Dinâmica da Paleta da Empresa para Marcações e Detalhes -->
     <style>
         :root {
             --admin-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
@@ -40,23 +40,15 @@
             --bs-primary-text-emphasis: {{ $cmsCorPrimaria ?? '#d90000' }};
             --bs-primary-bg-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.12);
             --bs-primary-border-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.3);
-            --bs-link-color: {{ $cmsCorPrimaria ?? '#d90000' }};
-            --bs-link-hover-color: {{ $cmsCorDestaque ?? '#b80000' }};
             --bs-focus-ring-color: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.25);
         }
         [data-bs-theme="dark"], body.dark-mode {
             --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
             --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
-            --bs-link-color: #f1f5f9;
-            --bs-link-hover-color: #ffffff;
-            --bs-body-bg: #0b0f19;
-            --bs-body-color: #f1f5f9;
-            --bs-tertiary-bg: #162032;
-            --bs-secondary-bg: #111827;
-            --bs-light: #162032;
-            --bs-light-rgb: 22, 32, 50;
-            --bs-light-bg-subtle: #162032;
-            --bs-border-color: rgba(255, 255, 255, 0.12);
+            --bs-primary-text-emphasis: {{ $cmsCorDestaque ?? '#ff7676' }};
+            --bs-primary-bg-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.18);
+            --bs-primary-border-subtle: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.35);
+            --bs-focus-ring-color: rgba({{ $cmsCorPrimariaRgb ?? '217, 0, 0' }}, 0.3);
         }
     </style>
 

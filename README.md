@@ -13,7 +13,7 @@ Sistema integrado de alta performance composto por uma **Landing Page (Single Pa
 | **Frontend Site** | Single Page responsiva | Inspirada na estrutura e distribuição do `sosrastreamento.com` |
 | **Identidade Visual** | Paleta Oficial Foco 7 (`#d90000`, `#25d366` e tema claro `#f8fafc`) | Design system limpo, navbar glassmorphism e tipografia Outfit/Roboto |
 | **Template do Painel** | AdminLTE 4 com Bootstrap 5 | Interface profissional oficial, suporte nativo Dark/Light mode e Treeview |
-| **Design System & Temas**| Dark/Light Mode Blindado | Neutralização global de caixas claras no dark mode, sincronização estrita de variáveis Bootstrap 5.3, script anti-flicker no `<head>` e cache-buster dinâmico (`?v=timestamp`) |
+| **Design System & Temas**| Padrão Oficial AdminLTE 4 & CMS | Superfícies 100% nativas do padrão oficial Dark/Light do AdminLTE 4 (Bootstrap 5.3), aplicando a paleta configurada pelo administrativo exclusivamente nas marcações e detalhes de identidade (sidebar ativa, botões, abas, badges, switches e foco) |
 | **Notificações** | Toastr (Global) | Notificações dinâmicas e não intrusivas para operações AJAX |
 | **Confirmações** | SweetAlert2 (Global) | **Nenhum alert() nativo permitido** no sistema |
 | **Editor de Conteúdo** | Summernote | Editor visual WYSIWYG completo em todas as textareas gerenciáveis |

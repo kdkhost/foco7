@@ -1,7 +1,10 @@
 /**
  * ==============================================================================
- * SISTEMA FOCO 7 - PALETA OFICIAL & HARMONIZAÇÃO COM ADMINLTE 4 (BOOTSTRAP 5)
- * Totalmente compatível com o Grid Oficial, Sidebar Toggle e Dark/Light Mode
+ * SISTEMA FOCO 7 - TEMA OFICIAL ADMINLTE 4 (BOOTSTRAP 5.3) & MARCAÇÕES DINÂMICAS
+ * 
+ * Padrão Oficial do AdminLTE v4 para superfícies Dark e Light.
+ * Marcações (sidebar ativa, botões, switches, badges e abas) na cor da paleta da
+ * empresa configurada no painel administrativo.
  * ==============================================================================
  */
 
@@ -11,65 +14,29 @@
     --admin-primary-hover: #b80000;
     --admin-primary-rgb: 217, 0, 0;
 
-    /* Sincronização estrita de variáveis Bootstrap 5 para AdminLTE 4 no Modo Claro */
-    --bs-primary: #d90000;
-    --bs-primary-rgb: 217, 0, 0;
-    --bs-primary-text-emphasis: #d90000;
-    --bs-primary-bg-subtle: rgba(217, 0, 0, 0.1);
-    --bs-primary-border-subtle: rgba(217, 0, 0, 0.25);
-    --bs-link-color: #c40000;
-    --bs-link-hover-color: #990000;
-    --bs-focus-ring-color: rgba(217, 0, 0, 0.25);
-
-    /* Superfícies e Textos do Tema Claro */
-    --admin-bg-base: #f4f6f9;
-    --admin-bg-card: #ffffff;
-    --admin-text-main: #0f172a;
-    --admin-text-secondary: #64748b;
+    /* Sincronização da paleta primária da empresa */
+    --bs-primary: var(--admin-primary);
+    --bs-primary-rgb: var(--admin-primary-rgb);
+    --bs-primary-text-emphasis: var(--admin-primary);
+    --bs-primary-bg-subtle: rgba(var(--admin-primary-rgb), 0.12);
+    --bs-primary-border-subtle: rgba(var(--admin-primary-rgb), 0.3);
+    --bs-focus-ring-color: rgba(var(--admin-primary-rgb), 0.25);
 }
 
 [data-bs-theme="dark"],
 body.dark-mode,
 html[data-bs-theme="dark"] {
-    --admin-primary: #ff5252;
-    --admin-primary-hover: #ff7676;
-    --admin-primary-rgb: 255, 82, 82;
-
-    /* No Tema Escuro: Cores semânticas profissionais de alto contraste */
-    --bs-primary: #d90000;
-    --bs-primary-rgb: 217, 0, 0;
-    --bs-primary-text-emphasis: #ff7676;
-    --bs-primary-bg-subtle: rgba(255, 82, 82, 0.16);
-    --bs-primary-border-subtle: rgba(255, 82, 82, 0.35);
-
-    /* LINKS NO MODO ESCURO: Claros, nítidos, NUNCA vermelho borrado */
-    --bs-link-color: #f1f5f9;
-    --bs-link-hover-color: #ffffff;
-    --bs-focus-ring-color: rgba(255, 82, 82, 0.3);
-
-    /* Superfícies e Textos do Tema Escuro (Profundo, moderno e legível) */
-    --admin-bg-base: #0b0f19;
-    --admin-bg-surface: #111827;
-    --admin-bg-card: #162032;
-    --admin-text-main: #f8fafc;
-    --admin-text-secondary: #94a3b8;
-    --bs-body-bg: #0b0f19;
-    --bs-body-color: #f1f5f9;
-    --bs-tertiary-bg: #162032;
-    --bs-secondary-bg: #111827;
-    --bs-border-color: rgba(255, 255, 255, 0.1);
-
-    /* Sincronização estrita de variáveis de luz/contraste do Bootstrap no Dark Mode */
-    --bs-light: #162032;
-    --bs-light-rgb: 22, 32, 50;
-    --bs-light-bg-subtle: #162032;
-    --bs-dark: #f8fafc;
-    --bs-dark-rgb: 248, 250, 252;
-    --bs-dark-bg-subtle: rgba(255, 255, 255, 0.05);
+    /* No Modo Escuro, mantemos a identidade da empresa para marcações com ênfase nítida */
+    --bs-primary: var(--admin-primary);
+    --bs-primary-rgb: var(--admin-primary-rgb);
+    --bs-primary-text-emphasis: var(--admin-primary-hover, #ff7676);
+    --bs-primary-bg-subtle: rgba(var(--admin-primary-rgb), 0.2);
+    --bs-primary-border-subtle: rgba(var(--admin-primary-rgb), 0.4);
+    --bs-focus-ring-color: rgba(var(--admin-primary-rgb), 0.3);
 }
 
 /* ==============================================================================
-   SIDEBAR OFICIAL ADMINLTE 4 - PALETA FOCO 7 E NAVEGAÇÃO LIMPA
+   SIDEBAR OFICIAL ADMINLTE 4 - MARCAÇÃO ATIVA NA COR DA EMPRESA
    ============================================================================== */
 
 /* Logotipo oficial na barra lateral */
@@ -81,9 +48,9 @@ html[data-bs-theme="dark"] {
     object-fit: contain;
 }
 
-/* Marcação do item ativo nativo na Sidebar (Sem pílulas gigantes nem box-shadow excessivo) */
+/* Marcação do item ativo na Sidebar com a cor da empresa */
 .app-sidebar .sidebar-menu .nav-link.active {
-    background-color: #d90000 !important;
+    background-color: var(--admin-primary) !important;
     color: #ffffff !important;
     font-weight: 600;
 }
@@ -118,293 +85,44 @@ html[data-bs-theme="dark"] {
 }
 
 /* ==============================================================================
-   PADRONIZAÇÃO PROFISSIONAL: CONTRASTE DINÂMICO & PREVENÇÃO DE CONFLITO DARK/LIGHT
-   Garante que o texto seja SEMPRE o oposto da cor de fundo em ambos os temas
+   DETALHES E MARCAÇÕES NA COR DA EMPRESA (ADMINISTRATIVO / CMS)
    ============================================================================== */
 
-/* --- NO TEMA CLARO (LIGHT) --- */
-[data-bs-theme="light"] .text-dark,
-[data-bs-theme="light"] .text-black,
-[data-bs-theme="light"] h1, [data-bs-theme="light"] h2, [data-bs-theme="light"] h3,
-[data-bs-theme="light"] h4, [data-bs-theme="light"] h5, [data-bs-theme="light"] h6,
-[data-bs-theme="light"] .card-title,
-[data-bs-theme="light"] .form-label {
-    color: #0f172a !important; /* Escuro sobre fundo claro */
-}
-
-[data-bs-theme="light"] .text-secondary,
-[data-bs-theme="light"] .text-muted {
-    color: #64748b !important;
-}
-
-/* Tipografia Primária no Tema Claro */
-[data-bs-theme="light"] .text-primary,
-[data-bs-theme="light"] a.text-primary,
-[data-bs-theme="light"] i.text-primary,
-[data-bs-theme="light"] .card-title.text-primary,
-[data-bs-theme="light"] .text-danger,
-[data-bs-theme="light"] a.text-danger,
-[data-bs-theme="light"] i.text-danger {
-    color: #d90000 !important;
-}
-
-/* --- NO TEMA ESCURO (DARK) - INVERSÃO RIGOROSA: TEXTOS SEMPRE CLAROS --- */
-[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-body.dark-mode .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-html[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-[data-bs-theme="dark"] .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-body.dark-mode .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-html[data-bs-theme="dark"] .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
-[data-bs-theme="dark"] h1:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] h2:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] h3:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] h4:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] h5:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] h6:not(.text-danger):not(.text-primary):not(.text-success):not(.text-warning),
-[data-bs-theme="dark"] .card-title:not(.text-danger):not(.text-primary),
-[data-bs-theme="dark"] .card-header:not([class*="bg-danger"]):not([class*="bg-primary"]),
-[data-bs-theme="dark"] .form-label,
-[data-bs-theme="dark"] .form-check-label,
-[data-bs-theme="dark"] strong:not([class*="text-"]):not(.text-warning):not(.text-danger),
-[data-bs-theme="dark"] label:not(.btn):not(.badge),
-body.dark-mode strong:not([class*="text-"]):not(.text-warning):not(.text-danger),
-body.dark-mode label:not(.btn):not(.badge) {
-    color: #f8fafc !important; /* Claros no Dark - Oposto do fundo, NUNCA somem */
-}
-
-/* Textos secundários e legendas no Dark: Cinza claro luminoso, 100% legível */
-[data-bs-theme="dark"] .text-secondary,
-body.dark-mode .text-secondary,
-[data-bs-theme="dark"] .text-muted,
-body.dark-mode .text-muted,
-[data-bs-theme="dark"] .form-text,
-[data-bs-theme="dark"] small.text-secondary {
-    color: #94a3b8 !important;
-}
-
-/* ELIMINAÇÃO TOTAL DO "BORRÃO VERMELHO" NO TEMA ESCURO: */
-/* Links e Botões de Link no Tema Escuro: Tons Claros / Coral de Alto Contraste */
-[data-bs-theme="dark"] a:not(.btn):not(.badge):not(.nav-link-active) {
-    color: #f1f5f9;
-}
-[data-bs-theme="dark"] a:not(.btn):not(.badge):hover {
-    color: #ffffff;
-    text-decoration: underline;
-}
-
-/* Links intencionais com .text-danger ou .text-primary no Dark: Coral luminoso legível */
-[data-bs-theme="dark"] a.text-danger,
-[data-bs-theme="dark"] a.text-primary,
-[data-bs-theme="dark"] .btn-link.text-danger,
-[data-bs-theme="dark"] .btn-link.text-primary {
-    color: #ff6b6b !important;
-    font-weight: 600;
-}
-[data-bs-theme="dark"] a.text-danger:hover,
-[data-bs-theme="dark"] a.text-primary:hover,
-[data-bs-theme="dark"] .btn-link.text-danger:hover,
-[data-bs-theme="dark"] .btn-link.text-primary:hover {
-    color: #ff9999 !important;
-    text-decoration: underline;
-}
-
-/* Ícones de destaque vermelho no Tema Escuro: Luminosos e nítidos (sem aberração de foco) */
-[data-bs-theme="dark"] i.text-danger,
-[data-bs-theme="dark"] i.text-primary,
-[data-bs-theme="dark"] .fas.text-danger,
-[data-bs-theme="dark"] .fas.text-primary {
-    color: #ff5c5c !important;
-}
-
-/* Títulos com .text-danger no Tema Escuro */
-[data-bs-theme="dark"] h1.text-danger, [data-bs-theme="dark"] h2.text-danger,
-[data-bs-theme="dark"] h3.text-danger, [data-bs-theme="dark"] h4.text-danger,
-[data-bs-theme="dark"] h5.text-danger, [data-bs-theme="dark"] h6.text-danger {
-    color: #ff6b6b !important;
-}
-
-/* SUPERFÍCIES NO TEMA ESCURO: Previne totalmente caixas brancas cegantes */
-[data-bs-theme="dark"] .bg-white:not(.qr-code-white),
-body.dark-mode .bg-white:not(.qr-code-white),
-html[data-bs-theme="dark"] .bg-white:not(.qr-code-white),
-[data-bs-theme="dark"] .bg-light,
-body.dark-mode .bg-light,
-html[data-bs-theme="dark"] .bg-light,
-[data-bs-theme="dark"] .bg-light-subtle,
-body.dark-mode .bg-light-subtle,
-html[data-bs-theme="dark"] .bg-light-subtle,
-[data-bs-theme="dark"] .alert-light,
-body.dark-mode .alert-light,
-html[data-bs-theme="dark"] .alert-light,
-[data-bs-theme="dark"] .card-header.bg-light,
-body.dark-mode .card-header.bg-light,
-[data-bs-theme="dark"] .card-footer.bg-light,
-body.dark-mode .card-footer.bg-light,
-[data-bs-theme="dark"] .modal-footer.bg-light,
-body.dark-mode .modal-footer.bg-light,
-[data-bs-theme="dark"] .table-light,
-body.dark-mode .table-light,
-[data-bs-theme="dark"] .card-body.bg-white,
-[data-bs-theme="dark"] .card.bg-white {
-    background-color: var(--admin-bg-card, #162032) !important;
-    color: #f8fafc !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Suporte específico para opacidades do Bootstrap no Modo Escuro */
-[data-bs-theme="dark"] .bg-light.bg-opacity-50,
-body.dark-mode .bg-light.bg-opacity-50,
-html[data-bs-theme="dark"] .bg-light.bg-opacity-50,
-[data-bs-theme="dark"] .bg-light.bg-opacity-75,
-body.dark-mode .bg-light.bg-opacity-75,
-html[data-bs-theme="dark"] .bg-light.bg-opacity-75 {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-    color: #f1f5f9 !important;
-}
-
-/* List Groups no Modo Escuro */
-[data-bs-theme="dark"] .list-group-item,
-body.dark-mode .list-group-item,
-html[data-bs-theme="dark"] .list-group-item {
-    background-color: var(--admin-bg-card, #162032) !important;
-    color: #f1f5f9 !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-[data-bs-theme="dark"] .list-group-item.bg-light,
-body.dark-mode .list-group-item.bg-light,
-[data-bs-theme="dark"] .list-group-item.bg-light-subtle,
-body.dark-mode .list-group-item.bg-light-subtle {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-    color: #f1f5f9 !important;
-}
-
-[data-bs-theme="dark"] .card,
-body.dark-mode .card {
-    background-color: var(--admin-bg-card, #162032) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    color: #f1f5f9 !important;
-}
-
-[data-bs-theme="dark"] .app-header {
-    background-color: var(--admin-bg-surface, #111827) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-[data-bs-theme="dark"] .app-header .nav-link {
-    color: #cbd5e1 !important;
-}
-
-[data-bs-theme="dark"] .app-header .nav-link:hover {
+/* Botões Primários */
+.btn-primary {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
     color: #ffffff !important;
 }
 
-/* Dropdowns e Menus no Tema Escuro */
-[data-bs-theme="dark"] .dropdown-menu {
-    background-color: var(--admin-bg-card, #162032) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    color: #f1f5f9 !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-bs-theme="dark"] .dropdown-item {
-    color: #e2e8f0 !important;
-}
-
-[data-bs-theme="dark"] .dropdown-item:hover,
-[data-bs-theme="dark"] .dropdown-item:focus {
-    background-color: rgba(255, 255, 255, 0.08) !important;
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--admin-primary-hover) !important;
+    border-color: var(--admin-primary-hover) !important;
     color: #ffffff !important;
 }
 
-/* Modais no Tema Escuro */
-[data-bs-theme="dark"] .modal-content {
-    background-color: var(--admin-bg-card, #162032) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    color: #f1f5f9 !important;
+.btn-outline-primary {
+    color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
 }
 
-[data-bs-theme="dark"] .modal-header,
-[data-bs-theme="dark"] .modal-footer {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Formulários e Inputs no Tema Escuro */
-[data-bs-theme="dark"] .form-control,
-[data-bs-theme="dark"] .form-select {
-    background-color: #0b0f19 !important;
-    border-color: rgba(255, 255, 255, 0.16) !important;
-    color: #f8fafc !important;
-}
-
-[data-bs-theme="dark"] .form-control:focus,
-[data-bs-theme="dark"] .form-select:focus {
-    background-color: #0b0f19 !important;
-    border-color: #ff6b6b !important;
-    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.2) !important;
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
     color: #ffffff !important;
 }
 
-[data-bs-theme="dark"] .form-control::placeholder {
-    color: #64748b !important;
-}
-
-/* Tabelas no Tema Escuro */
-[data-bs-theme="dark"] .table {
-    color: #f1f5f9 !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-[data-bs-theme="dark"] .table th {
-    color: #cbd5e1 !important;
-    background-color: rgba(255, 255, 255, 0.03) !important;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-[data-bs-theme="dark"] .table td {
-    color: #f1f5f9 !important;
-    border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-[data-bs-theme="dark"] .table-hover>tbody>tr:hover>* {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    color: #ffffff !important;
-}
-
-/* Exceções legítimas de contraste: Textos dentro de Fundos Amarelos (Warning) */
-[data-bs-theme="dark"] .bg-warning.text-dark,
-[data-bs-theme="dark"] .badge.bg-warning,
-[data-bs-theme="dark"] .btn-warning,
-[data-bs-theme="dark"] .alert-warning {
-    color: #111827 !important; /* Mantém escuro apenas quando o fundo for amarelo claro */
-}
-
-/* Fundos e Superfícies Primárias */
-.bg-primary {
-    background-color: #d90000 !important;
-    color: #ffffff !important;
-}
-
-.bg-primary-subtle {
-    background-color: rgba(217, 0, 0, 0.12) !important;
-    color: #d90000 !important;
-}
-
-[data-bs-theme="dark"] .bg-primary-subtle {
-    background-color: rgba(255, 82, 82, 0.18) !important;
-    color: #ff7676 !important;
-}
-
-.border-primary {
-    border-color: #d90000 !important;
-}
-
-.border-primary-subtle {
-    border-color: rgba(217, 0, 0, 0.3) !important;
-}
-
-/* Interruptores (Switches), Checkboxes e Radios */
+/* Switches, Checkboxes e Radios Marcados */
 .form-check-input:checked {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.form-switch .form-check-input:checked {
     background-color: var(--admin-primary) !important;
     border-color: var(--admin-primary) !important;
 }
@@ -414,12 +132,7 @@ body.dark-mode .card {
     box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.25) !important;
 }
 
-.form-switch .form-check-input:checked {
-    background-color: var(--admin-primary) !important;
-    border-color: var(--admin-primary) !important;
-}
-
-/* Focus em Campos de Texto e Seleção */
+/* Foco em Campos de Formulário */
 .form-control:focus,
 .form-select:focus {
     border-color: var(--admin-primary) !important;
@@ -435,40 +148,12 @@ body.dark-mode .card {
 }
 
 .nav-tabs .nav-link:hover:not(.active) {
-    color: var(--admin-primary-hover, #b80000) !important;
+    color: var(--admin-primary-hover) !important;
 }
 
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     background-color: var(--admin-primary) !important;
-    color: #ffffff !important;
-}
-
-/* Botões Primários e Outline */
-.btn-primary {
-    background-color: var(--admin-primary) !important;
-    border-color: var(--admin-primary) !important;
-    color: #ffffff !important;
-}
-
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active {
-    background-color: var(--admin-primary-hover, #b80000) !important;
-    border-color: var(--admin-primary-hover, #b80000) !important;
-    color: #ffffff !important;
-}
-
-.btn-outline-primary {
-    color: var(--admin-primary) !important;
-    border-color: var(--admin-primary) !important;
-}
-
-.btn-outline-primary:hover,
-.btn-outline-primary:focus,
-.btn-outline-primary:active {
-    background-color: var(--admin-primary) !important;
-    border-color: var(--admin-primary) !important;
     color: #ffffff !important;
 }
 
@@ -487,28 +172,73 @@ body.dark-mode .card {
 
 /* Badges e Status */
 .badge-foco {
-    background-color: var(--admin-primary);
-    color: #ffffff;
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+.bg-primary {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+}
+
+.bg-primary-subtle {
+    background-color: var(--bs-primary-bg-subtle) !important;
+    color: var(--bs-primary-text-emphasis) !important;
+}
+
+.border-primary {
+    border-color: var(--admin-primary) !important;
+}
+
+.border-primary-subtle {
+    border-color: var(--bs-primary-border-subtle) !important;
+}
+
+.text-primary,
+a.text-primary,
+i.text-primary {
+    color: var(--admin-primary) !important;
+}
+
+[data-bs-theme="dark"] .text-primary,
+[data-bs-theme="dark"] a.text-primary,
+[data-bs-theme="dark"] i.text-primary {
+    color: var(--bs-primary-text-emphasis, #ff7676) !important;
 }
 
 /* ==============================================================================
-   ALERTAS E COMPONENTES COM CONTRASTE EQUILIBRADO
+   COMPATIBILIDADE DE TEMA: PREVENÇÃO DE CONFLITOS DE CONTRASTE NO MODO ESCURO
+   Respeita 100% as superfícies nativas do AdminLTE 4 sem forçar cores arbitrárias.
    ============================================================================== */
-.alert-warning {
-    background-color: #fffbeb;
-    border: 1px solid #f59e0b;
-    color: #78350f;
+
+/* Inverte classes legadas de texto escuro estático (.text-dark, .text-black) no modo escuro */
+[data-bs-theme="dark"] .text-dark:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]),
+[data-bs-theme="dark"] .text-black:not(.btn-warning):not(.badge-warning):not(.alert-warning):not([class*="bg-warning"]) {
+    color: var(--bs-body-color, #dee2e6) !important;
 }
 
-[data-bs-theme="dark"] .alert-warning {
-    background-color: rgba(245, 158, 11, 0.16);
-    border: 1px solid #f59e0b;
-    color: #fef3c7;
+/* Se alguma view antiga usar .bg-white hardcoded (exceto QR code), adota o fundo de card nativo do Bootstrap */
+[data-bs-theme="dark"] .bg-white:not(.qr-code-white) {
+    background-color: var(--bs-card-bg, #2b3035) !important;
+    color: var(--bs-body-color, #dee2e6) !important;
 }
 
-/* Botões e badges amarelos / warning: texto escuro legível */
+[data-bs-theme="dark"] .card-header.bg-light,
+[data-bs-theme="dark"] .card-footer.bg-light,
+[data-bs-theme="dark"] .modal-footer.bg-light,
+[data-bs-theme="dark"] .list-group-item.bg-light,
+[data-bs-theme="dark"] .table-light,
+[data-bs-theme="dark"] thead.table-light,
+[data-bs-theme="dark"] .table-light th {
+    background-color: var(--bs-tertiary-bg, #2b3035) !important;
+    color: var(--bs-body-color, #dee2e6) !important;
+    border-color: var(--bs-border-color, #495057) !important;
+}
+
+/* Avisos (warning) mantêm texto escuro para legibilidade sobre amarelo */
 .btn-warning,
-.badge.bg-warning {
+.badge.bg-warning,
+[data-bs-theme="dark"] .bg-warning.text-dark {
     color: #111827 !important;
 }
 
@@ -542,7 +272,7 @@ body.dark-mode .card {
 .foco-dropzone-box {
     border: 2px dashed #cbd5e1;
     border-radius: 12px;
-    background: #f8fafc;
+    background: var(--bs-tertiary-bg, #f8fafc);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
@@ -550,7 +280,7 @@ body.dark-mode .card {
 }
 
 .foco-dropzone-box .foco-dropzone-title {
-    color: #1e293b;
+    color: var(--bs-body-color, #1e293b);
 }
 
 [data-bs-theme="dark"] .foco-dropzone-box {
@@ -563,8 +293,8 @@ body.dark-mode .card {
 }
 
 .foco-dropzone-box:hover {
-    border-color: rgba(217, 0, 0, 0.6);
-    background: #f1f5f9;
+    border-color: var(--admin-primary);
+    background: var(--bs-secondary-bg, #f1f5f9);
 }
 
 [data-bs-theme="dark"] .foco-dropzone-box:hover {
@@ -573,8 +303,8 @@ body.dark-mode .card {
 
 .foco-dropzone-box.is-dragover {
     border-color: var(--admin-primary) !important;
-    background: rgba(217, 0, 0, 0.08) !important;
-    box-shadow: 0 0 20px rgba(217, 0, 0, 0.25);
+    background: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.08) !important;
+    box-shadow: 0 0 20px rgba(var(--admin-primary-rgb, 217, 0, 0), 0.25);
     transform: scale(1.01);
 }
 
@@ -596,7 +326,7 @@ body.dark-mode .card {
    SUMMERNOTE WYSIWYG - INTEGRAÇÃO COM BOOTSTRAP 5
    ============================================================================== */
 .note-editor.note-frame {
-    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid var(--bs-border-color, rgba(0, 0, 0, 0.12)) !important;
     border-radius: 8px !important;
     overflow: hidden;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -604,7 +334,7 @@ body.dark-mode .card {
 
 .note-editor.note-frame:focus-within {
     border-color: var(--admin-primary) !important;
-    box-shadow: 0 0 0 0.2rem rgba(217, 0, 0, 0.18) !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.18) !important;
 }
 
 .note-editor.note-frame .note-toolbar {
@@ -626,13 +356,9 @@ body.dark-mode .card {
 }
 
 .note-editor.note-frame .note-btn.active {
-    background-color: rgba(217, 0, 0, 0.12) !important;
+    background-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.12) !important;
     color: var(--admin-primary) !important;
-    border-color: rgba(217, 0, 0, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .note-editor.note-frame {
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(var(--admin-primary-rgb, 217, 0, 0), 0.3) !important;
 }
 
 /* ==============================================================================
