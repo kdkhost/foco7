@@ -207,6 +207,70 @@ i.text-primary {
 }
 
 /* ==============================================================================
+   CÍRCULOS PERFEITOS (PREVENÇÃO DE FORMATO OVAL EM TODO O SISTEMA)
+   Garante proporção 1:1 rigorosa em badges, contadores e ícones
+   ============================================================================== */
+/* Garante matematicamente que nenhum elemento .rounded-circle seja oval no sistema */
+.rounded-circle {
+    aspect-ratio: 1 / 1 !important;
+}
+
+.rounded-circle:not(img) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.badge-circle,
+.badge.rounded-circle,
+span.badge.rounded-circle,
+span.rounded-circle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    font-size: 0.85rem !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Ícones circulares médios/grandes em cards de estatísticas */
+.icon-circle-lg,
+.rounded-circle.p-3:not(button):not(img),
+.rounded-circle.p-2:not(button):not(img):not(.badge) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    flex-shrink: 0 !important;
+}
+
+#adminThemeToggle {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+/* ==============================================================================
    COMPATIBILIDADE DE TEMA: PREVENÇÃO DE CONFLITOS DE CONTRASTE NO MODO ESCURO
    Respeita 100% as superfícies nativas do AdminLTE 4 sem forçar cores arbitrárias.
    ============================================================================== */
@@ -217,12 +281,22 @@ i.text-primary {
     color: var(--bs-body-color, #dee2e6) !important;
 }
 
-/* Se alguma view antiga usar .bg-white hardcoded (exceto QR code), adota o fundo de card nativo do Bootstrap */
-[data-bs-theme="dark"] .bg-white:not(.qr-code-white) {
+/* Garante legibilidade de labels e títulos de formulário no modo escuro */
+[data-bs-theme="dark"] .form-label,
+[data-bs-theme="dark"] .col-form-label {
+    color: var(--bs-body-color, #dee2e6) !important;
+}
+
+/* Se alguma view antiga usar .bg-white hardcoded (exceto previews explícitos), adota o fundo nativo */
+[data-bs-theme="dark"] .bg-white:not(.qr-code-white):not(.preview-fundo-branco):not(.device-frame-wrapper) {
     background-color: var(--bs-card-bg, #2b3035) !important;
     color: var(--bs-body-color, #dee2e6) !important;
 }
 
+/* Neutralização Global de superfícies claras (.bg-light, .bg-body-secondary) no Dark Mode */
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .bg-light-subtle,
+[data-bs-theme="dark"] .bg-body-secondary,
 [data-bs-theme="dark"] .card-header.bg-light,
 [data-bs-theme="dark"] .card-footer.bg-light,
 [data-bs-theme="dark"] .modal-footer.bg-light,

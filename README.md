@@ -108,7 +108,7 @@ public_html/
 - **Hero Section Dinâmico:** Carrossel de alta conversão com controle de imagem e opacidade do plano de fundo pelo painel CMS (0% a 100%), preview em tempo real, chamada para ação e CTAs duplos.
 - **Problema vs Solução:** "O risco não avisa antes de chegar" com cards de riscos e soluções Foco 7.
 - **Quem Somos:** Autoridade de mais de uma década no mercado e abrangência no Norte e Nordeste.
-- **Planos e Preços:** Cards modernos de alta conversão para Carros, Motos, Frotas e Cargas com checados na cor oficial Foco 7 e checkout transparente integrado.
+- **Planos e Preços:** Cards modernos de alta conversão para Carros, Motos, Frotas e Cargas com checados na cor oficial Foco 7, botões inferiores em linha única protegidos contra quebra (`white-space: nowrap`), texto de botão configurável por plano e checkout transparente integrado.
 - **Ronda Tática Foco 7 & Central 24h:** Fluxograma em 4 etapas ilustrando a velocidade de resposta.
 - **Recursos do App e Plataforma:** Visualização interativa das funcionalidades de rastreamento.
 - **6 Diferenciais:** Pilares de confiança da empresa.
@@ -130,6 +130,7 @@ public_html/
 - Summernote WYSIWYG oficial (`v0.8.20-bs5`) com tradução pt-BR, suporte nativo a Dark/Light Mode, toolbar completa e sincronização automática AJAX em todas as textareas gerenciáveis (História da Empresa, Ronda Tática, Aplicativo Mobile, Estética, FAQs, Depoimentos e Banners).
 - Hero Carousel com película gradiente cinematográfica escura (`#0b0f19`), controle de opacidade e layout em tela cheia (100% full-bleed).
 - Gerenciador visual de conteúdo (Logo, Banners, Carrossel, Textos, FAQ, Telefones, Cores).
+- **Gestão de Planos & Preços (`/admin/planos`):** CRUD completo com seleção intuitiva de ícones via `<select>` dinâmico com preview ao vivo (dispensando digitação manual de classes), personalização individual do texto do botão de contratação direto no plano, mensalidades, taxas de adesão, badges de destaque e listagem de recursos.
 
 ### Módulo 5: Sistema de Agendamento (FullCalendar 6)
 - Calendário interativo para agendamento de instalações, vistorias e suporte.

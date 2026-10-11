@@ -101,7 +101,7 @@
             <div class="card-header bg-transparent py-3">
                 <h6 class="fw-bold mb-0"><i class="fab fa-google text-danger me-2"></i> Prévia do Google (SERP Preview)</h6>
             </div>
-            <div class="card-body p-4 bg-white text-dark rounded-bottom">
+            <div class="card-body p-4 bg-body-tertiary rounded-bottom">
                 <div class="small text-success mb-1">https://foco7.com.br</div>
                 <h5 class="fw-bold text-primary mb-1 text-truncate" id="preview-google-title">{{ $seo->meta_title }}</h5>
                 <p class="small text-secondary mb-0" id="preview-google-desc" style="line-height: 1.4;">{{ $seo->meta_description }}</p>

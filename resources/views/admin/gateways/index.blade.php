@@ -783,7 +783,7 @@
                     Swal.fire({
                         title: 'Carnê Emitido com Sucesso!',
                         html: '<p class="text-muted mb-3">' + res.message + '</p>' +
-                              '<div class="p-3 bg-light rounded text-start small mb-3 border">' +
+                              '<div class="p-3 bg-body-secondary rounded text-start small mb-3 border">' +
                               '<strong>Código do Carnê:</strong> ' + res.codigo_carne + '<br>' +
                               '<strong>Parcelamento:</strong> ' + res.total_parcelas + ' parcelas de ' + res.valor_parcela + '<br>' +
                               '<strong>Plataforma:</strong> Efí PRO (Gerencianet)' +

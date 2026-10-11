@@ -579,11 +579,12 @@
                                 @endforeach
                             @endif
                         </ul>
-                        <button class="btn {{ $plano->destaque ? 'btn-foco-primary' : 'btn-outline-danger' }} w-100 py-3 mt-auto fw-bold btn-contratar"
+                        <button class="btn {{ $plano->destaque ? 'btn-foco-primary' : 'btn-outline-danger' }} w-100 py-3 mt-auto fw-bold btn-contratar text-nowrap"
+                                style="white-space: nowrap !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; font-size: 0.85rem !important;"
                                 data-plano-id="{{ $plano->id }}"
                                 data-plano-nome="{{ $plano->nome }}"
                                 data-plano-preco="{{ $plano->preco_formatado }}">
-                            <i class="fas fa-shield-alt me-1"></i> CONTRATAR AGORA
+                            <i class="fas fa-shield-alt me-1"></i> {{ $plano->texto_botao ?: 'CONTRATAR AGORA' }}
                         </button>
                     </div>
                 </div>

@@ -208,9 +208,9 @@
             <div class="tab-pane fade" id="tab-banners" role="tabpanel">
                 <!-- SEÇÃO 1: PLANO DE FUNDO & CONTROLE DE OPACIDADE DO HERO -->
                 <div class="card border border-light-subtle shadow-sm mb-4 rounded-3 overflow-hidden">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center py-3">
                         <div>
-                            <h5 class="fw-bold mb-0 text-dark">
+                            <h5 class="fw-bold mb-0 text-body">
                                 <i class="fas fa-sliders-h text-danger me-2"></i> Plano de Fundo & Controle de Opacidade do Hero Carousel
                             </h5>
                             <small class="text-secondary">Defina a imagem de fundo panorâmica e controle com precisão a opacidade da camada de sobreposição no site.</small>
@@ -460,7 +460,7 @@
                     
                     <!-- 1. SEÇÃO SOBRE NÓS / QUEM SOMOS -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3">
+                        <div class="card-header bg-body-tertiary py-3">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Seção Sobre Nós / Autoridade Foco 7</h6>
                         </div>
                         <div class="card-body p-4">
@@ -498,7 +498,7 @@
 
                     <!-- 2. SEÇÃO ESTÉTICA AUTOMOTIVA & DIFERENCIAIS -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-car-side me-2"></i> Seção Estética Automotiva no Site</h6>
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Landing Page & Diferenciais</span>
                         </div>
@@ -523,11 +523,11 @@
 
                             <!-- 4 CARDS DE DIFERENCIAIS / GARANTIAS DA ESTÉTICA AUTOMOTIVA -->
                             <div class="border-top pt-3">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-certificate text-danger me-2"></i> 4 Diferenciais e Selos de Garantia (Rodapé da Seção Estética)</h6>
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-certificate text-danger me-2"></i> 4 Diferenciais e Selos de Garantia (Rodapé da Seção Estética)</h6>
                                 <div class="row g-3">
                                     <!-- DIFERENCIAL 1 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Diferencial 1</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -545,7 +545,7 @@
                                     </div>
                                     <!-- DIFERENCIAL 2 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Diferencial 2</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -563,7 +563,7 @@
                                     </div>
                                     <!-- DIFERENCIAL 3 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Diferencial 3</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -581,7 +581,7 @@
                                     </div>
                                     <!-- DIFERENCIAL 4 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Diferencial 4</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -604,7 +604,7 @@
 
                     <!-- 3. SEÇÃO RISCOS VS SOLUÇÕES -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3">
+                        <div class="card-header bg-body-tertiary py-3">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Seção Riscos vs Soluções</h6>
                         </div>
                         <div class="card-body p-4">
@@ -635,7 +635,7 @@
                     @csrf
                     
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-mobile-alt me-2"></i> Seção do Aplicativo Mobile Foco 7</h6>
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Tecnologia & Download</span>
                         </div>
@@ -658,11 +658,11 @@
 
                             <!-- 4 CARDS DE RECURSOS DO APP -->
                             <div class="border-top pt-3 mb-4">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Cards de Recursos do Aplicativo (Lado Esquerdo)</h6>
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Cards de Recursos do Aplicativo (Lado Esquerdo)</h6>
                                 <div class="row g-3">
                                     <!-- RECURSO 1 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Recurso 1</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -680,7 +680,7 @@
                                     </div>
                                     <!-- RECURSO 2 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Recurso 2</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -698,7 +698,7 @@
                                     </div>
                                     <!-- RECURSO 3 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Recurso 3</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -716,7 +716,7 @@
                                     </div>
                                     <!-- RECURSO 4 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <span class="badge bg-danger mb-2">Recurso 4</span>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Ícone FontAwesome</label>
@@ -737,7 +737,7 @@
 
                             <!-- CARD DE DOWNLOAD & IMAGEM OFICIAL DO APLICATIVO -->
                             <div class="border-top pt-3">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-download text-danger me-2"></i> Card Lateral de Download & Imagem Oficial do Aplicativo (Lado Direito)</h6>
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-download text-danger me-2"></i> Card Lateral de Download & Imagem Oficial do Aplicativo (Lado Direito)</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label small fw-bold">Título do Card de Download</label>
@@ -748,7 +748,7 @@
                                         <input type="text" name="secao_app_card_subtitulo" class="form-control" value="{{ $settings['secao_app_card_subtitulo'] ?? 'Baixe gratuitamente na App Store e Google Play Store' }}">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold"><i class="fab fa-apple me-1 text-dark"></i> Link Apple App Store</label>
+                                        <label class="form-label small fw-bold"><i class="fab fa-apple me-1 text-body"></i> Link Apple App Store</label>
                                         <input type="text" name="secao_app_link_appstore" class="form-control" value="{{ $settings['secao_app_link_appstore'] ?? 'https://www.apple.com/app-store/' }}">
                                     </div>
                                     <div class="col-md-6">
@@ -769,7 +769,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-light p-3 text-end">
+                        <div class="card-footer bg-body-tertiary p-3 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
                                 <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO APLICATIVO
                             </button>
@@ -784,7 +784,7 @@
                     @csrf
                     
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Seção Ronda Tática & Fluxograma de Resposta Presencial</h6>
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle">4 Etapas de Resposta</span>
                         </div>
@@ -807,14 +807,14 @@
 
                             <!-- AS 4 ETAPAS DA RONDA TÁTICA -->
                             <div class="border-top pt-3">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-list-ol text-danger me-2"></i> As 4 Etapas do Fluxo da Ronda Tática</h6>
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-list-ol text-danger me-2"></i> As 4 Etapas do Fluxo da Ronda Tática</h6>
                                 <div class="row g-3">
                                     <!-- ETAPA 1 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <div class="d-flex align-items-center gap-2 mb-2">
-                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">1</span>
-                                                <span class="fw-bold text-dark">Etapa 1</span>
+                                                <span class="badge bg-danger rounded-circle badge-circle fw-bold">1</span>
+                                                <span class="fw-bold text-body">Etapa 1</span>
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Título da Etapa</label>
@@ -829,10 +829,10 @@
 
                                     <!-- ETAPA 2 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <div class="d-flex align-items-center gap-2 mb-2">
-                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">2</span>
-                                                <span class="fw-bold text-dark">Etapa 2</span>
+                                                <span class="badge bg-danger rounded-circle badge-circle fw-bold">2</span>
+                                                <span class="fw-bold text-body">Etapa 2</span>
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Título da Etapa</label>
@@ -847,10 +847,10 @@
 
                                     <!-- ETAPA 3 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <div class="d-flex align-items-center gap-2 mb-2">
-                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">3</span>
-                                                <span class="fw-bold text-dark">Etapa 3</span>
+                                                <span class="badge bg-danger rounded-circle badge-circle fw-bold">3</span>
+                                                <span class="fw-bold text-body">Etapa 3</span>
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Título da Etapa</label>
@@ -865,10 +865,10 @@
 
                                     <!-- ETAPA 4 -->
                                     <div class="col-md-6 col-lg-3">
-                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
                                             <div class="d-flex align-items-center gap-2 mb-2">
-                                                <span class="badge bg-danger rounded-circle p-2 px-3 fw-bold">4</span>
-                                                <span class="fw-bold text-dark">Etapa 4</span>
+                                                <span class="badge bg-danger rounded-circle badge-circle fw-bold">4</span>
+                                                <span class="fw-bold text-body">Etapa 4</span>
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label small fw-bold">Título da Etapa</label>
@@ -883,7 +883,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-light p-3 text-end">
+                        <div class="card-footer bg-body-tertiary p-3 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
                                 <i class="fas fa-save me-1"></i> SALVAR RONDA TÁTICA & ETAPAS
                             </button>
@@ -897,7 +897,7 @@
                 <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
                     @csrf
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-user-shield me-2"></i> Banner de Consentimento LGPD (Cookies) & Termos Legais</h6>
                                 <small class="text-secondary">Controle o banner flutuante do site e gerencie o conteúdo oficial da Política de Privacidade.</small>
@@ -908,8 +908,8 @@
                         </div>
                         <div class="card-body p-4">
                             <!-- CONTROLE DO BANNER FLUTUANTE -->
-                            <div class="p-3 bg-light rounded-3 border mb-4">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-cookie-bite text-warning me-2"></i> Configurações do Banner de Cookies (LGPD)</h6>
+                            <div class="p-3 bg-body-secondary rounded-3 border mb-4">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-cookie-bite text-warning me-2"></i> Configurações do Banner de Cookies (LGPD)</h6>
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <label class="form-label small fw-bold">Exibir Banner LGPD no Site?</label>
@@ -936,7 +936,7 @@
 
                             <!-- CONTEÚDO OFICIAL DA PÁGINA DE TERMOS & PRIVACIDADE -->
                             <div>
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-file-contract text-danger me-2"></i> Página Oficial de Política de Privacidade & Termos de Uso</h6>
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-file-contract text-danger me-2"></i> Página Oficial de Política de Privacidade & Termos de Uso</h6>
                                 <div class="row g-3">
                                     <div class="col-md-8">
                                         <label class="form-label small fw-bold">Título da Página de Privacidade</label>
@@ -957,7 +957,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-light p-3 text-end">
+                        <div class="card-footer bg-body-tertiary p-3 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
                                 <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DE LGPD & TERMOS
                             </button>
@@ -971,7 +971,7 @@
                 <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
                     @csrf
                     <div class="card border mb-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="fw-bold mb-0 text-success"><i class="fab fa-whatsapp me-2"></i> Botão Flutuante & Box Multicanais de Suporte</h6>
                                 <small class="text-secondary">Configure o botão flutuante oficial e ative ou oculte individualmente cada canal de atendimento dentro do box.</small>
@@ -980,8 +980,8 @@
                         </div>
                         <div class="card-body p-4">
                             <!-- CONFIGURAÇÃO GERAL DO BOX -->
-                            <div class="p-3 bg-light rounded-3 border mb-4">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-sliders-h text-danger me-2"></i> Cabeçalho do Box de Atendimento</h6>
+                            <div class="p-3 bg-body-secondary rounded-3 border mb-4">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-sliders-h text-danger me-2"></i> Cabeçalho do Box de Atendimento</h6>
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <label class="form-label small fw-bold">Botão Flutuante Ativo no Site?</label>
@@ -1002,7 +1002,7 @@
                             </div>
 
                             <!-- OS 5 CANAIS DE SUPORTE GERENCIÁVEIS INDIVIDUALMENTE -->
-                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-headset text-danger me-2"></i> Canais de Atendimento (Exibir / Ocultar Individualmente)</h6>
+                            <h6 class="fw-bold text-body mb-3"><i class="fas fa-headset text-danger me-2"></i> Canais de Atendimento (Exibir / Ocultar Individualmente)</h6>
                             <div class="row g-4">
                                 
                                 <!-- CANAL 1: RONDA & EMERGÊNCIA 24H -->
@@ -1077,7 +1077,7 @@
                                 <div class="col-md-6">
                                     <div class="card border border-info-subtle h-100 shadow-sm">
                                         <div class="card-header bg-info-subtle d-flex justify-content-between align-items-center py-2">
-                                            <span class="fw-bold text-dark"><i class="fas fa-headset me-1 text-info"></i> Canal 3: Suporte Técnico & Aplicativo</span>
+                                            <span class="fw-bold text-body"><i class="fas fa-headset me-1 text-info"></i> Canal 3: Suporte Técnico & Aplicativo</span>
                                             <div class="form-check form-switch m-0">
                                                 <input type="hidden" name="whatsapp_canal_3_ativo" value="0">
                                                 <input class="form-check-input" type="checkbox" name="whatsapp_canal_3_ativo" value="1" id="swCanal3" {{ ($settings['whatsapp_canal_3_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
@@ -1111,7 +1111,7 @@
                                 <div class="col-md-6">
                                     <div class="card border border-warning-subtle h-100 shadow-sm">
                                         <div class="card-header bg-warning-subtle d-flex justify-content-between align-items-center py-2">
-                                            <span class="fw-bold text-dark"><i class="fas fa-spray-can-sparkles me-1 text-warning"></i> Canal 4: Estética Automotiva & Serviços</span>
+                                            <span class="fw-bold text-body"><i class="fas fa-spray-can-sparkles me-1 text-warning"></i> Canal 4: Estética Automotiva & Serviços</span>
                                             <div class="form-check form-switch m-0">
                                                 <input type="hidden" name="whatsapp_canal_4_ativo" value="0">
                                                 <input class="form-check-input" type="checkbox" name="whatsapp_canal_4_ativo" value="1" id="swCanal4" {{ ($settings['whatsapp_canal_4_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
@@ -1177,7 +1177,7 @@
 
                             </div>
                         </div>
-                        <div class="card-footer bg-light p-3 text-end">
+                        <div class="card-footer bg-body-tertiary p-3 text-end">
                             <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
                                 <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO WHATSAPP & CANAIS
                             </button>
@@ -1343,7 +1343,7 @@
                             <span>Avaliação em Estrelas *</span>
                             <span id="labelEstrelasAdmin" class="text-warning fw-bold small">5 de 5 estrelas - Excelente!</span>
                         </label>
-                        <div class="foco-star-rating-box p-2 bg-light border rounded d-flex align-items-center gap-2" id="starPickerAdmin">
+                        <div class="foco-star-rating-box p-2 bg-body-secondary border rounded d-flex align-items-center gap-2" id="starPickerAdmin">
                             <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="1" title="1 Estrela"></i>
                             <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="2" title="2 Estrelas"></i>
                             <i class="fas fa-star fa-lg text-warning cursor-pointer star-pick-item" data-rating="3" title="3 Estrelas"></i>

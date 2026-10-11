@@ -21,6 +21,7 @@ class Plano extends Model
         'taxa_adesao',
         'recursos',
         'icone',
+        'texto_botao',
         'destaque',
         'tag_destaque',
         'ordem',

@@ -67,7 +67,7 @@
 
             <div class="card-body d-flex flex-column p-4">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-danger-subtle text-danger p-3 rounded-circle me-3 fs-3">
+                    <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 me-3 fs-3" style="width: 58px; height: 58px; aspect-ratio: 1 / 1;">
                         <i class="fas {{ $servico->icone ?: 'fa-car-side' }}"></i>
                     </div>
                     <div>

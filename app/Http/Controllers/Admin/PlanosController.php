@@ -30,6 +30,7 @@ class PlanosController extends Controller
             'preco_mensal' => 'required',
             'taxa_adesao' => 'nullable',
             'icone' => 'nullable|string|max:100',
+            'texto_botao' => 'nullable|string|max:100',
             'destaque' => 'nullable|boolean',
             'tag_destaque' => 'nullable|string|max:50',
             'ordem' => 'nullable|integer',
@@ -62,6 +63,7 @@ class PlanosController extends Controller
         $validated['destaque'] = $request->boolean('destaque');
         $validated['ativo'] = $request->boolean('ativo', true);
         $validated['slug'] = Str::slug($validated['nome']);
+        $validated['texto_botao'] = !empty(trim($request->input('texto_botao', ''))) ? trim($request->input('texto_botao')) : 'CONTRATAR AGORA';
 
         $id = $request->input('plano_id');
 

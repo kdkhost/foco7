@@ -245,7 +245,7 @@
             <form id="formRedefinirSenha" class="ajax-form" method="POST">
                 @csrf
                 <div class="modal-body p-4">
-                    <p class="small text-secondary mb-3">Defina a nova senha para o cliente <strong id="nomeClienteSenha" class="text-dark"></strong>:</p>
+                    <p class="small text-secondary mb-3">Defina a nova senha para o cliente <strong id="nomeClienteSenha" class="text-body fw-bold"></strong>:</p>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Nova Senha *</label>
                         <input type="password" name="nova_senha" id="nova_senha" class="form-control" required minlength="6" placeholder="Mínimo 6 caracteres">

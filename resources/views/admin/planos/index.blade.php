@@ -102,21 +102,48 @@
                             <input type="text" name="taxa_adesao" id="taxa_adesao" class="form-control mask-moeda" placeholder="R$ 0,00">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
-                            <input type="text" name="icone" id="icone" class="form-control" value="fa-car" placeholder="fa-car, fa-motorcycle">
+                            <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
+                                <span>Ícone do Plano</span>
+                                <span id="iconePreview" class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 rounded">
+                                    <i class="fas fa-car" id="iconePreviewIcon"></i>
+                                </span>
+                            </label>
+                            <select name="icone" id="icone" class="form-select" onchange="atualizarPreviewIcone(this.value)">
+                                <option value="fa-car">🚗 Carro / Passeio (fa-car)</option>
+                                <option value="fa-motorcycle">🏍️ Moto / Duas Rodas (fa-motorcycle)</option>
+                                <option value="fa-truck">🚚 Caminhão / Cargas (fa-truck)</option>
+                                <option value="fa-truck-pickup">🛻 Caminhonete / Pickup (fa-truck-pickup)</option>
+                                <option value="fa-van-shuttle">🚐 Van / Utilitário (fa-van-shuttle)</option>
+                                <option value="fa-bus">🚌 Ônibus / Transporte (fa-bus)</option>
+                                <option value="fa-shield-alt">🛡️ Escudo / Proteção (fa-shield-alt)</option>
+                                <option value="fa-satellite-dish">📡 Satélite / Rastreador (fa-satellite-dish)</option>
+                                <option value="fa-location-dot">📍 GPS / Localização (fa-location-dot)</option>
+                                <option value="fa-mobile-screen">📱 Aplicativo Mobile (fa-mobile-screen)</option>
+                                <option value="fa-boxes-stacked">📦 Frotas & Logística (fa-boxes-stacked)</option>
+                                <option value="fa-ship">🚤 Barco / Náutico (fa-ship)</option>
+                                <option value="fa-tractor">🚜 Trator / Agrícola (fa-tractor)</option>
+                                <option value="fa-star">⭐ Destaque / Especial (fa-star)</option>
+                                <option value="fa-crown">👑 Coroa / VIP Premium (fa-crown)</option>
+                                <option value="fa-bolt">⚡ Raio / Ultra Rápido (fa-bolt)</option>
+                                <option value="fa-key">🔑 Bloqueio / Ignição (fa-key)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Texto do Botão *</label>
+                            <input type="text" name="texto_botao" id="texto_botao" class="form-control" value="CONTRATAR AGORA" placeholder="Ex: CONTRATAR AGORA, ASSINAR">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold">Ordem de Exibição</label>
                             <input type="number" name="ordem" id="ordem" class="form-control" value="1">
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-check mt-4">
+                        <div class="col-md-6">
+                            <div class="form-check mt-3">
                                 <input class="form-check-input" type="checkbox" name="destaque" id="destaque" value="1">
-                                <label class="form-check-label fw-bold small" for="destaque">Plano em Destaque</label>
+                                <label class="form-check-label fw-bold small" for="destaque">Plano em Destaque (Mais Popular)</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">Tag de Destaque (Badge)</label>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tag de Destaque (Badge Superior)</label>
                             <input type="text" name="tag_destaque" id="tag_destaque" class="form-control" placeholder="MAIS POPULAR ⭐">
                         </div>
                         <div class="col-12">
@@ -137,9 +164,23 @@
 
 @section('scripts')
 <script>
+    function atualizarPreviewIcone(icone) {
+        if (!icone) icone = 'fa-car';
+        var cleanIcon = icone.trim();
+        // Remove fas fa- se vier duplicado
+        cleanIcon = cleanIcon.replace(/^fa[srbld]?\s+/, '').trim();
+        if (!cleanIcon.startsWith('fa-')) {
+            cleanIcon = 'fa-' + cleanIcon;
+        }
+        $('#iconePreviewIcon').attr('class', 'fas ' + cleanIcon);
+    }
+
     function abrirModalPlano() {
         $('#formPlano')[0].reset();
         $('#plano_id').val('');
+        $('#texto_botao').val('CONTRATAR AGORA');
+        $('#icone').val('fa-car');
+        atualizarPreviewIcone('fa-car');
         $('#modalPlanoTitulo').text('Cadastrar Plano');
         new bootstrap.Modal(document.getElementById('modalPlano')).show();
     }
@@ -154,7 +195,16 @@
                 $('#subtitulo').val(p.subtitulo);
                 $('#preco_mensal').val('R$ ' + parseFloat(p.preco_mensal).toFixed(2).replace('.', ','));
                 $('#taxa_adesao').val('R$ ' + parseFloat(p.taxa_adesao).toFixed(2).replace('.', ','));
-                $('#icone').val(p.icone);
+                
+                var iconeVal = p.icone || 'fa-car';
+                // Se o ícone não existir no select, adiciona option temporária
+                if ($('#icone option[value="' + iconeVal + '"]').length === 0) {
+                    $('#icone').append(new Option('Customizado (' + iconeVal + ')', iconeVal, true, true));
+                }
+                $('#icone').val(iconeVal);
+                atualizarPreviewIcone(iconeVal);
+
+                $('#texto_botao').val(p.texto_botao || 'CONTRATAR AGORA');
                 $('#ordem').val(p.ordem);
                 $('#destaque').prop('checked', p.destaque);
                 $('#tag_destaque').val(p.tag_destaque);

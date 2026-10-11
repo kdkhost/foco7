@@ -39,7 +39,7 @@
                             <span class="text-secondary small text-uppercase fw-semibold">Não Lidas</span>
                             <h3 class="fw-bold mb-0 text-danger" id="cardCountNaoLidas">{{ $totalNaoLidas }}</h3>
                         </div>
-                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-3">
+                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle icon-circle-lg">
                             <i class="fas fa-envelope-open-text fs-4"></i>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                             <span class="text-secondary small text-uppercase fw-semibold">Contatos do Site</span>
                             <h3 class="fw-bold mb-0 text-warning">{{ $totalContatos }}</h3>
                         </div>
-                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-3">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle icon-circle-lg">
                             <i class="fas fa-comment-dots fs-4"></i>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                             <span class="text-secondary small text-uppercase fw-semibold">Agendamentos</span>
                             <h3 class="fw-bold mb-0 text-primary">{{ $totalAgendamentos }}</h3>
                         </div>
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle icon-circle-lg">
                             <i class="fas fa-calendar-check fs-4"></i>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                             <span class="text-secondary small text-uppercase fw-semibold">Depoimentos / Estrelas</span>
                             <h3 class="fw-bold mb-0 text-success">{{ $totalDepoimentos }}</h3>
                         </div>
-                        <div class="bg-success bg-opacity-10 text-success rounded-circle p-3">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle icon-circle-lg">
                             <i class="fas fa-star fs-4"></i>
                         </div>
                     </div>
