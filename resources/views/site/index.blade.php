@@ -1516,21 +1516,53 @@
         </div>
     </div>
 
-    <!-- BANNER LGPD FLUTUANTE (CONSENTIMENTO DE COOKIES) -->
+    <!-- BANNER LGPD FLUTUANTE PREMIUM (CONSENTIMENTO DE COOKIES & PRIVACIDADE) -->
     @if(($configs['lgpd_ativo'] ?? '1') == '1')
-    <div class="foco-lgpd-banner" id="bannerLgpdFoco7">
-        <div class="foco-lgpd-content">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-danger text-white rounded-circle p-2 d-none d-sm-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
-                    <i class="fas fa-user-shield"></i>
+    <div class="foco-lgpd-banner" id="bannerLgpdFoco7" role="dialog" aria-labelledby="lgpdCardTitle" aria-describedby="lgpdCardDesc" aria-modal="false">
+        <div class="foco-lgpd-glow-line"></div>
+        <div class="foco-lgpd-card-header">
+            <div class="d-flex align-items-center gap-2">
+                <div class="foco-lgpd-icon-shield">
+                    <i class="fas fa-shield-halved"></i>
                 </div>
-                <p class="foco-lgpd-text">
-                    {{ $configs['lgpd_texto'] ?? 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).' }}
-                    <a href="{{ route('site.privacidade') }}" class="ms-1">{{ $configs['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}</a>
-                </p>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h4 class="foco-lgpd-title" id="lgpdCardTitle">Privacidade & Cookies</h4>
+                        <span class="foco-lgpd-badge-law">
+                            <i class="fas fa-lock me-1"></i>LGPD 13.709/18
+                        </span>
+                    </div>
+                    <span class="foco-lgpd-subtitle">Seus dados protegidos com criptografia</span>
+                </div>
             </div>
-            <button type="button" class="foco-lgpd-btn" id="btnAceitarLgpd">
-                <i class="fas fa-check-circle me-1"></i> {{ $configs['lgpd_btn_aceitar'] ?? 'Aceitar e Continuar' }}
+            <button type="button" class="foco-lgpd-btn-close" id="btnFecharLgpd" aria-label="Fechar aviso de privacidade" title="Dispensar aviso">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="foco-lgpd-card-body">
+            <p class="foco-lgpd-text" id="lgpdCardDesc">
+                {{ $configs['lgpd_texto'] ?? 'Utilizamos cookies essenciais e tecnologias semelhantes para garantir o funcionamento seguro do nosso sistema, personalizar sua experiência e analisar o tráfego em conformidade com a LGPD (Lei nº 13.709/2018).' }}
+            </p>
+            <div class="foco-lgpd-tags-row">
+                <span class="foco-lgpd-tag-item"><i class="fas fa-check-circle text-success me-1"></i>Essenciais</span>
+                <span class="foco-lgpd-tag-item"><i class="fas fa-check-circle text-success me-1"></i>Segurança 24h</span>
+                <span class="foco-lgpd-tag-item"><i class="fas fa-check-circle text-success me-1"></i>Performance</span>
+            </div>
+            <div class="foco-lgpd-policy-link">
+                <a href="{{ route('site.privacidade') }}" class="foco-lgpd-link" target="_blank" rel="noopener">
+                    <i class="fas fa-file-contract me-1"></i>{{ $configs['lgpd_btn_termos'] ?? 'Ler Política de Privacidade' }}
+                    <i class="fas fa-arrow-up-right-from-square ms-1 text-xs"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="foco-lgpd-card-actions">
+            <button type="button" class="foco-lgpd-btn-sec" id="btnEssenciaisLgpd" title="Permitir apenas os cookies estritamente necessários">
+                <i class="fas fa-sliders me-1"></i>Apenas Essenciais
+            </button>
+            <button type="button" class="foco-lgpd-btn-pri" id="btnAceitarLgpd" title="Aceitar todos e continuar com a melhor experiência">
+                <i class="fas fa-circle-check me-1"></i>{{ $configs['lgpd_btn_aceitar'] ?? 'Aceitar Todos' }}
             </button>
         </div>
     </div>
@@ -1741,24 +1773,64 @@
                 }
             });
 
-            // Banner LGPD com cookie/localStorage
-            var lgpdAceito = localStorage.getItem('foco7_lgpd_aceito');
-            var $bannerLgpd = $('#bannerLgpdFoco7');
-            if (!lgpdAceito && $bannerLgpd.length) {
+            // ========================================================
+            // BANNER LGPD PREMIUM: PERFORMANCE, PERSISTÊNCIA & UX
+            // ========================================================
+            (function () {
+                var consentKey = 'foco7_lgpd_aceito';
+                var $bannerLgpd = $('#bannerLgpdFoco7');
+                if (!$bannerLgpd.length) return;
+
+                var getCookie = function (name) {
+                    var match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+                    return match ? decodeURIComponent(match[2]) : null;
+                };
+
+                var savedConsent = localStorage.getItem(consentKey) || getCookie(consentKey);
+
+                // Performance: se já aceito, remove imediatamente do DOM sem layout shift ou repaints
+                if (savedConsent) {
+                    $bannerLgpd.remove();
+                    return;
+                }
+
+                // Exibição suave após carregamento dos recursos críticos (750ms)
                 setTimeout(function () {
                     $bannerLgpd.addClass('show');
-                }, 1200);
-            }
+                }, 750);
 
-            $('#btnAceitarLgpd').on('click', function () {
-                localStorage.setItem('foco7_lgpd_aceito', '1');
-                $bannerLgpd.fadeOut(300, function () {
-                    $(this).removeClass('show');
+                var saveAndDismiss = function (type, notifyMsg) {
+                    try {
+                        localStorage.setItem(consentKey, type);
+                    } catch (e) {}
+
+                    // Grava cookie por 1 ano (365 dias)
+                    var d = new Date();
+                    d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+                    document.cookie = consentKey + '=' + encodeURIComponent(type) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+
+                    $bannerLgpd.addClass('closing');
+                    setTimeout(function () {
+                        $bannerLgpd.remove();
+                    }, 420);
+
+                    if (notifyMsg && window.foco7Notify) {
+                        window.foco7Notify.success(notifyMsg);
+                    }
+                };
+
+                $('#btnAceitarLgpd').on('click', function () {
+                    saveAndDismiss('all', 'Preferências salvas! Todos os cookies foram autorizados com sucesso.');
                 });
-                if (window.foco7Notify) {
-                    window.foco7Notify.success('Suas preferências de privacidade foram salvas com sucesso.');
-                }
-            });
+
+                $('#btnEssenciaisLgpd').on('click', function () {
+                    saveAndDismiss('essential', 'Preferências salvas! Apenas cookies essenciais foram mantidos.');
+                });
+
+                $('#btnFecharLgpd').on('click', function () {
+                    saveAndDismiss('essential', 'Aviso dispensado. Cookies essenciais mantidos.');
+                });
+            })();
 
             // Botão WhatsApp Flutuante na Cor da Paleta & Box Multicanais
             var $btnWhatsappFloat = $('#btnFocoWhatsappFloat');
