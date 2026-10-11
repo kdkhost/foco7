@@ -55,12 +55,14 @@ class NotificacoesController extends Controller
     }
 
     /**
-     * Retorna as últimas notificações via AJAX para o sino da navbar e polling de Push
+     * Retorna as notificações pendentes (não lidas) via AJAX para o sino da navbar e polling de Push
      */
     public function ultimasAjax(Request $request)
     {
         $naoLidasCount = Notificacao::naoLidas()->count();
-        $ultimas = Notificacao::recentes()->take(5)->get();
+        // A lista do sino exibe estritamente as notificações NÃO LIDAS.
+        // Assim que forem lidas, o dropdown fica 100% limpo!
+        $ultimas = Notificacao::naoLidas()->recentes()->take(6)->get();
 
         // Verifica se há alguma notificação muito recente (últimos 35 segundos) para emitir som e Push nativo
         $novaPush = Notificacao::where('lida', false)
@@ -147,6 +149,23 @@ class NotificacoesController extends Controller
             'success' => true,
             'message' => 'Todas as notificações foram marcadas como lidas!',
             'nao_lidas_count' => 0,
+        ]);
+    }
+
+    /**
+     * Limpa e remove do histórico todas as notificações que já foram lidas
+     */
+    public function limparLidas()
+    {
+        $totalLidas = Notificacao::where('lida', true)->count();
+        Notificacao::where('lida', true)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => $totalLidas > 0 
+                ? "{$totalLidas} notificações lidas foram limpas do histórico com sucesso!" 
+                : "Nenhuma notificação lida encontrada para limpar.",
+            'nao_lidas_count' => Notificacao::naoLidas()->count(),
         ]);
     }
 

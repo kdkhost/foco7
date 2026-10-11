@@ -73,7 +73,7 @@
                 <h5 class="modal-title fw-bold" id="modalPlanoTitulo">Cadastrar Plano</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.planos.salvar') }}" method="POST" class="ajax-form" id="formPlano">
+            <form action="{{ route('admin.planos.salvar') }}" method="POST" class="ajax-form" id="formPlano" autocomplete="off">
                 @csrf
                 <input type="hidden" name="plano_id" id="plano_id">
                 <div class="modal-body">
@@ -107,7 +107,7 @@
                             <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
                                 <span>Ícone do Plano (FontAwesome, Flaticon ou Livre)</span>
                                 <span id="iconePreviewContainer" class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 rounded d-inline-flex align-items-center justify-content-center" style="font-size: 1.35rem; min-width: 42px; min-height: 42px; border: 1px solid rgba(217,0,0,0.2);">
-                                    <span id="iconePreviewContent"><i class="fas fa-car"></i></span>
+                                    <span id="iconePreviewContent"><i class="fas fa-icons text-muted" style="opacity: 0.4;"></i></span>
                                 </span>
                             </label>
                             
@@ -161,7 +161,7 @@
                             <!-- Campo de entrada livre (aceita FontAwesome, Flaticon, SVG ou qualquer classe) -->
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-body-tertiary"><i class="fas fa-terminal"></i></span>
-                                <input type="text" name="icone" id="icone" class="form-control" value="fa-car" placeholder="Ex: fa-truck-monster, fi fi-rr-car, bi bi-shield-check" oninput="onIconeInput(this.value)">
+                                <input type="text" name="icone" id="icone" class="form-control" value="" placeholder="Ex: fa-truck-monster, fi fi-rr-car, bi bi-shield-check" oninput="onIconeInput(this.value)">
                                 <button class="btn btn-outline-secondary" type="button" onclick="testarIconeRapido('fa-solid fa-car')" title="Exemplo FontAwesome">FA</button>
                                 <button class="btn btn-outline-secondary" type="button" onclick="testarIconeRapido('fi fi-rr-car')" title="Exemplo Flaticon">Flaticon</button>
                             </div>
@@ -182,11 +182,11 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Texto do Botão *</label>
-                            <input type="text" name="texto_botao" id="texto_botao" class="form-control" value="CONTRATAR AGORA" placeholder="Ex: CONTRATAR AGORA, ASSINAR">
+                            <input type="text" name="texto_botao" id="texto_botao" class="form-control" value="" placeholder="Ex: CONTRATAR AGORA, ASSINAR">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold">Ordem de Exibição</label>
-                            <input type="number" name="ordem" id="ordem" class="form-control" value="1">
+                            <input type="number" name="ordem" id="ordem" class="form-control" value="" placeholder="Ex: 1">
                         </div>
                         <div class="col-md-6">
                             <div class="form-check mt-3">
@@ -217,9 +217,12 @@
 @section('scripts')
 <script>
     function atualizarPreviewIcone(icone) {
-        if (!icone) icone = 'fa-car';
-        icone = icone.trim();
         var $el = $('#iconePreviewContent');
+        if (!icone || !icone.trim()) {
+            $el.html('<i class="fas fa-icons text-muted" style="opacity: 0.4;"></i>');
+            return;
+        }
+        icone = icone.trim();
         
         // 1. Se for SVG inline
         if (icone.startsWith('<svg')) {
@@ -267,7 +270,11 @@
     }
 
     function selecionarIconePredefinido(val) {
-        if (!val) return;
+        if (!val) {
+            $('#icone').val('');
+            atualizarPreviewIcone('');
+            return;
+        }
         if (val === 'custom') {
             $('#icone').focus().select();
             return;
@@ -280,8 +287,10 @@
         atualizarPreviewIcone(val);
         if ($('#icone_seletor option[value="' + val + '"]').length > 0) {
             $('#icone_seletor').val(val);
-        } else {
+        } else if (val && val.trim().length > 0) {
             $('#icone_seletor').val('custom');
+        } else {
+            $('#icone_seletor').val('');
         }
     }
 
@@ -292,11 +301,11 @@
 
     function abrirModalPlano() {
         $('#formPlano')[0].reset();
+        $('#formPlano').find('input:not([type="hidden"]):not([type="checkbox"]), textarea').val('');
+        $('#formPlano').find('select').prop('selectedIndex', 0);
+        $('#destaque').prop('checked', false);
         $('#plano_id').val('');
-        $('#texto_botao').val('CONTRATAR AGORA');
-        $('#icone').val('fa-car');
-        $('#icone_seletor').val('fa-car');
-        atualizarPreviewIcone('fa-car');
+        atualizarPreviewIcone('');
         $('#modalPlanoTitulo').text('Cadastrar Plano');
         new bootstrap.Modal(document.getElementById('modalPlano')).show();
     }

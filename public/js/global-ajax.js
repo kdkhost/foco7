@@ -221,16 +221,47 @@
 
                         if (res.success) {
                             window.foco7Notify.success(res.message || 'Operação realizada com sucesso!');
+
+                            var $modal = $form.closest('.modal');
+
+                            // Limpeza universal do formulário (exceto formulários de configurações com .keep-data)
+                            if (!$form.hasClass('keep-data')) {
+                                $form[0].reset();
+                                $form.find('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea').val('');
+                                $form.find('select').each(function () {
+                                    $(this).prop('selectedIndex', 0);
+                                });
+                                $form.find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
+                                $form.find('input[type="hidden"]:not([name="_token"]):not([name="_method"])').val('');
+                                
+                                if (typeof $.fn.summernote !== 'undefined') {
+                                    $form.find('.summernote').each(function () {
+                                        $(this).summernote('reset');
+                                    });
+                                }
+                                $form.find('.focodropzone-preview').empty();
+                                $form.find('.focodropzone-file-input').val('');
+                                $form.trigger('form:cleared');
+                            }
+
                             if (res.redirect) {
                                 setTimeout(function () {
                                     window.location.href = res.redirect;
-                                }, 1200);
+                                }, 1000);
                             } else if (res.reload) {
                                 setTimeout(function () {
                                     window.location.reload();
-                                }, 1200);
-                            } else if ($form.hasClass('reset-on-success')) {
-                                $form[0].reset();
+                                }, 1000);
+                            } else if ($modal.length) {
+                                var modalInst = bootstrap.Modal.getInstance($modal[0]);
+                                if (modalInst) {
+                                    modalInst.hide();
+                                } else {
+                                    $modal.modal('hide');
+                                }
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 600);
                             }
                         } else {
                             window.foco7Notify.error(res.message || 'Ocorreu um erro.');
@@ -262,6 +293,29 @@
                 }
 
                 $.ajax(ajaxOptions);
+            });
+
+            // Garante que todo formulário dentro de modal seja mantido 100% limpo e vazio ao fechar
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                var $modal = $(this);
+                var $f = $modal.find('form.ajax-form');
+                if ($f.length && !$f.hasClass('keep-data')) {
+                    $f[0].reset();
+                    $f.find('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea').val('');
+                    $f.find('select').each(function () {
+                        $(this).prop('selectedIndex', 0);
+                    });
+                    $f.find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
+                    $f.find('input[type="hidden"]:not([name="_token"]):not([name="_method"])').val('');
+                    if (typeof $.fn.summernote !== 'undefined') {
+                        $f.find('.summernote').each(function () {
+                            $(this).summernote('reset');
+                        });
+                    }
+                    $f.find('.focodropzone-preview').empty();
+                    $f.find('.focodropzone-file-input').val('');
+                    $f.trigger('form:cleared');
+                }
             });
         });
     }

@@ -228,6 +228,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [NotificacoesController::class, 'index'])->name('admin.notificacoes.index');
         Route::get('/ultimas-ajax', [NotificacoesController::class, 'ultimasAjax'])->name('admin.notificacoes.ultimas_ajax');
         Route::post('/marcar-todas', [NotificacoesController::class, 'marcarTodasLidas'])->name('admin.notificacoes.marcar_todas');
+        Route::post('/limpar-lidas', [NotificacoesController::class, 'limparLidas'])->name('admin.notificacoes.limpar_lidas');
         Route::post('/salvar-config', [NotificacoesController::class, 'salvarConfiguracoes'])->name('admin.notificacoes.salvar_config');
         Route::post('/teste', [NotificacoesController::class, 'dispararTeste'])->name('admin.notificacoes.teste');
         Route::post('/{notificacao}/lida', [NotificacoesController::class, 'marcarLida'])->name('admin.notificacoes.marcar_lida');

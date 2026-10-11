@@ -19,8 +19,11 @@
                 <button type="button" class="btn btn-primary me-2" onclick="dispararNotificacaoTeste()">
                     <i class="fas fa-paper-plane me-1"></i> Testar Push & E-mail
                 </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="marcarTodasComoLidas()">
+                <button type="button" class="btn btn-outline-secondary me-2" onclick="marcarTodasComoLidas()">
                     <i class="fas fa-check-double me-1"></i> Marcar Todas Lidas
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="limparTodasNotificacoesLidas()" title="Remover permanentemente do histórico as notificações já lidas">
+                    <i class="fas fa-trash-alt me-1"></i> Limpar Lidas
                 </button>
             </div>
         </div>
@@ -341,10 +344,20 @@
             success: function (res) {
                 if (res.success) {
                     toastr.success(res.message);
-                    $(`#notif-row-${id}`).removeClass('bg-body-tertiary bg-light bg-opacity-50');
-                    $(`#notif-row-${id} h6`).removeClass('text-dark text-body').addClass('text-body-secondary');
-                    $(`#notif-row-${id} .badge.bg-danger`).remove();
-                    $(`#notif-row-${id} button:contains("Marcar como Lida")`).remove();
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('status') === 'nao_lidas') {
+                        $(`#notif-row-${id}`).fadeOut(300, function() {
+                            $(this).remove();
+                            if ($('#listaNotificacoesContainer .list-group-item').length === 0) {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        $(`#notif-row-${id}`).removeClass('bg-body-tertiary bg-light bg-opacity-50');
+                        $(`#notif-row-${id} h6`).removeClass('text-dark text-body').addClass('text-body-secondary');
+                        $(`#notif-row-${id} .badge.bg-danger`).remove();
+                        $(`#notif-row-${id} button:contains("Marcar como Lida")`).remove();
+                    }
                     atualizarBadgesContador(res.nao_lidas_count);
                 }
             },
@@ -390,6 +403,37 @@
                     },
                     error: function () {
                         toastr.error('Erro ao marcar todas como lidas.');
+                    }
+                });
+            }
+        });
+    }
+
+    // Limpa todas as notificações que já foram lidas do histórico
+    function limparTodasNotificacoesLidas() {
+        Swal.fire({
+            title: 'Limpar notificações lidas?',
+            text: 'Todas as notificações que já foram lidas serão removidas permanentemente do histórico.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, limpar histórico',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.notificacoes.limpar_lidas") }}',
+                    type: 'POST',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        if (res.success) {
+                            toastr.success(res.message);
+                            setTimeout(() => window.location.reload(), 600);
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Erro ao limpar notificações lidas.');
                     }
                 });
             }

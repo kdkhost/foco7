@@ -92,12 +92,17 @@
                                 0
                             </span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end shadow-lg p-0 border-0" style="width: 330px; max-width: 90vw;">
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg p-0 border-0" style="width: 340px; max-width: 90vw;">
                             <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-body-tertiary rounded-top">
                                 <span class="fw-bold small text-body"><i class="fas fa-bell text-danger me-1"></i> Notificações</span>
-                                <span class="badge bg-danger badge-notificacoes-count" style="display: none;">0 novas</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger badge-notificacoes-count" style="display: none;">0 novas</span>
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none btn-marcar-todas-dropdown fw-semibold" style="display: none; font-size: 0.75rem;" onclick="marcarTodasNotificacoesLidasHeader(event)" title="Marcar todas como lidas e limpar">
+                                        <i class="fas fa-check-double me-1"></i>Marcar lidas
+                                    </button>
+                                </div>
                             </div>
-                            <div class="list-group list-group-flush" id="dropdownNotificacoesLista" style="max-height: 280px; overflow-y: auto;">
+                            <div class="list-group list-group-flush" id="dropdownNotificacoesLista" style="max-height: 290px; overflow-y: auto;">
                                 <div class="p-3 text-center text-muted small">Carregando notificações...</div>
                             </div>
                             <div class="p-2 border-top text-center bg-body-tertiary rounded-bottom">
@@ -545,39 +550,47 @@
                     success: function (res) {
                         if (!res.success) return;
 
-                        // Atualiza Badges
+                        // Atualiza Badges e Botão de Limpar
                         const count = res.nao_lidas_count;
                         $('.badge-notificacoes-count').text(count);
                         if (count > 0) {
                             $('.badge-notificacoes-count').show();
+                            $('.btn-marcar-todas-dropdown').show();
                         } else {
                             $('.badge-notificacoes-count').hide();
+                            $('.btn-marcar-todas-dropdown').hide();
                         }
 
                         // Atualiza Dropdown do Sininho
                         const $lista = $('#dropdownNotificacoesLista');
                         if ($lista.length) {
                             if (res.ultimas.length === 0) {
-                                $lista.html('<div class="p-3 text-center text-muted small"><i class="fas fa-check-circle text-success me-1"></i> Nenhuma notificação recente.</div>');
+                                $lista.html(`
+                                    <div class="p-4 text-center text-muted small">
+                                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2" style="width: 48px; height: 48px;">
+                                            <i class="fas fa-check fs-5"></i>
+                                        </div>
+                                        <div class="fw-bold text-body">Tudo limpo!</div>
+                                        <div class="text-secondary" style="font-size: 0.78rem;">Você não tem notificações pendentes.</div>
+                                    </div>
+                                `);
                             } else {
                                 let html = '';
                                 res.ultimas.forEach(function (n) {
-                                    const bgClass = !n.lida ? 'bg-body-secondary' : '';
-                                    const dot = !n.lida ? '<span class="badge bg-danger rounded-pill" style="font-size:0.6rem;">Nova</span>' : '';
                                     const linkDestino = n.link_acao || '{{ route("admin.notificacoes.index") }}';
                                     html += `
                                         <a href="/admin/notificacoes/${n.id}/abrir" 
                                            data-id="${n.id}" 
                                            data-link="${linkDestino}" 
-                                           data-lida="${n.lida ? '1' : '0'}" 
-                                           class="list-group-item list-group-item-action p-2 d-flex align-items-start gap-2 border-bottom dropdown-notificacao-item ${bgClass}">
+                                           data-lida="0" 
+                                           class="list-group-item list-group-item-action p-2 d-flex align-items-start gap-2 border-bottom dropdown-notificacao-item bg-body-tertiary">
                                             <div class="bg-${n.cor} bg-opacity-10 text-${n.cor} rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
                                                 <i class="${n.icone}" style="font-size: 0.85rem;"></i>
                                             </div>
                                             <div class="flex-grow-1 overflow-hidden">
                                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <span class="fw-semibold small text-truncate" style="max-width: 170px;">${n.titulo}</span>
-                                                    ${dot}
+                                                    <span class="fw-semibold small text-truncate" style="max-width: 175px;">${n.titulo}</span>
+                                                    <span class="badge bg-danger rounded-pill" style="font-size:0.6rem;">Nova</span>
                                                 </div>
                                                 <p class="small text-secondary mb-1 text-truncate" style="font-size: 0.78rem;">${n.mensagem}</p>
                                                 <span class="text-muted" style="font-size: 0.7rem;"><i class="far fa-clock me-1"></i>${n.tempo_relativo}</span>
@@ -655,6 +668,27 @@
                     });
                 }
             });
+
+            window.marcarTodasNotificacoesLidasHeader = function (e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                $.ajax({
+                    url: '{{ route("admin.notificacoes.marcar_todas") }}',
+                    type: 'POST',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        if (res.success) {
+                            window.foco7Notify.success(res.message);
+                            sincronizarNotificacoesAdmin();
+                            if (window.location.pathname.includes('/admin/notificacoes')) {
+                                setTimeout(() => window.location.reload(), 600);
+                            }
+                        }
+                    }
+                });
+            };
 
             sincronizarNotificacoesAdmin();
             setInterval(sincronizarNotificacoesAdmin, 25000);

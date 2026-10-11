@@ -37,7 +37,7 @@
     </div>
 
     <div class="card-body p-4">
-        <form action="{{ route('admin.configuracoes.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formConfiguracoes">
+        <form action="{{ route('admin.configuracoes.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form keep-data" id="formConfiguracoes">
             @csrf
 
             <div class="tab-content" id="configTabsContent">
