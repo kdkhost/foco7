@@ -1006,7 +1006,7 @@
         <div class="container">
             <div class="row g-5">
                 <div class="col-lg-4">
-                    <img src="{{ asset($configs['logo_fundo_claro'] ?? '/img/logo-foco7-dark.png') }}" alt="{{ $configs['nome'] }}" height="44" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+                    <img src="{{ asset($configs['logo_fundo_escuro'] ?? $configs['site_logo'] ?? '/img/logo-foco7.png') }}" alt="{{ $configs['nome'] }}" height="44" class="mb-3 logo-foco7" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7.png') }}';">
                     <p class="mt-3 text-secondary small leading-relaxed">
                         Líder em rastreamento veicular inteligente, bloqueio remoto e ronda tática presencial. Mais de 10 anos protegendo famílias e frotas corporativas em todo o território nacional.
                     </p>

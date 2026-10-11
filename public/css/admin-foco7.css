@@ -397,6 +397,75 @@ span.rounded-circle {
 }
 
 /* ==============================================================================
+   SIMULAÇÃO DE CONTRASTE PERFEITO PARA PREVIEWS DE LOGOTIPOS (LIGHT & DARK MODE)
+   ============================================================================== */
+
+/* Card 1 e 3: Logo para Fundo Preto / Letras Brancas e Favicon (Fundo Escuro Simulado) */
+.preview-fundo-escuro,
+.card.preview-fundo-escuro {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+    color: #f9fafb !important;
+}
+
+.preview-fundo-escuro .foco-dropzone-box {
+    background: #0b0f19 !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.preview-fundo-escuro .foco-dropzone-box .foco-dropzone-title,
+.preview-fundo-escuro .foco-dropzone-box .preview-title {
+    color: #f1f5f9 !important;
+}
+
+.preview-fundo-escuro .preview-media-container {
+    background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 12px !important;
+    padding: 18px 26px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    display: inline-block !important;
+}
+
+.preview-fundo-escuro .preview-media-container .foco-preview-img {
+    border: none !important;
+    box-shadow: none !important;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* Card 2: Logo para Fundo Branco / Letras Escuras (Fundo Branco Simulado) */
+.preview-fundo-branco,
+.card.preview-fundo-branco {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.preview-fundo-branco .foco-dropzone-box {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+}
+
+.preview-fundo-branco .foco-dropzone-box .foco-dropzone-title,
+.preview-fundo-branco .foco-dropzone-box .preview-title {
+    color: #0f172a !important;
+}
+
+.preview-fundo-branco .preview-media-container {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 18px 26px !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+    display: inline-block !important;
+}
+
+.preview-fundo-branco .preview-media-container .foco-preview-img {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* ==============================================================================
    SUMMERNOTE WYSIWYG - INTEGRAÇÃO COM BOOTSTRAP 5
    ============================================================================== */
 .note-editor.note-frame {

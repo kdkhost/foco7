@@ -130,7 +130,7 @@
                     <div class="row g-4">
                         <!-- 1. LOGO PARA FUNDO PRETO / ESCURO -->
                         <div class="col-lg-4">
-                            <div class="card bg-dark border-secondary p-3 h-100 shadow-sm text-white">
+                            <div class="card bg-dark preview-fundo-escuro border-secondary p-3 h-100 shadow-sm text-white">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <label class="form-label fw-bold text-white mb-0">
                                         <i class="fas fa-moon text-warning me-1"></i> Logo Fundo Preto
@@ -180,7 +180,7 @@
 
                         <!-- 3. ÍCONE FAVICON -->
                         <div class="col-lg-4">
-                            <div class="card bg-dark border-secondary p-3 h-100 shadow-sm text-white">
+                            <div class="card bg-dark preview-fundo-escuro border-secondary p-3 h-100 shadow-sm text-white">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <label class="form-label fw-bold text-white mb-0">
                                         <i class="fas fa-gem text-danger me-1"></i> Ícone Favicon
