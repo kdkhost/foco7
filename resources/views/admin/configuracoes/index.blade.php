@@ -295,20 +295,21 @@
                             <label class="form-label small fw-bold"><i class="fab fa-youtube text-danger me-1"></i> Canal no YouTube</label>
                             <input type="url" name="social_youtube" class="form-control" value="{{ $configs['social_youtube'] }}" placeholder="https://youtube.com/@foco7">
                         </div>
+                    </div>
                 </div>
 
                 <!-- ABA 5: GOOGLE RECAPTCHA V3 & SEGURANÇA -->
                 <div class="tab-pane fade" id="tab-recaptcha" role="tabpanel">
                     <div class="row g-4">
                         <div class="col-lg-8">
-                            <div class="card border border-light-subtle shadow-none p-3 bg-light mb-3">
+                            <div class="card border border-light-subtle shadow-none p-3 bg-body-secondary mb-3">
                                 <div class="form-check form-switch fs-5 mb-2">
                                     <input class="form-check-input" type="checkbox" name="recaptcha_ativo" id="recaptchaAtivoSwitch" value="1" {{ $configs['recaptcha_ativo'] == '1' ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-bold fs-6 text-dark" for="recaptchaAtivoSwitch">
+                                    <label class="form-check-label fw-bold fs-6 text-body" for="recaptchaAtivoSwitch">
                                         Ativar Proteção Google reCAPTCHA v3 no Formulário de Contato
                                     </label>
                                 </div>
-                                <p class="text-muted small mb-0">
+                                <p class="text-body-secondary small mb-0">
                                     Ao ativar, o sistema valida envios suspeitos e bots silenciosamente sem incomodar os visitantes com testes ou desafios visuais.
                                 </p>
                             </div>
@@ -335,15 +336,15 @@
                         <div class="col-lg-4">
                             <div class="card bg-dark text-white border-secondary p-3">
                                 <h6 class="fw-bold text-white mb-2">
-                                    <i class="fas fa-palette text-danger me-2"></i> Paleta Dinâmica & Anti-Spam
+                                    <i class="fas fa-shield-alt text-danger me-2"></i> Paleta Dinâmica & Anti-Spam
                                 </h6>
-                                <p class="small text-secondary mb-2">
+                                <p class="small text-white-50 mb-2">
                                     <strong>Cores Sincronizadas:</strong> O selo e o badge do reCAPTCHA herdam dinamicamente a paleta de cores primária configurada no sistema. Se a cor for alterada no painel, o selo se adapta automaticamente.
                                 </p>
-                                <p class="small text-secondary mb-3">
+                                <p class="small text-white-50 mb-3">
                                     <strong>Blindagem Avançada:</strong> O formulário conta com múltiplas camadas de proteção:
                                 </p>
-                                <ul class="small text-secondary ps-3 mb-0">
+                                <ul class="small text-white-50 ps-3 mb-0">
                                     <li>Honeypot invisível para bots</li>
                                     <li>Bloqueio de submissão instantânea por robôs</li>
                                     <li>Sanitização ativa contra injeções SQL e XSS</li>
