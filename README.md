@@ -211,6 +211,18 @@ public_html/
 - **Central de Notificações com Marcação Automática no Clique & Decremento Visual:** Interceptador AJAX no dropdown do sino da navbar e na página de listagem dedicada (`/admin/notificacoes`) que marca imediatamente como lida, remove o destaque visual e decrementa o contador sem recarregar a tela, além da rota segura `GET /admin/notificacoes/{id}/abrir` com suporte a cliques diretos.
 - **Desvinculação Estrita entre Formulário de Contato e Calendário de Serviços:** O formulário de contato do site público foi desconectado do banco de agendamentos e direcionado exclusivamente para a Central de Notificações. O FullCalendar 6 (`/admin/agendamentos`) foi blindado para exibir única e exclusivamente agendamentos reais de serviços de rastreamento e estética automotiva.
 
+### Módulo 19: Central Administrativa Dedicada de Depoimentos & Moderação e Blindagem Anti-Spam com reCAPTCHA v3 Dinâmico
+- **Página Administrativa Dedicada de Depoimentos (`/admin/depoimentos`):** Área exclusiva para gerenciar avaliações com cards de métricas em tempo real (Total Geral, Pendentes de Moderação, Aprovados/Publicados e Média de Estrelas), listagem com paginação e busca, modal interativo com drag & drop de foto do cliente, e exclusões confirmadas exclusivamente via SweetAlert2 (**zero `alert()` nativo**).
+- **Moderação em 1 Clique (Toggle AJAX Rápido):** O administrador aprova ou suspende depoimentos instantaneamente com feedback visual em tempo real e atualização automática dos contadores.
+- **Retenção para Moderação:** Depoimentos enviados por clientes na Landing Page entram compulsoriamente como inativos (`ativo = false`) e geram notificações direcionadas com link direto para a moderação.
+- **Google reCAPTCHA v3 no Formulário de Contato:** Validação transparente e sem fricção de pontuação humana (*score*), ativável e parametrizável nas Configurações do Sistema (`recaptcha_site_key`, `recaptcha_secret_key` e `recaptcha_ativo`).
+- **Paleta de Cores Dinâmica Sincronizada com o CMS:** O selo de segurança do formulário e o badge flutuante `.grecaptcha-badge` do Google herdam automaticamente as variáveis CSS `--foco-red`, `--bs-primary` e `--bs-primary-rgb`. Caso o administrador altere a cor primária no painel, o reCAPTCHA acompanha imediatamente a nova identidade visual.
+- **Blindagem em Camadas Anti-Spam & Anti-Injeção:** 
+  1. *Honeypot invisível (`_foco_hp_website`)*: Desarma crawlers e spambots silenciosamente;
+  2. *Time-Trap (`_foco_form_time`)*: Bloqueia disparos instantâneos de robôs submetidos em frações de segundo;
+  3. *Motor Anti-Injeção*: Expressões regulares ativas contra SQL Injection e injeções de script XSS;
+  4. *Sanitização Completa*: Limpeza e remoção de tags de risco antes do registro na Central de Notificações.
+
 ---
 
 ## ✅ Status de Implementação dos Módulos
@@ -235,13 +247,15 @@ public_html/
 | **Módulo 16**| Harmonização da Paleta Oficial CMS (`#d90000`) & Alto Contraste de Alertas Warning | ✅ Concluído & Validado |
 | **Módulo 17**| Checkout Transparente Efí Bank, Emissão de Carnê em PDF e Repasse de Taxas | ✅ Concluído & Validado |
 | **Módulo 18**| Sidebar Treeview Responsivo, Rolagem Mobile/Tablet e Notificações Dedicadas | ✅ Concluído & Validado |
+| **Módulo 19**| Página de Depoimentos & Moderação e reCAPTCHA v3 Dinâmico Anti-Spam | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **58 testes executados, 58 aprovados (100% de sucesso), 261 asserções**.
+- **67 testes executados, 67 aprovados (100% de sucesso), 302 asserções**.
+- Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 - Cobertura de rotas públicas, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---

@@ -42,7 +42,66 @@
             --bs-primary: {{ $cmsCorPrimaria ?? '#d90000' }};
             --bs-primary-rgb: {{ $cmsCorPrimariaRgb ?? '217, 0, 0' }};
         }
+
+        /* Badge do Google reCAPTCHA v3 e Selo Estilizados Dinamicamente com a Paleta do CMS */
+        .grecaptcha-badge {
+            border: 2px solid var(--foco-red) !important;
+            box-shadow: 0 8px 24px rgba(var(--bs-primary-rgb), 0.35) !important;
+            border-radius: 12px 0 0 12px !important;
+            transition: all 0.3s ease !important;
+            z-index: 9990 !important;
+        }
+        .grecaptcha-badge:hover {
+            box-shadow: 0 12px 32px rgba(var(--bs-primary-rgb), 0.55) !important;
+            transform: translateX(-4px);
+        }
+        .foco-recaptcha-box {
+            background: rgba(var(--bs-primary-rgb), 0.04);
+            border: 1px solid rgba(var(--bs-primary-rgb), 0.22);
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .foco-recaptcha-box:hover {
+            border-color: var(--foco-red);
+            box-shadow: 0 4px 14px rgba(var(--bs-primary-rgb), 0.15);
+        }
+        .foco-recaptcha-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(var(--bs-primary-rgb), 0.12);
+            color: var(--foco-red);
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+        .foco-recaptcha-badge-pill {
+            background-color: var(--foco-red);
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.3);
+            text-transform: uppercase;
+        }
+        .foco-recaptcha-links a {
+            color: var(--foco-red);
+            text-decoration: underline;
+        }
+        .foco-recaptcha-links a:hover {
+            color: var(--foco-red-hover);
+        }
     </style>
+
+    @if(($configs['recaptcha_ativo'] ?? '0') === '1' && !empty($configs['recaptcha_site_key']))
+    <!-- Google reCAPTCHA v3 API -->
+    <script src="https://www.google.com/recaptcha/api.js?render={{ $configs['recaptcha_site_key'] }}"></script>
+    @endif
 </head>
 <body id="inicio">
 
@@ -836,8 +895,21 @@
                 <div class="col-lg-7">
                     <div class="card-contato-form">
                         <h4 class="fw-bold mb-4" style="color: var(--foco-title);">Envie Sua Mensagem</h4>
-                        <form action="{{ route('site.contato') }}" method="POST" class="ajax-form reset-on-success">
+                        <form action="{{ route('site.contato') }}" method="POST" class="ajax-form reset-on-success" id="formContatoSite">
                             @csrf
+
+                            {{-- Blindagem Anti-Bot: Honeypot invisível para enganar robôs/crawlers automatizados --}}
+                            <div style="position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
+                                <label for="_foco_hp_website">Deixe este campo vazio</label>
+                                <input type="text" name="_foco_hp_website" id="_foco_hp_website" tabindex="-1" autocomplete="off">
+                            </div>
+
+                            {{-- Blindagem Anti-Bot: Carimbo de tempo para bloquear disparos ultra-rápidos de scripts --}}
+                            <input type="hidden" name="_foco_form_time" value="{{ time() }}">
+
+                            {{-- Token de Segurança Google reCAPTCHA v3 --}}
+                            <input type="hidden" name="g-recaptcha-response" id="gRecaptchaContatoResponse">
+
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label small text-secondary fw-semibold">Seu Nome Completo *</label>
@@ -859,8 +931,31 @@
                                     <label class="form-label small text-secondary fw-semibold">Dúvida ou Mensagem *</label>
                                     <textarea name="mensagem" rows="4" class="form-control" required placeholder="Como podemos ajudar você?"></textarea>
                                 </div>
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn-foco-primary w-100 py-3">
+
+                                {{-- Selo Visual de Segurança reCAPTCHA v3 Sincronizado com a Paleta Dinâmica do Site --}}
+                                <div class="col-12 mt-2">
+                                    <div class="foco-recaptcha-box d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="foco-recaptcha-icon">
+                                                <i class="fas fa-shield-halved"></i>
+                                            </div>
+                                            <div style="line-height: 1.25;">
+                                                <div class="fw-bold small text-dark">Protegido por Google reCAPTCHA v3</div>
+                                                <div class="text-secondary foco-recaptcha-links" style="font-size: 0.73rem;">
+                                                    Blindagem ativa anti-spam &amp; injeção &bull; 
+                                                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacidade</a> &bull; 
+                                                    <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Termos</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="foco-recaptcha-badge-pill">
+                                            <i class="fas fa-check-circle me-1"></i> Seguro
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-3">
+                                    <button type="submit" class="btn-foco-primary w-100 py-3" id="btnEnviarContatoSite">
                                         <i class="fas fa-paper-plane me-2"></i> ENVIAR SOLICITAÇÃO AGORA
                                     </button>
                                 </div>
@@ -2158,6 +2253,41 @@
                         window.foco7Notify.error(msg);
                     }
                 });
+            });
+
+            // Proteção Google reCAPTCHA v3 no Formulário de Contato
+            var recaptchaSiteKey = '{{ $configs['recaptcha_site_key'] ?? '' }}';
+            var recaptchaAtivo = '{{ $configs['recaptcha_ativo'] ?? '0' }}';
+
+            $('#formContatoSite').on('submit', function (e) {
+                var $form = $(this);
+                if (recaptchaAtivo === '1' && recaptchaSiteKey && typeof grecaptcha !== 'undefined') {
+                    if (!$form.data('recaptcha-verified')) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        var $btn = $form.find('[type="submit"]');
+                        var origHtml = $btn.html();
+                        $btn.prop('disabled', true).html('<i class="fas fa-shield-alt fa-spin me-2"></i> Verificando segurança...');
+
+                        grecaptcha.ready(function () {
+                            grecaptcha.execute(recaptchaSiteKey, { action: 'contato' }).then(function (token) {
+                                $('#gRecaptchaContatoResponse').val(token);
+                                $form.data('recaptcha-verified', true);
+                                $btn.prop('disabled', false).html(origHtml);
+                                $form.trigger('submit');
+                            }).catch(function (err) {
+                                console.warn('Aviso: falha na API reCAPTCHA, prosseguindo com segurança secundária:', err);
+                                $form.data('recaptcha-verified', true);
+                                $btn.prop('disabled', false).html(origHtml);
+                                $form.trigger('submit');
+                            });
+                        });
+                        return false;
+                    } else {
+                        // Reset para submissões subsequentes
+                        $form.removeData('recaptcha-verified');
+                    }
+                }
             });
 
             // Botão copiar PIX

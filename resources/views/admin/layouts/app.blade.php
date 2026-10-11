@@ -277,7 +277,7 @@
                             <li class="nav-header text-uppercase small text-secondary mt-3">Gestão de Conteúdo (CMS)</li>
 
                             @php
-                                $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*');
+                                $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*') || request()->routeIs('admin.depoimentos.*');
                             @endphp
                             <li class="nav-item {{ $isCmsActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isCmsActive ? 'active' : '' }}">
@@ -331,9 +331,15 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-depoimentos" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-depoimentos', event); }">
+                                        <a href="{{ route('admin.depoimentos.index') }}" class="nav-link {{ request()->routeIs('admin.depoimentos.*') ? 'active' : '' }}">
                                             <i class="fas fa-star nav-icon text-warning"></i>
-                                            <p>Depoimentos</p>
+                                            <p>
+                                                Depoimentos & Moderação
+                                                @php $pendentesDepCount = \App\Models\Depoimento::where('ativo', false)->count(); @endphp
+                                                @if($pendentesDepCount > 0)
+                                                    <span class="badge bg-warning text-dark ms-auto" style="font-size: 0.65rem;">{{ $pendentesDepCount }}</span>
+                                                @endif
+                                            </p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

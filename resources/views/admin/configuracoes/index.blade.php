@@ -28,6 +28,11 @@
                     <i class="fas fa-share-alt text-danger me-1"></i> Redes Sociais
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="recaptcha-tab" data-bs-toggle="tab" data-bs-target="#tab-recaptcha" type="button">
+                    <i class="fas fa-shield-alt text-danger me-1"></i> reCAPTCHA v3 & Segurança
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -289,6 +294,61 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold"><i class="fab fa-youtube text-danger me-1"></i> Canal no YouTube</label>
                             <input type="url" name="social_youtube" class="form-control" value="{{ $configs['social_youtube'] }}" placeholder="https://youtube.com/@foco7">
+                        </div>
+                </div>
+
+                <!-- ABA 5: GOOGLE RECAPTCHA V3 & SEGURANÇA -->
+                <div class="tab-pane fade" id="tab-recaptcha" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card border border-light-subtle shadow-none p-3 bg-light mb-3">
+                                <div class="form-check form-switch fs-5 mb-2">
+                                    <input class="form-check-input" type="checkbox" name="recaptcha_ativo" id="recaptchaAtivoSwitch" value="1" {{ $configs['recaptcha_ativo'] == '1' ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold fs-6 text-dark" for="recaptchaAtivoSwitch">
+                                        Ativar Proteção Google reCAPTCHA v3 no Formulário de Contato
+                                    </label>
+                                </div>
+                                <p class="text-muted small mb-0">
+                                    Ao ativar, o sistema valida envios suspeitos e bots silenciosamente sem incomodar os visitantes com testes ou desafios visuais.
+                                </p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Chave do Site (Site Key) *</label>
+                                    <input type="text" name="recaptcha_site_key" class="form-control" value="{{ $configs['recaptcha_site_key'] }}" placeholder="Ex: 6LdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+                                    <div class="form-text small">Chave pública utilizada no frontend (JavaScript) para gerar o token invisível de segurança.</div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Chave Secreta (Secret Key) *</label>
+                                    <div class="input-group">
+                                        <input type="password" name="recaptcha_secret_key" id="recaptchaSecretKey" class="form-control" value="{{ $configs['recaptcha_secret_key'] }}" placeholder="Ex: 6LdYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('recaptchaSecretKey')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text small">Chave privada utilizada pelo backend PHP para validar a pontuação de autenticidade junto à API do Google.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card bg-dark text-white border-secondary p-3">
+                                <h6 class="fw-bold text-white mb-2">
+                                    <i class="fas fa-palette text-danger me-2"></i> Paleta Dinâmica & Anti-Spam
+                                </h6>
+                                <p class="small text-secondary mb-2">
+                                    <strong>Cores Sincronizadas:</strong> O selo e o badge do reCAPTCHA herdam dinamicamente a paleta de cores primária configurada no sistema. Se a cor for alterada no painel, o selo se adapta automaticamente.
+                                </p>
+                                <p class="small text-secondary mb-3">
+                                    <strong>Blindagem Avançada:</strong> O formulário conta com múltiplas camadas de proteção:
+                                </p>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li>Honeypot invisível para bots</li>
+                                    <li>Bloqueio de submissão instantânea por robôs</li>
+                                    <li>Sanitização ativa contra injeções SQL e XSS</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

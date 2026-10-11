@@ -55,6 +55,11 @@ class ConfiguracoesController extends Controller
             'social_facebook' => CmsSetting::get('social_facebook', 'https://facebook.com/foco7rastreamento'),
             'social_linkedin' => CmsSetting::get('social_linkedin', ''),
             'social_youtube' => CmsSetting::get('social_youtube', ''),
+
+            // Google reCAPTCHA v3 (Anti-Spam & Blindagem)
+            'recaptcha_site_key' => CmsSetting::get('recaptcha_site_key', ''),
+            'recaptcha_secret_key' => CmsSetting::get('recaptcha_secret_key', ''),
+            'recaptcha_ativo' => CmsSetting::get('recaptcha_ativo', '0'),
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -65,7 +70,7 @@ class ConfiguracoesController extends Controller
      */
     public function salvar(Request $request)
     {
-        // 1. Dados da Empresa
+        // 1. Dados da Empresa e Segurança
         $camposTexto = [
             'site_nome', 'razao_social', 'cnpj', 'site_slogan',
             'contato_email', 'contato_telefone', 'contato_whatsapp', 'contato_whatsapp_formatado',
@@ -73,14 +78,18 @@ class ConfiguracoesController extends Controller
             'endereco_estado', 'endereco_cep', 'horario_atendimento',
             'mail_mailer', 'mail_host', 'mail_port', 'mail_encryption',
             'mail_username', 'mail_from_address', 'mail_from_name',
-            'social_instagram', 'social_facebook', 'social_linkedin', 'social_youtube'
+            'social_instagram', 'social_facebook', 'social_linkedin', 'social_youtube',
+            'recaptcha_site_key', 'recaptcha_secret_key',
         ];
 
         foreach ($camposTexto as $campo) {
             if ($request->has($campo)) {
-                CmsSetting::set($campo, $request->input($campo, ''), 'sistema');
+                CmsSetting::set($campo, trim((string)$request->input($campo, '')), 'sistema');
             }
         }
+
+        // Status do reCAPTCHA
+        CmsSetting::set('recaptcha_ativo', $request->has('recaptcha_ativo') ? '1' : '0', 'sistema');
 
         // Senha SMTP (só atualiza se preenchida)
         if ($request->filled('mail_password')) {

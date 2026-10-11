@@ -15,6 +15,8 @@ use App\Models\ServicoEstetica;
 use App\Models\Notificacao;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SiteController extends Controller
@@ -200,6 +202,11 @@ class SiteController extends Controller
             'carne_max_parcelas' => (int) CmsSetting::get('carne_max_parcelas', '12'),
             'repassar_taxas_cliente' => CmsSetting::get('repassar_taxas_cliente', '0') == '1',
             'pix_desconto' => (float) CmsSetting::get('pix_desconto', '5'),
+
+            // Proteção Google reCAPTCHA v3 & Blindagem Anti-Spam
+            'recaptcha_site_key' => CmsSetting::get('recaptcha_site_key', ''),
+            'recaptcha_secret_key' => CmsSetting::get('recaptcha_secret_key', ''),
+            'recaptcha_ativo' => CmsSetting::get('recaptcha_ativo', '0'),
         ];
 
         return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'seo', 'configs'));
@@ -237,35 +244,140 @@ class SiteController extends Controller
     }
 
     /**
-     * Processa formulário de contato via AJAX
+     * Processa formulário de contato via AJAX com proteção Google reCAPTCHA v3 e blindagem anti-spam/injeção
      */
     public function contato(Request $request)
     {
+        // 1. Blindagem Anti-Bot Camada 1: Honeypot invisível
+        if ($request->filled('_foco_hp_website')) {
+            // Robô preencheu o campo invisível: retorna sucesso simulado para desarmar o bot sem salvar lixo
+            return response()->json([
+                'success' => true,
+                'message' => 'Obrigado pelo contato! Nossa equipe entrará em contato em instantes.',
+            ]);
+        }
+
+        // 2. Blindagem Anti-Bot Camada 2: Time-Trap (validação de tempo mínimo de preenchimento)
+        $formTime = $request->input('_foco_form_time');
+        if ($formTime && is_numeric($formTime)) {
+            $tempoDecorrido = time() - (int)$formTime;
+            // Se submetido em menos de 1 segundo após o carregamento da página, é disparo robótico
+            if ($tempoDecorrido < 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Envio muito rápido detectado. Por favor, aguarde alguns segundos e tente novamente.',
+                ], 422);
+            }
+        }
+
+        // 3. Validação dos Dados
         $validated = $request->validate([
             'nome' => 'required|string|max:120',
             'telefone' => 'required|string|max:30',
             'email' => 'nullable|email|max:120',
             'veiculo' => 'nullable|string|max:100',
-            'mensagem' => 'required|string|max:1000',
+            'mensagem' => 'required|string|max:1500',
         ], [
             'nome.required' => 'Por favor, informe seu nome completo.',
             'telefone.required' => 'Informe seu telefone ou WhatsApp para retorno.',
             'mensagem.required' => 'Por favor, digite sua mensagem ou dúvida.',
+            'email.email' => 'Informe um endereço de e-mail válido.',
         ]);
+
+        // 4. Blindagem Anti-Injeção Camada 3: Detecção de Padrões Maliciosos (SQL Injection e XSS)
+        $textosParaVerificar = [
+            $validated['nome'],
+            $validated['telefone'],
+            $validated['email'] ?? '',
+            $validated['veiculo'] ?? '',
+            $validated['mensagem'],
+        ];
+
+        $padroesInjecao = [
+            // Padrões de SQL Injection
+            '/(union\s+(all\s+)?select)/i',
+            '/(select\s+.+\s+from)/i',
+            '/(insert\s+into.+values)/i',
+            '/(drop\s+(table|database|procedure))/i',
+            '/(update\s+.+\s+set)/i',
+            '/(delete\s+from)/i',
+            '/(information_schema|sys\.tables|pg_stat)/i',
+            '#(--\s*$|/\*.*?\*/|;\s*--)#i',
+            "/('|\")\s*(or|and)\s*('|\")?\d+('|\")?\s*=\s*('|\")?\d+/i",
+            // Padrões de Cross-Site Scripting (XSS)
+            '#<script.*?>.*?</script>#is',
+            '#javascript\s*:#i',
+            '#(onload|onerror|onclick)\s*=#i',
+            '#<iframe.*?>#i',
+            '#<img.*?src=[\'"]?javascript:#i',
+        ];
+
+        foreach ($textosParaVerificar as $texto) {
+            foreach ($padroesInjecao as $padrao) {
+                if (preg_match($padrao, $texto)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Caracteres ou formatos não permitidos detectados no envio. Por favor, revise sua mensagem.',
+                    ], 422);
+                }
+            }
+        }
+
+        // 5. Validação Google reCAPTCHA v3 Camada 4
+        $recaptchaAtivo = CmsSetting::get('recaptcha_ativo', '0') === '1';
+        $recaptchaSecret = CmsSetting::get('recaptcha_secret_key', '');
+
+        if ($recaptchaAtivo && !empty($recaptchaSecret)) {
+            $recaptchaToken = $request->input('g-recaptcha-response');
+
+            if (empty($recaptchaToken)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Falha na verificação de segurança reCAPTCHA. Por favor, atualize a página e tente novamente.',
+                ], 422);
+            }
+
+            try {
+                $response = Http::asForm()->timeout(5)->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $recaptchaSecret,
+                    'response' => $recaptchaToken,
+                    'remoteip' => $request->ip(),
+                ]);
+
+                $recaptchaResult = $response->json();
+
+                if (!($recaptchaResult['success'] ?? false) || (isset($recaptchaResult['score']) && $recaptchaResult['score'] < 0.3)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'A verificação de segurança automática não confirmou a autenticidade humana do envio. Se necessário, entre em contato via WhatsApp.',
+                    ], 422);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Falha momentânea na comunicação com a API do Google reCAPTCHA: ' . $e->getMessage());
+            }
+        }
+
+        // Sanitização final e remoção de tags HTML residuais
+        $nomeLimpo = strip_tags(trim($validated['nome']));
+        $telefoneLimpo = strip_tags(trim($validated['telefone']));
+        $emailLimpo = !empty($validated['email']) ? strip_tags(trim($validated['email'])) : null;
+        $veiculoLimpo = !empty($validated['veiculo']) ? strip_tags(trim($validated['veiculo'])) : null;
+        $mensagemLimpa = strip_tags(trim($validated['mensagem']));
 
         // Registra exclusivamente na Central de Notificações dedicada (não polui o calendário de serviços)
         Notificacao::registrar(
             tipo: 'contato',
             titulo: 'Nova Mensagem de Contato do Site',
-            mensagem: "{$validated['nome']} ({$validated['telefone']}) enviou uma mensagem: \"" . Str::limit($validated['mensagem'], 110) . "\"",
+            mensagem: "{$nomeLimpo} ({$telefoneLimpo}) enviou uma mensagem: \"" . Str::limit($mensagemLimpa, 110) . "\"",
             linkAcao: route('admin.notificacoes.index'),
             dados: [
-                'origem' => 'Formulário de Contato da Landing Page',
-                'cliente' => $validated['nome'],
-                'telefone' => $validated['telefone'],
-                'email' => $validated['email'] ?? 'Não informado',
-                'veiculo' => $validated['veiculo'] ?? 'Não informado',
-                'mensagem' => $validated['mensagem'],
+                'origem' => 'Formulário de Contato da Landing Page (Protegido por reCAPTCHA v3)',
+                'cliente' => $nomeLimpo,
+                'telefone' => $telefoneLimpo,
+                'email' => $emailLimpo ?? 'Não informado',
+                'veiculo' => $veiculoLimpo ?? 'Não informado',
+                'mensagem' => $mensagemLimpa,
+                'ip' => $request->ip(),
             ],
             notificarEmail: true
         );
@@ -296,6 +408,7 @@ class SiteController extends Controller
             'texto.min' => 'Seu relato deve conter pelo menos 10 caracteres.',
         ]);
 
+        // Grava como pendente de aprovação (moderação do administrador)
         $depoimento = Depoimento::create([
             'nome_cliente' => trim($validated['nome_cliente']),
             'cidade_uf' => trim($validated['cidade_uf'] ?? 'Belém - PA'),
@@ -303,28 +416,29 @@ class SiteController extends Controller
             'estrelas' => (int) $validated['estrelas'],
             'texto' => strip_tags(trim($validated['texto'])),
             'ordem' => 99,
-            'ativo' => true,
+            'ativo' => false, // Aguardando aprovação do administrador
         ]);
 
-        // Direciona para a Central de Notificações
+        // Direciona para a Central de Notificações com link direto para a página de Depoimentos & Moderação
         Notificacao::registrar(
             tipo: 'depoimento',
-            titulo: "Novo Depoimento ({$validated['estrelas']} Estrelas)",
-            mensagem: "{$validated['nome_cliente']} avaliou o serviço com {$validated['estrelas']} estrelas: \"" . Str::limit($validated['texto'], 110) . "\"",
-            linkAcao: route('admin.cms.index'),
+            titulo: "Novo Depoimento ({$validated['estrelas']} Estrelas) - Pendente de Moderação",
+            mensagem: "{$validated['nome_cliente']} enviou uma avaliação de {$validated['estrelas']} estrelas aguardando aprovação: \"" . Str::limit($validated['texto'], 110) . "\"",
+            linkAcao: route('admin.depoimentos.index', ['status' => 'pendentes']),
             dados: [
                 'origem' => 'Avaliação do Site Público',
                 'cliente' => $validated['nome_cliente'],
                 'estrelas' => $validated['estrelas'] . ' de 5 estrelas',
                 'veiculo' => $validated['veiculo'] ?? 'Não informado',
                 'depoimento' => $validated['texto'],
+                'status' => 'Pendente de Moderação',
             ],
             notificarEmail: true
         );
 
         return response()->json([
             'success' => true,
-            'message' => 'Muito obrigado pela sua avaliação! Seu depoimento foi publicado com sucesso.',
+            'message' => 'Muito obrigado pela sua avaliação! Seu relato foi recebido com sucesso e será publicado após moderação da equipe.',
             'depoimento' => $depoimento,
         ]);
     }

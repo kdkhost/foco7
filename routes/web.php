@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\FaturasController;
 use App\Http\Controllers\Admin\EmailTemplatesController;
 use App\Http\Controllers\Admin\CronController;
 use App\Http\Controllers\Admin\NotificacoesController;
+use App\Http\Controllers\Admin\DepoimentosController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
 
@@ -100,6 +101,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/depoimento/obter/{id}', [CmsController::class, 'obterDepoimento'])->name('admin.cms.obter_depoimento');
         Route::post('/depoimento', [CmsController::class, 'salvarDepoimento'])->name('admin.cms.salvar_depoimento');
         Route::delete('/depoimento/{id}', [CmsController::class, 'excluirDepoimento'])->name('admin.cms.excluir_depoimento');
+    });
+
+    // Depoimentos & Moderação de Avaliações (Página Administrativa Dedicada)
+    Route::prefix('depoimentos')->group(function () {
+        Route::get('/', [DepoimentosController::class, 'index'])->name('admin.depoimentos.index');
+        Route::get('/obter/{id}', [DepoimentosController::class, 'obter'])->name('admin.depoimentos.obter');
+        Route::post('/salvar', [DepoimentosController::class, 'salvar'])->name('admin.depoimentos.salvar');
+        Route::post('/toggle/{id}', [DepoimentosController::class, 'toggleAprovacao'])->name('admin.depoimentos.toggle');
+        Route::delete('/{id}', [DepoimentosController::class, 'excluir'])->name('admin.depoimentos.excluir');
     });
 
     // Estética Automotiva (Serviços & Pacotes)
@@ -223,6 +233,18 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/{notificacao}/lida', [NotificacoesController::class, 'marcarLida'])->name('admin.notificacoes.marcar_lida');
         Route::get('/{notificacao}/abrir', [NotificacoesController::class, 'abrirERedirecionar'])->name('admin.notificacoes.abrir');
         Route::delete('/{notificacao}', [NotificacoesController::class, 'excluir'])->name('admin.notificacoes.excluir');
+    });
+
+    // Depoimentos & Moderação de Avaliações
+    Route::prefix('depoimentos')->group(function () {
+        Route::get('/', [DepoimentosController::class, 'index'])->name('admin.depoimentos.index');
+        Route::get('/obter/{id}', [DepoimentosController::class, 'obter'])->name('admin.depoimentos.obter');
+        Route::get('/{id}/obter', [DepoimentosController::class, 'obter']);
+        Route::post('/salvar', [DepoimentosController::class, 'salvar'])->name('admin.depoimentos.salvar');
+        Route::post('/toggle/{id}', [DepoimentosController::class, 'toggleAprovacao'])->name('admin.depoimentos.toggle_aprovacao');
+        Route::post('/{id}/toggle-aprovacao', [DepoimentosController::class, 'toggleAprovacao']);
+        Route::delete('/{id}', [DepoimentosController::class, 'excluir'])->name('admin.depoimentos.excluir');
+        Route::delete('/{id}/excluir', [DepoimentosController::class, 'excluir']);
     });
 });
 

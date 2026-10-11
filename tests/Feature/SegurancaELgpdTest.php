@@ -135,7 +135,7 @@ class SegurancaELgpdTest extends TestCase
         $this->assertDatabaseHas('depoimentos', [
             'nome_cliente' => 'Fabio Silveira',
             'estrelas' => 5,
-            'ativo' => true,
+            'ativo' => false,
         ]);
     }
 
