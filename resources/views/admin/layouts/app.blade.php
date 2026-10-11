@@ -175,13 +175,11 @@
                 <nav class="mt-2">
                     <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
                         @if(auth()->user()->role === 'admin')
-                            <!-- SEÇÃO 1: VISÃO GERAL -->
-                            <li class="nav-header text-uppercase small text-secondary mt-1">Visão Geral</li>
-
+                            <!-- TOPO DE ACESSO RÁPIDO (SEM HEADER PARA ECONOMIZAR ESPAÇO) -->
                             <li class="nav-item">
                                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>Dashboard</p>
+                                    <p><span class="menu-text">Dashboard</span></p>
                                 </a>
                             </li>
 
@@ -189,14 +187,14 @@
                                 <a href="{{ route('admin.notificacoes.index') }}" class="nav-link {{ request()->routeIs('admin.notificacoes.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-bell text-danger"></i>
                                     <p>
-                                        Central de Notificações
-                                        <span class="badge bg-danger ms-auto badge-notificacoes-count" style="display: none;">0</span>
+                                        <span class="menu-text">Notificações</span>
+                                        <span class="badge bg-danger ms-auto badge-notificacoes-count" style="display: none; font-size: 0.65rem;">0</span>
                                     </p>
                                 </a>
                             </li>
 
-                            <!-- SEÇÃO 2: ATENDIMENTOS & SERVIÇOS (TREEVIEW) -->
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Atendimentos & Serviços</li>
+                            <!-- SEÇÃO 1: OPERAÇÕES & SERVIÇOS -->
+                            <li class="nav-header">Operações &amp; Serviços</li>
 
                             @php
                                 $isServicosActive = request()->routeIs('admin.agendamentos.*') || request()->routeIs('admin.estetica.*') || request()->routeIs('admin.planos.*');
@@ -205,34 +203,31 @@
                                 <a href="javascript:void(0)" class="nav-link {{ $isServicosActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-calendar-check text-warning"></i>
                                     <p>
-                                        Atendimentos & Ordens
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                        <span class="menu-text">Atendimentos</span>
+                                        <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
                                             <i class="far fa-calendar-alt nav-icon text-danger"></i>
-                                            <p>Agenda & Ordens</p>
+                                            <p><span class="menu-text">Agenda &amp; Ordens</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
                                             <i class="fas fa-car-side nav-icon text-warning"></i>
-                                            <p>Estética Automotiva</p>
+                                            <p><span class="menu-text">Estética Automotiva</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
                                             <i class="fas fa-tags nav-icon text-danger"></i>
-                                            <p>Planos & Preços</p>
+                                            <p><span class="menu-text">Planos &amp; Preços</span></p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-
-                            <!-- SEÇÃO 3: FINANCEIRO & COBRANÇAS (TREEVIEW) -->
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Financeiro & Assinantes</li>
 
                             @php
                                 $isFinanceiroActive = request()->routeIs('admin.clientes.*') || request()->routeIs('admin.faturas.*') || request()->routeIs('admin.gateways.*');
@@ -241,40 +236,40 @@
                                 <a href="javascript:void(0)" class="nav-link {{ $isFinanceiroActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-file-invoice-dollar text-success"></i>
                                     <p>
-                                        Financeiro & Cobranças
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                        <span class="menu-text">Financeiro</span>
+                                        <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
                                             <i class="fas fa-users nav-icon text-danger"></i>
-                                            <p>Base de Clientes</p>
+                                            <p><span class="menu-text">Base de Clientes</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
                                             <i class="fas fa-file-invoice nav-icon text-success"></i>
-                                            <p>Faturas & Mensalidades</p>
+                                            <p><span class="menu-text">Faturas &amp; Mensalidades</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
                                             <i class="fas fa-credit-card nav-icon text-primary"></i>
-                                            <p>Gateways (MP & EFI)</p>
+                                            <p><span class="menu-text">Gateways de Pagamento</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link">
                                             <i class="fas fa-book-open nav-icon text-warning"></i>
-                                            <p>Gerador de Carnês (PDF)</p>
+                                            <p><span class="menu-text">Carnês em PDF</span></p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
 
-                            <!-- SEÇÃO 4: GESTÃO DE CONTEÚDO (CMS & SEO) (TREEVIEW) -->
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão de Conteúdo (CMS)</li>
+                            <!-- SEÇÃO 2: SITE & CONTEÚDO -->
+                            <li class="nav-header">Site &amp; Comunicação</li>
 
                             @php
                                 $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*') || request()->routeIs('admin.depoimentos.*');
@@ -283,58 +278,22 @@
                                 <a href="javascript:void(0)" class="nav-link {{ $isCmsActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-laptop-code text-info"></i>
                                     <p>
-                                        CMS & Landing Page
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                        <span class="menu-text">Gestão do Site</span>
+                                        <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.index') ? 'active' : '' }}">
                                             <i class="fas fa-desktop nav-icon text-secondary"></i>
-                                            <p>Painel Geral CMS</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-cores" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-cores', event); }">
-                                            <i class="fas fa-palette nav-icon text-danger"></i>
-                                            <p>Cores & Tema</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-banners', event); }">
-                                            <i class="fas fa-images nav-icon text-secondary"></i>
-                                            <p>Banners & Hero</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-app', event); }">
-                                            <i class="fas fa-mobile-alt nav-icon text-danger"></i>
-                                            <p>Aplicativo Mobile</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-ronda', event); }">
-                                            <i class="fas fa-shield-alt nav-icon text-danger"></i>
-                                            <p>Ronda Tática</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-secoes" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-secoes', event); }">
-                                            <i class="fas fa-layer-group nav-icon text-secondary"></i>
-                                            <p>Sobre & Diferenciais</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-faq" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-faq', event); }">
-                                            <i class="fas fa-question-circle nav-icon text-warning"></i>
-                                            <p>FAQs & Dúvidas</p>
+                                            <p><span class="menu-text">Editor Geral (CMS)</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.depoimentos.index') }}" class="nav-link {{ request()->routeIs('admin.depoimentos.*') ? 'active' : '' }}">
                                             <i class="fas fa-star nav-icon text-warning"></i>
                                             <p>
-                                                Depoimentos & Moderação
+                                                <span class="menu-text">Depoimentos</span>
                                                 @php $pendentesDepCount = \App\Models\Depoimento::where('ativo', false)->count(); @endphp
                                                 @if($pendentesDepCount > 0)
                                                     <span class="badge bg-warning text-dark ms-auto" style="font-size: 0.65rem;">{{ $pendentesDepCount }}</span>
@@ -343,28 +302,13 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-lgpd" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-lgpd', event); }">
-                                            <i class="fas fa-user-shield nav-icon text-danger"></i>
-                                            <p>LGPD & Termos</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-whatsapp" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-whatsapp', event); }">
-                                            <i class="fab fa-whatsapp nav-icon text-success"></i>
-                                            <p>WhatsApp Flutuante</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
                                         <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
                                             <i class="fas fa-search nav-icon text-warning"></i>
-                                            <p>SEO & Meta Tags</p>
+                                            <p><span class="menu-text">SEO &amp; Google</span></p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-
-                            <!-- SEÇÃO 5: COMUNICAÇÃO & MENSAGENS (TREEVIEW) -->
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Comunicação & Mensagens</li>
 
                             @php
                                 $isEmailsActive = request()->routeIs('admin.emails.*');
@@ -373,28 +317,28 @@
                                 <a href="javascript:void(0)" class="nav-link {{ $isEmailsActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-envelope-open-text text-danger"></i>
                                     <p>
-                                        Templates de E-mails
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                        <span class="menu-text">Templates de E-mail</span>
+                                        <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.index') ? 'active' : '' }}">
                                             <i class="fas fa-list nav-icon text-secondary"></i>
-                                            <p>Todos os Modelos</p>
+                                            <p><span class="menu-text">Todos os Modelos</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.create') }}" class="nav-link {{ request()->routeIs('admin.emails.create') ? 'active' : '' }}">
                                             <i class="fas fa-plus-circle nav-icon text-danger"></i>
-                                            <p>Novo Modelo</p>
+                                            <p><span class="menu-text">Novo Modelo</span></p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
 
-                            <!-- SEÇÃO 6: SISTEMA & CONFIGURAÇÕES (TREEVIEW) -->
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
+                            <!-- SEÇÃO 3: SISTEMA & CONFIGURAÇÕES -->
+                            <li class="nav-header">Sistema &amp; Ajustes</li>
 
                             @php
                                 $isSistemaActive = request()->routeIs('admin.configuracoes.*') || request()->routeIs('admin.cron.*') || request()->routeIs('admin.manutencao.*') || request()->routeIs('admin.perfil.*');
@@ -403,33 +347,33 @@
                                 <a href="javascript:void(0)" class="nav-link {{ $isSistemaActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-cogs text-secondary"></i>
                                     <p>
-                                        Sistema & Ajustes
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                        <span class="menu-text">Configurações</span>
+                                        <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
                                             <i class="fas fa-sliders-h nav-icon text-warning"></i>
-                                            <p>Configurações & SMTP</p>
+                                            <p><span class="menu-text">Sistema &amp; SMTP</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
                                             <i class="fas fa-clock nav-icon text-danger"></i>
-                                            <p>Central de Cron Jobs</p>
+                                            <p><span class="menu-text">Central de Cron Jobs</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
                                             <i class="fas fa-tools nav-icon text-secondary"></i>
-                                            <p>Modo Manutenção</p>
+                                            <p><span class="menu-text">Modo Manutenção</span></p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
                                             <i class="fas fa-user-circle nav-icon text-secondary"></i>
-                                            <p>Meu Perfil</p>
+                                            <p><span class="menu-text">Meu Perfil</span></p>
                                         </a>
                                     </li>
                                 </ul>
