@@ -177,6 +177,26 @@ class AgendamentosController extends Controller
     }
 
     /**
+     * Cancela um agendamento com registro de motivo e liberacao de vaga
+     */
+    public function cancelar(Request $request, $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $motivo = $request->input('motivo', 'Cancelado pelo administrador');
+
+        $agendamento->status = 'cancelado';
+        $logCancelamento = "[Cancelado em " . date('d/m/Y H:i') . "]: " . $motivo;
+        $agendamento->observacoes = trim(($agendamento->observacoes ? $agendamento->observacoes . "\n" : '') . $logCancelamento);
+        $agendamento->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Agendamento cancelado com sucesso e vaga liberada no calendário!',
+            'agendamento' => $agendamento,
+        ]);
+    }
+
+    /**
      * Exclui um agendamento
      */
     public function excluir($id)

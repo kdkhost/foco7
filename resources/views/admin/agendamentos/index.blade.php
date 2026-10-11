@@ -158,9 +158,14 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-danger d-none" id="btnExcluirAgendamento" onclick="excluirAgendamentoAtual()">
-                        <i class="fas fa-trash-alt me-1"></i> Excluir
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-danger d-none" id="btnExcluirAgendamento" onclick="excluirAgendamentoAtual()">
+                            <i class="fas fa-trash-alt me-1"></i> Excluir
+                        </button>
+                        <button type="button" class="btn btn-warning d-none text-dark fw-semibold" id="btnCancelarAgendamentoModal" onclick="cancelarAgendamentoModalAtual()">
+                            <i class="fas fa-ban me-1"></i> Cancelar Agendamento
+                        </button>
+                    </div>
                     <div>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-danger fw-bold" id="btnSalvarAgendamento">
@@ -258,6 +263,11 @@
 
                             $('#modalAgendamentoTitulo').html('<i class="fas fa-edit me-1 text-danger"></i> Editar Agendamento #' + ag.id);
                             $('#btnExcluirAgendamento').removeClass('d-none');
+                            if (ag.status !== 'cancelado') {
+                                $('#btnCancelarAgendamentoModal').removeClass('d-none');
+                            } else {
+                                $('#btnCancelarAgendamentoModal').addClass('d-none');
+                            }
                             new bootstrap.Modal(document.getElementById('modalAgendamento')).show();
                         }
                     },
@@ -341,6 +351,7 @@
         $('#formAgendamento')[0].reset();
         $('#agendamento_id').val('');
         $('#btnExcluirAgendamento').addClass('d-none');
+        $('#btnCancelarAgendamentoModal').addClass('d-none');
         $('#modalAgendamentoTitulo').html('<i class="fas fa-calendar-plus me-1 text-danger"></i> Novo Agendamento');
         $('#categoria').val('rastreamento');
         $('#tipo_pagamento').val('online');
@@ -351,6 +362,46 @@
         $('#data_hora_inicio').val(nowStr);
 
         new bootstrap.Modal(document.getElementById('modalAgendamento')).show();
+    }
+
+    function cancelarAgendamentoModalAtual() {
+        var id = $('#agendamento_id').val();
+        if (!id) return;
+
+        Swal.fire({
+            title: 'Cancelar Agendamento?',
+            text: 'Deseja realmente cancelar este atendimento? O horário será liberado no calendário.',
+            input: 'text',
+            inputPlaceholder: 'Motivo do cancelamento (opcional)',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, Cancelar',
+            cancelButtonText: 'Manter Agendado'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                var motivo = result.value || 'Cancelado pelo administrador via calendário';
+                $.ajax({
+                    url: '/admin/agendamentos/cancelar/' + id,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: { motivo: motivo },
+                    success: function (res) {
+                        window.foco7Notify.success(res.message);
+                        var modalEl = document.getElementById('modalAgendamento');
+                        var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        calendar.refetchEvents();
+                    },
+                    error: function (xhr) {
+                        window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao cancelar agendamento.');
+                    }
+                });
+            }
+        });
     }
 
     function excluirAgendamentoAtual() {

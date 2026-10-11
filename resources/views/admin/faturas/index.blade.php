@@ -147,6 +147,11 @@
                         </td>
                         <td class="text-end">
                             <div class="btn-group">
+                                @if($fat->status !== 'pago')
+                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirModalAnteciparFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', {{ $fat->valor }}, {{ $fat->numero_parcela ?? 1 }})" title="Antecipar / Quitar com Desconto">
+                                        <i class="fas fa-hand-holding-usd"></i>
+                                    </button>
+                                @endif
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarFatura({{ $fat->id }})" title="Editar Fatura">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -232,6 +237,74 @@
             </form>
         </div>
     </div>
+<!-- MODAL DE ANTECIPAÇÃO DE PARCELA -->
+<div class="modal fade" id="modalAnteciparParcela" tabindex="-1" aria-labelledby="modalAnteciparParcelaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white py-3">
+                <h5 class="modal-title fw-bold" id="modalAnteciparParcelaLabel">
+                    <i class="fas fa-hand-holding-usd me-2"></i> Antecipação de Parcela
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form id="formAnteciparParcela" onsubmit="confirmarAntecipacaoFatura(event)">
+                @csrf
+                <input type="hidden" id="anteciparFaturaId" name="fatura_id">
+                <div class="modal-body p-4">
+                    <div class="p-3 rounded-3 bg-body-secondary border mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary small">Código da Fatura:</span>
+                            <span class="fw-bold text-body" id="anteciparCodigo">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary small">Cliente:</span>
+                            <span class="fw-semibold text-body" id="anteciparCliente">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary small">Valor Original:</span>
+                            <span class="fw-bold fs-5 text-success" id="anteciparValorOriginal">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-body">Desconto por Antecipação (R$)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-body-secondary">R$</span>
+                            <input type="number" step="0.01" min="0" class="form-control" id="anteciparDesconto" name="desconto" value="0.00" oninput="calcularTotalAntecipadoFatura()">
+                        </div>
+                        <small class="text-muted" style="font-size: 0.72rem;">Defina o abatimento concedido ao cliente para liquidação imediata.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-body">Método de Quitação</label>
+                        <select class="form-select" id="anteciparMetodo" name="metodo_pagamento">
+                            <option value="pix" selected>PIX Instantâneo</option>
+                            <option value="dinheiro">Dinheiro em Espécie</option>
+                            <option value="cartao">Cartão de Crédito / Débito</option>
+                            <option value="transferencia">Transferência Bancária</option>
+                            <option value="boleto">Boleto Quitado</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-body">Observações da Baixa</label>
+                        <input type="text" class="form-control" id="anteciparObs" name="observacao" placeholder="Ex: Antecipação solicitada pelo cliente via WhatsApp">
+                    </div>
+
+                    <div class="p-3 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-25 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-success">Total a Liquidar:</span>
+                        <span class="fw-bold fs-4 text-success" id="anteciparValorFinal">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold" id="btnConfirmarAntecipacao">
+                        <i class="fas fa-check-circle me-1"></i> Confirmar &amp; Liquidar Parcela
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -298,6 +371,60 @@
                     }
                 }
             });
+        });
+    }
+
+    // Funções de Antecipação de Parcela
+    let faturaValorOriginalAtual = 0;
+
+    function abrirModalAnteciparFatura(id, codigo, cliente, valor, parcela) {
+        faturaValorOriginalAtual = valor;
+        $('#anteciparFaturaId').val(id);
+        $('#anteciparCodigo').text(`${codigo} (Parc. ${parcela})`);
+        $('#anteciparCliente').text(cliente);
+        $('#anteciparValorOriginal').text(`R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+        $('#anteciparDesconto').val('0.00');
+        $('#anteciparObs').val(`Antecipação da parcela ${parcela}`);
+        calcularTotalAntecipadoFatura();
+
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAnteciparParcela'));
+        modal.show();
+    }
+
+    function calcularTotalAntecipadoFatura() {
+        const desconto = parseFloat($('#anteciparDesconto').val()) || 0;
+        const final = Math.max(0, faturaValorOriginalAtual - desconto);
+        $('#anteciparValorFinal').text(`R$ ${final.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+    }
+
+    function confirmarAntecipacaoFatura(e) {
+        e.preventDefault();
+        const id = $('#anteciparFaturaId').val();
+        const $btn = $('#btnConfirmarAntecipacao');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Liquidando...');
+
+        $.ajax({
+            url: `/admin/faturas/antecipar/${id}`,
+            type: 'POST',
+            data: $('#formAnteciparParcela').serialize(),
+            success: function (res) {
+                $btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Confirmar & Liquidar Parcela');
+                if (res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalAnteciparParcela')).hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Parcela Liquidada!',
+                        text: res.message,
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            },
+            error: function (xhr) {
+                $btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Confirmar & Liquidar Parcela');
+                window.foco7Notify.error(xhr.responseJSON?.message || 'Erro ao processar antecipação.');
+            }
         });
     }
 </script>

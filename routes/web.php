@@ -136,6 +136,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/obter/{id}', [FaturasController::class, 'obter'])->name('admin.faturas.obter');
         Route::post('/', [FaturasController::class, 'salvar'])->name('admin.faturas.salvar');
         Route::post('/status/{id}', [FaturasController::class, 'alterarStatus'])->name('admin.faturas.status');
+        Route::post('/antecipar/{id}', [FaturasController::class, 'anteciparParcela'])->name('admin.faturas.antecipar');
+        Route::post('/antecipar-lote', [FaturasController::class, 'anteciparLote'])->name('admin.faturas.antecipar_lote');
         Route::delete('/{id}', [FaturasController::class, 'excluir'])->name('admin.faturas.excluir');
     });
 
@@ -154,6 +156,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/obter/{id}', [AgendamentosController::class, 'obter'])->name('admin.agendamentos.obter');
         Route::post('/', [AgendamentosController::class, 'salvar'])->name('admin.agendamentos.salvar');
         Route::post('/horario', [AgendamentosController::class, 'atualizarHorario'])->name('admin.agendamentos.horario');
+        Route::post('/cancelar/{id}', [AgendamentosController::class, 'cancelar'])->name('admin.agendamentos.cancelar');
         Route::delete('/{id}', [AgendamentosController::class, 'excluir'])->name('admin.agendamentos.excluir');
     });
 
