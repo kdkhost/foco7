@@ -48,7 +48,7 @@
 
     @yield('styles')
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
 
     <div class="app-wrapper">
 
@@ -173,21 +173,21 @@
 
             <div class="sidebar-wrapper">
                 <nav class="mt-2">
-                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                         @if(auth()->user()->role === 'admin')
-                            <!-- TOPO DE ACESSO RÁPIDO (SEM HEADER PARA ECONOMIZAR ESPAÇO) -->
+                            <!-- TOPO DE ACESSO RÁPIDO -->
                             <li class="nav-item">
                                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p><span class="menu-text">Dashboard</span></p>
+                                    <p>Dashboard</p>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.notificacoes.index') }}" class="nav-link {{ request()->routeIs('admin.notificacoes.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-bell text-danger"></i>
+                                    <i class="nav-icon fas fa-bell"></i>
                                     <p>
-                                        <span class="menu-text">Notificações</span>
+                                        Notificações
                                         <span class="badge bg-danger ms-auto badge-notificacoes-count" style="display: none; font-size: 0.65rem;">0</span>
                                     </p>
                                 </a>
@@ -201,29 +201,29 @@
                             @endphp
                             <li class="nav-item {{ $isServicosActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isServicosActive ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-calendar-check text-warning"></i>
+                                    <i class="nav-icon fas fa-calendar-check"></i>
                                     <p>
-                                        <span class="menu-text">Atendimentos</span>
+                                        Atendimentos
                                         <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
-                                            <i class="far fa-calendar-alt nav-icon text-danger"></i>
-                                            <p><span class="menu-text">Agenda &amp; Ordens</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Agenda &amp; Ordens</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
-                                            <i class="fas fa-car-side nav-icon text-warning"></i>
-                                            <p><span class="menu-text">Estética Automotiva</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Estética Automotiva</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
-                                            <i class="fas fa-tags nav-icon text-danger"></i>
-                                            <p><span class="menu-text">Planos &amp; Preços</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Planos &amp; Preços</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -234,35 +234,35 @@
                             @endphp
                             <li class="nav-item {{ $isFinanceiroActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isFinanceiroActive ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-file-invoice-dollar text-success"></i>
+                                    <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                     <p>
-                                        <span class="menu-text">Financeiro</span>
+                                        Financeiro
                                         <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
-                                            <i class="fas fa-users nav-icon text-danger"></i>
-                                            <p><span class="menu-text">Base de Clientes</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Base de Clientes</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
-                                            <i class="fas fa-file-invoice nav-icon text-success"></i>
-                                            <p><span class="menu-text">Faturas &amp; Mensalidades</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Faturas &amp; Mensalidades</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
-                                            <i class="fas fa-credit-card nav-icon text-primary"></i>
-                                            <p><span class="menu-text">Gateways de Pagamento</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Gateways de Pagamento</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link">
-                                            <i class="fas fa-book-open nav-icon text-warning"></i>
-                                            <p><span class="menu-text">Carnês em PDF</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Carnês em PDF</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -276,24 +276,24 @@
                             @endphp
                             <li class="nav-item {{ $isCmsActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isCmsActive ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-laptop-code text-info"></i>
+                                    <i class="nav-icon fas fa-laptop-code"></i>
                                     <p>
-                                        <span class="menu-text">Gestão do Site</span>
+                                        Gestão do Site
                                         <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.index') ? 'active' : '' }}">
-                                            <i class="fas fa-desktop nav-icon text-secondary"></i>
-                                            <p><span class="menu-text">Editor Geral (CMS)</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Editor Geral (CMS)</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.depoimentos.index') }}" class="nav-link {{ request()->routeIs('admin.depoimentos.*') ? 'active' : '' }}">
-                                            <i class="fas fa-star nav-icon text-warning"></i>
+                                            <i class="nav-icon far fa-circle"></i>
                                             <p>
-                                                <span class="menu-text">Depoimentos</span>
+                                                Depoimentos
                                                 @php $pendentesDepCount = \App\Models\Depoimento::where('ativo', false)->count(); @endphp
                                                 @if($pendentesDepCount > 0)
                                                     <span class="badge bg-warning text-dark ms-auto" style="font-size: 0.65rem;">{{ $pendentesDepCount }}</span>
@@ -303,8 +303,8 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
-                                            <i class="fas fa-search nav-icon text-warning"></i>
-                                            <p><span class="menu-text">SEO &amp; Google</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>SEO &amp; Google</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -315,23 +315,23 @@
                             @endphp
                             <li class="nav-item {{ $isEmailsActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isEmailsActive ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-envelope-open-text text-danger"></i>
+                                    <i class="nav-icon fas fa-envelope"></i>
                                     <p>
-                                        <span class="menu-text">Templates de E-mail</span>
+                                        Templates de E-mail
                                         <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.index') ? 'active' : '' }}">
-                                            <i class="fas fa-list nav-icon text-secondary"></i>
-                                            <p><span class="menu-text">Todos os Modelos</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Todos os Modelos</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.create') }}" class="nav-link {{ request()->routeIs('admin.emails.create') ? 'active' : '' }}">
-                                            <i class="fas fa-plus-circle nav-icon text-danger"></i>
-                                            <p><span class="menu-text">Novo Modelo</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Novo Modelo</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -345,35 +345,35 @@
                             @endphp
                             <li class="nav-item {{ $isSistemaActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isSistemaActive ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-cogs text-secondary"></i>
+                                    <i class="nav-icon fas fa-cogs"></i>
                                     <p>
-                                        <span class="menu-text">Configurações</span>
+                                        Configurações
                                         <i class="nav-arrow fas fa-angle-right"></i>
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
-                                            <i class="fas fa-sliders-h nav-icon text-warning"></i>
-                                            <p><span class="menu-text">Sistema &amp; SMTP</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Sistema &amp; SMTP</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
-                                            <i class="fas fa-clock nav-icon text-danger"></i>
-                                            <p><span class="menu-text">Central de Cron Jobs</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Central de Cron Jobs</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
-                                            <i class="fas fa-tools nav-icon text-secondary"></i>
-                                            <p><span class="menu-text">Modo Manutenção</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Modo Manutenção</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
-                                            <i class="fas fa-user-circle nav-icon text-secondary"></i>
-                                            <p><span class="menu-text">Meu Perfil</span></p>
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Meu Perfil</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -418,7 +418,7 @@
         </aside>
 
         <!-- CONTEÚDO PRINCIPAL -->
-        <main class="app-main p-4">
+        <main class="app-main">
             <div class="app-content-header mb-4">
                 <div class="container-fluid">
                     <div class="row align-items-center">
@@ -465,16 +465,16 @@
     <script src="{{ asset('js/global-summernote.js') }}"></script>
 
     <script>
-        // Alternador Dark / Light Mode no Admin
+        // Alternador Dark / Light Mode oficial AdminLTE 4 & Bootstrap 5
         $(function () {
-            var theme = localStorage.getItem('foco7_admin_theme') || 'dark';
+            var theme = localStorage.getItem('foco7_admin_theme') || 'light';
 
             function applyAdminTheme(t) {
                 if (t === 'dark') {
-                    $('html, body').attr('data-bs-theme', 'dark').addClass('dark-mode');
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
                     $('#adminThemeIcon').removeClass('fa-sun').addClass('fa-moon');
                 } else {
-                    $('html, body').attr('data-bs-theme', 'light').removeClass('dark-mode');
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
                     $('#adminThemeIcon').removeClass('fa-moon').addClass('fa-sun');
                 }
             }
@@ -643,44 +643,6 @@
             sincronizarNotificacoesAdmin();
             setInterval(sincronizarNotificacoesAdmin, 25000);
             @endif
-
-            // ==============================================================================
-            // GERENCIAMENTO ROBUSTO DE TREEVIEW DA SIDEBAR (DESKTOP, TABLET E CELULAR)
-            // ==============================================================================
-            $(document).on('click', '.sidebar-menu .nav-item > a.nav-link', function (e) {
-                var $treeview = $(this).siblings('.nav-treeview');
-                if ($treeview.length) {
-                    e.preventDefault();
-                    var $parent = $(this).parent('.nav-item');
-                    var isOpen = $parent.hasClass('menu-open');
-
-                    if (isOpen) {
-                        $parent.removeClass('menu-open');
-                        $treeview.stop(true, true).slideUp(200);
-                    } else {
-                        $parent.addClass('menu-open');
-                        $treeview.stop(true, true).slideDown(200);
-                    }
-                }
-            });
-
-            // Mantém os submenus ativos abertos na carga inicial
-            $('.sidebar-menu .nav-treeview').each(function () {
-                if ($(this).find('.nav-link.active').length > 0) {
-                    $(this).parent('.nav-item').addClass('menu-open');
-                    $(this).show();
-                }
-            });
-
-            // Suporte para fechar a sidebar no mobile ao clicar no backdrop ou em link
-            $(document).on('click', 'body.sidebar-open::before', function () {
-                $('body').removeClass('sidebar-open');
-            });
-            $(document).on('click', '.app-sidebar .nav-link:not([href="javascript:void(0)"]):not([href="#"])', function () {
-                if ($(window).width() < 992) {
-                    $('body').removeClass('sidebar-open');
-                }
-            });
         });
     </script>
 
