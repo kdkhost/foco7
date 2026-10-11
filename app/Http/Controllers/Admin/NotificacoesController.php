@@ -113,6 +113,27 @@ class NotificacoesController extends Controller
     }
 
     /**
+     * Marca como lida ao clicar e redireciona para a página de destino da notificação
+     */
+    public function abrirERedirecionar(Request $request, Notificacao $notificacao)
+    {
+        if (!$notificacao->lida) {
+            $notificacao->marcarComoLida();
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'link' => $notificacao->link_acao ?: route('admin.notificacoes.index'),
+                'nao_lidas_count' => Notificacao::naoLidas()->count(),
+            ]);
+        }
+
+        $destino = $notificacao->link_acao ?: route('admin.notificacoes.index');
+        return redirect()->to($destino);
+    }
+
+    /**
      * Marca todas as notificações como lidas
      */
     public function marcarTodasLidas()

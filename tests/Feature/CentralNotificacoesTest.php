@@ -169,4 +169,29 @@ class CentralNotificacoesTest extends TestCase
             'titulo' => 'Teste de Notificação Push & E-mail',
         ]);
     }
+
+    /**
+     * Testa se clicar para abrir notificação marca como lida e redireciona
+     */
+    public function test_abrir_notificacao_marca_como_lida_e_redireciona(): void
+    {
+        $notif = Notificacao::registrar(
+            tipo: 'contato',
+            titulo: 'Lead para abrir',
+            mensagem: 'Mensagem do lead...',
+            linkAcao: route('admin.notificacoes.index'),
+            notificarEmail: false
+        );
+
+        $this->assertFalse($notif->lida);
+
+        $response = $this->actingAs($this->adminUser)->get("/admin/notificacoes/{$notif->id}/abrir");
+
+        $response->assertRedirect(route('admin.notificacoes.index'));
+
+        $this->assertDatabaseHas('notificacoes', [
+            'id' => $notif->id,
+            'lida' => true,
+        ]);
+    }
 }

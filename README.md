@@ -205,7 +205,11 @@ public_html/
 - **Efí Bank Totalmente Funcional:** Suporte nativo à API oficial Efí Bank (Gerencianet) para PIX instantâneo com mTLS (certificado `.pem`) e fallback BACEN EMVCo com CRC16 válido, Boletos registrados com linha digitável e Cartão de crédito transparente.
 - **Emissão de Carnê de Mensalidades em PDF (A4):** Geração de carnês profissionais parcelados via `barryvdh/laravel-dompdf`, incluindo capa institucional, resumo geral de parcelas, canhotos destacáveis do sacado e ficha de compensação com QR Code Pix em cada lâmina.
 - **Repasse de Taxas Operacionais & Tarifas Bancárias:** Parametrização dinâmica no painel administrativo (`/admin/gateways`) para repassar custos ao cliente de forma transparente. Cálculo em tempo real no checkout via AJAX (`/checkout/calcular-taxas`) discriminando subtotal do plano, custos operacionais e desconto à vista.
-- **Área do Cliente com Acesso ao Carnê PDF:** Na tela de faturas do cliente (`/cliente/faturas`), parcelas vinculadas a carnês exibem selo distintivo e botão para download imediato do Carnê completo em PDF.
+### Módulo 18: Sidebar Treeview Responsivo, Rolagem Fluida Mobile/Tablet & Central de Notificações Dedicada
+- **Sidebar com Treeview & Agrupamento Lógico de Submenus:** Reestruturação visual completa da barra lateral com organização hierárquica por categorias (Visão Geral, Atendimentos & Serviços, Financeiro & Assinantes, Gestão de Conteúdo CMS, Comunicação & Mensagens e Sistema & Operações), rotação fluida da seta indicadora e expansão automática da seção da página ativa.
+- **Rolagem Vertical Suave em Dispositivos Móveis e Tablets:** Ajuste estrito de CSS com altura adaptativa viewport (`100dvh`), inércia touch nativa (`-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain`), espaçamento inferior de segurança (`padding-bottom: 90px`) e botão de fechamento rápido ("X") na barra superior para telas menores que 992px.
+- **Central de Notificações com Marcação Automática no Clique & Decremento Visual:** Interceptador AJAX no dropdown do sino da navbar e na página de listagem dedicada (`/admin/notificacoes`) que marca imediatamente como lida, remove o destaque visual e decrementa o contador sem recarregar a tela, além da rota segura `GET /admin/notificacoes/{id}/abrir` com suporte a cliques diretos.
+- **Desvinculação Estrita entre Formulário de Contato e Calendário de Serviços:** O formulário de contato do site público foi desconectado do banco de agendamentos e direcionado exclusivamente para a Central de Notificações. O FullCalendar 6 (`/admin/agendamentos`) foi blindado para exibir única e exclusivamente agendamentos reais de serviços de rastreamento e estética automotiva.
 
 ---
 
@@ -230,14 +234,15 @@ public_html/
 | **Módulo 15**| Central de Notificações, Web Push no Celular e E-mails Transacionais para o Admin | ✅ Concluído & Validado |
 | **Módulo 16**| Harmonização da Paleta Oficial CMS (`#d90000`) & Alto Contraste de Alertas Warning | ✅ Concluído & Validado |
 | **Módulo 17**| Checkout Transparente Efí Bank, Emissão de Carnê em PDF e Repasse de Taxas | ✅ Concluído & Validado |
+| **Módulo 18**| Sidebar Treeview Responsivo, Rolagem Mobile/Tablet e Notificações Dedicadas | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **57 testes executados, 57 aprovados (100% de sucesso), 256 asserções**.
-- Cobertura de rotas públicas, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
+- **58 testes executados, 58 aprovados (100% de sucesso), 261 asserções**.
+- Cobertura de rotas públicas, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
 

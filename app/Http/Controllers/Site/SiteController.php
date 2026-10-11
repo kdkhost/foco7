@@ -253,27 +253,12 @@ class SiteController extends Controller
             'mensagem.required' => 'Por favor, digite sua mensagem ou dúvida.',
         ]);
 
-        $lead = Agendamento::create([
-            'categoria' => 'rastreamento',
-            'cliente_nome' => $validated['nome'],
-            'cliente_telefone' => $validated['telefone'],
-            'cliente_email' => $validated['email'] ?? null,
-            'tipo_servico' => 'Contato / Dúvida via Landing Page',
-            'veiculo_modelo' => $validated['veiculo'] ?? null,
-            'cidade' => 'Não informada',
-            'tipo_pagamento' => 'local',
-            'data_hora_inicio' => now(),
-            'observacoes' => 'Mensagem do formulário de contato: ' . $validated['mensagem'],
-            'status' => 'pendente',
-            'cor_calendario' => '#f59e0b',
-        ]);
-
-        // Direciona para a Central de Notificações da Foco 7 com e-mail ao administrador e push
+        // Registra exclusivamente na Central de Notificações dedicada (não polui o calendário de serviços)
         Notificacao::registrar(
             tipo: 'contato',
             titulo: 'Nova Mensagem de Contato do Site',
             mensagem: "{$validated['nome']} ({$validated['telefone']}) enviou uma mensagem: \"" . Str::limit($validated['mensagem'], 110) . "\"",
-            linkAcao: route('admin.agendamentos.index'),
+            linkAcao: route('admin.notificacoes.index'),
             dados: [
                 'origem' => 'Formulário de Contato da Landing Page',
                 'cliente' => $validated['nome'],

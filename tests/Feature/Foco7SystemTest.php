@@ -133,11 +133,16 @@ class Foco7SystemTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        $this->assertDatabaseHas('agendamentos', [
+        // Certifica que o contato foi devidamente registrado na Central de Notificações
+        $this->assertDatabaseHas('notificacoes', [
+            'tipo' => 'contato',
+            'titulo' => 'Nova Mensagem de Contato do Site',
+        ]);
+
+        // Certifica que o formulário de contato NÃO polui o calendário de agendamento de serviços
+        $this->assertDatabaseMissing('agendamentos', [
             'cliente_nome' => 'Carlos Alberto',
-            'cliente_telefone' => '(91) 98888-7777',
             'tipo_servico' => 'Contato / Dúvida via Landing Page',
-            'status' => 'pendente',
         ]);
     }
 

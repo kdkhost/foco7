@@ -158,19 +158,26 @@
 
         <!-- SIDEBAR COM TREEVIEW E PALETA FOCO 7 (ADMINLTE 4) -->
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-            <div class="sidebar-brand d-flex align-items-center justify-content-start px-3 py-3 border-bottom border-secondary">
-                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
+            <div class="sidebar-brand d-flex align-items-center justify-content-between px-3 py-3 border-bottom border-secondary">
+                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2">
                     <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image">
-                    <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-auto small">
+                    <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-1 small">
                         {{ auth()->user()->role === 'admin' ? 'ADMIN' : 'CLIENTE' }}
                     </span>
                 </a>
+                <!-- Botão de Fechar no Mobile / Tablet -->
+                <button type="button" class="btn btn-sm btn-link text-white-50 d-lg-none p-1 text-decoration-none" data-lte-toggle="sidebar" title="Fechar Menu">
+                    <i class="fas fa-times fs-5"></i>
+                </button>
             </div>
 
             <div class="sidebar-wrapper">
                 <nav class="mt-2">
                     <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
                         @if(auth()->user()->role === 'admin')
+                            <!-- SEÇÃO 1: VISÃO GERAL -->
+                            <li class="nav-header text-uppercase small text-secondary mt-1">Visão Geral</li>
+
                             <li class="nav-item">
                                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -182,220 +189,247 @@
                                 <a href="{{ route('admin.notificacoes.index') }}" class="nav-link {{ request()->routeIs('admin.notificacoes.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-bell text-danger"></i>
                                     <p>
-                                        Notificações
+                                        Central de Notificações
                                         <span class="badge bg-danger ms-auto badge-notificacoes-count" style="display: none;">0</span>
                                     </p>
                                 </a>
                             </li>
 
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão do Portal & Serviços</li>
+                            <!-- SEÇÃO 2: ATENDIMENTOS & SERVIÇOS (TREEVIEW) -->
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Atendimentos & Serviços</li>
 
-                            <li class="nav-item {{ request()->routeIs('admin.cms.*') ? 'menu-open' : '' }}">
-                                <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-laptop-code"></i>
+                            @php
+                                $isServicosActive = request()->routeIs('admin.agendamentos.*') || request()->routeIs('admin.estetica.*') || request()->routeIs('admin.planos.*');
+                            @endphp
+                            <li class="nav-item {{ $isServicosActive ? 'menu-open' : '' }}">
+                                <a href="javascript:void(0)" class="nav-link {{ $isServicosActive ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-calendar-check text-warning"></i>
+                                    <p>
+                                        Atendimentos & Ordens
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
+                                            <i class="far fa-calendar-alt nav-icon text-danger"></i>
+                                            <p>Agenda & Ordens</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
+                                            <i class="fas fa-car-side nav-icon text-warning"></i>
+                                            <p>Estética Automotiva</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
+                                            <i class="fas fa-tags nav-icon text-danger"></i>
+                                            <p>Planos & Preços</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- SEÇÃO 3: FINANCEIRO & COBRANÇAS (TREEVIEW) -->
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Financeiro & Assinantes</li>
+
+                            @php
+                                $isFinanceiroActive = request()->routeIs('admin.clientes.*') || request()->routeIs('admin.faturas.*') || request()->routeIs('admin.gateways.*');
+                            @endphp
+                            <li class="nav-item {{ $isFinanceiroActive ? 'menu-open' : '' }}">
+                                <a href="javascript:void(0)" class="nav-link {{ $isFinanceiroActive ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-invoice-dollar text-success"></i>
+                                    <p>
+                                        Financeiro & Cobranças
+                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
+                                            <i class="fas fa-users nav-icon text-danger"></i>
+                                            <p>Base de Clientes</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
+                                            <i class="fas fa-file-invoice nav-icon text-success"></i>
+                                            <p>Faturas & Mensalidades</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
+                                            <i class="fas fa-credit-card nav-icon text-primary"></i>
+                                            <p>Gateways (MP & EFI)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link">
+                                            <i class="fas fa-book-open nav-icon text-warning"></i>
+                                            <p>Gerador de Carnês (PDF)</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- SEÇÃO 4: GESTÃO DE CONTEÚDO (CMS & SEO) (TREEVIEW) -->
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Gestão de Conteúdo (CMS)</li>
+
+                            @php
+                                $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*');
+                            @endphp
+                            <li class="nav-item {{ $isCmsActive ? 'menu-open' : '' }}">
+                                <a href="javascript:void(0)" class="nav-link {{ $isCmsActive ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-laptop-code text-info"></i>
                                     <p>
                                         CMS & Landing Page
                                         <i class="nav-arrow fas fa-angle-right ms-auto"></i>
                                     </p>
                                 </a>
-                                <ul class="nav nav-treeview ps-2">
+                                <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-cores" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-cores', event); }">
-                                            <i class="fas fa-palette nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Cores & Tema</p>
+                                        <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.index') ? 'active' : '' }}">
+                                            <i class="fas fa-desktop nav-icon text-secondary"></i>
+                                            <p>Painel Geral CMS</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-banners', event); }">
-                                            <i class="fas fa-images nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Banners & Hero</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-cores" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-cores', event); }">
+                                            <i class="fas fa-palette nav-icon text-danger"></i>
+                                            <p>Cores & Tema</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-app', event); }">
-                                            <i class="fas fa-mobile-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Aplicativo Mobile</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-banners" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-banners', event); }">
+                                            <i class="fas fa-images nav-icon text-secondary"></i>
+                                            <p>Banners & Hero</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-ronda', event); }">
-                                            <i class="fas fa-shield-alt nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Ronda Tática</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-app" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-app', event); }">
+                                            <i class="fas fa-mobile-alt nav-icon text-danger"></i>
+                                            <p>Aplicativo Mobile</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-secoes" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-secoes', event); }">
-                                            <i class="fas fa-layer-group nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Sobre & Diferenciais</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-ronda" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-ronda', event); }">
+                                            <i class="fas fa-shield-alt nav-icon text-danger"></i>
+                                            <p>Ronda Tática</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-faq" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-faq', event); }">
-                                            <i class="fas fa-question-circle nav-icon text-warning" style="font-size: 0.75rem;"></i>
-                                            <p class="small">FAQs & Dúvidas</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-secoes" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-secoes', event); }">
+                                            <i class="fas fa-layer-group nav-icon text-secondary"></i>
+                                            <p>Sobre & Diferenciais</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-depoimentos" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-depoimentos', event); }">
-                                            <i class="fas fa-star nav-icon text-warning" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Depoimentos</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-faq" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-faq', event); }">
+                                            <i class="fas fa-question-circle nav-icon text-warning"></i>
+                                            <p>FAQs & Dúvidas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-lgpd" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-lgpd', event); }">
-                                            <i class="fas fa-user-shield nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">LGPD & Termos</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-depoimentos" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-depoimentos', event); }">
+                                            <i class="fas fa-star nav-icon text-warning"></i>
+                                            <p>Depoimentos</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.cms.index') }}#tab-whatsapp" class="nav-link py-1" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-whatsapp', event); }">
-                                            <i class="fab fa-whatsapp nav-icon text-success" style="font-size: 0.75rem;"></i>
-                                            <p class="small">WhatsApp Flutuante</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-car-side text-warning"></i>
-                                    <p>Estética Automotiva</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-tags text-danger"></i>
-                                    <p>Planos & Preços</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-calendar-alt text-danger"></i>
-                                    <p>Agenda & Ordens</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-search text-warning"></i>
-                                    <p>SEO & Meta Tags</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Clientes & Financeiro</li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-users text-danger"></i>
-                                    <p>Base de Clientes</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-file-invoice-dollar text-success"></i>
-                                    <p>Faturas & Mensalidades</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item {{ request()->routeIs('admin.gateways.*') ? 'menu-open' : '' }}">
-                                <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-credit-card text-success"></i>
-                                    <p>
-                                        Gateways & Carnê
-                                        <i class="nav-arrow fas fa-angle-right ms-auto"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview ps-2">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.gateways.index') }}" class="nav-link py-1">
-                                            <i class="fas fa-sliders-h nav-icon text-success" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Mercado Pago & EFI</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-lgpd" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-lgpd', event); }">
+                                            <i class="fas fa-user-shield nav-icon text-danger"></i>
+                                            <p>LGPD & Termos</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link py-1">
-                                            <i class="fas fa-book-open nav-icon text-warning" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Gerador de Carnês (PDF)</p>
+                                        <a href="{{ route('admin.cms.index') }}#tab-whatsapp" class="nav-link" onclick="if(window.ativarAbaCms) { window.ativarAbaCms('tab-whatsapp', event); }">
+                                            <i class="fab fa-whatsapp nav-icon text-success"></i>
+                                            <p>WhatsApp Flutuante</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
+                                            <i class="fas fa-search nav-icon text-warning"></i>
+                                            <p>SEO & Meta Tags</p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
 
-                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
+                            <!-- SEÇÃO 5: COMUNICAÇÃO & MENSAGENS (TREEVIEW) -->
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Comunicação & Mensagens</li>
 
-                            <li class="nav-item {{ request()->routeIs('admin.emails.*') ? 'menu-open' : '' }}">
-                                <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.*') ? 'active' : '' }}">
+                            @php
+                                $isEmailsActive = request()->routeIs('admin.emails.*');
+                            @endphp
+                            <li class="nav-item {{ $isEmailsActive ? 'menu-open' : '' }}">
+                                <a href="javascript:void(0)" class="nav-link {{ $isEmailsActive ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-envelope-open-text text-danger"></i>
                                     <p>
                                         Templates de E-mails
                                         <i class="nav-arrow fas fa-angle-right ms-auto"></i>
                                     </p>
                                 </a>
-                                <ul class="nav nav-treeview ps-2">
+                                <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.emails.index') }}" class="nav-link py-1">
-                                            <i class="fas fa-list nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Todos os Modelos</p>
+                                        <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.index') ? 'active' : '' }}">
+                                            <i class="fas fa-list nav-icon text-secondary"></i>
+                                            <p>Todos os Modelos</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.emails.create') }}" class="nav-link py-1">
-                                            <i class="fas fa-plus-circle nav-icon text-danger" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Novo Modelo</p>
+                                        <a href="{{ route('admin.emails.create') }}" class="nav-link {{ request()->routeIs('admin.emails.create') ? 'active' : '' }}">
+                                            <i class="fas fa-plus-circle nav-icon text-danger"></i>
+                                            <p>Novo Modelo</p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
 
-                            <li class="nav-item">
-                                <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-clock text-danger"></i>
-                                    <p>Central de Cron Jobs</p>
-                                </a>
-                            </li>
+                            <!-- SEÇÃO 6: SISTEMA & CONFIGURAÇÕES (TREEVIEW) -->
+                            <li class="nav-header text-uppercase small text-secondary mt-3">Sistema & Operações</li>
 
-                            <li class="nav-item {{ request()->routeIs('admin.configuracoes.*') ? 'menu-open' : '' }}">
-                                <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-sliders-h text-warning"></i>
+                            @php
+                                $isSistemaActive = request()->routeIs('admin.configuracoes.*') || request()->routeIs('admin.cron.*') || request()->routeIs('admin.manutencao.*') || request()->routeIs('admin.perfil.*');
+                            @endphp
+                            <li class="nav-item {{ $isSistemaActive ? 'menu-open' : '' }}">
+                                <a href="javascript:void(0)" class="nav-link {{ $isSistemaActive ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-cogs text-secondary"></i>
                                     <p>
-                                        Configurações & SMTP
+                                        Sistema & Ajustes
                                         <i class="nav-arrow fas fa-angle-right ms-auto"></i>
                                     </p>
                                 </a>
-                                <ul class="nav nav-treeview ps-2">
+                                <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.configuracoes.index') }}" class="nav-link py-1">
-                                            <i class="fas fa-building nav-icon text-secondary" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Dados & Logotipos</p>
+                                        <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
+                                            <i class="fas fa-sliders-h nav-icon text-warning"></i>
+                                            <p>Configurações & SMTP</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.configuracoes.index') }}#smtp" class="nav-link py-1">
-                                            <i class="fas fa-server nav-icon text-warning" style="font-size: 0.75rem;"></i>
-                                            <p class="small">Servidor SMTP</p>
+                                        <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
+                                            <i class="fas fa-clock nav-icon text-danger"></i>
+                                            <p>Central de Cron Jobs</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
+                                            <i class="fas fa-tools nav-icon text-secondary"></i>
+                                            <p>Modo Manutenção</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
+                                            <i class="fas fa-user-circle nav-icon text-secondary"></i>
+                                            <p>Meu Perfil</p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-tools text-secondary"></i>
-                                    <p>Modo Manutenção</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-user-circle text-secondary"></i>
-                                    <p>Meu Perfil</p>
-                                </a>
-                            </li>
                         @else
-                            <!-- ITENS DA ÁREA DO CLIENTE (MESMO PADRÃO ADMINLTE 4) -->
+                            <!-- ITENS DA ÁREA DO CLIENTE -->
                             <li class="nav-item">
                                 <a href="{{ route('cliente.dashboard') }}" class="nav-link {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -564,8 +598,13 @@
                                 res.ultimas.forEach(function (n) {
                                     const bgClass = !n.lida ? 'bg-light bg-opacity-75' : '';
                                     const dot = !n.lida ? '<span class="badge bg-danger rounded-pill" style="font-size:0.6rem;">Nova</span>' : '';
+                                    const linkDestino = n.link_acao || '{{ route("admin.notificacoes.index") }}';
                                     html += `
-                                        <a href="${n.link_acao || '{{ route("admin.notificacoes.index") }}'}" class="list-group-item list-group-item-action p-2 d-flex align-items-start gap-2 border-bottom ${bgClass}">
+                                        <a href="/admin/notificacoes/${n.id}/abrir" 
+                                           data-id="${n.id}" 
+                                           data-link="${linkDestino}" 
+                                           data-lida="${n.lida ? '1' : '0'}" 
+                                           class="list-group-item list-group-item-action p-2 d-flex align-items-start gap-2 border-bottom dropdown-notificacao-item ${bgClass}">
                                             <div class="bg-${n.cor} bg-opacity-10 text-${n.cor} rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
                                                 <i class="${n.icone}" style="font-size: 0.85rem;"></i>
                                             </div>
@@ -615,9 +654,83 @@
                 });
             }
 
+            // CLIQUE NO ITEM DO DROPDOWN: MARCA COMO LIDA IMEDIATAMENTE VIA AJAX E ATUALIZA CONTADORES
+            $(document).on('click', '.dropdown-notificacao-item', function (e) {
+                const $item = $(this);
+                const id = $item.data('id');
+                const linkDestino = $item.data('link');
+                const jaLida = $item.data('lida') == '1';
+
+                if (!jaLida && id) {
+                    e.preventDefault();
+                    // Otimização visual instantânea
+                    $item.removeClass('bg-light bg-opacity-75');
+                    $item.find('.badge.bg-danger').remove();
+                    $item.data('lida', '1');
+
+                    // Decremento imediato otimista do badge
+                    let curCount = parseInt($('.badge-notificacoes-count').first().text()) || 0;
+                    curCount = Math.max(0, curCount - 1);
+                    $('.badge-notificacoes-count').text(curCount);
+                    if (curCount <= 0) {
+                        $('.badge-notificacoes-count').hide();
+                    }
+
+                    // Notifica o backend via AJAX
+                    $.ajax({
+                        url: `/admin/notificacoes/${id}/lida`,
+                        type: 'POST',
+                        data: { _token: '{{ csrf_token() }}' },
+                        complete: function () {
+                            if (linkDestino && linkDestino !== '#' && linkDestino !== 'javascript:void(0)') {
+                                window.location.href = linkDestino;
+                            }
+                        }
+                    });
+                }
+            });
+
             sincronizarNotificacoesAdmin();
             setInterval(sincronizarNotificacoesAdmin, 25000);
             @endif
+
+            // ==============================================================================
+            // GERENCIAMENTO ROBUSTO DE TREEVIEW DA SIDEBAR (DESKTOP, TABLET E CELULAR)
+            // ==============================================================================
+            $(document).on('click', '.sidebar-menu .nav-item > a.nav-link', function (e) {
+                var $treeview = $(this).siblings('.nav-treeview');
+                if ($treeview.length) {
+                    e.preventDefault();
+                    var $parent = $(this).parent('.nav-item');
+                    var isOpen = $parent.hasClass('menu-open');
+
+                    if (isOpen) {
+                        $parent.removeClass('menu-open');
+                        $treeview.stop(true, true).slideUp(200);
+                    } else {
+                        $parent.addClass('menu-open');
+                        $treeview.stop(true, true).slideDown(200);
+                    }
+                }
+            });
+
+            // Mantém os submenus ativos abertos na carga inicial
+            $('.sidebar-menu .nav-treeview').each(function () {
+                if ($(this).find('.nav-link.active').length > 0) {
+                    $(this).parent('.nav-item').addClass('menu-open');
+                    $(this).show();
+                }
+            });
+
+            // Suporte para fechar a sidebar no mobile ao clicar no backdrop ou em link
+            $(document).on('click', 'body.sidebar-open::before', function () {
+                $('body').removeClass('sidebar-open');
+            });
+            $(document).on('click', '.app-sidebar .nav-link:not([href="javascript:void(0)"]):not([href="#"])', function () {
+                if ($(window).width() < 992) {
+                    $('body').removeClass('sidebar-open');
+                }
+            });
         });
     </script>
 

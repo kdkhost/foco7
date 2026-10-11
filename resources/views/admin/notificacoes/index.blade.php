@@ -166,7 +166,7 @@
 
                                             <div class="d-flex align-items-center gap-2 mt-2">
                                                 @if(!empty($notif->link_acao))
-                                                    <a href="{{ $notif->link_acao }}" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size: 0.8rem;">
+                                                    <a href="{{ route('admin.notificacoes.abrir', $notif->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2 btn-abrir-modulo" data-id="{{ $notif->id }}" style="font-size: 0.8rem;">
                                                         <i class="fas fa-external-link-alt me-1"></i> Acessar Módulo
                                                     </a>
                                                 @endif
@@ -353,6 +353,17 @@
             }
         });
     }
+
+    // Ao clicar em Acessar Módulo, atualiza a interface antes de navegar
+    $(document).on('click', '.btn-abrir-modulo', function () {
+        const id = $(this).data('id');
+        $(`#notif-row-${id}`).removeClass('bg-light bg-opacity-50');
+        $(`#notif-row-${id} h6`).removeClass('text-dark').addClass('text-secondary');
+        $(`#notif-row-${id} .badge.bg-danger`).remove();
+        $(`#notif-row-${id} button:contains("Marcar como Lida")`).remove();
+        let cur = parseInt($('#cardCountNaoLidas').text()) || 0;
+        atualizarBadgesContador(Math.max(0, cur - 1));
+    });
 
     // Marca todas as notificações como lidas
     function marcarTodasComoLidas() {

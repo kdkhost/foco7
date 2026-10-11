@@ -41,7 +41,11 @@ class AgendamentosController extends Controller
         $start = $request->input('start');
         $end = $request->input('end');
 
-        $query = Agendamento::with('servicoEstetica');
+        // O calendário é exclusivo para agendamento de serviços (instalações, revisões e estética)
+        $query = Agendamento::with('servicoEstetica')
+            ->whereIn('categoria', ['rastreamento', 'estetica'])
+            ->where('tipo_servico', 'not like', '%Contato%')
+            ->where('tipo_servico', 'not like', '%Dúvida%');
 
         if ($start && $end) {
             $query->whereBetween('data_hora_inicio', [

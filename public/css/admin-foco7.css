@@ -822,48 +822,214 @@ body.dark-mode .app-header {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
-/* Sidebar Fixa e com Rolagem Independente (Evita quebras com menus longos) */
-.layout-fixed .app-sidebar {
-    grid-area: lte-app-sidebar;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    position: sticky !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    z-index: 1030;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    background-color: var(--admin-sidebar-bg, #11141c) !important;
+/* ==============================================================================
+   SIDEBAR E TREEVIEW - ADMINLTE 4 & RESPONSIVIDADE TOTAL (DESKTOP, TABLET E CELULAR)
+   ============================================================================== */
+
+/* Desktop (>= 992px): Barra lateral fixa com rolagem independente */
+@media (min-width: 992px) {
+    .layout-fixed .app-sidebar {
+        grid-area: lte-app-sidebar;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        position: sticky !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        z-index: 1030;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        background-color: var(--admin-sidebar-bg, #11141c) !important;
+    }
+
+    .layout-fixed .app-sidebar .sidebar-wrapper {
+        flex: 1 1 auto;
+        height: calc(100vh - 56px) !important;
+        max-height: calc(100vh - 56px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
 }
 
-.layout-fixed .app-sidebar .sidebar-brand {
+/* Mobile e Tablet (< 992px): Drawer offcanvas com rolagem vertical touch suave garantida */
+@media (max-width: 991.98px) {
+    .app-sidebar,
+    .layout-fixed .app-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100% !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        width: 290px !important;
+        max-width: 85vw !important;
+        z-index: 1045 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        background-color: var(--admin-sidebar-bg, #11141c) !important;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6) !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .app-sidebar .sidebar-wrapper,
+    .layout-fixed .app-sidebar .sidebar-wrapper {
+        flex: 1 1 auto !important;
+        height: calc(100vh - 56px) !important;
+        height: calc(100dvh - 56px) !important;
+        max-height: calc(100vh - 56px) !important;
+        max-height: calc(100dvh - 56px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-y !important;
+        overscroll-behavior: contain !important;
+        padding-bottom: 90px !important;
+    }
+
+    /* Backdrop escuro quando sidebar estiver aberta */
+    body.sidebar-open::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(2px);
+        z-index: 1040;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+}
+
+/* Sidebar Brand (Logo e Cabeçalho) */
+.app-sidebar .sidebar-brand {
     flex: 0 0 56px;
     height: 56px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
-.layout-fixed .app-sidebar .sidebar-wrapper {
-    flex: 1 1 auto;
-    height: calc(100vh - 56px) !important;
-    max-height: calc(100vh - 56px) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar {
+/* Scrollbars customizadas para webkit */
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar {
     width: 5px;
 }
-
-.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar-track {
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar-track {
     background: transparent;
 }
-
-.layout-fixed .app-sidebar .sidebar-wrapper::-webkit-scrollbar-thumb {
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
+}
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: var(--admin-primary);
+}
+
+/* ==============================================================================
+   ESTILOS DE TREEVIEW E SUBMENUS AGRUPADOS
+   ============================================================================== */
+.app-sidebar .nav-item {
+    position: relative;
+    margin-bottom: 2px;
+}
+
+.app-sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    margin: 1px 8px;
+    transition: all 0.2s ease;
+    color: #cbd5e1;
+    cursor: pointer;
+}
+
+.app-sidebar .nav-link p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.app-sidebar .nav-link .nav-icon {
+    width: 1.5rem;
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Seta indicadora do Treeview com rotação suave */
+.app-sidebar .nav-link .nav-arrow {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-left: auto;
+}
+
+.app-sidebar .nav-item.menu-open > .nav-link .nav-arrow,
+.app-sidebar .nav-item.active > .nav-link .nav-arrow {
+    transform: rotate(90deg);
+    opacity: 1;
+}
+
+/* Submenu Treeview Container */
+.app-sidebar .nav-treeview {
+    display: none;
+    list-style: none;
+    padding-left: 0;
+    margin: 4px 8px 6px 8px;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border-left: 2px solid rgba(217, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+.app-sidebar .nav-item.menu-open > .nav-treeview {
+    display: block;
+}
+
+.app-sidebar .nav-treeview .nav-link {
+    padding: 0.5rem 0.85rem 0.5rem 1rem;
+    font-size: 0.825rem;
+    margin: 1px 4px;
+    color: #94a3b8;
+}
+
+.app-sidebar .nav-treeview .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.app-sidebar .nav-treeview .nav-link.active {
+    background-color: var(--admin-primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.app-sidebar .nav-treeview .nav-icon {
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+    width: 1.25rem;
+}
+
+/* Cabeçalhos de seção (Headers) */
+.app-sidebar .nav-header {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 1rem 1.25rem 0.4rem 1.25rem;
+    color: #64748b !important;
 }
 
 /* Área de Conteúdo Principal */
