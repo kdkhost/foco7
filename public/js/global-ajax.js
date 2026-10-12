@@ -180,6 +180,22 @@
                 });
             }
 
+            // Memoriza o valor ORIGINAL (renderizado pelo servidor) de cada input hidden dos formulários AJAX.
+            // Assim, ao limpar o formulário, campos fixos como name="tipo" value="hero_slide" são restaurados
+            // em vez de apagados (o que causava erro 422 "validation.required" no próximo envio).
+            $('form.ajax-form input[type="hidden"]').each(function () {
+                if (this.getAttribute('data-foco-initial') === null) {
+                    this.setAttribute('data-foco-initial', this.value || '');
+                }
+            });
+
+            window.focoResetHiddenInputs = function ($f) {
+                $f.find('input[type="hidden"]:not([name="_token"]):not([name="_method"])').each(function () {
+                    var initial = this.getAttribute('data-foco-initial');
+                    this.value = initial !== null ? initial : '';
+                });
+            };
+
             // Reinicialização de tooltips após cada requisição AJAX
             $(document).ajaxComplete(function () {
                 setTimeout(function () {
@@ -232,7 +248,7 @@
                                     $(this).prop('selectedIndex', 0);
                                 });
                                 $form.find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
-                                $form.find('input[type="hidden"]:not([name="_token"]):not([name="_method"])').val('');
+                                window.focoResetHiddenInputs($form);
                                 
                                 if (typeof $.fn.summernote !== 'undefined') {
                                     $form.find('.summernote').each(function () {
@@ -311,7 +327,7 @@
                         $(this).prop('selectedIndex', 0);
                     });
                     $f.find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
-                    $f.find('input[type="hidden"]:not([name="_token"]):not([name="_method"])').val('');
+                    window.focoResetHiddenInputs($f);
                     if (typeof $.fn.summernote !== 'undefined') {
                         $f.find('.summernote').each(function () {
                             $(this).summernote('reset');

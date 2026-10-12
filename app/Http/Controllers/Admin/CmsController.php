@@ -103,6 +103,11 @@ class CmsController extends Controller
      */
     public function salvarBanner(Request $request)
     {
+        // Garante o tipo padrão caso o campo oculto chegue vazio
+        if (!$request->filled('tipo')) {
+            $request->merge(['tipo' => 'hero_slide']);
+        }
+
         $validated = $request->validate([
             'tipo' => 'required|string',
             'titulo' => 'required|string|max:255',
