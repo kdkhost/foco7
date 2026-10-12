@@ -164,8 +164,13 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a class="dropdown-item {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}" href="{{ route('admin.usuarios.index') }}">
+                                        <i class="fas fa-users-cog me-2 text-danger"></i> Usuários &amp; Permissões
+                                    </a>
+                                </li>
+                                <li>
                                     <a class="dropdown-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}" href="{{ route('admin.configuracoes.index') }}">
-                                        <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações & SMTP
+                                        <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações &amp; SMTP
                                     </a>
                                 </li>
                             @else
@@ -398,7 +403,7 @@
                             <li class="nav-header">Sistema &amp; Ajustes</li>
 
                             @php
-                                $isSistemaActive = request()->routeIs('admin.configuracoes.*') || request()->routeIs('admin.cron.*') || request()->routeIs('admin.manutencao.*') || request()->routeIs('admin.perfil.*');
+                                $isSistemaActive = request()->routeIs('admin.configuracoes.*') || request()->routeIs('admin.cron.*') || request()->routeIs('admin.manutencao.*') || request()->routeIs('admin.perfil.*') || request()->routeIs('admin.usuarios.*');
                             @endphp
                             <li class="nav-item {{ $isSistemaActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isSistemaActive ? 'active' : '' }}">
@@ -409,6 +414,12 @@
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.usuarios.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Usuários &amp; Permissões</p>
+                                        </a>
+                                    </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
                                             <i class="nav-icon far fa-circle"></i>

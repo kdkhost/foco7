@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\TwoFactorAuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
@@ -19,7 +20,7 @@ class PerfilController extends Controller
     }
 
     /**
-     * Atualiza os dados cadastrais do perfil via AJAX
+     * Atualiza os dados cadastrais e endereço completo do perfil via AJAX
      */
     public function salvarDados(Request $request)
     {
@@ -30,6 +31,17 @@ class PerfilController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'telefone' => 'nullable|string|max:30',
             'cpf_cnpj' => 'nullable|string|max:20',
+            'data_nascimento' => 'nullable|date',
+            'genero' => 'nullable|string|max:20',
+            'cargo' => 'nullable|string|max:100',
+            'bio' => 'nullable|string|max:1000',
+            'cep' => 'nullable|string|max:10',
+            'endereco' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:20',
+            'complemento' => 'nullable|string|max:100',
+            'bairro' => 'nullable|string|max:100',
+            'cidade' => 'nullable|string|max:100',
+            'estado' => 'nullable|string|max:2',
         ], [
             'name.required' => 'O nome completo é obrigatório.',
             'email.required' => 'O e-mail é obrigatório.',
@@ -38,15 +50,26 @@ class PerfilController extends Controller
         ]);
 
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name' => trim($request->name),
+            'email' => strtolower(trim($request->email)),
             'telefone' => $request->telefone,
             'cpf_cnpj' => $request->cpf_cnpj,
+            'data_nascimento' => $request->data_nascimento,
+            'genero' => $request->genero,
+            'cargo' => $request->cargo,
+            'bio' => $request->bio,
+            'cep' => $request->cep,
+            'endereco' => $request->endereco,
+            'numero' => $request->numero,
+            'complemento' => $request->complemento,
+            'bairro' => $request->bairro,
+            'cidade' => $request->cidade,
+            'estado' => $request->estado,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Seus dados foram atualizados com sucesso!',
+            'message' => 'Seus dados pessoais e endereço foram atualizados com sucesso!',
         ]);
     }
 
@@ -134,6 +157,194 @@ class PerfilController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Sua senha foi alterada com sucesso!',
+        ]);
+    }
+
+    /**
+     * Inicia o fluxo de ativação do 2FA gerando chave secreta e QR Code (AJAX)
+     */
+    public function iniciar2fa(Request $request)
+    {
+        $user = auth()->user();
+
+        $secret = TwoFactorAuthService::generateSecretKey(16);
+        $otpAuthUrl = TwoFactorAuthService::getOtpAuthUrl($user->email, $secret, 'Foco 7');
+        $qrCodeUrl = TwoFactorAuthService::getQrCodeImageUrl($otpAuthUrl, 240);
+
+        // Armazena provisoriamente na sessão para confirmação
+        session(['temp_2fa_secret' => $secret]);
+
+        return response()->json([
+            'success' => true,
+            'secret' => $secret,
+            'secret_formatted' => chunk_split($secret, 4, ' '),
+            'otpauth_url' => $otpAuthUrl,
+            'qrcode_url' => $qrCodeUrl,
+        ]);
+    }
+
+    /**
+     * Confirma o código do aplicativo autenticador e ativa o 2FA (AJAX)
+     */
+    public function confirmar2fa(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'code' => 'required|string|min:6|max:8',
+        ], [
+            'code.required' => 'Digite o código de 6 dígitos gerado no aplicativo.',
+            'code.min' => 'O código de autenticação possui 6 dígitos.',
+        ]);
+
+        $secret = session('temp_2fa_secret') ?? $request->secret;
+
+        if (empty($secret)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A sessão de configuração expirou. Inicie a configuração novamente.',
+            ], 422);
+        }
+
+        if (!TwoFactorAuthService::verifyCode($secret, $request->code)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Código inválido ou expirado. Verifique o relógio do seu celular e tente novamente.',
+            ], 422);
+        }
+
+        // Gera 8 códigos de recuperação
+        $recoveryCodes = TwoFactorAuthService::generateRecoveryCodes(8);
+
+        $user->update([
+            'two_factor_secret' => $secret,
+            'two_factor_recovery_codes' => json_encode($recoveryCodes),
+            'two_factor_confirmed_at' => now(),
+            'two_factor_enabled' => true,
+        ]);
+
+        session()->forget('temp_2fa_secret');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Autenticação em Duas Etapas (2FA) ativada com sucesso!',
+            'recovery_codes' => $recoveryCodes,
+        ]);
+    }
+
+    /**
+     * Desativa o 2FA mediante confirmação de senha ou código (AJAX)
+     */
+    public function desativar2fa(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'senha_ou_codigo' => 'required|string',
+        ], [
+            'senha_ou_codigo.required' => 'Informe sua senha atual ou o código do autenticador para confirmar.',
+        ]);
+
+        $input = trim($request->senha_ou_codigo);
+
+        $validoPorSenha = Hash::check($input, $user->password);
+        $validoPorTotp = !empty($user->two_factor_secret) && TwoFactorAuthService::verifyCode($user->two_factor_secret, $input);
+
+        if (!$validoPorSenha && !$validoPorTotp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Senha ou código incorreto. A desativação não foi autorizada.',
+            ], 422);
+        }
+
+        $user->update([
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+            'two_factor_enabled' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'A Autenticação em Duas Etapas (2FA) foi desativada.',
+        ]);
+    }
+
+    /**
+     * Visualiza os códigos de recuperação ativos (AJAX)
+     */
+    public function visualizarRecoveryCodes(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'password' => 'required|string',
+        ], [
+            'password.required' => 'Informe sua senha atual para visualizar os códigos de recuperação.',
+        ]);
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Senha incorreta.',
+            ], 422);
+        }
+
+        $rawCodes = json_decode($user->two_factor_recovery_codes ?? '[]', true);
+        $codes = [];
+
+        if (is_array($rawCodes)) {
+            foreach ($rawCodes as $item) {
+                if (is_array($item)) {
+                    $codes[] = [
+                        'code' => $item['code'] ?? '',
+                        'used' => $item['used'] ?? false,
+                    ];
+                } else {
+                    $codes[] = [
+                        'code' => $item,
+                        'used' => false,
+                    ];
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'codes' => $codes,
+        ]);
+    }
+
+    /**
+     * Regenera os 8 códigos de recuperação (AJAX)
+     */
+    public function regenerarRecoveryCodes(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'password' => 'required|string',
+        ], [
+            'password.required' => 'Informe sua senha atual para regenerar os códigos.',
+        ]);
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Senha incorreta.',
+            ], 422);
+        }
+
+        $newCodes = TwoFactorAuthService::generateRecoveryCodes(8);
+
+        $user->update([
+            'two_factor_recovery_codes' => json_encode($newCodes),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Novos códigos de recuperação gerados com sucesso!',
+            'codes' => $newCodes,
         ]);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
+use App\Services\TwoFactorAuthService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +26,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * Processa a autenticação do usuário com proteção contra brute-force
-     */
     /**
      * Processa a autenticação do usuário com proteção contra brute-force
      */
@@ -79,7 +78,6 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'), $remember)) {
             RateLimiter::clear($throttleKey);
             RateLimiter::clear($ipThrottleKey);
-            $request->session()->regenerate();
 
             $user = Auth::user();
 
@@ -93,6 +91,26 @@ class AuthController extends Controller
 
                 return back()->withErrors(['email' => $msg]);
             }
+
+            // Se o usuário possui 2FA ativo, exige o desafio do autenticador
+            if ($user->hasTwoFactor()) {
+                Auth::logout();
+                $request->session()->put('login.2fa.user_id', $user->id);
+                $request->session()->put('login.2fa.remember', $remember);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'requires_2fa' => true,
+                        'message' => 'Autenticação em duas etapas requerida.',
+                        'redirect' => route('login.2fa'),
+                    ]);
+                }
+
+                return redirect()->route('login.2fa');
+            }
+
+            $request->session()->regenerate();
 
             $redirectUrl = $user->isAdmin()
                 ? route('admin.dashboard')
@@ -334,5 +352,116 @@ class AuthController extends Controller
                 'telefone' => $user->telefone,
             ],
         ]);
+    }
+
+    /**
+     * Exibe a tela de desafio da autenticação em duas etapas (2FA)
+     */
+    public function twoFactorChallengeForm(Request $request)
+    {
+        if (!session()->has('login.2fa.user_id')) {
+            return redirect()->route('login');
+        }
+
+        $userId = session('login.2fa.user_id');
+        $user = User::find($userId);
+
+        if (!$user) {
+            session()->forget(['login.2fa.user_id', 'login.2fa.remember']);
+            return redirect()->route('login');
+        }
+
+        return view('auth.two-factor-challenge', compact('user'));
+    }
+
+    /**
+     * Processa a verificação do código 2FA ou código de recuperação
+     */
+    public function twoFactorChallengeVerify(Request $request)
+    {
+        if (!session()->has('login.2fa.user_id')) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Sessão expirada. Faça login novamente.', 'redirect' => route('login')], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        $userId = session('login.2fa.user_id');
+        $user = User::find($userId);
+
+        if (!$user) {
+            session()->forget(['login.2fa.user_id', 'login.2fa.remember']);
+            return redirect()->route('login');
+        }
+
+        $throttleKey = '2fa|' . $user->id . '|' . $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $msg = "Muitas tentativas de verificação. Aguarde {$seconds} segundos.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 429);
+            }
+            return back()->withErrors(['code' => $msg]);
+        }
+
+        $isRecovery = $request->boolean('usar_recuperacao') || $request->filled('recovery_code');
+        $valido = false;
+
+        if ($isRecovery) {
+            $request->validate([
+                'recovery_code' => 'required|string',
+            ], [
+                'recovery_code.required' => 'Informe o código de recuperação de emergência.',
+            ]);
+
+            $valido = TwoFactorAuthService::verifyAndConsumeRecoveryCode($user, $request->recovery_code);
+        } else {
+            $request->validate([
+                'code' => 'required|string|min:6|max:8',
+            ], [
+                'code.required' => 'Digite o código de 6 dígitos gerado no seu aplicativo autenticador.',
+            ]);
+
+            $valido = TwoFactorAuthService::verifyCode($user->two_factor_secret, $request->code);
+        }
+
+        if (!$valido) {
+            RateLimiter::hit($throttleKey, 60);
+            $erroMsg = $isRecovery ? 'Código de recuperação inválido ou já utilizado.' : 'Código de 6 dígitos incorreto ou expirado.';
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $erroMsg], 422);
+            }
+
+            return back()->withErrors(['code' => $erroMsg]);
+        }
+
+        RateLimiter::clear($throttleKey);
+
+        $remember = session('login.2fa.remember', false);
+        Auth::login($user, $remember);
+        session()->forget(['login.2fa.user_id', 'login.2fa.remember']);
+        $request->session()->regenerate();
+
+        $redirectUrl = $user->isAdmin() ? route('admin.dashboard') : route('cliente.dashboard');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Autenticação de 2 fatores confirmada com sucesso!',
+                'redirect' => $redirectUrl,
+            ]);
+        }
+
+        return redirect()->intended($redirectUrl);
+    }
+
+    /**
+     * Cancela o fluxo de 2FA e volta para a tela de login
+     */
+    public function cancelTwoFactor(Request $request)
+    {
+        session()->forget(['login.2fa.user_id', 'login.2fa.remember']);
+        return redirect()->route('login');
     }
 }

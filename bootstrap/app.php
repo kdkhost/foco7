@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => \App\Http\Middleware\ControleAcesso::class,
+            'permissao' => \App\Http\Middleware\VerificarPermissao::class,
             'manutencao' => \App\Http\Middleware\ModoManutencao::class,
         ]);
     })

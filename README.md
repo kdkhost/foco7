@@ -275,8 +275,9 @@ public_html/
 | **Módulo 26**| Dashboard Reformulada com KPIs Animados, Contador de Visitas & Analítico Completo (Chart.js), Cancelamento de Agendamentos e Antecipação de Parcelas Financeiras | ✅ Concluído & Validado |
 | **Módulo 27**| Auditoria Contábil de Faturas (Bloqueio Direto & Estorno Manual com Recálculo da Receita), Logo Adaptável em Auth, Visualização de Senha e Proteção contra Força Bruta | ✅ Concluído & Validado |
 | **Módulo 28**| Área do Cliente Completa: Cancelamento de Agendamentos Online com Notificação Automática, Gestão Cadastral Completa, Alteração Segura de Senha com Botões de Olho, Avatar com Drag & Drop e Alternância Dinâmica de Logo/Favicon na Sidebar (Compactada e no Hover) | ✅ Concluído & Validado |
-| **Módulo 29**| Blindagem Geográfica para as Américas (Prevenção de Ataques, Scanners e Injeções de Países Europeus/Asiáticos com Painel de Controle, Whitelist e Simulador AJAX) & Seção de Empresas Parceiras em Carrossel Infinito Touch & Drag (Gerenciamento CMS, Logos Vetorizadas Oficiais e Suporte aos Modos Claro/Escuro) | ✅ Concluído & Validado |
 | **Módulo 30**| Unidades, Filiais & Mapa Interativo do Brasil com Rotas e Presença Nacional (CRUD AJAX no Admin, Leaflet.js, Busca em Tempo Real, Traçado de Rotas Google Maps/Waze, Ocultação Inteligente e Zero Alert) | ✅ Concluído & Validado |
+| **Módulo 31**| Modo de Manutenção Avançado & Wallpaper Panorâmico Drag & Drop (FocoDropzone com Preview em Tempo Real e Persistência de Dados) | ✅ Concluído & Validado |
+| **Módulo 32**| Gestão Completa de Usuários & Permissões Modulares (`/admin/usuarios`), Perfil com Dados Pessoais & Endereço ViaCEP (`/admin/perfil`) e Autenticação de 2 Fatores Funcional (2FA TOTP RFC 6238, QR Code, Desafio no Login e Recovery Codes) | ✅ Concluído & Validado |
 
 ---
 
@@ -395,11 +396,36 @@ public_html/
 
 ---
 
+## 👥 Módulo 32: Gestão de Usuários, Controle Granular de Permissões, Perfil Completo com ViaCEP & Autenticação 2FA (TOTP)
+
+### 1. Painel de Usuários do Sistema (`/admin/usuarios`)
+- **Gestão Completa (CRUD AJAX):** Listagem dinâmica com busca por nome, e-mail e CPF, filtros por papel, status e segurança 2FA, e paginação limpa.
+- **Small Boxes AdminLTE 4:** Métricas consolidadas em tempo real (Total de Usuários, Administradores/Gestores, Operadores/Equipe, Clientes e Protegidos por 2FA).
+- **Matriz de Permissões Modulares:** Controle de acesso granular em 6 categorias e 16 permissões (Dashboard, Agenda, Estética, Planos, Clientes, Faturas, Gateways, CMS, Filiais, Parceiros, Depoimentos, SEO, Notificações, E-mails, Usuários, Configurações, Cron e Manutenção) com perfis pré-configurados (*Super Administrador*, *Gerente Geral*, *Atendente*, *Analista Financeiro* e *Cliente*) e botões de marcação rápida.
+- **Operações Seguras:** Toggle rápido de status (Ativo/Inativo), modal rápido de redefinição de senha com botões de olho, e exclusão com SweetAlert2 protegida contra auto-exclusão e exclusão do último administrador.
+- **Upload de Avatar via FocoDropzone:** Suporte a drag & drop com proporção 1:1, preview imediato e remoção AJAX.
+
+### 2. Página de Perfil Dedicada Completa (`/admin/perfil`)
+- **Aba de Dados Pessoais & Profissionais:** Nome Completo, E-mail, CPF/CNPJ com máscara, Telefone/WhatsApp, Data de Nascimento, Gênero, Cargo e Biografia.
+- **Aba de Endereço Completo com ViaCEP:** CEP com busca automática via AJAX preenchendo Logradouro, Bairro, Cidade e UF, além de Número e Complemento.
+- **Aba de Segurança & Senha:** Validação estrita de senha atual, nova senha (mínimo 8 caracteres) e botões visuais para alternar visibilidade (olho).
+- **Aba de Autenticação em Duas Etapas (2FA):** Ciclo de vida completo do segundo fator de autenticação com status visual dinâmico.
+
+### 3. Autenticação de 2 Fatores Funcional (2FA TOTP RFC 6238)
+- **Camada de Serviço Especializada (`TwoFactorAuthService`):** Algoritmo TOTP compatível com Google Authenticator, Microsoft Authenticator, Authy e 1Password:
+  - Geração de segredo aleatório Base32 (16 caracteres).
+  - Cálculo de código TOTP em HMAC-SHA1 com tolerância temporal de drift de relógio (+/- 30s).
+  - URL oficial `otpauth://totp/...` e renderização de QR Code.
+- **Códigos de Recuperação de Emergência (Recovery Codes):** Geração de 8 códigos de backup exclusivos (`XXXX-XXXX`) com cópia em 1 clique e download em arquivo `.txt`. Cada código é de uso único e é consumido automaticamente após a validação.
+- **Desafio 2FA no Fluxo de Login (`/login/2fa`):** Se o usuário possui 2FA ativo, o login convencional intercepta a sessão e redireciona para a tela de verificação de 6 dígitos ou uso de código de recuperação de emergência com rate limiting rigoroso contra força bruta.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
-A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **113 testes executados, 113 aprovados (100% de sucesso), 526 asserções**.
-- Cobertura completa: Unidades, filiais e mapa interativo do Brasil (Leaflet.js com geocodificação, traçado de rotas Google Maps/Waze, ocultação condicional quando não há unidades ativas, CRUD e toggle AJAX), régua de cobrança pré e pós-vencimento com cálculo de multa (2%) e juros de mora diários, geração antecipada de mensalidades recorrentes, prevenção de duplicidade de disparos, endpoint AJAX de execução imediata da régua, persistência de parâmetros no painel admin, modal de faturas do cliente sem resíduos de teste, rotas públicas, moderação de depoimentos, bloqueio geográfico de países fora das Américas, liberação de países americanos, bypass por whitelist de IP, rotas de webhook isentas de bloqueio geográfico, CRUD e toggle de parceiros via AJAX, carrossel infinito de parceiros, moderação de depoimentos com toggle AJAX e exclusão SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
+A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
+- **126 testes executados, 126 aprovados (100% de sucesso), 591 asserções**.
+- Cobertura completa: Usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, régua de cobrança pré e pós-vencimento, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks e isolamento ACL.
 
 ---
 

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ManutencaoController;
 use App\Http\Controllers\Admin\GatewaysController;
 use App\Http\Controllers\Admin\PerfilController;
+use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\ConfiguracoesController;
 use App\Http\Controllers\Admin\ServicosEsteticaController;
 use App\Http\Controllers\Admin\ClientesController;
@@ -52,6 +53,9 @@ Route::get('/storage/{path}', [SiteController::class, 'servirMidiaStorage'])->wh
 */
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1')->name('login.post');
+Route::get('/login/2fa', [AuthController::class, 'twoFactorChallengeForm'])->name('login.2fa');
+Route::post('/login/2fa', [AuthController::class, 'twoFactorChallengeVerify'])->middleware('throttle:5,1')->name('login.2fa.verify');
+Route::get('/login/2fa/cancelar', [AuthController::class, 'cancelTwoFactor'])->name('login.2fa.cancel');
 Route::get('/cadastro', [AuthController::class, 'cadastroForm'])->name('register');
 Route::post('/cadastro', [AuthController::class, 'cadastro'])->middleware('throttle:5,1')->name('register.post');
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
@@ -238,12 +242,28 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/excluir/{id}', [CronController::class, 'destroy'])->name('admin.cron.destroy');
     });
 
-    // Meu Perfil de Usuário
+    // Gestão de Usuários & Permissões do Sistema
+    Route::prefix('usuarios')->group(function () {
+        Route::get('/', [UsuarioController::class, 'index'])->name('admin.usuarios.index');
+        Route::post('/', [UsuarioController::class, 'store'])->name('admin.usuarios.store');
+        Route::get('/{id}', [UsuarioController::class, 'show'])->name('admin.usuarios.show');
+        Route::post('/{id}', [UsuarioController::class, 'update'])->name('admin.usuarios.update');
+        Route::post('/toggle/{id}', [UsuarioController::class, 'toggleStatus'])->name('admin.usuarios.toggle');
+        Route::delete('/{id}', [UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
+        Route::post('/reset-senha/{id}', [UsuarioController::class, 'resetPassword'])->name('admin.usuarios.reset_password');
+    });
+
+    // Meu Perfil de Usuário & Autenticação de 2 Fatores (2FA)
     Route::prefix('perfil')->group(function () {
         Route::get('/', [PerfilController::class, 'index'])->name('admin.perfil.index');
         Route::post('/dados', [PerfilController::class, 'salvarDados'])->name('admin.perfil.salvar_dados');
         Route::post('/avatar', [PerfilController::class, 'salvarAvatar'])->name('admin.perfil.salvar_avatar');
         Route::post('/senha', [PerfilController::class, 'alterarSenha'])->name('admin.perfil.alterar_senha');
+        Route::post('/2fa/iniciar', [PerfilController::class, 'iniciar2fa'])->name('admin.perfil.2fa.iniciar');
+        Route::post('/2fa/confirmar', [PerfilController::class, 'confirmar2fa'])->name('admin.perfil.2fa.confirmar');
+        Route::post('/2fa/desativar', [PerfilController::class, 'desativar2fa'])->name('admin.perfil.2fa.desativar');
+        Route::post('/2fa/recovery-codes', [PerfilController::class, 'visualizarRecoveryCodes'])->name('admin.perfil.2fa.recovery_codes');
+        Route::post('/2fa/regenerar-recovery-codes', [PerfilController::class, 'regenerarRecoveryCodes'])->name('admin.perfil.2fa.regenerar_recovery_codes');
     });
 
     // Configurações do Sistema & Servidor SMTP
