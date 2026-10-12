@@ -126,6 +126,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'excluir'])->name('admin.parceiros.excluir');
     });
 
+    // Filiais & Localidades de Atendimento (Mapa Interativo do Brasil)
+    Route::prefix('filiais')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\FiliaisController::class, 'index'])->name('admin.filiais.index');
+        Route::get('/obter/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'obter'])->name('admin.filiais.obter');
+        Route::post('/salvar', [\App\Http\Controllers\Admin\FiliaisController::class, 'salvar'])->name('admin.filiais.salvar');
+        Route::post('/toggle/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'toggle'])->name('admin.filiais.toggle');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'excluir'])->name('admin.filiais.excluir');
+    });
+
     // Estética Automotiva (Serviços & Pacotes)
     Route::prefix('estetica')->group(function () {
         Route::get('/', [ServicosEsteticaController::class, 'index'])->name('admin.estetica.index');

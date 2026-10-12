@@ -519,5 +519,8 @@ class DatabaseSeeder extends Seeder
 
         // 12. Empresas Parceiras Homologadas
         $this->call(ParceirosSeeder::class);
+
+        // 13. Filiais e Localidades de Atendimento (Mapa Interativo)
+        $this->call(FiliaisSeeder::class);
     }
 }

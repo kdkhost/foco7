@@ -2995,5 +2995,129 @@ img, svg, video, canvas, audio, iframe, embed, object {
     opacity: 1;
 }
 
+/* ==========================================================================
+   SEÇÃO FILIAIS & LOCALIDADES DE ATENDIMENTO (MAPA DO BRASIL INTERATIVO)
+   ========================================================================== */
+.section-filiais {
+    background-color: var(--foco-bg, #ffffff);
+    position: relative;
+    border-top: 1px solid var(--foco-border, #e2e8f0);
+}
+
+.filiais-sidebar {
+    background: var(--foco-card-bg, #ffffff);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card-filial-item {
+    background: var(--foco-card-bg, #ffffff);
+    border: 1px solid var(--foco-border, #e2e8f0);
+    transition: all 0.25s ease;
+}
+
+.card-filial-item:hover {
+    border-color: rgba(217, 0, 0, 0.5);
+    box-shadow: 0 6px 16px rgba(217, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.card-filial-item.active {
+    border-color: var(--foco-red);
+    background: rgba(217, 0, 0, 0.03);
+    box-shadow: 0 0 0 1px var(--foco-red), 0 8px 20px rgba(217, 0, 0, 0.12);
+}
+
+/* MARCADOR CUSTOMIZADO FOCO 7 NO LEAFLET */
+.foco-marker-container {
+    position: relative;
+    width: 36px;
+    height: 48px;
+}
+
+.foco-map-marker-pin {
+    width: 32px;
+    height: 32px;
+    border-radius: 50% 50% 50% 0;
+    background: linear-gradient(135deg, #ff2a2a 0%, #d90000 100%);
+    position: absolute;
+    transform: rotate(-45deg);
+    left: 2px;
+    top: 2px;
+    box-shadow: 0 4px 14px rgba(217, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.foco-map-marker-pin:hover {
+    transform: rotate(-45deg) scale(1.15);
+    box-shadow: 0 6px 20px rgba(217, 0, 0, 0.7);
+}
+
+.foco-map-marker-pin::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.foco-map-marker-pulse {
+    background: rgba(217, 0, 0, 0.35);
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    left: 8px;
+    top: 30px;
+    transform: rotateX(55deg);
+    z-index: -2;
+    animation: focoMarkerPulse 2s ease-out infinite;
+}
+
+@keyframes focoMarkerPulse {
+    0% {
+        transform: rotateX(55deg) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: rotateX(55deg) scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* POPUP ESTILIZADO DO LEAFLET */
+.leaflet-popup-content-wrapper {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(217, 0, 0, 0.3) !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 14px 16px !important;
+    line-height: 1.4 !important;
+    font-family: inherit !important;
+}
+
+.leaflet-popup-tip {
+    background: #0f172a !important;
+}
+
+.leaflet-popup-close-button {
+    color: #ffffff !important;
+    padding: 6px !important;
+}
+
 
 

@@ -35,6 +35,9 @@
     <!-- Swiper 11 Slider (Carrosséis Touch e Drag) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
+    <!-- Leaflet.js CSS (Mapa Interativo do Brasil) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
     <!-- Toastr & SweetAlert2 (Global) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -185,6 +188,9 @@
                         @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#parceiros">Parceiros</a></li>
                         @endif
+                        @if(isset($filiais) && $filiais->count() > 0)
+                        <li class="nav-item"><a class="nav-link" href="#unidades">Onde Estamos</a></li>
+                        @endif
                         <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                     </ul>
@@ -271,6 +277,13 @@
                 <a href="#parceiros" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-handshake"></i></div>
                     <span class="android-item-text">Empresas Parceiras</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                @endif
+                @if(isset($filiais) && $filiais->count() > 0)
+                <a href="#unidades" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-map-location-dot"></i></div>
+                    <span class="android-item-text">Nossas Unidades</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 @endif
@@ -955,6 +968,118 @@
     </section>
     @endif
 
+    @if(isset($filiais) && $filiais->count() > 0)
+    <!-- 10.1 NOSSAS UNIDADES & ONDE ESTAMOS (MAPA INTERATIVO DO BRASIL) -->
+    <section id="unidades" class="section-filiais py-5 position-relative">
+        <div class="container position-relative">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-danger fw-bold text-uppercase small"><i class="fas fa-map-location-dot me-1"></i> {{ $configs['secao_filiais_badge'] ?? 'Presença Nacional' }}</span>
+                <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">{{ $configs['secao_filiais_titulo'] ?? 'Nossas Unidades & Cobertura de Atendimento' }}</h2>
+                <p class="text-secondary small mt-2 mb-0">{{ $configs['secao_filiais_subtitulo'] ?? 'Encontre a unidade Foco 7 mais próxima de você com suporte presencial, instalação rápida e ronda tática.' }}</p>
+            </div>
+
+            <div class="row g-4 align-items-stretch">
+                <!-- COLUNA ESQUERDA: LISTA DE FILIAIS E BUSCA -->
+                <div class="col-lg-4 col-xl-4 d-flex flex-column">
+                    <div class="filiais-sidebar p-3 p-md-4 h-100 d-flex flex-column border">
+                        <div class="mb-3">
+                            <label for="filtroFiliaisInput" class="form-label fw-bold small text-muted text-uppercase mb-2">
+                                <i class="fas fa-search me-1 text-danger"></i> Localizar Unidade
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-magnifying-glass text-muted"></i></span>
+                                <input type="text" id="filtroFiliaisInput" class="form-control bg-light border-start-0" placeholder="Buscar por cidade, estado ou nome..." autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <span class="small text-muted fw-semibold">
+                                <strong id="filiaisContador" class="text-danger">{{ $filiais->count() }}</strong> {{ $filiais->count() == 1 ? 'unidade ativa' : 'unidades ativas' }}
+                            </span>
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none text-muted p-0" id="btnResetarMapa" title="Ver todo o Brasil">
+                                <i class="fas fa-compress-arrows-alt me-1"></i> Ver Todas
+                            </button>
+                        </div>
+
+                        <!-- LISTAGEM COM SCROLL -->
+                        <div class="filiais-scroll-list flex-grow-1 overflow-auto pe-1" id="listaFiliaisCards" style="max-height: 480px;">
+                            @foreach($filiais as $f)
+                            <div class="card-filial-item p-3 mb-3 rounded-3 cursor-pointer" 
+                                 id="card-filial-{{ $f->id }}"
+                                 data-id="{{ $f->id }}"
+                                 data-lat="{{ $f->latitude }}"
+                                 data-lng="{{ $f->longitude }}"
+                                 data-cidade="{{ strtolower($f->cidade) }}"
+                                 data-estado="{{ strtolower($f->estado) }}"
+                                 data-nome="{{ strtolower($f->nome) }}"
+                                 onclick="focarFilialNoMapa({{ $f->id }}, {{ $f->latitude ?? 'null' }}, {{ $f->longitude ?? 'null' }})">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold mb-0 text-dark filial-item-title">{{ $f->nome }}</h6>
+                                    @if($f->destaque)
+                                    <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 0.65rem;">Matriz</span>
+                                    @else
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1" style="font-size: 0.65rem;">{{ $f->estado }}</span>
+                                    @endif
+                                </div>
+
+                                <p class="small text-muted mb-2 lh-sm">
+                                    <i class="fas fa-location-dot text-danger me-1"></i> {{ $f->endereco_completo }}
+                                </p>
+
+                                @if($f->telefone || $f->whatsapp)
+                                <div class="d-flex flex-wrap gap-2 small text-secondary mb-2">
+                                    @if($f->telefone)
+                                    <span><i class="fas fa-phone-alt text-muted me-1"></i> {{ $f->telefone }}</span>
+                                    @endif
+                                    @if($f->whatsapp)
+                                    <span><i class="fab fa-whatsapp text-success me-1"></i> {{ $f->whatsapp }}</span>
+                                    @endif
+                                </div>
+                                @endif
+
+                                @if($f->horario_atendimento)
+                                <div class="small text-muted mb-3">
+                                    <i class="fas fa-clock text-muted me-1"></i> {{ $f->horario_atendimento }}
+                                </div>
+                                @endif
+
+                                <div class="d-flex gap-2 mt-2 pt-2 border-top">
+                                    <button type="button" class="btn btn-sm btn-outline-danger w-50 py-1 fw-bold" onclick="event.stopPropagation(); focarFilialNoMapa({{ $f->id }}, {{ $f->latitude ?? 'null' }}, {{ $f->longitude ?? 'null' }})">
+                                        <i class="fas fa-crosshairs me-1"></i> Ver no Mapa
+                                    </button>
+                                    <a href="{{ $f->rota_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-50 py-1 fw-bold text-white text-center text-decoration-none" onclick="event.stopPropagation();">
+                                        <i class="fas fa-route me-1"></i> Como Chegar
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
+
+                            <div id="filiaisVazioMsg" class="text-center py-4 text-muted d-none">
+                                <i class="fas fa-map-marker-slash fa-2x mb-2 text-secondary opacity-50"></i>
+                                <p class="small mb-0">Nenhuma unidade encontrada para esta busca.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUNA DIREITA: MAPA DO BRASIL INTERATIVO LEAFLET -->
+                <div class="col-lg-8 col-xl-8">
+                    <div class="filiais-map-wrapper position-relative rounded-4 overflow-hidden border shadow-sm h-100" style="min-height: 540px;">
+                        <div id="mapaBrasilFiliais" style="width: 100%; height: 100%; min-height: 540px; z-index: 1;"></div>
+                        
+                        <!-- BOTÃO FLUTUANTE DE RESETAR VISÃO DO BRASIL -->
+                        <div class="position-absolute bottom-0 start-0 m-3 z-3">
+                            <button type="button" class="btn btn-sm btn-light border shadow-sm fw-bold px-3 py-2 d-flex align-items-center gap-2" id="btnMapaVisaoGeral" title="Visualizar todo o Brasil">
+                                <i class="fas fa-globe-americas text-danger"></i> Visão Geral Brasil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
+
     <!-- 11. PERGUNTAS FREQUENTES (FAQ) -->
     <section id="faq" class="section-faq">
         <div class="container">
@@ -1116,6 +1241,9 @@
                         <li class="mb-2"><a href="#app">Aplicativo</a></li>
                         @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
+                        @endif
+                        @if(isset($filiais) && $filiais->count() > 0)
+                        <li class="mb-2"><a href="#unidades">Onde Estamos / Filiais</a></li>
                         @endif
                         <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
                         <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos & LGPD</a></li>
@@ -2615,5 +2743,187 @@
             }
         });
     </script>
+
+    @if(isset($filiais) && $filiais->count() > 0)
+    <!-- Leaflet.js JS (Mapa Interativo do Brasil) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filiaisData = @json($filiais);
+            const mapaContainer = document.getElementById('mapaBrasilFiliais');
+            if (!mapaContainer || !filiaisData || filiaisData.length === 0) return;
+
+            // Inicializa mapa centrado no Brasil
+            const map = L.map('mapaBrasilFiliais', {
+                center: [-14.235, -51.9253],
+                zoom: 4,
+                scrollWheelZoom: false
+            });
+
+            // Camada de alta qualidade CartoDB Voyager
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            map.on('focus', function () { map.scrollWheelZoom.enable(); });
+            map.on('blur', function () { map.scrollWheelZoom.disable(); });
+
+            const markers = {};
+            const bounds = [];
+
+            // Ícone estilizado Foco 7 (Pin Vermelho com Pulso)
+            function criarIconeFoco7(destaque) {
+                return L.divIcon({
+                    className: 'custom-foco-div-icon',
+                    html: `
+                        <div class="foco-marker-container">
+                            <div class="foco-map-marker-pin ${destaque ? 'foco-pin-matriz' : ''}"></div>
+                            <div class="foco-map-marker-pulse"></div>
+                        </div>
+                    `,
+                    iconSize: [36, 48],
+                    iconAnchor: [18, 44],
+                    popupAnchor: [0, -42]
+                });
+            }
+
+            // Adiciona marcadores para cada filial com latitude e longitude válidas
+            filiaisData.forEach(function (filial) {
+                if (filial.latitude && filial.longitude) {
+                    const lat = parseFloat(filial.latitude);
+                    const lng = parseFloat(filial.longitude);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        bounds.push([lat, lng]);
+
+                        const icone = criarIconeFoco7(filial.destaque);
+                        const marker = L.marker([lat, lng], { icon: icone }).addTo(map);
+
+                        const rotaUrl = filial.link_rota || `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                        const wazeUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+                        const telLimpo = filial.whatsapp ? filial.whatsapp.replace(/\D/g, '') : '';
+                        const waUrl = telLimpo ? `https://wa.me/55${telLimpo}?text=Ol%C3%A1!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20a%20unidade%20${encodeURIComponent(filial.nome)}` : '';
+
+                        let popupHtml = `
+                            <div style="min-width: 250px; max-width: 300px; color: #fff;">
+                                ${filial.foto ? `<div style="margin: -14px -16px 12px -16px; height: 110px; overflow: hidden; border-bottom: 2px solid #d90000;"><img src="/storage/${filial.foto}" style="width: 100%; height: 100%; object-fit: cover;" alt="${filial.nome}"></div>` : ''}
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                    <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff; line-height: 1.2;">${filial.nome}</h6>
+                                    ${filial.destaque ? '<span style="background: #d90000; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 999px; margin-left: 6px; text-transform: uppercase;">Matriz</span>' : ''}
+                                </div>
+                                <div style="font-size: 0.78rem; color: #cbd5e1; margin-bottom: 8px;">
+                                    <i class="fas fa-map-marker-alt" style="color: #ef4444; margin-right: 4px;"></i>
+                                    ${filial.endereco ? filial.endereco : ''}${filial.bairro ? ', ' + filial.bairro : ''}<br>
+                                    <strong>${filial.cidade} - ${filial.estado}</strong>${filial.cep ? ' | CEP ' + filial.cep : ''}
+                                </div>
+                                ${filial.horario_atendimento ? `
+                                <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">
+                                    <i class="fas fa-clock" style="margin-right: 4px;"></i> ${filial.horario_atendimento}
+                                </div>` : ''}
+                                ${filial.telefone || filial.whatsapp ? `
+                                <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 12px;">
+                                    ${filial.telefone ? `<span><i class="fas fa-phone-alt" style="margin-right: 3px;"></i> ${filial.telefone}</span> ` : ''}
+                                    ${filial.whatsapp ? `<span><i class="fab fa-whatsapp" style="color: #22c55e; margin-left: 6px; margin-right: 3px;"></i> ${filial.whatsapp}</span>` : ''}
+                                </div>` : ''}
+                                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                                    <a href="${rotaUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #d90000; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 8px rgba(217,0,0,0.4);">
+                                        <i class="fas fa-route"></i> Traçar Rota
+                                    </a>
+                                    <a href="${wazeUrl}" target="_blank" rel="noopener noreferrer" style="background: #334155; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px;" title="Abrir no Waze">
+                                        <i class="fab fa-waze"></i> Waze
+                                    </a>
+                                    ${waUrl ? `
+                                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="background: #16a34a; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center;" title="Falar no WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>` : ''}
+                                </div>
+                            </div>
+                        `;
+
+                        marker.bindPopup(popupHtml, { maxWidth: 320 });
+                        markers[filial.id] = marker;
+
+                        marker.on('click', function () {
+                            destacarCardFilial(filial.id);
+                        });
+                    }
+                }
+            });
+
+            // Ajusta o enquadramento inicial para englobar todas as filiais
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+            }
+
+            // Ação de focar filial a partir do card
+            window.focarFilialNoMapa = function (id, lat, lng) {
+                destacarCardFilial(id);
+                if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+                    map.flyTo([lat, lng], 15, { duration: 1.2 });
+                    if (markers[id]) {
+                        setTimeout(() => markers[id].openPopup(), 600);
+                    }
+                }
+            };
+
+            function destacarCardFilial(id) {
+                document.querySelectorAll('.card-filial-item').forEach(c => c.classList.remove('active'));
+                const card = document.getElementById('card-filial-' + id);
+                if (card) {
+                    card.classList.add('active');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
+            function resetarVisaoGeral() {
+                document.querySelectorAll('.card-filial-item').forEach(c => c.classList.remove('active'));
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+                } else {
+                    map.flyTo([-14.235, -51.9253], 4);
+                }
+            }
+
+            const btnResetar = document.getElementById('btnResetarMapa');
+            if (btnResetar) btnResetar.addEventListener('click', resetarVisaoGeral);
+
+            const btnVisaoGeral = document.getElementById('btnMapaVisaoGeral');
+            if (btnVisaoGeral) btnVisaoGeral.addEventListener('click', resetarVisaoGeral);
+
+            // Busca em tempo real nos cards
+            const filtroInput = document.getElementById('filtroFiliaisInput');
+            if (filtroInput) {
+                filtroInput.addEventListener('input', function () {
+                    const termo = this.value.toLowerCase().trim();
+                    let visiveis = 0;
+                    document.querySelectorAll('.card-filial-item').forEach(function (card) {
+                        const cidade = card.getAttribute('data-cidade') || '';
+                        const estado = card.getAttribute('data-estado') || '';
+                        const nome = card.getAttribute('data-nome') || '';
+                        if (cidade.includes(termo) || estado.includes(termo) || nome.includes(termo)) {
+                            card.classList.remove('d-none');
+                            visiveis++;
+                        } else {
+                            card.classList.add('d-none');
+                        }
+                    });
+
+                    const contador = document.getElementById('filiaisContador');
+                    if (contador) contador.textContent = visiveis;
+
+                    const msgVazio = document.getElementById('filiaisVazioMsg');
+                    if (msgVazio) {
+                        if (visiveis === 0) {
+                            msgVazio.classList.remove('d-none');
+                        } else {
+                            msgVazio.classList.add('d-none');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    @endif
 </body>
 </html>

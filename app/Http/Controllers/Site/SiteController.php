@@ -10,6 +10,7 @@ use App\Models\Plano;
 use App\Models\Faq;
 use App\Models\Depoimento;
 use App\Models\Parceiro;
+use App\Models\Filial;
 use App\Models\SeoConfig;
 use App\Models\Agendamento;
 use App\Models\ServicoEstetica;
@@ -34,6 +35,7 @@ class SiteController extends Controller
         $faqs = Faq::ativo()->get();
         $depoimentos = Depoimento::ativo()->get();
         $parceiros = Parceiro::ativo()->ordenado()->get();
+        $filiais = Filial::ativo()->ordenado()->get();
         $seo = SeoConfig::paraPagina('home');
 
         $logoFundoEscuro = CmsSetting::getLogo('escuro');
@@ -214,9 +216,14 @@ class SiteController extends Controller
             'secao_parceiros_badge' => CmsSetting::get('secao_parceiros_badge', 'Ecossistema & Homologações'),
             'secao_parceiros_titulo' => CmsSetting::get('secao_parceiros_titulo', 'Empresas Parceiras & Tecnologias Homologadas'),
             'secao_parceiros_subtitulo' => CmsSetting::get('secao_parceiros_subtitulo', 'Conectados às principais seguradoras, fabricantes de rastreadores e operadoras de telecomunicação do Brasil.'),
+
+            // Seção Filiais & Localidades no Mapa do Brasil
+            'secao_filiais_badge' => CmsSetting::get('secao_filiais_badge', 'Presença & Atendimento'),
+            'secao_filiais_titulo' => CmsSetting::get('secao_filiais_titulo', 'Nossas Filiais & Localidades de Atendimento'),
+            'secao_filiais_subtitulo' => CmsSetting::get('secao_filiais_subtitulo', 'Localize a unidade Foco 7 mais próxima, trace a rota e converse diretamente com nossa equipe local.'),
         ];
 
-        return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'parceiros', 'seo', 'configs'));
+        return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'parceiros', 'filiais', 'seo', 'configs'));
     }
 
     /**
