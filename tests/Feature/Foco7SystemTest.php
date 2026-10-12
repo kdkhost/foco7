@@ -176,4 +176,35 @@ class Foco7SystemTest extends TestCase
         $preview = \App\Services\EmailTemplateService::renderPreview('lembrete_agendamento');
         $this->assertStringContainsString('AGENDAMENTO HOJE', $preview);
     }
+
+    /**
+     * Testa salvamento de configurações de manutenção e preview pelo administrador
+     */
+    public function test_salvar_configuracoes_manutencao_e_preview(): void
+    {
+        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        $responseSalvar = $this->actingAs($admin)->postJson('/admin/manutencao', [
+            'manutencao_ativa' => '1',
+            'manutencao_titulo' => 'SISTEMA EM MANUTENÇÃO TESTE',
+            'manutencao_mensagem' => 'Mensagem de teste de manutenção.',
+            'manutencao_previsao' => '2026-10-15T12:00',
+            'manutencao_token' => 'token_teste_123',
+            'manutencao_ips_liberados' => '189.10.20.30',
+            'manutencao_mostrar_whatsapp' => '1',
+            'manutencao_mostrar_redes' => '1',
+        ]);
+
+        $responseSalvar->assertStatus(200);
+        $responseSalvar->assertJson(['success' => true]);
+
+        $this->assertEquals('1', CmsSetting::get('manutencao_ativa'));
+        $this->assertEquals('SISTEMA EM MANUTENÇÃO TESTE', CmsSetting::get('manutencao_titulo'));
+
+        // Pré-visualização da página de manutenção
+        $responsePreview = $this->actingAs($admin)->get('/admin/manutencao/preview');
+        $responsePreview->assertStatus(200);
+        $responsePreview->assertSee('SISTEMA EM MANUTENÇÃO TESTE');
+        $responsePreview->assertSee('MODO PRÉ-VISUALIZAÇÃO DE ADMINISTRADOR');
+    }
 }

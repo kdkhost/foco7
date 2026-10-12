@@ -358,6 +358,24 @@ public_html/
 
 ---
 
+## 🛠️ Módulo 31: Modo de Manutenção Avançado & Wallpaper Drag & Drop (FocoDropzone)
+
+### 1. Persistência de Dados & Resolução de Limpeza de Campos
+- **Formulário com `.keep-data`:** Utilização da classe oficial `.keep-data` no formulário de manutenção (`/admin/manutencao`), prevenindo a limpeza universal de inputs pós-sucesso do `global-ajax.js` e mantendo títulos, mensagens e datas intactos na interface.
+- **Sincronização Direta de Status:** Interruptor liga/desliga (`manutencao_ativa`) inserido diretamente no formulário, permitindo salvar ou alternar a ativação do modo de manutenção via submissão tradicional de formulário ou botão de 1 clique no cabeçalho com SweetAlert2.
+
+### 2. Wallpaper Panorâmico via Drag & Drop (FocoDropzone)
+- **Upload Inteligente:** Suporte completo ao componente `FocoDropzone` com arrastar e soltar (drag & drop), seletor de arquivos, validação de tipos (JPG, PNG, WEBP), limite de tamanho (5MB) e preview em tempo real com dimensões detectadas via JavaScript.
+- **Armazenamento e Sanitização:** Upload direcionado para `public/uploads/manutencao/` com remoção preventiva de wallpapers customizados anteriores e opção de restauração rápida para a imagem padrão do sistema.
+- **Wallpaper Padrão de Alta Resolução (`/img/manutencao-bg.jpg`):** Imagem oficial com ambientação de segurança veicular, mapa de telemetria GPS e iluminação neon.
+
+### 3. Experiência de Visitantes vs Administradores
+- **Página de Manutenção Estilizada (`site.manutencao`):** Background panorâmico dinâmico com desfoque e overlay escuro (`backdrop-filter`), contagem regressiva em tempo real com blocos monoespaçados, integração com botão de emergência WhatsApp e canais de plantão 24h.
+- **Barra de Alerta Fixa no Topo da Landing Page:** Exibição de banner vermelho no topo da página inicial para administradores e IPs autorizados avisando que a manutenção está ativa para o público geral, com atalhos diretos para visualizar a página como visitante.
+- **Simulador e Pré-Visualização:** Rota exclusiva `/admin/manutencao/preview` e suporte a parâmetro de consulta `?preview_manutencao=1` para conferência do layout sem necessidade de logout.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):

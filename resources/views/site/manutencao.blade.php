@@ -17,6 +17,13 @@
         }
         body {
             background-color: #080a0f;
+            @if(!empty($bg_imagem))
+            background-image: url('{{ asset($bg_imagem) }}');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            @endif
             color: #ffffff;
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             min-height: 100vh;
@@ -29,46 +36,51 @@
             overflow-x: hidden;
         }
         .bg-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(217, 0, 0, 0.15) 0%, rgba(8, 10, 15, 0.95) 75%);
+            background: radial-gradient(circle at center, rgba(18, 23, 34, 0.72) 0%, rgba(8, 10, 15, 0.94) 85%);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 1;
         }
         .manutencao-card {
             position: relative;
             z-index: 2;
-            max-width: 720px;
+            max-width: 740px;
             width: 100%;
-            background: rgba(18, 23, 34, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px 30px;
+            background: rgba(18, 23, 34, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 24px;
+            padding: 44px 34px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(217, 0, 0, 0.18);
         }
         .countdown-box {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            min-width: 90px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px;
+            min-width: 95px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
         .countdown-num {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             font-weight: 800;
             color: var(--cor-destaque);
             line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
         .countdown-label {
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #94a3b8;
-            margin-top: 5px;
+            margin-top: 6px;
         }
         .btn-whatsapp-manutencao {
             background: #25d366;
@@ -95,6 +107,13 @@
     <div class="bg-overlay"></div>
 
     <div class="manutencao-card">
+        @if(!empty($is_preview))
+        <div class="alert alert-warning py-2 px-3 mb-4 rounded-pill d-inline-flex align-items-center gap-2 small fw-bold shadow-sm">
+            <i class="fas fa-eye text-warning fs-6"></i>
+            <span>MODO PRÉ-VISUALIZAÇÃO DE ADMINISTRADOR (Visitantes veem exatamente esta tela)</span>
+        </div>
+        @endif
+
         <!-- Logomarca Oficial Transparente -->
         <div class="mb-4">
             <img src="{{ asset($logo ?? '/img/logo-foco7.png') }}" alt="Foco 7" height="68" class="mb-2">

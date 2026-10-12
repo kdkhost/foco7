@@ -130,6 +130,9 @@
                     if (inputName === 'hero_bg_upload') {
                         $container.append(`<input type="hidden" name="remover_hero_bg" value="1">`);
                     }
+                    if (inputName === 'manutencao_bg' || inputName === 'manutencao_bg_upload') {
+                        $container.append(`<input type="hidden" name="remover_manutencao_bg" value="1">`);
+                    }
                 });
 
                 // Drag & Drop visual feedback

@@ -83,10 +83,11 @@ class DatabaseSeeder extends Seeder
             ['chave' => 'manutencao_titulo', 'valor' => 'SITE EM MANUTENÇÃO PROGRAMADA', 'grupo' => 'manutencao', 'tipo' => 'text', 'descricao' => 'Título da página de manutenção'],
             ['chave' => 'manutencao_mensagem', 'valor' => 'Estamos aplicando melhorias em nossos servidores de monitoramento para proporcionar ainda mais velocidade e precisão. Nossa Central 24h continua ativa sem interrupções.', 'grupo' => 'manutencao', 'tipo' => 'textarea', 'descricao' => 'Mensagem exibida ao público'],
             ['chave' => 'manutencao_previsao', 'valor' => date('Y-m-d H:i:s', strtotime('+48 hours')), 'grupo' => 'manutencao', 'tipo' => 'text', 'descricao' => 'Data e hora limite para contagem regressiva'],
-            ['chave' => 'manutencao_ips_liberados', 'valor' => '127.0.0.1,::1,177.192.4.34', 'grupo' => 'manutencao', 'tipo' => 'textarea', 'descricao' => 'IPs autorizados separados por vírgula'],
+            ['chave' => 'manutencao_ips_liberados', 'valor' => '', 'grupo' => 'manutencao', 'tipo' => 'textarea', 'descricao' => 'IPs autorizados separados por vírgula'],
             ['chave' => 'manutencao_token', 'valor' => 'foco7_vip_bypass_2026', 'grupo' => 'manutencao', 'tipo' => 'text', 'descricao' => 'Token de liberação direta de dispositivo'],
             ['chave' => 'manutencao_mostrar_redes', 'valor' => '1', 'grupo' => 'manutencao', 'tipo' => 'boolean', 'descricao' => 'Exibir links sociais na manutenção'],
             ['chave' => 'manutencao_mostrar_whatsapp', 'valor' => '1', 'grupo' => 'manutencao', 'tipo' => 'boolean', 'descricao' => 'Exibir botão do WhatsApp na manutenção'],
+            ['chave' => 'manutencao_bg', 'valor' => '/img/manutencao-bg.jpg', 'grupo' => 'manutencao', 'tipo' => 'image', 'descricao' => 'Imagem de fundo da página de manutenção'],
 
             // Gateways de Pagamento
             ['chave' => 'mercadopago_ativo', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ativar Mercado Pago Checkout'],

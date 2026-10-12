@@ -3,6 +3,28 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.7.1] - 2026-10-12
+
+### 🛠️ Modo de Manutenção: Persistência de Dados via AJAX (.keep-data), Wallpaper Drag & Drop (FocoDropzone) e Barra de Alerta Administrativa
+- **Correção da Persistência dos Campos do Formulário (`.keep-data`):**
+  - Adicionada a classe `keep-data` ao formulário de manutenção (`resources/views/admin/manutencao/index.blade.php`), impedindo o reset automático universal do `global-ajax.js` ao salvar com sucesso. Todas as informações inseridas (título, mensagem explicativa, data de contagem regressiva, token de bypass, IPs liberados e opções de contato) permanecem preservadas na tela.
+- **Sincronização de Status Direta no Formulário:**
+  - Inclusão do interruptor switch (`manutencao_ativa`) diretamente dentro do formulário de configurações, além do card de ativação rápida no topo. O método `ManutencaoController::salvar` agora sincroniza o status ativo/inativo enviado no formulário com validação e cache inteligente.
+- **Upload de Imagem de Fundo (Wallpaper) com Drag & Drop (FocoDropzone):**
+  - Implementação completa do componente global `FocoDropzone` no painel de manutenção com arrastar e soltar (drag & drop), seleção manual de arquivo, detecção automática de proporções (1920x1080), preview em tempo real via `FileReader`, limites de tamanho (5MB) e botão de remoção/restauração para o wallpaper padrão.
+  - Disponibilização do wallpaper oficial de alta tecnologia automotiva (`public/img/manutencao-bg.jpg`) com linhas de telemetria GPS e iluminação neon.
+  - Suporte ao upload com salvamento em `public/uploads/manutencao/` e limpeza preventiva da imagem anterior customizada.
+- **Página de Manutenção com Wallpaper Dinâmico e Glassmorphism (`site.manutencao`):**
+  - Estilização premium da tela de manutenção com suporte a `background-image` dinâmico em tela cheia, overlay com gradiente e desfoque (`backdrop-filter: blur(6px)`), contagem regressiva em tempo real com números monoespaçados tabulares e botões de contato oficiais.
+- **Barra de Aviso Fixa na Landing Page para Administradores:**
+  - Quando o modo de manutenção está ativado e o administrador navega pela Landing Page pública (`site.index`), uma barra fixa de topo em gradiente vermelho alerta que a manutenção está ativa para o público comum, fornecendo atalhos diretos para "Ver como Visitante" e "Painel de Manutenção".
+- **Pré-Visualização em Tempo Real (`admin.manutencao.preview`):**
+  - Nova rota `/admin/manutencao/preview` e parâmetro `?preview_manutencao=1` permitindo que administradores visualizem a qualquer momento a experiência exata exibida aos visitantes normais, acompanhado de selo de identificação prévia.
+- **Sanitização de IPs Liberados Padrão:**
+  - Remoção de `127.0.0.1` dos IPs liberados por padrão nos seeders para evitar que testes em janelas anônimas no ambiente local ignorassem o modo de manutenção involuntariamente.
+
+---
+
 ## [1.7.0] - 2026-10-09
 
 ### ⚙️ Gestão Dinâmica de Tarefas Cron, Cadastro Manual, 5 Rotinas Oficiais & Animações no Botão

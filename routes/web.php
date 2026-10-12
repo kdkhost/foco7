@@ -184,6 +184,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [ManutencaoController::class, 'index'])->name('admin.manutencao.index');
         Route::post('/toggle', [ManutencaoController::class, 'toggle'])->name('admin.manutencao.toggle');
         Route::post('/', [ManutencaoController::class, 'salvar'])->name('admin.manutencao.salvar');
+        Route::get('/preview', [ManutencaoController::class, 'preview'])->name('admin.manutencao.preview');
     });
 
     // Gateways de Pagamento & Cobrança por Carnê

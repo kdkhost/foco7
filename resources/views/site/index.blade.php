@@ -114,6 +114,26 @@
 </head>
 <body id="inicio">
 
+    @if(\App\Models\CmsSetting::get('manutencao_ativa', '0') == '1')
+    <!-- BARRA FIXA DE AVISO: MODO DE MANUTENÇÃO ATIVO (Visível para Administradores / IPs Autorizados) -->
+    <div class="alert alert-danger mb-0 py-2 px-3 fw-bold rounded-0 border-0 shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-2" style="position: sticky; top: 0; z-index: 9999999; font-size: 0.88rem; background: linear-gradient(90deg, #8b0000, #dc2626); color: #ffffff;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-exclamation-triangle fs-5 text-warning"></i>
+            <span>
+                <strong>MODO DE MANUTENÇÃO ATIVADO:</strong> Visitantes comuns veem a página de manutenção. Seu acesso está liberado por ser Administrador ou IP autorizado.
+            </span>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.manutencao.preview') }}" target="_blank" class="btn btn-sm btn-light text-danger fw-bold py-1 px-3 shadow-sm">
+                <i class="fas fa-eye me-1"></i> Ver Tela de Manutenção
+            </a>
+            <a href="{{ route('admin.manutencao.index') }}" class="btn btn-sm btn-outline-light fw-bold py-1 px-3">
+                <i class="fas fa-tools me-1"></i> Painel de Manutenção
+            </a>
+        </div>
+    </div>
+    @endif
+
     <!-- 1. CABEÇALHO FIXO GLOBAL (TOPBAR + NAVBAR) -->
     <header class="foco-header-fixed" id="focoHeader">
         <!-- TOPBAR FIXO DE CONTATO E ÁREA DO CLIENTE -->
