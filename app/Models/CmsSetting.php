@@ -26,11 +26,12 @@ class CmsSetting extends Model
     public static function get(string $chave, mixed $default = null): mixed
     {
         try {
-            $settings = Cache::rememberForever('cms_settings_all', function () {
+            $settings = Cache::remember('cms_settings_all', 60, function () {
                 return self::all()->pluck('valor', 'chave')->toArray();
             });
 
-            return $settings[$chave] ?? $default;
+            $valor = $settings[$chave] ?? null;
+            return ($valor === null || $valor === '') ? $default : $valor;
         } catch (\Throwable $e) {
             return $default;
         }

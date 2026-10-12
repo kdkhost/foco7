@@ -17,13 +17,11 @@
         }
         body {
             background-color: #080a0f;
-            @if(!empty($bg_imagem))
-            background-image: url('{{ asset($bg_imagem) }}');
+            background-image: url('{{ asset(!empty($bg_imagem) ? $bg_imagem : "/img/manutencao-bg.jpg") }}');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            @endif
             color: #ffffff;
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             min-height: 100vh;

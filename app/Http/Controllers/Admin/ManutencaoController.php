@@ -10,11 +10,26 @@ use Illuminate\Support\Facades\File;
 class ManutencaoController extends Controller
 {
     /**
+     * Retorna a URL válida do wallpaper ativo com fallback garantido
+     */
+    protected function getWallpaperUrl(): string
+    {
+        $bg = CmsSetting::get('manutencao_bg');
+        if (!empty($bg)) {
+            $cleanPath = parse_url($bg, PHP_URL_PATH) ?: $bg;
+            if (file_exists(public_path(ltrim($cleanPath, '/\\')))) {
+                return $bg;
+            }
+        }
+        return '/img/manutencao-bg.jpg';
+    }
+
+    /**
      * Exibe o painel de controle do Modo de Manutenção
      */
     public function index(Request $request)
     {
-        $statusAtivo = CmsSetting::get('manutencao_ativa', '0') == '1';
+        $statusAtivo = (string) CmsSetting::get('manutencao_ativa', '0') === '1';
         $titulo = CmsSetting::get('manutencao_titulo', 'SITE EM MANUTENÇÃO PROGRAMADA');
         $mensagem = CmsSetting::get('manutencao_mensagem', 'Estamos realizando melhorias em nossos servidores de monitoramento.');
         $previsao = CmsSetting::get('manutencao_previsao', date('Y-m-d H:i', strtotime('+24 hours')));
@@ -22,7 +37,7 @@ class ManutencaoController extends Controller
         $token = CmsSetting::get('manutencao_token', 'foco7_vip_bypass_2026');
         $mostrarRedes = CmsSetting::get('manutencao_mostrar_redes', '1') == '1';
         $mostrarWhatsApp = CmsSetting::get('manutencao_mostrar_whatsapp', '1') == '1';
-        $bgImagem = CmsSetting::get('manutencao_bg', '/img/manutencao-bg.jpg');
+        $bgImagem = $this->getWallpaperUrl();
         $meuIp = $request->ip();
 
         return view('admin.manutencao.index', compact(
@@ -44,8 +59,8 @@ class ManutencaoController extends Controller
      */
     public function toggle(Request $request)
     {
-        $statusAtual = CmsSetting::get('manutencao_ativa', '0') == '1';
-        $novoStatus = $statusAtual ? '0' : '1';
+        $statusAtual = (string) CmsSetting::get('manutencao_ativa', '0');
+        $novoStatus = ($statusAtual === '1' || $statusAtual === 'true') ? '0' : '1';
 
         CmsSetting::set('manutencao_ativa', $novoStatus, 'manutencao', 'boolean');
 
@@ -85,11 +100,9 @@ class ManutencaoController extends Controller
             'manutencao_bg.max' => 'O tamanho máximo da imagem de fundo é de 5MB.',
         ]);
 
-        // Sincroniza o status da manutenção enviado no formulário
-        if ($request->has('manutencao_ativa')) {
-            $isAtivo = $request->boolean('manutencao_ativa') ? '1' : '0';
-            CmsSetting::set('manutencao_ativa', $isAtivo, 'manutencao', 'boolean');
-        }
+        // Sincroniza o status da manutenção (trata switch e input hidden de forma estrita)
+        $isAtivo = ($request->input('manutencao_ativa') === '1' || $request->boolean('manutencao_ativa')) ? '1' : '0';
+        CmsSetting::set('manutencao_ativa', $isAtivo, 'manutencao', 'boolean');
 
         CmsSetting::set('manutencao_titulo', $validated['manutencao_titulo'], 'manutencao');
         CmsSetting::set('manutencao_mensagem', $validated['manutencao_mensagem'], 'manutencao');
@@ -128,15 +141,31 @@ class ManutencaoController extends Controller
                     @unlink($caminhoAntigo);
                 }
             }
-            CmsSetting::set('manutencao_bg', '', 'manutencao', 'image');
+            CmsSetting::set('manutencao_bg', '/img/manutencao-bg.jpg', 'manutencao', 'image');
         }
 
-        $bgAtual = CmsSetting::get('manutencao_bg', '/img/manutencao-bg.jpg');
+        $bgAtual = $this->getWallpaperUrl();
 
         return response()->json([
             'success' => true,
-            'message' => 'Configurações da Página de Manutenção salvas com sucesso!',
+            'message' => 'Configurações salvas com sucesso! Status: ' . ($isAtivo === '1' ? 'MANUTENÇÃO ATIVADA' : 'SITE ONLINE'),
             'bg_imagem' => $bgAtual,
+            'status_ativo' => $isAtivo === '1',
+            'reload' => true,
+        ]);
+    }
+
+    /**
+     * Limpa a lista de IPs liberados para permitir teste imediato em navegador anônimo
+     */
+    public function limparIps(Request $request)
+    {
+        CmsSetting::set('manutencao_ips_liberados', '', 'manutencao');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lista de IPs liberados zerada com sucesso! Testes em aba anônima agora serão bloqueados.',
+            'reload' => true,
         ]);
     }
 
@@ -157,7 +186,7 @@ class ManutencaoController extends Controller
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
             'logo' => CmsSetting::getLogo('escuro'),
-            'bg_imagem' => CmsSetting::get('manutencao_bg', '/img/manutencao-bg.jpg'),
+            'bg_imagem' => $this->getWallpaperUrl(),
             'client_ip' => request()->ip(),
             'is_preview' => true,
         ];

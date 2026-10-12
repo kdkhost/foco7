@@ -576,4 +576,38 @@ class SiteController extends Controller
 
         abort(403, 'Token de autorização inválido.');
     }
+
+    /**
+     * Exibe a página oficial de manutenção (para acesso direto ou teste público)
+     */
+    public function manutencaoView(Request $request)
+    {
+        $bg = CmsSetting::get('manutencao_bg');
+        if (empty($bg)) {
+            $bg = '/img/manutencao-bg.jpg';
+        } else {
+            $cleanPath = parse_url($bg, PHP_URL_PATH) ?: $bg;
+            if (!file_exists(public_path(ltrim($cleanPath, '/\\')))) {
+                $bg = '/img/manutencao-bg.jpg';
+            }
+        }
+
+        $dadosManutencao = [
+            'titulo' => CmsSetting::get('manutencao_titulo', 'SITE EM MANUTENÇÃO PROGRAMADA'),
+            'mensagem' => CmsSetting::get('manutencao_mensagem', 'Estamos realizando melhorias em nossos servidores de monitoramento.'),
+            'previsao' => CmsSetting::get('manutencao_previsao', date('Y-m-d H:i:s', strtotime('+24 hours'))),
+            'mostrar_redes' => CmsSetting::get('manutencao_mostrar_redes', '1') == '1',
+            'mostrar_whatsapp' => CmsSetting::get('manutencao_mostrar_whatsapp', '1') == '1',
+            'whatsapp' => CmsSetting::get('contato_whatsapp', '559180510736'),
+            'telefone' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
+            'instagram' => CmsSetting::get('social_instagram', ''),
+            'facebook' => CmsSetting::get('social_facebook', ''),
+            'youtube' => CmsSetting::get('social_youtube', ''),
+            'logo' => CmsSetting::getLogo('escuro'),
+            'bg_imagem' => $bg,
+            'client_ip' => $request->ip(),
+        ];
+
+        return response()->view('site.manutencao', $dadosManutencao, 200);
+    }
 }

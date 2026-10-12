@@ -14,13 +14,14 @@ class ModoManutencao
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Ignorar rotas do painel, login, instalador, webhooks e status
+        // 1. Ignorar rotas do painel, login, instalador, webhooks, status e rota pública de manutenção
         if (
             $request->is('admin*') ||
             $request->is('login*') ||
             $request->is('logout*') ||
             $request->is('instalar*') ||
             $request->is('webhook*') ||
+            $request->is('manutencao') ||
             $request->is('manutencao/bypass*') ||
             $request->is('up')
         ) {
@@ -35,7 +36,7 @@ class ModoManutencao
         }
 
         // 3. Forçar visualização prévia da manutenção se solicitado por parâmetro
-        if ($request->has('preview_manutencao') || $request->has('teste_manutencao')) {
+        if ($request->has('preview_manutencao') || $request->has('teste_manutencao') || $request->has('manutencao')) {
             return $this->renderManutencaoView($request, 200);
         }
 
@@ -64,10 +65,20 @@ class ModoManutencao
     }
 
     /**
-     * Renderiza a página oficial de manutenção
+     * Renderiza a página oficial de manutenção com fallback garantido de wallpaper
      */
     protected function renderManutencaoView(Request $request, int $status = 503): Response
     {
+        $bg = CmsSetting::get('manutencao_bg');
+        if (empty($bg)) {
+            $bg = '/img/manutencao-bg.jpg';
+        } else {
+            $cleanPath = parse_url($bg, PHP_URL_PATH) ?: $bg;
+            if (!file_exists(public_path(ltrim($cleanPath, '/\\')))) {
+                $bg = '/img/manutencao-bg.jpg';
+            }
+        }
+
         $dadosManutencao = [
             'titulo' => CmsSetting::get('manutencao_titulo', 'SITE EM MANUTENÇÃO PROGRAMADA'),
             'mensagem' => CmsSetting::get('manutencao_mensagem', 'Estamos realizando melhorias em nossos servidores de monitoramento.'),
@@ -80,7 +91,7 @@ class ModoManutencao
             'facebook' => CmsSetting::get('social_facebook', ''),
             'youtube' => CmsSetting::get('social_youtube', ''),
             'logo' => CmsSetting::getLogo('escuro'),
-            'bg_imagem' => CmsSetting::get('manutencao_bg', '/img/manutencao-bg.jpg'),
+            'bg_imagem' => $bg,
             'client_ip' => $request->ip(),
         ];
 

@@ -33,6 +33,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [SiteController::class, 'index'])->name('site.home');
+Route::get('/manutencao', [SiteController::class, 'manutencaoView'])->name('site.manutencao.publica');
 Route::get('/privacidade', [SiteController::class, 'privacidade'])->name('site.privacidade');
 Route::post('/contato', [SiteController::class, 'contato'])->name('site.contato');
 Route::post('/agendar', [SiteController::class, 'agendar'])->name('site.agendar');
@@ -184,6 +185,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [ManutencaoController::class, 'index'])->name('admin.manutencao.index');
         Route::post('/toggle', [ManutencaoController::class, 'toggle'])->name('admin.manutencao.toggle');
         Route::post('/', [ManutencaoController::class, 'salvar'])->name('admin.manutencao.salvar');
+        Route::post('/limpar-ips', [ManutencaoController::class, 'limparIps'])->name('admin.manutencao.limpar_ips');
         Route::get('/preview', [ManutencaoController::class, 'preview'])->name('admin.manutencao.preview');
     });
 

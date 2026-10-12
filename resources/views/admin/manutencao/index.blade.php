@@ -54,6 +54,7 @@
                                 </p>
                             </div>
                             <div class="form-check form-switch fs-4 mb-0">
+                                <input type="hidden" name="manutencao_ativa" value="0">
                                 <input class="form-check-input" type="checkbox" name="manutencao_ativa" id="switchManutencaoAtiva" value="1" {{ $statusAtivo ? 'checked' : '' }}>
                             </div>
                         </div>
@@ -74,10 +75,28 @@
                              data-ratio="1920 × 1080 px (16:9 Panorâmica Alta Definição)"
                              data-max-size="5MB"
                              data-accept="image/jpeg,image/png,image/webp"
-                             data-current-preview="{{ !empty($bgImagem) ? asset($bgImagem) : '' }}">
+                             data-current-preview="{{ asset(!empty($bgImagem) ? $bgImagem : '/img/manutencao-bg.jpg') }}">
                         </div>
                         <div class="form-text small mt-1">
                             Arraste e solte o wallpaper aqui ou clique para selecionar. Formatos permitidos: JPG, PNG, WEBP. Tamanho máximo: 5MB.
+                        </div>
+
+                        <!-- Card de Pré-visualização do Wallpaper Ativo no Sistema -->
+                        <div class="card p-3 mt-3 bg-dark border border-secondary border-opacity-50 rounded-3 text-white">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase text-danger d-flex align-items-center gap-1">
+                                    <i class="fas fa-desktop"></i> Wallpaper Ativo no Sistema
+                                </span>
+                                <a href="{{ asset(!empty($bgImagem) ? $bgImagem : '/img/manutencao-bg.jpg') }}" target="_blank" class="btn btn-sm btn-outline-light py-0 px-2 small">
+                                    <i class="fas fa-external-link-alt me-1"></i> Abrir em Nova Aba
+                                </a>
+                            </div>
+                            <div class="rounded-3 overflow-hidden position-relative shadow-sm" style="height: 170px; background-image: url('{{ asset(!empty($bgImagem) ? $bgImagem : '/img/manutencao-bg.jpg') }}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.15);">
+                                <div class="position-absolute bottom-0 start-0 w-100 p-2" style="background: linear-gradient(to top, rgba(0,0,0,0.88), transparent);">
+                                    <div class="small fw-bold text-white text-truncate">{{ basename($bgImagem) }}</div>
+                                    <div class="small text-white-50" style="font-size: 0.75rem;">1920 × 1080 px • Panorâmica HD com efeito Glassmorphism</div>
+                                </div>
+                            </div>
                         </div>
 
                         @if(!empty($bgImagem) && $bgImagem !== '/img/manutencao-bg.jpg')
@@ -114,14 +133,30 @@
                     </div>
 
                     <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label small fw-bold mb-0">IPs Liberados (Separados por vírgula)</label>
-                            <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" id="btnAddMeuIp" data-ip="{{ $meuIp }}">
-                                <i class="fas fa-plus-circle me-1"></i> Adicionar meu IP atual ({{ $meuIp }})
-                            </button>
+                        <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                            <label class="form-label small fw-bold mb-0">
+                                <i class="fas fa-network-wired text-danger me-1"></i> IPs Liberados (Separados por vírgula)
+                            </label>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-semibold" id="btnAddMeuIp" data-ip="{{ $meuIp }}">
+                                    <i class="fas fa-plus-circle me-1"></i> Adicionar meu IP ({{ $meuIp }})
+                                </button>
+                                <span class="text-secondary small">|</span>
+                                <button type="button" class="btn btn-sm btn-link text-warning p-0 text-decoration-none fw-semibold" id="btnLimparIps">
+                                    <i class="fas fa-eraser me-1"></i> Limpar IPs
+                                </button>
+                            </div>
                         </div>
-                        <textarea name="manutencao_ips_liberados" id="manutencao_ips_liberados" rows="2" class="form-control" placeholder="177.192.4.34, 201.55.3.10">{{ $ips }}</textarea>
-                        <div class="form-text small">Deixe sem IPs de rede local (127.0.0.1) se desejar testar a tela de manutenção no próprio computador em aba anônima.</div>
+
+                        <!-- Alerta Explicativo sobre Janela Anônima e IP -->
+                        <div class="alert alert-dark border border-secondary border-opacity-50 py-2 px-3 small mb-2 d-flex align-items-start gap-2">
+                            <i class="fas fa-info-circle text-info fs-5 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <strong>Importante para testes em Janela Anônima:</strong> A janela anônima no mesmo computador compartilha a mesma rede e endereço IP (<code>{{ $meuIp }}</code>). Se esse IP estiver salvo abaixo, a janela anônima <strong>não será bloqueada</strong>. Para testar o bloqueio real, clique em <strong>Limpar IPs</strong> ou acesse diretamente pelo link oficial <a href="{{ url('/manutencao') }}" target="_blank" class="text-danger fw-bold text-decoration-underline">{{ url('/manutencao') }}</a>.
+                            </div>
+                        </div>
+
+                        <textarea name="manutencao_ips_liberados" id="manutencao_ips_liberados" rows="2" class="form-control font-monospace small" placeholder="Ex: 177.192.4.34, 201.55.3.10">{{ $ips }}</textarea>
                     </div>
 
                     <div class="row g-3 mb-4">
@@ -168,10 +203,17 @@
 
                 <h6 class="fw-bold text-body mb-2"><i class="fas fa-flask text-danger me-1"></i> Como Testar Como Visitante</h6>
                 <p class="mb-2">Para ver a página exatamente como um visitante da internet enxerga:</p>
-                <ul class="ps-3 mb-3">
-                    <li class="mb-1">Clique no botão <a href="{{ route('admin.manutencao.preview') }}" target="_blank" class="fw-bold text-danger text-decoration-underline">Visualizar Página</a> no topo.</li>
-                    <li>Ou abra uma <strong>janela anônima</strong> sem estar com seu IP na lista de IPs liberados.</li>
-                </ul>
+                <div class="d-grid gap-2 mb-3">
+                    <a href="{{ url('/manutencao') }}" target="_blank" class="btn btn-outline-danger fw-bold py-2">
+                        <i class="fas fa-external-link-alt me-1"></i> Abrir /manutencao (Página Oficial)
+                    </a>
+                    <a href="{{ route('admin.manutencao.preview') }}" target="_blank" class="btn btn-outline-secondary fw-bold py-2">
+                        <i class="fas fa-eye me-1"></i> Visualização com Badge de Admin
+                    </a>
+                </div>
+                <div class="alert alert-secondary py-2 px-3 small mb-0">
+                    <i class="fas fa-user-secret me-1"></i> <strong>Em janela anônima na raiz (/):</strong> Certifique-se de clicar em <strong>"Limpar IPs"</strong> ao lado do campo de IPs para que seu endereço não dê bypass automático.
+                </div>
             </div>
         </div>
     </div>
@@ -240,6 +282,40 @@
                 $txt.val(meuIp);
             }
             window.foco7Notify.info('IP ' + meuIp + ' adicionado à lista de liberação!');
+        });
+
+        // Limpar lista de IPs liberados com SweetAlert2 de confirmação
+        $('#btnLimparIps').on('click', function () {
+            Swal.fire({
+                title: 'Limpar lista de IPs liberados?',
+                text: 'Ao limpar os IPs autorizados, janelas anônimas no seu computador serão bloqueadas e verão a tela de manutenção oficial.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d90000',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, Limpar Lista de IPs',
+                cancelButtonText: 'Cancelar'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("admin.manutencao.limpar_ips") }}',
+                        type: 'POST',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        success: function (res) {
+                            if (res.success) {
+                                $('#manutencao_ips_liberados').val('');
+                                window.foco7Notify.success(res.message);
+                                setTimeout(function () { window.location.reload(); }, 900);
+                            } else {
+                                window.foco7Notify.error(res.message || 'Falha ao limpar IPs liberados.');
+                            }
+                        },
+                        error: function () {
+                            window.foco7Notify.error('Falha ao processar solicitação de limpeza de IPs.');
+                        }
+                    });
+                }
+            });
         });
 
         // Copiar Link de Bypass para a área de transferência
