@@ -219,15 +219,24 @@
             var $container = $(selector);
             if (!$container.length) return;
 
+            if (!$container.data('foco-dropzone-initialized')) {
+                this.init(selector);
+            }
+
             var $empty = $container.find('.foco-dropzone-empty');
             var $preview = $container.find('.foco-dropzone-preview');
             var $img = $container.find('.foco-preview-img');
             var $fileNameEl = $container.find('.preview-file-name');
             var $title = $container.find('.preview-title');
             var $specsBadge = $container.find('.preview-specs-detected');
+            var $input = $container.find('.foco-dropzone-input');
+
+            // Limpa qualquer flag de remoção pendente
+            $container.find('input[name^="remover_"]').remove();
 
             if (fileUrl) {
                 var name = displayName || fileUrl.split('/').pop();
+                $input.val('');
                 if ($img.length) {
                     $img.attr('src', fileUrl);
                 }
@@ -248,12 +257,17 @@
             var $container = $(selector);
             if (!$container.length) return;
 
+            if (!$container.data('foco-dropzone-initialized')) {
+                this.init(selector);
+            }
+
             var $input = $container.find('.foco-dropzone-input');
             var $empty = $container.find('.foco-dropzone-empty');
             var $preview = $container.find('.foco-dropzone-preview');
             var $img = $container.find('.foco-preview-img');
             var $fileNameEl = $container.find('.preview-file-name');
 
+            $container.find('input[name^="remover_"]').remove();
             $input.val('');
             if ($img.length) $img.attr('src', '');
             if ($fileNameEl.length) $fileNameEl.text('Arquivo anexado');

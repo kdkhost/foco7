@@ -194,7 +194,7 @@
 
                         <div class="col-12">
                             <label class="form-label small fw-bold">Logomarca do Parceiro (SVG, PNG ou WEBP)</label>
-                            <div class="foco-dropzone"
+                            <div class="foco-dropzone preview-fundo-branco"
                                  data-input-name="logo_upload"
                                  data-ratio="Horizontal (200 × 60 px ideal)"
                                  data-max-size="5MB"
@@ -235,9 +235,10 @@
         $('#modalParceiroTitulo').html('<i class="fas fa-handshake text-danger me-2"></i> Nova Marca Parceira');
         $('#parceiro_ativo').prop('checked', true);
 
-        // Limpa preview da dropzone
-        $('#dropzoneParceiro').find('.focodropzone-preview').empty();
-        $('#dropzoneParceiro').find('.focodropzone-file-input').val('');
+        // Reseta o componente de upload FocoDropzone
+        if (window.FocoDropzone) {
+            window.FocoDropzone.reset('#dropzoneParceiro');
+        }
 
         new bootstrap.Modal(document.getElementById('modalParceiro')).show();
     }
@@ -255,12 +256,12 @@
 
                 $('#modalParceiroTitulo').html('<i class="fas fa-edit text-danger me-2"></i> Editar Parceiro: ' + p.nome);
 
-                // Preview da logo existente
-                var $prev = $('#dropzoneParceiro').find('.focodropzone-preview');
-                $prev.empty();
-                if (p.logo) {
-                    var logoSrc = (p.logo.startsWith('http') || p.logo.startsWith('/')) ? p.logo : '/' + p.logo;
-                    $prev.html('<div class="p-2 border rounded bg-white d-inline-block shadow-sm"><img src="' + logoSrc + '" style="max-height: 48px; max-width: 140px; object-fit: contain;"></div>');
+                // Define o preview da logo existente via FocoDropzone
+                var logoUrl = res.logo_url || p.logo_url || (p.logo ? (p.logo.startsWith('http') ? p.logo : '/' + p.logo.replace(/^\//, '')) : '');
+                if (logoUrl && window.FocoDropzone) {
+                    window.FocoDropzone.setPreview('#dropzoneParceiro', logoUrl, p.nome);
+                } else if (window.FocoDropzone) {
+                    window.FocoDropzone.reset('#dropzoneParceiro');
                 }
 
                 new bootstrap.Modal(document.getElementById('modalParceiro')).show();

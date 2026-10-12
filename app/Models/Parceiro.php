@@ -25,6 +25,11 @@ class Parceiro extends Model
         'ordem' => 'integer',
     ];
 
+    protected $appends = [
+        'logo_url',
+        'categoria',
+    ];
+
     /**
      * Scope para parceiros ativos
      */

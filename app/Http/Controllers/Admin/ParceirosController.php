@@ -51,6 +51,7 @@ class ParceirosController extends Controller
         return response()->json([
             'success' => true,
             'parceiro' => $parceiro,
+            'logo_url' => $parceiro->logo_url,
         ]);
     }
 
@@ -114,6 +115,14 @@ class ParceirosController extends Controller
             $fileName = 'parceiro_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadDir, $fileName);
             $parceiro->logo = '/uploads/parceiros/' . $fileName;
+        } elseif ($request->input('remover_logo_upload') == '1' || $request->input('remover_logo') == '1') {
+            if ($parceiro->logo && !str_starts_with($parceiro->logo, '/img/parceiros/')) {
+                $cleanOld = public_path(ltrim($parceiro->logo, '/'));
+                if (file_exists($cleanOld)) {
+                    @unlink($cleanOld);
+                }
+            }
+            $parceiro->logo = '/img/favicon.png';
         } elseif (!$id && empty($parceiro->logo)) {
             $parceiro->logo = '/img/favicon.png';
         }

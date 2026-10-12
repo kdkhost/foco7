@@ -239,6 +239,11 @@
                                         $(this).summernote('reset');
                                     });
                                 }
+                                if (window.FocoDropzone) {
+                                    $form.find('.foco-dropzone').each(function () {
+                                        window.FocoDropzone.reset(this);
+                                    });
+                                }
                                 $form.find('.focodropzone-preview').empty();
                                 $form.find('.focodropzone-file-input').val('');
                                 $form.trigger('form:cleared');
@@ -310,6 +315,11 @@
                     if (typeof $.fn.summernote !== 'undefined') {
                         $f.find('.summernote').each(function () {
                             $(this).summernote('reset');
+                        });
+                    }
+                    if (window.FocoDropzone) {
+                        $f.find('.foco-dropzone').each(function () {
+                            window.FocoDropzone.reset(this);
                         });
                     }
                     $f.find('.focodropzone-preview').empty();
