@@ -24,9 +24,9 @@ class FiliaisSeeder extends Seeder
                 'whatsapp' => '(91) 98051-0736',
                 'email' => 'belem@foco7.com.br',
                 'horario_atendimento' => 'Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00',
-                'latitude' => -1.4557549,
-                'longitude' => -48.4901799,
-                'link_rota' => 'https://www.google.com/maps/dir/?api=1&destination=-1.4557549,-48.4901799',
+                'latitude' => -1.4502989,
+                'longitude' => -48.4881242,
+                'link_rota' => null,
                 'destaque' => true,
                 'ativo' => true,
                 'ordem' => 1,
@@ -42,9 +42,9 @@ class FiliaisSeeder extends Seeder
                 'whatsapp' => '(91) 98051-0736',
                 'email' => 'ananindeua@foco7.com.br',
                 'horario_atendimento' => 'Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00',
-                'latitude' => -1.3732890,
-                'longitude' => -48.4113240,
-                'link_rota' => 'https://www.google.com/maps/dir/?api=1&destination=-1.3732890,-48.4113240',
+                'latitude' => -1.4017675,
+                'longitude' => -48.4277227,
+                'link_rota' => null,
                 'destaque' => false,
                 'ativo' => true,
                 'ordem' => 2,
@@ -60,9 +60,9 @@ class FiliaisSeeder extends Seeder
                 'whatsapp' => '(91) 98051-0736',
                 'email' => 'castanhal@foco7.com.br',
                 'horario_atendimento' => 'Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00',
-                'latitude' => -1.2974000,
-                'longitude' => -47.9254000,
-                'link_rota' => 'https://www.google.com/maps/dir/?api=1&destination=-1.2974000,-47.9254000',
+                'latitude' => -1.3014937,
+                'longitude' => -47.9961794,
+                'link_rota' => null,
                 'destaque' => false,
                 'ativo' => true,
                 'ordem' => 3,
@@ -78,9 +78,9 @@ class FiliaisSeeder extends Seeder
                 'whatsapp' => '(91) 98051-0736',
                 'email' => 'saoluis@foco7.com.br',
                 'horario_atendimento' => 'Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00',
-                'latitude' => -2.5028000,
-                'longitude' => -44.2985000,
-                'link_rota' => 'https://www.google.com/maps/dir/?api=1&destination=-2.5028000,-44.2985000',
+                'latitude' => -2.5004301,
+                'longitude' => -44.2860749,
+                'link_rota' => null,
                 'destaque' => false,
                 'ativo' => true,
                 'ordem' => 4,
@@ -91,24 +91,24 @@ class FiliaisSeeder extends Seeder
                 'estado' => 'CE',
                 'endereco' => 'Av. Santos Dumont, 2122',
                 'bairro' => 'Aldeota',
-                'cep' => '60150-161',
-                'telefone' => '(85) 3456-7890',
+                'cep' => '60150-160',
+                'telefone' => '(85) 3030-4040',
                 'whatsapp' => '(91) 98051-0736',
                 'email' => 'fortaleza@foco7.com.br',
                 'horario_atendimento' => 'Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00',
-                'latitude' => -3.7375000,
-                'longitude' => -38.5036000,
-                'link_rota' => 'https://www.google.com/maps/dir/?api=1&destination=-3.7375000,-38.5036000',
+                'latitude' => -3.7425643,
+                'longitude' => -38.4787474,
+                'link_rota' => null,
                 'destaque' => false,
                 'ativo' => true,
                 'ordem' => 5,
-            ]
+            ],
         ];
 
-        foreach ($unidades as $unidade) {
-            Filial::firstOrCreate(
-                ['nome' => $unidade['nome'], 'cidade' => $unidade['cidade']],
-                $unidade
+        foreach ($unidades as $dados) {
+            Filial::updateOrCreate(
+                ['nome' => $dados['nome']],
+                $dados
             );
         }
     }

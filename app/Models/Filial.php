@@ -84,7 +84,7 @@ class Filial extends Model
     public function getRotaOsmUrlAttribute()
     {
         if (!empty($this->latitude) && !empty($this->longitude)) {
-            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}";
+            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}#map=17/{$this->latitude}/{$this->longitude}";
         }
 
         $destinoFormatado = urlencode("{$this->endereco}, {$this->bairro}, {$this->cidade} - {$this->estado}, Brasil");
@@ -92,20 +92,24 @@ class Filial extends Model
     }
 
     /**
-     * URL direta para traçar rota (OpenStreetMap / Link Personalizado ou Navegador)
+     * URL direta para traçar rota no Google Maps com endereço completo e CEP exatos
+     */
+    public function getRotaGoogleMapsUrlAttribute()
+    {
+        $destino = trim("{$this->endereco}, " . ($this->bairro ? "{$this->bairro}, " : "") . "{$this->cidade} - {$this->estado}" . ($this->cep ? ", {$this->cep}" : ""));
+        return "https://www.google.com/maps/dir/?api=1&destination=" . urlencode($destino);
+    }
+
+    /**
+     * URL direta para traçar rota (OpenStreetMap por padrão, ou link_rota se customizado)
      */
     public function getRotaUrlAttribute()
     {
-        if (!empty($this->link_rota)) {
+        if (!empty($this->link_rota) && !str_contains($this->link_rota, '-1.4557549')) {
             return $this->link_rota;
         }
 
-        if (!empty($this->latitude) && !empty($this->longitude)) {
-            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}";
-        }
-
-        $destinoFormatado = urlencode("{$this->endereco}, {$this->bairro}, {$this->cidade} - {$this->estado}");
-        return "https://www.openstreetmap.org/search?query={$destinoFormatado}";
+        return $this->rota_osm_url;
     }
 
     /**

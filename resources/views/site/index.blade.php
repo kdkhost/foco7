@@ -1047,7 +1047,7 @@
                                     <button type="button" class="btn btn-sm btn-outline-danger w-50 py-1 fw-bold" onclick="event.stopPropagation(); focarFilialNoMapa({{ $f->id }}, {{ $f->latitude ?? 'null' }}, {{ $f->longitude ?? 'null' }})">
                                         <i class="fas fa-crosshairs me-1"></i> Ver no Mapa
                                     </button>
-                                    <a href="{{ $f->rota_osm_url ?? $f->rota_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-50 py-1 fw-bold text-white text-center text-decoration-none" onclick="event.stopPropagation();" title="Traçar Rota no OpenStreetMap (Sem custos)">
+                                    <a href="{{ $f->rota_osm_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-50 py-1 fw-bold text-white text-center text-decoration-none" onclick="event.stopPropagation();" title="Traçar Rota no OpenStreetMap (100% Gratuito)">
                                         <i class="fas fa-route me-1"></i> Como Chegar
                                     </a>
                                 </div>
@@ -2799,14 +2799,16 @@
                         const icone = criarIconeFoco7(filial.destaque);
                         const marker = L.marker([lat, lng], { icon: icone }).addTo(map);
 
-                        const rotaOsmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C${lat}%2C${lng}`;
-                        const rotaUrl = filial.link_rota || rotaOsmUrl;
+                        const rotaOsmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C${lat}%2C${lng}#map=17/${lat}/${lng}`;
+                        const enderecoCompleto = `${filial.endereco || ''}, ${filial.bairro ? filial.bairro + ', ' : ''}${filial.cidade} - ${filial.estado}${filial.cep ? ', ' + filial.cep : ''}`;
+                        const rotaGoogleUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(enderecoCompleto)}`;
+                        const rotaUrl = (filial.link_rota && !filial.link_rota.includes('-1.4557549')) ? filial.link_rota : rotaOsmUrl;
                         const wazeUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
                         const telLimpo = filial.whatsapp ? filial.whatsapp.replace(/\D/g, '') : '';
                         const waUrl = telLimpo ? `https://wa.me/55${telLimpo}?text=Ol%C3%A1!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20a%20unidade%20${encodeURIComponent(filial.nome)}` : '';
 
                         let popupHtml = `
-                            <div style="min-width: 250px; max-width: 300px; color: #fff;">
+                            <div style="min-width: 260px; max-width: 320px; color: #fff;">
                                 ${filial.foto ? `<div style="margin: -14px -16px 12px -16px; height: 110px; overflow: hidden; border-bottom: 2px solid #d90000;"><img src="/storage/${filial.foto}" style="width: 100%; height: 100%; object-fit: cover;" alt="${filial.nome}"></div>` : ''}
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                                     <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff; line-height: 1.2;">${filial.nome}</h6>
@@ -2826,22 +2828,27 @@
                                     ${filial.telefone ? `<span><i class="fas fa-phone-alt" style="margin-right: 3px;"></i> ${filial.telefone}</span> ` : ''}
                                     ${filial.whatsapp ? `<span><i class="fab fa-whatsapp" style="color: #22c55e; margin-left: 6px; margin-right: 3px;"></i> ${filial.whatsapp}</span>` : ''}
                                 </div>` : ''}
-                                <div style="display: flex; gap: 6px; margin-top: 10px;">
-                                    <a href="${rotaUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #d90000; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 8px rgba(217,0,0,0.4);" title="Traçar Rota no OpenStreetMap">
-                                        <i class="fas fa-route"></i> Traçar Rota
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                    <a href="${rotaOsmUrl}" target="_blank" rel="noopener noreferrer" style="background: #d90000; color: #fff; padding: 8px 10px; border-radius: 8px; text-decoration: none; font-size: 0.78rem; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(217,0,0,0.4);" title="Traçar rota no OpenStreetMap gratuito">
+                                        <i class="fas fa-route"></i> Traçar Rota no OpenStreetMap
                                     </a>
-                                    <a href="${wazeUrl}" target="_blank" rel="noopener noreferrer" style="background: #334155; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px;" title="Abrir no Waze">
-                                        <i class="fab fa-waze"></i> Waze
-                                    </a>
-                                    ${waUrl ? `
-                                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="background: #16a34a; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center;" title="Falar no WhatsApp">
-                                        <i class="fab fa-whatsapp"></i>
-                                    </a>` : ''}
+                                    <div style="display: flex; gap: 6px;">
+                                        <a href="${rotaGoogleUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #1e293b; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15); padding: 6px 8px; border-radius: 6px; text-decoration: none; font-size: 0.72rem; font-weight: 600; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Abrir endereço exato no Google Maps">
+                                            <i class="fab fa-google text-warning"></i> Google Maps
+                                        </a>
+                                        <a href="${wazeUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #1e293b; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15); padding: 6px 8px; border-radius: 6px; text-decoration: none; font-size: 0.72rem; font-weight: 600; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Abrir no Waze">
+                                            <i class="fab fa-waze text-info"></i> Waze
+                                        </a>
+                                        ${waUrl ? `
+                                        <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="background: #16a34a; color: #fff; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;" title="Falar no WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>` : ''}
+                                    </div>
                                 </div>
                             </div>
                         `;
 
-                        marker.bindPopup(popupHtml, { maxWidth: 320 });
+                        marker.bindPopup(popupHtml, { maxWidth: 340 });
                         markers[filial.id] = marker;
 
                         marker.on('click', function () {

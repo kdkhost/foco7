@@ -200,4 +200,36 @@ class FiliaisEMapaBrasilTest extends TestCase
             'id' => $filial->id,
         ]);
     }
+
+    /**
+     * Valida que as URLs de rota geradas pelo model batem exatamente com as coordenadas e endereço completo
+     */
+    public function test_rotas_utilizam_coordenadas_e_enderecos_exatos(): void
+    {
+        $filial = Filial::create([
+            'nome' => 'Matriz Belém',
+            'cidade' => 'Belém',
+            'estado' => 'PA',
+            'endereco' => 'Tv. Quintino Bocaiúva, 1200',
+            'bairro' => 'Nazaré',
+            'cep' => '66053-240',
+            'latitude' => -1.4502989,
+            'longitude' => -48.4881242,
+            'link_rota' => null,
+            'ativo' => true,
+        ]);
+
+        // Rota OpenStreetMap deve apontar para as coordenadas exatas
+        $this->assertStringContainsString('openstreetmap.org/directions', $filial->rota_osm_url);
+        $this->assertStringContainsString('-1.4502989', $filial->rota_osm_url);
+        $this->assertStringContainsString('-48.4881242', $filial->rota_osm_url);
+
+        // Rota Google Maps deve conter o endereço completo formatado com número e CEP
+        $this->assertStringContainsString('google.com/maps/dir', $filial->rota_google_maps_url);
+        $this->assertStringContainsString(urlencode('Tv. Quintino Bocaiúva, 1200'), $filial->rota_google_maps_url);
+        $this->assertStringContainsString('66053-240', $filial->rota_google_maps_url);
+
+        // Rota padrão deve ser a do OpenStreetMap quando link_rota for nulo
+        $this->assertEquals($filial->rota_osm_url, $filial->rota_url);
+    }
 }
