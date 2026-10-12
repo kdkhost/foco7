@@ -4,6 +4,50 @@
 @section('page_title', 'Usuários & Permissões')
 @section('page_description', 'Gerencie administradores, atendentes, permissões modulares de acesso e segurança 2FA.')
 
+@section('styles')
+<style>
+    #modalUsuario .modal-dialog {
+        max-width: 980px;
+        margin: 1.5rem auto;
+    }
+    #modalUsuario .modal-content {
+        max-height: calc(100vh - 3rem);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    #modalUsuario form#formUsuario {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+    #modalUsuario .modal-usuario-body {
+        flex: 1 1 auto;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+        max-height: calc(100vh - 240px);
+        padding: 1.5rem;
+    }
+    #modalUsuario .modal-usuario-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    #modalUsuario .modal-usuario-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+    }
+    #modalUsuario .modal-usuario-body::-webkit-scrollbar-thumb {
+        background: rgba(217, 0, 0, 0.4);
+        border-radius: 4px;
+    }
+    #modalUsuario .modal-usuario-body::-webkit-scrollbar-thumb:hover {
+        background: #d90000;
+    }
+</style>
+@endsection
+
 @section('content')
 <!-- SMALL BOXES / MÉTRICAS ADMINLTE 4 -->
 <div class="row g-3 mb-4">
@@ -264,23 +308,23 @@
 <!-- MODAL DE CADASTRO E EDIÇÃO DE USUÁRIO COM MATRIZ DE PERMISSÕES -->
 <!-- ============================================================== -->
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header bg-danger text-white">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow overflow-hidden">
+            <div class="modal-header bg-danger text-white flex-shrink-0">
                 <h5 class="modal-title fw-bold" id="modalUsuarioTitulo">
                     <i class="fas fa-user-plus me-2"></i> Novo Usuário
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             
-            <form id="formUsuario" action="{{ route('admin.usuarios.store') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+            <form id="formUsuario" action="{{ route('admin.usuarios.store') }}" method="POST" enctype="multipart/form-data" class="ajax-form d-flex flex-column flex-grow-1 overflow-hidden" style="min-height: 0;">
                 @csrf
                 <input type="hidden" name="usuario_id" id="usuarioId" value="">
                 <input type="hidden" name="remover_avatar" id="usuarioRemoverAvatar" value="0">
 
-                <div class="modal-body p-0">
-                    <!-- NAVEGAÇÃO POR ABAS NO MODAL -->
-                    <ul class="nav nav-tabs nav-fill border-bottom bg-body-tertiary px-3 pt-2" id="modalUsuarioTabs" role="tablist">
+                <!-- NAVEGAÇÃO POR ABAS NO MODAL (FIXA NO TOPO) -->
+                <div class="flex-shrink-0 border-bottom bg-body-tertiary px-3 pt-2">
+                    <ul class="nav nav-tabs nav-fill border-0 m-0" id="modalUsuarioTabs" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active fw-semibold" id="tab-acesso-btn" data-bs-toggle="tab" data-bs-target="#tab-acesso" type="button">
                                 <i class="fas fa-id-badge text-danger me-1"></i> Acesso &amp; Perfil
@@ -302,8 +346,11 @@
                             </button>
                         </li>
                     </ul>
+                </div>
 
-                    <div class="tab-content p-4" id="modalUsuarioTabsContent">
+                <!-- CORPO DO MODAL COM SCROLL SUAVE ATIVO -->
+                <div class="modal-body modal-usuario-body flex-grow-1 overflow-y-auto">
+                    <div class="tab-content" id="modalUsuarioTabsContent">
                         
                         <!-- ABA 1: ACESSO & FUNÇÃO -->
                         <div class="tab-pane fade show active" id="tab-acesso" role="tabpanel">
@@ -475,8 +522,8 @@
                     </div>
                 </div>
 
-                <div class="modal-footer bg-body-tertiary">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer bg-body-tertiary flex-shrink-0 py-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger px-4 fw-bold" id="btnSalvarUsuario">
                         <i class="fas fa-save me-1"></i> SALVAR USUÁRIO
                     </button>
