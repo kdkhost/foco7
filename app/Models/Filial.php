@@ -84,7 +84,7 @@ class Filial extends Model
     public function getRotaOsmUrlAttribute()
     {
         if (!empty($this->latitude) && !empty($this->longitude)) {
-            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}#map=17/{$this->latitude}/{$this->longitude}";
+            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&to={$this->latitude}%2C{$this->longitude}#map=17/{$this->latitude}/{$this->longitude}";
         }
 
         $destinoFormatado = urlencode("{$this->endereco}, {$this->bairro}, {$this->cidade} - {$this->estado}, Brasil");

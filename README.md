@@ -390,7 +390,7 @@ public_html/
 - **Regras Idênticas à Seção de Parceiros:** Se não houver filiais ativas no banco de dados, a seção completa, o item do menu desktop ("Onde Estamos"), o link do menu drawer Android e o link do rodapé são 100% ocultados automaticamente.
 - **OpenStreetMap Oficial com Leaflet.js (Zero Custo / Livre de Google Maps):** Renderização direta com tiles do OpenStreetMap (`tile.openstreetmap.org`), sem necessidade de faturamento, sem chave paga de API e sem cobranças por visualizações.
 - **Marcador Customizado com Efeito Pulso:** Pin estilizado com gradiente oficial da Foco 7 (`#d90000`) e animação de radar pulsante.
-- **Popups Informativos e Traçado de Rotas:** Ao clicar no marcador, o popup exibe foto da fachada, nome da filial, badge de Matriz/UF, endereço completo, horário de atendimento, telefone, botão de contato WhatsApp e botões para traçar rota no **OpenStreetMap Routing** (`https://www.openstreetmap.org/directions`) e em navegadores móveis (Waze/GPS).
+- **Popups Informativos e Traçado de Rotas:** Ao clicar no marcador, o popup exibe foto da fachada, nome da filial, badge de Matriz/UF, endereço completo, horário de atendimento, telefone, botão de contato WhatsApp e botões para traçar rota no **OpenStreetMap Routing** com preenchimento automático do destino exato via parâmetro oficial `to=` (`https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&to={lat}%2C{lng}`) e opção em navegadores móveis (Waze/GPS/Google Maps com endereço completo e CEP).
 - **Lista Lateral com Busca em Tempo Real:** Campo de pesquisa instantânea que filtra filiais por cidade, estado ou nome, contador dinâmico de unidades visíveis, botão para resetar a visão geral do Brasil e animação suave `flyTo` ao clicar no card de qualquer filial.
 
 ---

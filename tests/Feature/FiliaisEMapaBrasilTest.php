@@ -219,8 +219,9 @@ class FiliaisEMapaBrasilTest extends TestCase
             'ativo' => true,
         ]);
 
-        // Rota OpenStreetMap deve apontar para as coordenadas exatas
+        // Rota OpenStreetMap deve apontar para as coordenadas exatas com parametro to
         $this->assertStringContainsString('openstreetmap.org/directions', $filial->rota_osm_url);
+        $this->assertStringContainsString('to=-1.4502989%2C-48.4881242', $filial->rota_osm_url);
         $this->assertStringContainsString('-1.4502989', $filial->rota_osm_url);
         $this->assertStringContainsString('-48.4881242', $filial->rota_osm_url);
 

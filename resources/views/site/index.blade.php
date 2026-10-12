@@ -2799,7 +2799,7 @@
                         const icone = criarIconeFoco7(filial.destaque);
                         const marker = L.marker([lat, lng], { icon: icone }).addTo(map);
 
-                        const rotaOsmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C${lat}%2C${lng}#map=17/${lat}/${lng}`;
+                        const rotaOsmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&to=${lat}%2C${lng}#map=17/${lat}/${lng}`;
                         const enderecoCompleto = `${filial.endereco || ''}, ${filial.bairro ? filial.bairro + ', ' : ''}${filial.cidade} - ${filial.estado}${filial.cep ? ', ' + filial.cep : ''}`;
                         const rotaGoogleUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(enderecoCompleto)}`;
                         const rotaUrl = (filial.link_rota && !filial.link_rota.includes('-1.4557549')) ? filial.link_rota : rotaOsmUrl;
