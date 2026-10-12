@@ -23,6 +23,8 @@ class Fatura extends Model
         'valor',
         'taxa_repassada',
         'valor_original',
+        'valor_multa',
+        'valor_juros',
         'gateway',
         'metodo_pagamento',
         'gateway_transaction_id',
@@ -33,20 +35,29 @@ class Fatura extends Model
         'url_boleto',
         'link_pdf_carne',
         'status',
+        'ultimo_lembrete_enviado',
+        'data_ultimo_lembrete',
+        'total_lembretes_enviados',
         'data_vencimento',
         'data_pagamento',
         'webhook_payload',
+        'historico_cobranca',
     ];
 
     protected $casts = [
         'valor' => 'decimal:2',
         'taxa_repassada' => 'decimal:2',
         'valor_original' => 'decimal:2',
+        'valor_multa' => 'decimal:2',
+        'valor_juros' => 'decimal:2',
         'numero_parcela' => 'integer',
         'total_parcelas' => 'integer',
+        'total_lembretes_enviados' => 'integer',
         'data_vencimento' => 'date',
         'data_pagamento' => 'datetime',
+        'data_ultimo_lembrete' => 'datetime',
         'webhook_payload' => 'array',
+        'historico_cobranca' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -64,12 +75,70 @@ class Fatura extends Model
         return 'R$ ' . number_format($this->valor, 2, ',', '.');
     }
 
+    /**
+     * Retorna o valor total com eventuais encargos de multa e juros
+     */
+    public function getValorTotalComEncargosAttribute(): float
+    {
+        $base = (float) $this->valor;
+        $multa = (float) ($this->valor_multa ?? 0);
+        $juros = (float) ($this->valor_juros ?? 0);
+        return round($base + $multa + $juros, 2);
+    }
+
+    public function getValorTotalComEncargosFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format($this->valor_total_com_encargos, 2, ',', '.');
+    }
+
+    public function getMultaFormatadaAttribute(): string
+    {
+        return 'R$ ' . number_format($this->valor_multa ?? 0, 2, ',', '.');
+    }
+
+    public function getJurosFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format($this->valor_juros ?? 0, 2, ',', '.');
+    }
+
+    /**
+     * Retorna a quantidade de dias de atraso caso a fatura esteja vencida
+     */
+    public function getDiasAtrasoAttribute(): int
+    {
+        if (!$this->data_vencimento) {
+            return 0;
+        }
+
+        $hoje = now()->startOfDay();
+        $venc = $this->data_vencimento->startOfDay();
+
+        if ($hoje->greaterThan($venc)) {
+            return (int) $venc->diffInDays($hoje);
+        }
+
+        return 0;
+    }
+
+    public function isVencida(): bool
+    {
+        if ($this->status === 'pago' || $this->status === 'cancelado' || $this->status === 'estornado') {
+            return false;
+        }
+
+        return $this->status === 'vencida' || ($this->data_vencimento && $this->data_vencimento->isPast());
+    }
+
     public function getStatusBadgeAttribute(): string
     {
+        if ($this->isVencida() && $this->status !== 'cancelado') {
+            return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Vencida (' . $this->dias_atraso . 'd)</span>';
+        }
+
         return match ($this->status) {
             'pago' => '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Pago</span>',
-            'cancelado' => '<span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Cancelado</span>',
-            'estornado' => '<span class="badge bg-secondary text-white"><i class="fas fa-undo me-1"></i> Estornado</span>',
+            'cancelado' => '<span class="badge bg-secondary"><i class="fas fa-ban me-1"></i> Cancelado</span>',
+            'estornado' => '<span class="badge bg-dark text-white"><i class="fas fa-undo me-1"></i> Estornado</span>',
             default => '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Aguardando Pagamento</span>',
         };
     }

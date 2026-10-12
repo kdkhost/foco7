@@ -60,6 +60,16 @@ class CronJobsSeeder extends Seeder
                 'ativo' => true,
                 'sistema' => true,
             ],
+            [
+                'nome' => 'Régua de Cobrança Automatizada e Mensalidades',
+                'descricao' => 'Gera mensalidades com antecedência, envia 1º/2º/3º lembretes, cobrança no vencimento e avisos de atraso com juros e multa.',
+                'comando' => 'faturas:processar-regua',
+                'tipo' => 'artisan',
+                'expressao_cron' => '30 6 * * *',
+                'frequencia_descricao' => 'Diariamente às 06:30',
+                'ativo' => true,
+                'sistema' => true,
+            ],
         ];
 
         foreach ($padroes as $item) {

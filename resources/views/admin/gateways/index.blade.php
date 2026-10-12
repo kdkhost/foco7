@@ -29,6 +29,11 @@
                     <i class="fas fa-percentage text-primary me-2"></i> Gateway Padrão & Repasse de Taxas
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="regua-tab" data-bs-toggle="tab" data-bs-target="#tab-regua" type="button" role="tab">
+                    <i class="fas fa-clock-rotate-left text-danger me-2"></i> Régua de Cobrança & Mensalidades
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -707,6 +712,266 @@
                 </form>
             </div>
 
+            <!-- ===================================================================
+                 5. ABA RÉGUA DE COBRANÇA AUTOMATIZADA & MENSALIDADES RECORRENTES
+                 =================================================================== -->
+            <div class="tab-pane fade" id="tab-regua" role="tabpanel">
+                <form action="{{ route('admin.gateways.salvar') }}" method="POST" class="ajax-form">
+                    @csrf
+                    
+                    <!-- CABEÇALHO DO MÓDULO & CONTROLE MESTRE -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-clock-rotate-left me-2"></i> Régua de Cobrança Automatizada para Mensalidades</h6>
+                                <small class="text-body-secondary">Disparos preventivos pré-vencimento, cobrança no vencimento e régua de atrasos com cálculo automático de multa e juros de mora.</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="executarReguaCobrancaAgora()">
+                                    <i class="fas fa-play me-1"></i> Processar Régua Agora
+                                </button>
+                                <div class="form-check form-switch fs-5 mb-0">
+                                    <input class="form-check-input" type="checkbox" name="regua_cobranca_ativa" value="1" id="regua_cobranca_ativa" {{ $configs['regua_cobranca_ativa'] ? 'checked' : '' }}>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Geração Antecipada de Mensalidades Recorrentes (Dias Antes)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-plus text-danger"></i></span>
+                                        <input type="number" name="gerar_mensalidade_dias_antes" class="form-control" min="1" max="60" value="{{ $configs['gerar_mensalidade_dias_antes'] }}">
+                                        <span class="input-group-text">dias de antecedência</span>
+                                    </div>
+                                    <small class="text-body-secondary">Número de dias antes da data base do cliente para emitir a próxima fatura do ciclo mensal.</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Canal: E-mail Transacional</label>
+                                    <div class="form-check form-switch pt-2">
+                                        <input class="form-check-input" type="checkbox" name="regua_enviar_email" value="1" id="regua_enviar_email" {{ $configs['regua_enviar_email'] ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="regua_enviar_email">Disparar por E-mail</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Canal: WhatsApp</label>
+                                    <div class="form-check form-switch pt-2">
+                                        <input class="form-check-input" type="checkbox" name="regua_enviar_whatsapp" value="1" id="regua_enviar_whatsapp" {{ $configs['regua_enviar_whatsapp'] ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="regua_enviar_whatsapp">Habilitar WhatsApp</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ETAPA 1: LEMBRETES PRÉ-VENCIMENTO (PREVENTIVOS) -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3">
+                            <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-bell me-2"></i> Lembretes Pré-Vencimento (Preventivos)</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <!-- 1º LEMBRETE -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary">1º Lembrete</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_1_ativo" value="1" {{ $configs['regua_lembrete_1_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold">Dias Antes do Vencimento</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_lembrete_1_dias" class="form-control" min="1" max="30" value="{{ $configs['regua_lembrete_1_dias'] }}">
+                                            <span class="input-group-text">dias</span>
+                                        </div>
+                                        <small class="text-body-secondary d-block">Fatura disponível para pagamento antecipado.</small>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <span class="badge bg-light text-dark border"><i class="fas fa-envelope text-primary me-1"></i> cobranca_lembrete_1</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2º LEMBRETE -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-info text-dark">2º Lembrete</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_2_ativo" value="1" {{ $configs['regua_lembrete_2_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold">Dias Antes do Vencimento</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_lembrete_2_dias" class="form-control" min="1" max="30" value="{{ $configs['regua_lembrete_2_dias'] }}">
+                                            <span class="input-group-text">dias</span>
+                                        </div>
+                                        <small class="text-body-secondary d-block">Alerta de que faltam poucos dias.</small>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <span class="badge bg-light text-dark border"><i class="fas fa-envelope text-info me-1"></i> cobranca_lembrete_2</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3º LEMBRETE -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-body-tertiary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-warning text-dark">3º Lembrete (Véspera)</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_3_ativo" value="1" {{ $configs['regua_lembrete_3_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold">Dias Antes do Vencimento</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_lembrete_3_dias" class="form-control" min="1" max="10" value="{{ $configs['regua_lembrete_3_dias'] }}">
+                                            <span class="input-group-text">dia(s)</span>
+                                        </div>
+                                        <small class="text-body-secondary d-block">Aviso de que vence amanhã.</small>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <span class="badge bg-light text-dark border"><i class="fas fa-envelope text-warning me-1"></i> cobranca_lembrete_3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- COBRANÇA NO VENCIMENTO -->
+                            <div class="p-3 border rounded bg-light-subtle mt-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-danger me-2">Cobrança no Vencimento (D-0)</span>
+                                    <strong class="text-body">Disparar no Dia do Vencimento</strong>
+                                    <div class="small text-body-secondary mt-1">Notifica o cliente às 08:00 informando que a fatura vence hoje e orientando o pagamento via PIX para evitar juros.</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="badge bg-white text-dark border"><i class="fas fa-envelope text-danger me-1"></i> cobranca_vencimento_hoje</span>
+                                    <div class="form-check form-switch mb-0 fs-5">
+                                        <input class="form-check-input" type="checkbox" name="regua_vencimento_hoje_ativo" value="1" {{ $configs['regua_vencimento_hoje_ativo'] ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ETAPA 2: RÉGUA DE ATRASOS & ENCARGOS (MULTA E JUROS) -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Lembretes Pós-Vencimento (Atrasos & Multas)</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4 mb-4">
+                                <!-- 1º AVISO DE ATRASO -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-danger-subtle h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-danger">1º Aviso de Atraso</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_1_ativo" value="1" {{ $configs['regua_atraso_1_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold">Dias de Atraso</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_atraso_1_dias" class="form-control" min="1" max="15" value="{{ $configs['regua_atraso_1_dias'] }}">
+                                            <span class="input-group-text">dia(s)</span>
+                                        </div>
+                                        <small class="text-body-secondary d-block">Vencida ontem com cálculo inicial de multa.</small>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <span class="badge bg-white text-dark border"><i class="fas fa-envelope text-danger me-1"></i> cobranca_atraso_1</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2º AVISO DE ATRASO -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-danger-subtle h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-danger">2º Aviso de Atraso</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_2_ativo" value="1" {{ $configs['regua_atraso_2_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold">Dias de Atraso</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_atraso_2_dias" class="form-control" min="2" max="30" value="{{ $configs['regua_atraso_2_dias'] }}">
+                                            <span class="input-group-text">dias</span>
+                                        </div>
+                                        <small class="text-body-secondary d-block">Cobrança com multa + juros de mora.</small>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <span class="badge bg-white text-dark border"><i class="fas fa-envelope text-danger me-1"></i> cobranca_atraso_2</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3º AVISO DE ATRASO (SUSPENSÃO) -->
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-dark text-white h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-danger">3º Aviso & Suspensão</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_3_ativo" value="1" {{ $configs['regua_atraso_3_ativo'] ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                        <label class="form-label small fw-bold text-white">Dias de Atraso</label>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <input type="number" name="regua_atraso_3_dias" class="form-control" min="5" max="60" value="{{ $configs['regua_atraso_3_dias'] }}">
+                                            <span class="input-group-text">dias</span>
+                                        </div>
+                                        <small class="text-white-50 d-block">Alerta de corte de sinal e negativação SPC/Serasa.</small>
+                                        <div class="mt-2 pt-2 border-top border-secondary">
+                                            <span class="badge bg-secondary text-white"><i class="fas fa-envelope text-danger me-1"></i> cobranca_atraso_3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PARÂMETROS FINANCEIROS DE ENCARGOS -->
+                            <div class="p-3 border rounded bg-body-tertiary">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-coins text-warning me-2"></i> Configuração de Encargos por Inadimplência</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Multa por Atraso (%)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.1" name="regua_multa_percentual" class="form-control" value="{{ $configs['regua_multa_percentual'] }}">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <small class="text-body-secondary">Padrão legal CDC: 2,0%</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Juros de Mora ao Mês (%)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.1" name="regua_juros_mensal_percentual" class="form-control" value="{{ $configs['regua_juros_mensal_percentual'] }}">
+                                            <span class="input-group-text">% ao mês</span>
+                                        </div>
+                                        <small class="text-body-secondary">Padrão legal: 1,0% ao mês</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Juros Diários (%)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.001" name="regua_juros_diario_percentual" class="form-control" value="{{ $configs['regua_juros_diario_percentual'] }}">
+                                            <span class="input-group-text">% ao dia</span>
+                                        </div>
+                                        <small class="text-body-secondary">Cálculo proporcional diário</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Dias de Tolerância</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" name="regua_dias_tolerancia" class="form-control" min="0" max="10" value="{{ $configs['regua_dias_tolerancia'] }}">
+                                            <span class="input-group-text">dia(s)</span>
+                                        </div>
+                                        <small class="text-body-secondary">Prazo de carência antes dos juros</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DA RÉGUA DE COBRANÇA
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
@@ -810,5 +1075,68 @@
             }
         });
     });
+
+    // ========================================================
+    // DISPARO MANUAL DA RÉGUA DE COBRANÇA VIA AJAX COM SWEETALERT2
+    // ========================================================
+    function executarReguaCobrancaAgora() {
+        Swal.fire({
+            title: 'Processar Régua de Cobrança?',
+            text: 'O sistema irá emitir mensalidades antecipadas, disparar os 3 lembretes pré-vencimento, cobrança no vencimento e avisos de atraso com cálculo de multa e juros.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-play me-1"></i> Sim, processar agora!',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processando régua...',
+                    text: 'Aguarde a verificação de faturas e disparo das notificações.',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                $.ajax({
+                    url: '{{ route("admin.gateways.executar_regua") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function(res) {
+                        if (res.success) {
+                            var m = res.metricas || {};
+                            var preTotal = (m.lembretes_pre_1 || 0) + (m.lembretes_pre_2 || 0) + (m.lembretes_pre_3 || 0);
+                            var atrasoTotal = (m.atraso_1 || 0) + (m.atraso_2 || 0) + (m.atraso_3 || 0);
+
+                            var resumoHtml = '<div class="text-start small p-3 bg-body-tertiary rounded border mb-2">' +
+                                '<p class="mb-1"><strong><i class="fas fa-plus-circle text-primary me-1"></i> Mensalidades Recorrentes Geradas:</strong> ' + (m.mensalidades_geradas || 0) + '</p>' +
+                                '<p class="mb-1"><strong><i class="fas fa-bell text-info me-1"></i> Lembretes Preventivos Disparados:</strong> ' + preTotal + '</p>' +
+                                '<p class="mb-1"><strong><i class="fas fa-exclamation-circle text-danger me-1"></i> Vencimento Hoje (D-0):</strong> ' + (m.vencimento_hoje || 0) + '</p>' +
+                                '<p class="mb-1"><strong><i class="fas fa-triangle-exclamation text-warning me-1"></i> Avisos de Atraso Disparados:</strong> ' + atrasoTotal + '</p>' +
+                                '<p class="mb-0"><strong><i class="fas fa-calculator text-success me-1"></i> Faturas com Encargos Atualizados:</strong> ' + (m.faturas_atualizadas_encargos || 0) + '</p>' +
+                                '</div>';
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Régua Processada com Sucesso!',
+                                html: resumoHtml,
+                                confirmButtonColor: '#d90000',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Aviso', res.message, 'warning');
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao processar régua de cobrança.';
+                        Swal.fire('Erro', msg, 'error');
+                    }
+                });
+            }
+        });
+    }
 </script>
 @endsection

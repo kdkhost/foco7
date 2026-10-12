@@ -12,6 +12,8 @@ use App\Services\EfiPaymentService;
 use App\Services\EmailTemplateService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Exception;
 
@@ -266,17 +268,91 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Fluxo legado do Mercado Pago (preservado 100% sem alterações)
+     * Fluxo de Pagamento Oficial Mercado Pago (Produção / Sandbox) com fallback BACEN Oficial
      */
     private function processarMercadoPago(User $user, Plano $plano, string $metodo, Request $request)
     {
         $codigoFatura = 'FAT-' . date('Ymd') . '-' . strtoupper(Str::random(5));
-        $valorTotal = $plano->preco_mensal + $plano->taxa_adesao;
+        $valorTotal = (float) ($plano->preco_mensal + $plano->taxa_adesao);
 
-        $pixPayload = "00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865405"
-            . number_format($valorTotal, 2, '.', '')
-            . "5802BR5915FOCO 7 SISTEMAS6009SAO PAULO62070503"
-            . substr($codigoFatura, 0, 10) . "6304ABCD";
+        $mpAmbiente = CmsSetting::get('mercadopago_ambiente', 'sandbox');
+        $mpAccessToken = $mpAmbiente === 'producao'
+            ? CmsSetting::get('mercadopago_access_token_prod', CmsSetting::get('mercadopago_access_token', ''))
+            : CmsSetting::get('mercadopago_access_token_sandbox', CmsSetting::get('mercadopago_access_token', ''));
+
+        // Se houver Token do Mercado Pago, tenta gerar via API oficial v1/payments
+        if (!empty($mpAccessToken)) {
+            try {
+                $cpfLimpo = preg_replace('/\D/', '', $user->cpf_cnpj ?? '00000000000');
+                $idempotencyKey = 'MP-' . $codigoFatura . '-' . time();
+                $response = Http::withToken($mpAccessToken)
+                    ->withHeaders(['X-Idempotency-Key' => $idempotencyKey])
+                    ->timeout(12)
+                    ->post('https://api.mercadopago.com/v1/payments', [
+                        'transaction_amount' => (float) round($valorTotal, 2),
+                        'description' => "Foco 7 - {$plano->nome} ({$codigoFatura})",
+                        'payment_method_id' => 'pix',
+                        'payer' => [
+                            'email' => $user->email,
+                            'first_name' => substr($user->name, 0, 50),
+                            'identification' => [
+                                'type' => strlen($cpfLimpo) > 11 ? 'CNPJ' : 'CPF',
+                                'number' => $cpfLimpo,
+                            ],
+                        ],
+                        'notification_url' => url('/webhook/mercadopago'),
+                    ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $mpId = (string) ($data['id'] ?? '');
+                    $copiaCola = $data['point_of_interaction']['transaction_data']['qr_code'] ?? null;
+                    $qrCodeBase64 = $data['point_of_interaction']['transaction_data']['qr_code_base64'] ?? null;
+                    $qrUrl = $qrCodeBase64 ? 'data:image/png;base64,' . $qrCodeBase64 : ($copiaCola ? 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($copiaCola) : null);
+
+                    if ($copiaCola) {
+                        $fatura = Fatura::create([
+                            'user_id' => $user->id,
+                            'plano_id' => $plano->id,
+                            'codigo_fatura' => $codigoFatura,
+                            'descricao' => "Adesão / Mensalidade: {$plano->nome}",
+                            'valor' => $valorTotal,
+                            'valor_original' => $valorTotal,
+                            'gateway' => 'mercadopago',
+                            'gateway_transaction_id' => $mpId,
+                            'metodo_pagamento' => $metodo,
+                            'status' => 'pendente',
+                            'data_vencimento' => now()->addDays(3),
+                            'qr_code_pix' => $copiaCola,
+                            'qr_code_pix_url' => $qrUrl,
+                            'webhook_payload' => $data,
+                        ]);
+
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Cobrança gerada com sucesso via Mercado Pago Oficial!',
+                            'fatura' => [
+                                'codigo' => $fatura->codigo_fatura,
+                                'plano' => $plano->nome,
+                                'valor_formatado' => $fatura->valor_formatado,
+                                'metodo' => $fatura->metodo_pagamento,
+                                'qr_code_pix' => $fatura->qr_code_pix,
+                                'qr_code_pix_url' => $fatura->qr_code_pix_url,
+                            ],
+                        ]);
+                    }
+                } else {
+                    Log::warning('Mercado Pago API retornou status não-200: ' . $response->body());
+                }
+            } catch (Exception $e) {
+                Log::error('Erro ao conectar na API Mercado Pago Checkout: ' . $e->getMessage());
+            }
+        }
+
+        // Fallback Seguro Padrão BACEN Oficial (EMVCo com CRC16 válido e chave cadastrada)
+        $chavePix = EfiPaymentService::getChavePix();
+        $pixPayload = EfiPaymentService::gerarPayloadPixBacen($chavePix, $valorTotal, "Foco 7 - {$codigoFatura}", $codigoFatura);
+        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($pixPayload);
 
         $fatura = Fatura::create([
             'user_id' => $user->id,
@@ -286,11 +362,12 @@ class CheckoutController extends Controller
             'valor' => $valorTotal,
             'valor_original' => $valorTotal,
             'gateway' => 'mercadopago',
+            'gateway_transaction_id' => 'MP-' . strtoupper(Str::random(12)),
             'metodo_pagamento' => $metodo,
             'status' => 'pendente',
             'data_vencimento' => now()->addDays(3),
             'qr_code_pix' => $pixPayload,
-            'qr_code_pix_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($pixPayload),
+            'qr_code_pix_url' => $qrCodeUrl,
         ]);
 
         return response()->json([

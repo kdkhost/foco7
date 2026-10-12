@@ -37,8 +37,12 @@ class VerificarFaturasVencidas extends Command
         }
 
         $processadas = 0;
+        $params = \App\Services\ReguaCobrancaService::obterParametros();
         foreach ($faturas as $fatura) {
             $fatura->status = 'vencida';
+            $encargos = \App\Services\ReguaCobrancaService::calcularEncargos($fatura, $params);
+            $fatura->valor_multa = $encargos['valor_multa'];
+            $fatura->valor_juros = $encargos['valor_juros'];
             $fatura->save();
             $processadas++;
 
@@ -49,6 +53,10 @@ class VerificarFaturasVencidas extends Command
                     'fatura_id' => $fatura->codigo_fatura,
                     'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
                     'valor' => $fatura->valor_formatado,
+                    'valor_multa' => $fatura->multa_formatada,
+                    'valor_juros' => $fatura->juros_formatado,
+                    'valor_total' => 'R$ ' . number_format($encargos['valor_total'], 2, ',', '.'),
+                    'dias_atraso' => (string) $encargos['dias_atraso'],
                     'data_vencimento' => $fatura->data_vencimento ? $fatura->data_vencimento->format('d/m/Y') : '',
                     'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
                 ]);

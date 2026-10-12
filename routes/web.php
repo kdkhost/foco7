@@ -198,6 +198,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/excluir-template-email/{chave}', [GatewaysController::class, 'excluirEmailTemplate'])->name('admin.gateways.excluir_email_template');
         Route::post('/preview-email', [GatewaysController::class, 'previewEmail'])->name('admin.gateways.preview_email');
         Route::post('/executar-cron', [GatewaysController::class, 'executarCron'])->name('admin.gateways.executar_cron');
+        Route::post('/executar-regua', [GatewaysController::class, 'executarRegua'])->name('admin.gateways.executar_regua');
     });
 
     // Templates de E-mails Próprios (Páginas Dedicadas)

@@ -65,6 +65,59 @@ class EmailTemplateService
                 'corpo_padrao' => self::getTemplatePadraoRecuperacaoSenha(),
                 'sistema' => true,
             ],
+
+            // =========================================================================
+            // RÉGUA DE COBRANÇA AUTOMATIZADA: PRÉ E PÓS-VENCIMENTO (COM ENCARGOS)
+            // =========================================================================
+            'cobranca_lembrete_1' => [
+                'nome' => 'Régua: 1º Lembrete Preventivo (Fatura Disponível)',
+                'descricao' => 'Disparado com antecedência (ex: 10 dias antes) informando que a fatura foi gerada e está aberta para pagamento.',
+                'assunto_padrao' => '⏰ 1º Lembrete: Sua fatura Foco 7 está disponível (#{fatura_id})',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaLembrete1(),
+                'sistema' => true,
+            ],
+            'cobranca_lembrete_2' => [
+                'nome' => 'Régua: 2º Lembrete Preventivo (Vencimento Próximo)',
+                'descricao' => 'Disparado quando faltam poucos dias para o vencimento (ex: 5 dias antes).',
+                'assunto_padrao' => '🔔 2º Lembrete: Faltam poucos dias para o vencimento da sua fatura (#{fatura_id})',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaLembrete2(),
+                'sistema' => true,
+            ],
+            'cobranca_lembrete_3' => [
+                'nome' => 'Régua: 3º Lembrete Preventivo (Vence Amanhã)',
+                'descricao' => 'Disparado na véspera do vencimento (1 dia antes) para evitar atrasos e encargos.',
+                'assunto_padrao' => '⚡ Importante: Sua fatura Foco 7 vence amanhã (#{fatura_id})',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaLembrete3(),
+                'sistema' => true,
+            ],
+            'cobranca_vencimento_hoje' => [
+                'nome' => 'Régua: Cobrança no Vencimento (Vence Hoje)',
+                'descricao' => 'Disparado na data exata de vencimento da fatura (D-0) alertando para o pagamento até 23:59.',
+                'assunto_padrao' => '🚨 Atenção: Sua fatura Foco 7 vence HOJE (#{fatura_id})',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaVencimentoHoje(),
+                'sistema' => true,
+            ],
+            'cobranca_atraso_1' => [
+                'nome' => 'Régua: 1º Aviso de Atraso (Vencida Ontem)',
+                'descricao' => 'Disparado logo após o vencimento (ex: 1 dia de atraso) informando a incidência de multa.',
+                'assunto_padrao' => '⚠️ Aviso de Atraso: Fatura (#{fatura_id}) vencida ontem - Regularize seu acesso',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaAtraso1(),
+                'sistema' => true,
+            ],
+            'cobranca_atraso_2' => [
+                'nome' => 'Régua: 2º Aviso de Atraso (Multa e Juros Acumulados)',
+                'descricao' => 'Disparado com atraso intermediário (ex: 5 dias) com o valor recalculado com multa e juros de mora.',
+                'assunto_padrao' => '❗ 2º Aviso de Cobrança: Fatura (#{fatura_id}) em atraso com encargos',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaAtraso2(),
+                'sistema' => true,
+            ],
+            'cobranca_atraso_3' => [
+                'nome' => 'Régua: 3º Aviso de Atraso (Alerta de Suspensão de Sinal)',
+                'descricao' => 'Disparado em atraso avançado (ex: 10 dias) com alerta formal de corte de sinal do rastreador.',
+                'assunto_padrao' => '⛔ Notificação Urgente: Risco iminente de suspensão de sinal do rastreador (#{fatura_id})',
+                'corpo_padrao' => self::getTemplatePadraoCobrancaAtraso3(),
+                'sistema' => true,
+            ],
         ];
 
         // Mesclar com templates personalizados cadastrados
@@ -193,8 +246,13 @@ class EmailTemplateService
             'data_vencimento' => date('d/m/Y', strtotime('+5 days')),
             'link_fatura' => url('/cliente/faturas'),
             'link_carne' => url('/cliente/faturas'),
-            'pix_copia_cola' => '00020126580014br.gov.bcb.pix0136foco7-pix-demonstracao-2026520400005303986540589.905802BR5915FOCO 7 SISTEMAS6009BELEM62070503FAT6304ABCD',
+            'pix_copia_cola' => EfiPaymentService::gerarPayloadPixBacen(CmsSetting::get('chave_pix', 'financeiro@foco7.com.br'), 89.90, 'Foco 7 - Mensalidade', 'FAT20261009'),
             'codigo_barras' => '36490.00001 00000.000000 00000.000000 1 90000000008990',
+            'valor_multa' => 'R$ 1,80',
+            'valor_juros' => 'R$ 0,90',
+            'valor_total' => 'R$ 92,60',
+            'dias_atraso' => '5',
+            'dias_antecedencia' => '10',
             'nome_empresa' => CmsSetting::get('site_nome', 'Foco 7 - Rastreamento e Segurança'),
             'telefone_empresa' => CmsSetting::get('contato_telefone', '(91) 8051-0736'),
             'whatsapp_empresa' => CmsSetting::get('contato_whatsapp_formatado', '(91) 8051-0736'),
@@ -753,6 +811,261 @@ HTML;
 </div>
 
 <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-bottom: 0;">Se você não solicitou a alteração da sua senha, desconsidere este e-mail. Nenhuma ação será tomada e sua conta permanece totalmente protegida.</p>
+HTML;
+    }
+
+    // =========================================================================
+    // MÉTODOS HTML PADRÕES: RÉGUA DE COBRANÇA (PRÉ E PÓS-VENCIMENTO)
+    // =========================================================================
+
+    private static function getTemplatePadraoCobrancaLembrete1(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">1º LEMBRETE PREVENTIVO</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 20px;">Informamos com antecedência que a fatura referente à sua mensalidade <strong>{plano_nome}</strong> já foi emitida e está disponível para pagamento.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px 14px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase;">Fatura Número</td>
+                        <td style="padding: 6px 0; font-size: 14px; font-weight: 800; text-align: right; color: #0f172a;">#{fatura_id}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0 6px 0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase;">Data de Vencimento</td>
+                        <td style="padding: 8px 0 6px 0; font-size: 15px; font-weight: 800; text-align: right; color: #d90000;">{data_vencimento}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 24px; background-color: #ffffff; border-top: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 15px; font-weight: 800; color: #0f172a; vertical-align: middle;">Valor da Mensalidade:</td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="font-size: 22px; font-weight: 900; color: #d90000;">{valor}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Visualizar Fatura & Pagar Agora &rarr;</a>
+</div>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin-bottom: 0;">Você pode pagar com total comodidade via <strong>PIX</strong> (baixa instantânea em segundos), Cartão de Crédito ou Boleto.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaLembrete2(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #fef3c7; color: #b45309; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">2º LEMBRETE PREVENTIVO</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 20px;">Lembramos que a sua fatura da <strong>Foco 7 Rastreamento</strong> (#{fatura_id}) vencerá em breve, no dia <strong>{data_vencimento}</strong>.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; overflow: hidden;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 20px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 13px; font-weight: 600; color: #92400e; text-transform: uppercase;">Plano / Serviço:</td>
+                        <td style="font-size: 14px; font-weight: 800; text-align: right; color: #0f172a;">{plano_nome}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 8px; font-size: 13px; font-weight: 600; color: #92400e; text-transform: uppercase;">Vencimento:</td>
+                        <td style="padding-top: 8px; font-size: 15px; font-weight: 800; text-align: right; color: #b45309;">{data_vencimento}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 8px; font-size: 15px; font-weight: 800; color: #0f172a;">Valor:</td>
+                        <td style="padding-top: 8px; font-size: 22px; font-weight: 900; text-align: right; color: #d90000;">{valor}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Efetuar Pagamento &rarr;</a>
+</div>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin-bottom: 0;">Antecipe seu pagamento para evitar encargos e manter seu veículo sempre protegido com central 24h.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaLembrete3(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #ffedd5; color: #c2410c; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">VENCE AMANHÃ ⚡</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 20px;">Sua fatura <strong>#{fatura_id}</strong> referente à proteção do seu veículo vence <strong>amanhã ({data_vencimento})</strong>.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #fff7ed; border: 1px solid #fed7aa; border-radius: 16px; padding: 20px 24px; text-align: center;">
+    <p style="font-size: 13px; font-weight: 700; color: #9a3412; text-transform: uppercase; margin: 0 0 6px 0;">Valor a liquidar até amanhã</p>
+    <div style="font-size: 28px; font-weight: 900; color: #d90000; margin-bottom: 12px;">{valor}</div>
+    <p style="font-size: 13px; color: #475569; margin: 0;">Pague via PIX e garanta baixa imediata sem risco de cobrança de encargos de mora.</p>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Pagar Agora via PIX &rarr;</a>
+</div>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaVencimentoHoje(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #fee2e2; color: #b91c1c; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">VENCE HOJE 🚨</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Atenção, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 20px;">Sua fatura <strong>#{fatura_id}</strong> ({plano_nome}) vence <strong>hoje, dia {data_vencimento}</strong>.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 16px; padding: 22px 24px; text-align: center;">
+    <p style="font-size: 13px; font-weight: 700; color: #991b1b; text-transform: uppercase; margin: 0 0 4px 0;">Valor da Fatura com Vencimento Hoje</p>
+    <div style="font-size: 30px; font-weight: 900; color: #d90000; margin-bottom: 10px;">{valor}</div>
+    <p style="font-size: 13px; color: #7f1d1d; margin: 0;">Efetue o pagamento até às 23:59 para evitar a incidência de multa por atraso ({multa_percentual}%) e juros de mora.</p>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #990000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 16px 38px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.4); text-transform: uppercase;">Pagar Fatura Hoje &rarr;</a>
+</div>
+
+<p style="font-size: 12px; color: #64748b; text-align: center;">Caso já tenha efetuado o pagamento via PIX nos últimos minutos, por favor desconsidere este aviso.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaAtraso1(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #fee2e2; color: #b91c1c; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">FATURA VENCIDA (1º AVISO)</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Prezado(a) {cliente_nome},</h2>
+<p style="text-align: center; margin-bottom: 20px;">Identificamos que a fatura <strong>#{fatura_id}</strong>, com vencimento em <strong>{data_vencimento}</strong>, ainda não teve o pagamento confirmado em nosso sistema.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 18px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 13px; color: #64748b;">Valor Original:</td>
+                        <td style="font-size: 14px; font-weight: 700; text-align: right; color: #334155;">{valor_original}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 6px; font-size: 13px; color: #b91c1c;">Multa por Atraso ({multa_percentual}%):</td>
+                        <td style="padding-top: 6px; font-size: 14px; font-weight: 700; text-align: right; color: #b91c1c;">+ {multa}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 6px; font-size: 13px; color: #b91c1c;">Juros de Mora Acumulados:</td>
+                        <td style="padding-top: 6px; font-size: 14px; font-weight: 700; text-align: right; color: #b91c1c;">+ {juros}</td>
+                    </tr>
+                    <tr style="border-top: 1px dashed #cbd5e1;">
+                        <td style="padding-top: 12px; font-size: 15px; font-weight: 800; color: #0f172a;">Total Atualizado para Quitação:</td>
+                        <td style="padding-top: 12px; font-size: 22px; font-weight: 900; text-align: right; color: #d90000;">{valor_atualizado}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #b80000 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.35); text-transform: uppercase;">Regularizar Fatura via PIX &rarr;</a>
+</div>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin-bottom: 0;">Regularize hoje mesmo para evitar o bloqueio temporário do aplicativo e dos serviços de telemetria.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaAtraso2(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #fee2e2; color: #991b1b; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase;">2º AVISO DE COBRANÇA (EM ATRASO)</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center;">Olá, {cliente_nome}!</h2>
+<p style="text-align: center; margin-bottom: 20px;">Consta em nosso sistema que a fatura <strong>#{fatura_id}</strong> encontra-se com <strong>{dias_atraso} dias de atraso</strong> (vencimento original em {data_vencimento}).</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #fef2f2; border: 1.5px solid #f87171; border-radius: 16px; padding: 20px 24px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="font-size: 13px; color: #4b5563;">Valor Original:</td>
+            <td style="font-size: 14px; font-weight: 700; text-align: right; color: #111827;">{valor_original}</td>
+        </tr>
+        <tr>
+            <td style="padding-top: 6px; font-size: 13px; color: #991b1b;">Multa por Atraso ({multa_percentual}%):</td>
+            <td style="padding-top: 6px; font-size: 14px; font-weight: 700; text-align: right; color: #991b1b;">+ {multa}</td>
+        </tr>
+        <tr>
+            <td style="padding-top: 6px; font-size: 13px; color: #991b1b;">Juros de Mora ({dias_atraso} dias):</td>
+            <td style="padding-top: 6px; font-size: 14px; font-weight: 700; text-align: right; color: #991b1b;">+ {juros}</td>
+        </tr>
+        <tr style="border-top: 1.5px solid #fca5a5;">
+            <td style="padding-top: 12px; font-size: 15px; font-weight: 800; color: #0f172a;">Total Atualizado:</td>
+            <td style="padding-top: 12px; font-size: 24px; font-weight: 900; text-align: right; color: #d90000;">{valor_atualizado}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #d90000 0%, #7f1d1d 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 16px 38px; border-radius: 8px; box-shadow: 0 4px 15px rgba(217, 0, 0, 0.4); text-transform: uppercase;">Quitar Débito Agora &rarr;</a>
+</div>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin-bottom: 0;">Para dúvidas ou negociar o pagamento, nossa equipe está disponível no WhatsApp {whatsapp_empresa}.</p>
+HTML;
+    }
+
+    private static function getTemplatePadraoCobrancaAtraso3(): string
+    {
+        return <<<HTML
+<div style="text-align: center; margin-bottom: 20px;">
+    <span style="display: inline-block; background-color: #450a0a; color: #ffffff; font-size: 13px; font-weight: 800; padding: 6px 18px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;">ALERTA DE SUSPENSÃO DE SINAL ⛔</span>
+</div>
+
+<h2 style="font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 12px; text-align: center; color: #991b1b;">Notificação Formal de Inadimplência</h2>
+<p style="text-align: center; margin-bottom: 20px;">Prezado(a) <strong>{cliente_nome}</strong>, informamos que a fatura <strong>#{fatura_id}</strong> atingiu <strong>{dias_atraso} dias de inadimplência</strong>.</p>
+
+<div style="margin: 24px 0 28px 0; background-color: #fff1f2; border: 2px solid #e11d48; border-radius: 16px; padding: 22px 24px;">
+    <p style="font-size: 14px; font-weight: 800; color: #9f1239; margin: 0 0 8px 0; text-transform: uppercase;">Consequências Iminentes:</p>
+    <ul style="font-size: 13px; color: #881337; margin: 0 0 14px 0; padding-left: 20px; line-height: 1.6;">
+        <li>Bloqueio imediato do sinal de telemetria e rastreamento veicular;</li>
+        <li>Suspensão do atendimento da Ronda Tática Presencial 24h;</li>
+        <li>Inclusão do CPF/CNPJ nos órgãos de proteção ao crédito (SPC/Serasa).</li>
+    </ul>
+    <div style="border-top: 1px solid #fecdd3; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 14px; font-weight: 800; color: #0f172a;">Valor Total com Encargos:</span>
+        <span style="font-size: 24px; font-weight: 900; color: #be123c;">{valor_atualizado}</span>
+    </div>
+</div>
+
+<div class="btn-wrapper" style="text-align: center; margin: 26px 0 30px 0; width: 100%;">
+    <a href="{link_fatura}" class="btn-action" style="display: inline-block; background: linear-gradient(135deg, #be123c 0%, #881337 100%); color: #ffffff !important; text-decoration: none !important; font-size: 15px; font-weight: 800; padding: 16px 38px; border-radius: 8px; box-shadow: 0 4px 15px rgba(190, 18, 60, 0.4); text-transform: uppercase;">Evitar Suspensão - Pagar via PIX &rarr;</a>
+</div>
+
+<p style="font-size: 12px; color: #64748b; text-align: center; margin-bottom: 0;">Evite prejuízos e mantenha a proteção do seu patrimônio ativa.</p>
 HTML;
     }
 }

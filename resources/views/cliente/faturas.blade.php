@@ -101,6 +101,26 @@
                 <h4 id="modalFatValor" class="text-success fw-black mb-1">R$ 0,00</h4>
                 <div id="modalFatTaxaInfo" class="text-muted small mb-3 d-none"></div>
 
+                <!-- ENCARGOS SE HOUVER ATRASO -->
+                <div id="modalFatEncargosBox" class="p-2 mb-3 rounded bg-danger bg-opacity-10 border border-danger border-opacity-25 text-start d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Fatura Vencida</span>
+                        <span class="small text-danger fw-bold" id="modalFatDiasAtraso">0 dias de atraso</span>
+                    </div>
+                    <div class="small d-flex justify-content-between text-muted">
+                        <span>Multa por Atraso:</span>
+                        <span class="fw-semibold text-danger" id="modalFatMulta">R$ 0,00</span>
+                    </div>
+                    <div class="small d-flex justify-content-between text-muted">
+                        <span>Juros de Mora:</span>
+                        <span class="fw-semibold text-danger" id="modalFatJuros">R$ 0,00</span>
+                    </div>
+                    <div class="small d-flex justify-content-between text-dark fw-bold border-top mt-1 pt-1">
+                        <span>Total Atualizado:</span>
+                        <span class="text-danger" id="modalFatTotalEncargos">R$ 0,00</span>
+                    </div>
+                </div>
+
                 <!-- SE FOR CARNÊ -->
                 <div id="modalFatCarneBox" class="p-3 bg-success bg-opacity-10 rounded border border-success mb-3 d-none text-start">
                     <div class="d-flex justify-content-between align-items-center">
@@ -157,7 +177,19 @@
             if (res.success && res.fatura) {
                 var f = res.fatura;
                 $('#modalFatDesc').text(f.descricao);
-                $('#modalFatValor').text(f.valor_formatado);
+
+                // Encargos de Atraso
+                if (f.is_vencida || f.valor_multa > 0 || f.valor_juros > 0) {
+                    $('#modalFatEncargosBox').removeClass('d-none');
+                    $('#modalFatDiasAtraso').text(f.dias_atraso + ' dias de atraso');
+                    $('#modalFatMulta').text(f.multa_formatada || 'R$ 0,00');
+                    $('#modalFatJuros').text(f.juros_formatado || 'R$ 0,00');
+                    $('#modalFatTotalEncargos').text(f.valor_total_formatado || f.valor_formatado);
+                    $('#modalFatValor').text(f.valor_total_formatado || f.valor_formatado).addClass('text-danger').removeClass('text-success');
+                } else {
+                    $('#modalFatEncargosBox').addClass('d-none');
+                    $('#modalFatValor').text(f.valor_formatado).removeClass('text-danger').addClass('text-success');
+                }
 
                 // Taxa repassada
                 if (f.taxa_repassada > 0) {

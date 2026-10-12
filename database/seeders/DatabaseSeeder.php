@@ -12,6 +12,7 @@ use App\Models\Faq;
 use App\Models\Depoimento;
 use App\Models\SeoConfig;
 use App\Models\ServicoEstetica;
+use App\Services\EfiPaymentService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -398,6 +399,9 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
+            $chavePixProd = CmsSetting::get('chave_pix', 'financeiro@foco7.com.br');
+            $pixSeed = EfiPaymentService::gerarPayloadPixBacen($chavePixProd, 69.90, 'Foco 7 - FAT-2026-0001', 'FAT20260001');
+
             Fatura::firstOrCreate(
                 ['codigo_fatura' => 'FAT-2026-0001'],
                 [
@@ -406,12 +410,13 @@ class DatabaseSeeder extends Seeder
                     'codigo_fatura' => 'FAT-2026-0001',
                     'descricao' => 'Mensalidade Foco 7 - Plano Carro Protegido (Jeep Renegade)',
                     'valor' => 69.90,
-                    'gateway' => 'mercadopago',
+                    'valor_original' => 69.90,
+                    'gateway' => 'efi',
                     'metodo_pagamento' => 'pix',
                     'status' => 'pendente',
                     'data_vencimento' => date('Y-m-d', strtotime('+5 days')),
-                    'qr_code_pix' => '00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540569.905802BR5915FOCO 7 SISTEMAS6009SAO PAULO62070503***6304ABCD',
-                    'qr_code_pix_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=FOCO7PIXDEMO',
+                    'qr_code_pix' => $pixSeed,
+                    'qr_code_pix_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($pixSeed),
                 ]
             );
         }

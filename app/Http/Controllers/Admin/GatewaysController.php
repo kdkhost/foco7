@@ -10,6 +10,7 @@ use App\Models\Plano;
 use App\Models\Fatura;
 use App\Services\EmailTemplateService;
 use App\Services\EfiPaymentService;
+use App\Services\ReguaCobrancaService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
@@ -103,6 +104,31 @@ class GatewaysController extends Controller
             'carne_instrucoes' => CmsSetting::get('carne_instrucoes', 'Cobrança bancária emitida via Efí PRO para clientes Foco 7. Em caso de dúvidas, consulte nossa central pelo WhatsApp.'),
             'carne_envio_email' => CmsSetting::get('carne_envio_email', '1') == '1',
             'carne_envio_whatsapp' => CmsSetting::get('carne_envio_whatsapp', '1') == '1',
+
+            // ==========================================
+            // 4. RÉGUA DE COBRANÇA AUTOMATIZADA
+            // ==========================================
+            'regua_cobranca_ativa' => CmsSetting::get('regua_cobranca_ativa', '1') == '1',
+            'gerar_mensalidade_dias_antes' => CmsSetting::get('gerar_mensalidade_dias_antes', '15'),
+            'regua_lembrete_1_ativo' => CmsSetting::get('regua_lembrete_1_ativo', '1') == '1',
+            'regua_lembrete_1_dias' => CmsSetting::get('regua_lembrete_1_dias', '10'),
+            'regua_lembrete_2_ativo' => CmsSetting::get('regua_lembrete_2_ativo', '1') == '1',
+            'regua_lembrete_2_dias' => CmsSetting::get('regua_lembrete_2_dias', '5'),
+            'regua_lembrete_3_ativo' => CmsSetting::get('regua_lembrete_3_ativo', '1') == '1',
+            'regua_lembrete_3_dias' => CmsSetting::get('regua_lembrete_3_dias', '1'),
+            'regua_vencimento_hoje_ativo' => CmsSetting::get('regua_vencimento_hoje_ativo', '1') == '1',
+            'regua_atraso_1_ativo' => CmsSetting::get('regua_atraso_1_ativo', '1') == '1',
+            'regua_atraso_1_dias' => CmsSetting::get('regua_atraso_1_dias', '1'),
+            'regua_atraso_2_ativo' => CmsSetting::get('regua_atraso_2_ativo', '1') == '1',
+            'regua_atraso_2_dias' => CmsSetting::get('regua_atraso_2_dias', '5'),
+            'regua_atraso_3_ativo' => CmsSetting::get('regua_atraso_3_ativo', '1') == '1',
+            'regua_atraso_3_dias' => CmsSetting::get('regua_atraso_3_dias', '10'),
+            'regua_multa_percentual' => CmsSetting::get('regua_multa_percentual', '2.0'),
+            'regua_juros_mensal_percentual' => CmsSetting::get('regua_juros_mensal_percentual', '1.0'),
+            'regua_juros_diario_percentual' => CmsSetting::get('regua_juros_diario_percentual', '0.033'),
+            'regua_dias_tolerancia' => CmsSetting::get('regua_dias_tolerancia', '0'),
+            'regua_enviar_email' => CmsSetting::get('regua_enviar_email', '1') == '1',
+            'regua_enviar_whatsapp' => CmsSetting::get('regua_enviar_whatsapp', '0') == '1',
         ];
 
         // URLs Oficiais de Webhook
@@ -124,6 +150,13 @@ class GatewaysController extends Controller
         $cronStatus = [
             'comando_cpanel' => '* * * * * cd ' . base_path() . ' && php artisan schedule:run >> /dev/null 2>&1',
             'rotinas' => [
+                'regua_cobranca' => [
+                    'nome' => 'Régua de Cobrança & Mensalidades Recorrentes',
+                    'comando' => 'faturas:processar-regua',
+                    'frequencia' => 'Diário às 07:00 e 13:00',
+                    'descricao' => 'Gera mensalidades com antecedência, dispara 3 lembretes preventivos, cobrança no vencimento e 3 avisos de atraso com multa e juros.',
+                    'ultima_execucao' => CmsSetting::get('cron_last_run_regua_cobranca', 'Aguardando agendador'),
+                ],
                 'verificar_vencidas' => [
                     'nome' => 'Verificação de Faturas Vencidas',
                     'comando' => 'faturas:verificar-vencidas',
@@ -345,9 +378,94 @@ class GatewaysController extends Controller
         CmsSetting::set('carne_envio_email', $request->boolean('carne_envio_email') ? '1' : '0', 'gateways');
         CmsSetting::set('carne_envio_whatsapp', $request->boolean('carne_envio_whatsapp') ? '1' : '0', 'gateways');
 
+        // 5. RÉGUA DE COBRANÇA AUTOMATIZADA
+        $reguaAtiva = ($request->boolean('cobranca_regua_ativa') || $request->boolean('regua_cobranca_ativa')) ? '1' : '0';
+        CmsSetting::set('regua_cobranca_ativa', $reguaAtiva, 'financeiro');
+        CmsSetting::set('cobranca_regua_ativa', $reguaAtiva, 'gateways');
+
+        $diasAntecedencia = $request->input('cobranca_dias_antecedencia_fatura', $request->input('gerar_mensalidade_dias_antes', '10'));
+        CmsSetting::set('gerar_mensalidade_dias_antes', $diasAntecedencia, 'financeiro');
+        CmsSetting::set('cobranca_dias_antecedencia_fatura', $diasAntecedencia, 'gateways');
+
+        $lembrete1 = $request->input('cobranca_dias_lembrete_1', $request->input('regua_lembrete_1_dias', '10'));
+        CmsSetting::set('regua_lembrete_1_ativo', ($request->boolean('cobranca_lembrete_1_ativo') || $request->boolean('regua_lembrete_1_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_lembrete_1_dias', $lembrete1, 'financeiro');
+        CmsSetting::set('cobranca_dias_lembrete_1', $lembrete1, 'gateways');
+
+        $lembrete2 = $request->input('cobranca_dias_lembrete_2', $request->input('regua_lembrete_2_dias', '5'));
+        CmsSetting::set('regua_lembrete_2_ativo', ($request->boolean('cobranca_lembrete_2_ativo') || $request->boolean('regua_lembrete_2_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_lembrete_2_dias', $lembrete2, 'financeiro');
+        CmsSetting::set('cobranca_dias_lembrete_2', $lembrete2, 'gateways');
+
+        $lembrete3 = $request->input('cobranca_dias_lembrete_3', $request->input('regua_lembrete_3_dias', '1'));
+        CmsSetting::set('regua_lembrete_3_ativo', ($request->boolean('cobranca_lembrete_3_ativo') || $request->boolean('regua_lembrete_3_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_lembrete_3_dias', $lembrete3, 'financeiro');
+        CmsSetting::set('cobranca_dias_lembrete_3', $lembrete3, 'gateways');
+
+        CmsSetting::set('regua_vencimento_hoje_ativo', ($request->boolean('cobranca_vencimento_hoje_ativo') || $request->boolean('regua_vencimento_hoje_ativo', true)) ? '1' : '0', 'financeiro');
+
+        $atraso1 = $request->input('cobranca_dias_atraso_1', $request->input('regua_atraso_1_dias', '1'));
+        CmsSetting::set('regua_atraso_1_ativo', ($request->boolean('cobranca_atraso_1_ativo') || $request->boolean('regua_atraso_1_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_atraso_1_dias', $atraso1, 'financeiro');
+        CmsSetting::set('cobranca_dias_atraso_1', $atraso1, 'gateways');
+
+        $atraso2 = $request->input('cobranca_dias_atraso_2', $request->input('regua_atraso_2_dias', '5'));
+        CmsSetting::set('regua_atraso_2_ativo', ($request->boolean('cobranca_atraso_2_ativo') || $request->boolean('regua_atraso_2_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_atraso_2_dias', $atraso2, 'financeiro');
+        CmsSetting::set('cobranca_dias_atraso_2', $atraso2, 'gateways');
+
+        $atraso3 = $request->input('cobranca_dias_atraso_3', $request->input('regua_atraso_3_dias', '10'));
+        CmsSetting::set('regua_atraso_3_ativo', ($request->boolean('cobranca_atraso_3_ativo') || $request->boolean('regua_atraso_3_ativo', true)) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_atraso_3_dias', $atraso3, 'financeiro');
+        CmsSetting::set('cobranca_dias_atraso_3', $atraso3, 'gateways');
+
+        $multa = $request->input('cobranca_multa_percentual', $request->input('regua_multa_percentual', '2.0'));
+        CmsSetting::set('regua_multa_percentual', $multa, 'financeiro');
+        CmsSetting::set('cobranca_multa_percentual', $multa, 'gateways');
+
+        $juros = $request->input('cobranca_juros_mensal_percentual', $request->input('regua_juros_mensal_percentual', '1.0'));
+        CmsSetting::set('regua_juros_mensal_percentual', $juros, 'financeiro');
+        CmsSetting::set('cobranca_juros_mensal_percentual', $juros, 'gateways');
+
+        if ($request->filled('cobranca_bloquear_rastreador_apos_dias')) {
+            CmsSetting::set('cobranca_bloquear_rastreador_apos_dias', $request->input('cobranca_bloquear_rastreador_apos_dias'), 'gateways');
+        }
+
+        CmsSetting::set('regua_juros_diario_percentual', $request->input('regua_juros_diario_percentual', round(((float)$juros) / 30, 4) ?: '0.033'), 'financeiro');
+        CmsSetting::set('regua_dias_tolerancia', $request->input('regua_dias_tolerancia', '0'), 'financeiro');
+        CmsSetting::set('regua_enviar_email', $request->boolean('regua_enviar_email', true) ? '1' : '0', 'financeiro');
+        CmsSetting::set('regua_enviar_whatsapp', $request->boolean('regua_enviar_whatsapp') ? '1' : '0', 'financeiro');
+
         return response()->json([
             'success' => true,
-            'message' => 'Configurações do Portal de Pagamentos e Repasse de Taxas salvas com sucesso!',
+            'message' => 'Configurações de Pagamento, Carnês e Régua de Cobrança salvas com sucesso!',
+        ]);
+    }
+
+    /**
+     * Executa a régua de cobrança imediatamente sob demanda via AJAX
+     */
+    public function executarRegua(Request $request)
+    {
+        $resultado = ReguaCobrancaService::processarFila();
+
+        return response()->json([
+            'success' => $resultado['sucesso'] ?? true,
+            'message' => $resultado['mensagem'] ?? 'Régua de cobrança processada com sucesso.',
+            'detalhes' => [
+                'geradas' => $resultado['mensalidades_geradas'] ?? 0,
+                'fila' => [
+                    'lembrete_1' => $resultado['lembrete_1'] ?? 0,
+                    'lembrete_2' => $resultado['lembrete_2'] ?? 0,
+                    'lembrete_3' => $resultado['lembrete_3'] ?? 0,
+                    'vencimento_hoje' => $resultado['vencimento_hoje'] ?? 0,
+                    'atraso_1' => $resultado['atraso_1'] ?? 0,
+                    'atraso_2' => $resultado['atraso_2'] ?? 0,
+                    'atraso_3' => $resultado['atraso_3'] ?? 0,
+                    'total_processados' => $resultado['total_processados'] ?? 0,
+                ],
+            ],
+            'metricas' => $resultado['metricas'] ?? [],
         ]);
     }
 

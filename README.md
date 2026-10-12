@@ -314,11 +314,55 @@ public_html/
 
 ---
 
+## 💳 Módulo 30: Modo Produção Real & Régua de Cobrança Automatizada (Pré e Pós-Vencimento)
+
+### 1. Transição Total para Modo Produção Real (Zero Resíduos de Teste)
+- **Eliminação de Mockups & Payloads Fictícios:**
+  - Remoção de qualquer chave PIX demo ou CRC mockado (`FOCO7PIXDEMO`, `6304ABCD`, UUIDs arbitrários).
+  - Emissão de QR Code PIX e Copia e Cola 100% no padrão oficial EMVCo do Banco Central do Brasil com cálculo dinâmico de CRC-16 CCITT válido e chave oficial cadastrada (`EfiPaymentService::gerarPayloadPixBacen`).
+  - Integração nativa de Produção / Sandbox no Mercado Pago via API oficial (`/v1/payments`) com cabeçalho de idempotência e fallback dinâmico BACEN em caso de ausência de credencial de API.
+  - Sanitização de faturas seed e dados demonstrativos com payloads reais.
+  - Modal de pagamento do cliente (`/cliente/faturas`) atualizada para exibir o demonstrativo de encargos discriminado (multa contratual, juros diários de mora e total atualizado).
+
+### 2. Régua de Cobrança Automatizada em 7 Etapas (Pré e Pós-Vencimento)
+- **Geração Antecipada de Mensalidades Recorrentes:**
+  - Emissão automática de novas faturas mensais com antecedência de **X dias** (configurável no painel administrativo, padrão de 10 a 15 dias) para clientes com planos ativos sem fatura futura em aberto.
+  - Prevenção de duplicidade: garante uma única fatura mensal por ciclo de competência.
+- **Esteira Pré-Vencimento (Preventiva):**
+  - **1º Lembrete Preventivo (D - X dias, padrão 10 dias):** Fatura disponibilizada para pagamento e aviso de vencimento próximo.
+  - **2º Lembrete Preventivo (D - Y dias, padrão 5 dias):** Notificação de vencimento se aproximando com código PIX rápido.
+  - **3º Lembrete Preventivo (D - Z dias / Véspera, padrão 1 dia):** Alerta de que a mensalidade vence amanhã.
+  - **Cobrança no Vencimento (D - 0 / Vence Hoje):** Aviso no próprio dia informando que a fatura vence hoje e prevenindo a incidência de encargos.
+- **Esteira Pós-Vencimento com Encargos Legais:**
+  - **1º Aviso de Atraso (D + A dias, padrão 1 dia de atraso):** Comunicação de vencimento expirado com aplicação de multa moratória legal de 2% (Art. 52 § 1º do Código de Defesa do Consumidor).
+  - **2º Aviso de Atraso (D + B dias, padrão 5 dias de atraso):** Encargos recalculados diariamente com juros de mora legais (1% ao mês / 0,033% ao dia) e link direto para quitação.
+  - **3º Aviso de Atraso (D + C dias, padrão 10 dias de atraso):** Notificação severa com aviso prévio de suspensão de sinal do rastreador veicular e negativação de crédito.
+
+### 3. Templates de E-mail Oficiais Registrados
+- Templates responsivos encapsulados no layout corporativo da Foco 7:
+  - `cobranca_lembrete_1` (1º Lembrete Preventivo - Fatura Disponível)
+  - `cobranca_lembrete_2` (2º Lembrete Preventivo - Vencimento Próximo)
+  - `cobranca_lembrete_3` (3º Lembrete Preventivo - Vence Amanhã)
+  - `cobranca_vencimento_hoje` (Cobrança no Dia do Vencimento - Vence Hoje)
+  - `cobranca_atraso_1` (1º Aviso de Atraso - Fatura Vencida com Multa Inicial)
+  - `cobranca_atraso_2` (2º Aviso de Atraso - Juros de Mora Diários)
+  - `cobranca_atraso_3` (3º Aviso de Atraso - Alerta de Suspensão de Sinal e Bloqueio)
+
+### 4. Painel Administrativo (`/admin/gateways` - Aba "Régua de Cobrança & Mensalidades")
+- Chave geral liga/desliga da régua de cobrança.
+- Inputs configuráveis para dias de antecedência de emissão de mensalidade.
+- Switches e inputs de dias para cada uma das 7 etapas da régua.
+- Parametrização financeira de Multa (%) e Juros de Mora Mensal (%).
+- Botão interativo **"Processar Régua Agora"** via AJAX com SweetAlert2 para execução imediata e feedback de métricas em tempo real.
+- Comando Artisan integrado à central de tarefas Cron: `php artisan faturas:processar-regua`.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **93 testes executados, 93 aprovados (100% de sucesso), 419 asserções**.
-- Cobertura de rotas públicas, moderação de depoimentos, bloqueio geográfico de países fora das Américas, liberação de países americanos, bypass por whitelist de IP, rotas de webhook isentas de bloqueio geográfico, CRUD e toggle de parceiros via AJAX, carrossel infinito de parceiros, moderação de depoimentos com toggle AJAX e exclusão SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
+- **104 testes executados, 104 aprovados (100% de sucesso), 487 asserções**.
+- Cobertura completa: Régua de cobrança pré e pós-vencimento com cálculo de multa (2%) e juros de mora diários, geração antecipada de mensalidades recorrentes, prevenção de duplicidade de disparos, endpoint AJAX de execução imediata da régua, persistência de parâmetros no painel admin, modal de faturas do cliente sem resíduos de teste, rotas públicas, moderação de depoimentos, bloqueio geográfico de países fora das Américas, liberação de países americanos, bypass por whitelist de IP, rotas de webhook isentas de bloqueio geográfico, CRUD e toggle de parceiros via AJAX, carrossel infinito de parceiros, moderação de depoimentos com toggle AJAX e exclusão SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
 
