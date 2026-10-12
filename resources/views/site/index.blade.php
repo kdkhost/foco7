@@ -320,18 +320,17 @@
                 @forelse($slides as $index => $slide)
                 @php
                     $slideImg = '';
-                    $cleanPath = !empty($slide->imagem) ? (parse_url($slide->imagem, PHP_URL_PATH) ?: $slide->imagem) : '';
-                    if (!empty($slide->imagem) && !str_contains($slide->imagem, 'hero-banner-') && file_exists(public_path(ltrim($cleanPath, '/')))) {
+                    if (!empty($slide->imagem)) {
                         $slideImg = asset($slide->imagem);
                     } elseif (!empty($heroBgImagem)) {
                         $slideImg = $heroBgImagem;
+                    } else {
+                        $slideImg = asset('/img/manutencao-bg.jpg');
                     }
                 @endphp
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                    @if(!empty($slideImg))
-                        <!-- Imagem de fundo em tela cheia (100% de ponta a ponta sem corte) -->
-                        <div class="hero-slide-bg" style="background-image: url('{{ $slideImg }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
-                    @endif
+                    <!-- Imagem de fundo em tela cheia (100% de ponta a ponta sem corte) -->
+                    <div class="hero-slide-bg" style="background-image: url('{{ $slideImg }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
                     <!-- Película degradê profissional em tela cheia para contraste cinematográfico -->
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
 
@@ -412,9 +411,7 @@
                 </div>
                 @empty
                 <div class="carousel-item active">
-                    @if(!empty($heroBgImagem))
-                        <div class="hero-slide-bg" style="background-image: url('{{ $heroBgImagem }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
-                    @endif
+                    <div class="hero-slide-bg" style="background-image: url('{{ !empty($heroBgImagem) ? $heroBgImagem : asset('/img/manutencao-bg.jpg') }}'); {{ $heroBlur > 0 ? "filter: blur({$heroBlur}px); transform: scale(1.05);" : '' }}"></div>
                     <div class="hero-slide-overlay hero-bg-overlay" style="background: linear-gradient(90deg, {{ $heroOverlayCor }}f5 0%, {{ $heroOverlayCor }}d9 45%, {{ $heroOverlayCor }}8c 75%, {{ $heroOverlayCor }}33 100%); opacity: {{ $heroOpacidadeDecimal }};"></div>
                     <div class="hero-slide-content">
                         <div class="container position-relative">
@@ -811,7 +808,7 @@
                         @php
                             $appMockupImg = !empty($configs['secao_app_mockup_imagem']) ? $configs['secao_app_mockup_imagem'] : '/img/app-mockup-foco7.jpg';
                         @endphp
-                        <img src="{{ asset($appMockupImg) }}" alt="{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Foco 7' }}" class="img-fluid rounded-4 mb-3 shadow-lg" style="max-height: 380px; object-fit: contain;">
+                        <img src="{{ asset($appMockupImg) }}" alt="{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Foco 7' }}" class="img-fluid rounded-4 mb-3 shadow-lg" style="max-height: 380px; object-fit: contain;" onerror="this.onerror=null; this.src='{{ asset('/img/app-mockup-foco7.jpg') }}';">
                         <h4 class="fw-bold mt-4" style="color: var(--foco-title);">{{ $configs['secao_app_card_titulo'] ?? 'Aplicativo Oficial Foco 7' }}</h4>
                         <p class="text-secondary small">{{ $configs['secao_app_card_subtitulo'] ?? 'Baixe gratuitamente na App Store e Google Play Store' }}</p>
                         <div class="d-flex justify-content-center gap-3 mt-3">

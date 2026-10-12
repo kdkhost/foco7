@@ -99,7 +99,16 @@ class DepoimentosController extends Controller
             $file = $request->file('foto_upload');
             $fileName = 'depoimento_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadPath, $fileName);
+
+            $storageDir = storage_path('app/public/uploads/depoimentos');
+            if (!File::isDirectory($storageDir)) {
+                File::makeDirectory($storageDir, 0755, true, true);
+            }
+            @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
+
             $validated['foto'] = '/uploads/depoimentos/' . $fileName;
+        } elseif ($request->boolean('remover_foto_upload') || $request->boolean('remover_foto')) {
+            $validated['foto'] = null;
         }
 
         if ($id) {
@@ -115,6 +124,7 @@ class DepoimentosController extends Controller
             'success' => true,
             'message' => $msg,
             'depoimento' => $depoimento,
+            'reload' => true,
         ]);
     }
 

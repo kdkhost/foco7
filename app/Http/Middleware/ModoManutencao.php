@@ -23,6 +23,8 @@ class ModoManutencao
             $request->is('webhook*') ||
             $request->is('manutencao') ||
             $request->is('manutencao/bypass*') ||
+            $request->is('uploads*') ||
+            $request->is('storage*') ||
             $request->is('up')
         ) {
             return $next($request);

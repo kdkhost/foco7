@@ -40,16 +40,44 @@ class CmsController extends Controller
 
         // Upload de Imagem de Fundo do Hero se enviada
         if ($request->hasFile('hero_bg_upload')) {
-            $path = $request->file('hero_bg_upload')->store('uploads/banners', 'public');
-            $dados['hero_bg_imagem'] = '/storage/' . $path;
+            $file = $request->file('hero_bg_upload');
+            $uploadPath = public_path('uploads/banners');
+            if (!\Illuminate\Support\Facades\File::isDirectory($uploadPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($uploadPath, 0755, true, true);
+            }
+            $fileName = 'hero_bg_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $fileName);
+
+            // Espelha para storage/app/public/uploads/banners para garantir qualquer link existente
+            $storageDir = storage_path('app/public/uploads/banners');
+            if (!\Illuminate\Support\Facades\File::isDirectory($storageDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($storageDir, 0755, true, true);
+            }
+            @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
+
+            $dados['hero_bg_imagem'] = '/uploads/banners/' . $fileName;
         } elseif ($request->boolean('remover_hero_bg')) {
             $dados['hero_bg_imagem'] = '';
         }
 
         // Upload de Mockup / Imagem da Seção do Aplicativo se enviado
         if ($request->hasFile('app_mockup_upload')) {
-            $path = $request->file('app_mockup_upload')->store('uploads/app', 'public');
-            $dados['secao_app_mockup_imagem'] = '/storage/' . $path;
+            $file = $request->file('app_mockup_upload');
+            $uploadPath = public_path('uploads/app');
+            if (!\Illuminate\Support\Facades\File::isDirectory($uploadPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($uploadPath, 0755, true, true);
+            }
+            $fileName = 'app_mockup_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $fileName);
+
+            // Espelha para storage/app/public/uploads/app
+            $storageDir = storage_path('app/public/uploads/app');
+            if (!\Illuminate\Support\Facades\File::isDirectory($storageDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($storageDir, 0755, true, true);
+            }
+            @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
+
+            $dados['secao_app_mockup_imagem'] = '/uploads/app/' . $fileName;
         } elseif ($request->boolean('remover_app_mockup') || $request->boolean('remover_app_mockup_upload')) {
             $dados['secao_app_mockup_imagem'] = '';
         }
@@ -89,8 +117,22 @@ class CmsController extends Controller
         ]);
 
         if ($request->hasFile('imagem_upload')) {
-            $path = $request->file('imagem_upload')->store('uploads/banners', 'public');
-            $validated['imagem'] = '/storage/' . $path;
+            $file = $request->file('imagem_upload');
+            $uploadPath = public_path('uploads/banners');
+            if (!\Illuminate\Support\Facades\File::isDirectory($uploadPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($uploadPath, 0755, true, true);
+            }
+            $fileName = 'banner_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $fileName);
+
+            // Espelha para storage/app/public/uploads/banners
+            $storageDir = storage_path('app/public/uploads/banners');
+            if (!\Illuminate\Support\Facades\File::isDirectory($storageDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($storageDir, 0755, true, true);
+            }
+            @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
+
+            $validated['imagem'] = '/uploads/banners/' . $fileName;
         }
 
         $id = $request->input('banner_id');

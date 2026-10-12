@@ -145,7 +145,10 @@
                                     <tr id="dep-row-{{ $dep->id }}" class="{{ !$dep->ativo ? 'bg-warning bg-opacity-10' : '' }}">
                                         <td>
                                             @if($dep->foto)
-                                                <img src="{{ asset($dep->foto) }}" alt="{{ $dep->nome_cliente }}" class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;">
+                                                <img src="{{ asset($dep->foto) }}" alt="{{ $dep->nome_cliente }}" class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
+                                                <div class="bg-secondary bg-opacity-25 text-body fw-bold rounded-circle d-none align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                                    {{ substr($dep->nome_cliente, 0, 1) }}
+                                                </div>
                                             @else
                                                 <div class="bg-secondary bg-opacity-25 text-body fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
                                                     {{ substr($dep->nome_cliente, 0, 1) }}

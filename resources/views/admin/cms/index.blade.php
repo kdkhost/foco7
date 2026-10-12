@@ -1348,7 +1348,7 @@
                 <h5 class="modal-title fw-bold" id="modalDepoimentoTitulo">Depoimento de Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.cms.salvar_depoimento') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formDepoimento">
+            <form action="{{ route('admin.depoimentos.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formDepoimento">
                 @csrf
                 <input type="hidden" name="depoimento_id" id="depoimento_id">
                 <div class="modal-body p-4">

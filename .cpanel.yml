@@ -2,6 +2,9 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/fococomb/public_html/
-    - /bin/rsync -av --exclude='.git' --exclude='.env' --exclude='storage/logs/*.log' ./ $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/public/uploads/banners $DEPLOYPATH/public/uploads/depoimentos $DEPLOYPATH/public/uploads/app $DEPLOYPATH/public/uploads/manutencao $DEPLOYPATH/public/uploads/branding $DEPLOYPATH/public/uploads/parceiros $DEPLOYPATH/public/uploads/estetica $DEPLOYPATH/public/uploads/avatares
+    - /bin/mkdir -p $DEPLOYPATH/storage/app/public/uploads
+    - /bin/rsync -av --exclude='.git' --exclude='.env' --exclude='storage/logs/*.log' --exclude='public/uploads/*' --exclude='storage/app/public/*' ./ $DEPLOYPATH
+    - /bin/chmod -R 775 $DEPLOYPATH/public/uploads $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache
     - /bin/chmod -R 755 $DEPLOYPATH/public
-    - /bin/chmod -R 775 $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache
+    - cd $DEPLOYPATH && php artisan storage:link || true

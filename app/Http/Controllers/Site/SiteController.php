@@ -610,4 +610,97 @@ class SiteController extends Controller
 
         return response()->view('site.manutencao', $dadosManutencao, 200);
     }
+
+    /**
+     * Rota de contingência para servir arquivos de upload sem quebrar imagens em servidores cPanel/LiteSpeed
+     */
+    public function servirMidiaUpload(string $path)
+    {
+        $cleanPath = ltrim(str_replace(['../', '..\\'], '', $path), '/\\');
+
+        $candidatos = [
+            public_path('uploads/' . $cleanPath),
+            public_path($cleanPath),
+            storage_path('app/public/uploads/' . $cleanPath),
+            storage_path('app/public/' . $cleanPath),
+            base_path('public/uploads/' . $cleanPath),
+            base_path('uploads/' . $cleanPath),
+        ];
+
+        foreach ($candidatos as $arquivo) {
+            if (file_exists($arquivo) && is_file($arquivo)) {
+                $mime = @mime_content_type($arquivo) ?: 'application/octet-stream';
+                return response()->file($arquivo, [
+                    'Content-Type' => $mime,
+                    'Cache-Control' => 'public, max-age=31536000',
+                ]);
+            }
+        }
+
+        return $this->gerarImagemFallback($cleanPath);
+    }
+
+    /**
+     * Rota de contingência para servir arquivos da pasta storage sem depender do symlink
+     */
+    public function servirMidiaStorage(string $path)
+    {
+        $cleanPath = ltrim(str_replace(['../', '..\\'], '', $path), '/\\');
+
+        $candidatos = [
+            storage_path('app/public/' . $cleanPath),
+            public_path('storage/' . $cleanPath),
+            public_path('uploads/' . $cleanPath),
+            public_path($cleanPath),
+            base_path('storage/app/public/' . $cleanPath),
+        ];
+
+        foreach ($candidatos as $arquivo) {
+            if (file_exists($arquivo) && is_file($arquivo)) {
+                $mime = @mime_content_type($arquivo) ?: 'application/octet-stream';
+                return response()->file($arquivo, [
+                    'Content-Type' => $mime,
+                    'Cache-Control' => 'public, max-age=31536000',
+                ]);
+            }
+        }
+
+        return $this->gerarImagemFallback($cleanPath);
+    }
+
+    /**
+     * Gera fallback visual limpo para evitar espaços com ícone de imagem quebrada no navegador
+     */
+    protected function gerarImagemFallback(string $path)
+    {
+        // Se for imagem de avatar ou depoimento: retorna avatar SVG com silhueta moderna
+        if (str_contains($path, 'depoimento') || str_contains($path, 'avatar')) {
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">'
+                 . '<circle cx="50" cy="50" r="50" fill="#2d3748"/>'
+                 . '<circle cx="50" cy="38" r="18" fill="#a0aec0"/>'
+                 . '<path d="M 22 84 C 22 64, 34 58, 50 58 C 66 58, 78 64, 78 84 Z" fill="#a0aec0"/>'
+                 . '</svg>';
+            return response($svg, 200)->header('Content-Type', 'image/svg+xml')->header('Cache-Control', 'public, max-age=86400');
+        }
+
+        // Se for banner ou hero: retorna o wallpaper de alta definição do sistema se existir
+        if (str_contains($path, 'banner') || str_contains($path, 'hero')) {
+            $bgHeroPadrao = public_path('img/manutencao-bg.jpg');
+            if (file_exists($bgHeroPadrao)) {
+                return response()->file($bgHeroPadrao, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'public, max-age=86400']);
+            }
+        }
+
+        // Se for mockup do aplicativo: retorna a imagem padrão do app se existir
+        if (str_contains($path, 'app') || str_contains($path, 'mockup')) {
+            $appMockup = public_path('img/app-mockup-foco7.jpg');
+            if (file_exists($appMockup)) {
+                return response()->file($appMockup, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'public, max-age=86400']);
+            }
+        }
+
+        // Fallback universal: pixel PNG 1x1 transparente (impede ícone de imagem quebrada)
+        $pngTransparente = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+        return response($pngTransparente, 200)->header('Content-Type', 'image/png')->header('Cache-Control', 'public, max-age=86400');
+    }
 }

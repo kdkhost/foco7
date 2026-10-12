@@ -42,6 +42,8 @@ Route::get('/manutencao/bypass/{token}', [SiteController::class, 'bypassManutenc
 Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
 Route::get('/checkout/calcular-taxas', [CheckoutController::class, 'calcularTaxas'])->name('checkout.calcular_taxas');
 Route::get('/faturas/carne/{codigo}/pdf', [CheckoutController::class, 'downloadCarnePdf'])->name('faturas.carne.pdf');
+Route::get('/uploads/{path}', [SiteController::class, 'servirMidiaUpload'])->where('path', '.*')->name('midia.uploads');
+Route::get('/storage/{path}', [SiteController::class, 'servirMidiaStorage'])->where('path', '.*')->name('midia.storage');
 
 /*
 |--------------------------------------------------------------------------
