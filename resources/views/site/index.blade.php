@@ -435,7 +435,7 @@
             </div>
 
             @if($slides->count() > 1)
-            <div class="container position-relative hero-nav-container">
+            <div class="container hero-nav-container">
                 <div class="hero-carousel-nav">
                     <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide Anterior" title="Slide Anterior">
                         <i class="fas fa-chevron-left"></i>
