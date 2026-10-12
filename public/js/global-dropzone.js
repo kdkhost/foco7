@@ -117,21 +117,46 @@
                     $container.find('input[name^="remover_"]').remove();
                     $container.append(`<input type="hidden" name="remover_${inputName}" value="1">`);
 
+                    var baseName = inputName.replace(/_upload$/, '');
+                    if (baseName !== inputName) {
+                        $container.append(`<input type="hidden" name="remover_${baseName}" value="1">`);
+                    }
+
                     if (inputName.startsWith('efi_certificado_')) {
                         var sufixo = inputName.replace('efi_certificado_', '');
                         $container.append(`<input type="hidden" name="remover_efi_cert_${sufixo}" value="1">`);
                     }
-                    if (inputName === 'app_mockup_upload') {
+                    if (inputName === 'app_mockup_upload' || inputName === 'app_mockup') {
                         $container.append(`<input type="hidden" name="remover_app_mockup" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_app_mockup_upload" value="1">`);
                     }
-                    if (inputName === 'og_image_upload') {
+                    if (inputName === 'og_image_upload' || inputName === 'og_image') {
                         $container.append(`<input type="hidden" name="remover_og_image" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_og_image_upload" value="1">`);
                     }
-                    if (inputName === 'hero_bg_upload') {
+                    if (inputName === 'hero_bg_upload' || inputName === 'hero_bg') {
                         $container.append(`<input type="hidden" name="remover_hero_bg" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_hero_bg_upload" value="1">`);
                     }
                     if (inputName === 'manutencao_bg' || inputName === 'manutencao_bg_upload') {
                         $container.append(`<input type="hidden" name="remover_manutencao_bg" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_manutencao_bg_upload" value="1">`);
+                    }
+                    if (inputName === 'imagem_upload' || inputName === 'imagem') {
+                        $container.append(`<input type="hidden" name="remover_imagem_upload" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_imagem" value="1">`);
+                    }
+                    if (inputName === 'foto_upload' || inputName === 'foto') {
+                        $container.append(`<input type="hidden" name="remover_foto_upload" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_foto" value="1">`);
+                    }
+                    if (inputName === 'logo_upload' || inputName === 'logo') {
+                        $container.append(`<input type="hidden" name="remover_logo_upload" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_logo" value="1">`);
+                    }
+                    if (inputName === 'avatar_upload' || inputName === 'avatar') {
+                        $container.append(`<input type="hidden" name="remover_avatar_upload" value="1">`);
+                        $container.append(`<input type="hidden" name="remover_avatar" value="1">`);
                     }
                 });
 

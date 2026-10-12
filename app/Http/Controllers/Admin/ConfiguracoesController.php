@@ -116,6 +116,8 @@ class ConfiguracoesController extends Controller
             $logoUrl = '/uploads/branding/' . $fileName;
             CmsSetting::set('site_logo', $logoUrl, 'branding');
             @copy(public_path(ltrim($logoUrl, '/\\')), public_path('img/logo-foco7.png'));
+        } elseif ($request->boolean('remover_logo_upload') || $request->boolean('remover_logo') || $request->input('remover_logo_upload') == '1' || $request->input('remover_logo') == '1') {
+            CmsSetting::set('site_logo', '', 'branding');
         }
 
         // 3. Upload de Logotipo Secundário (Fundo Claro / Branco) com Drag & Drop
@@ -127,6 +129,9 @@ class ConfiguracoesController extends Controller
             CmsSetting::set('site_logo_clara', $logoLightUrl, 'branding');
             CmsSetting::set('site_logo_light', $logoLightUrl, 'branding');
             @copy(public_path(ltrim($logoLightUrl, '/\\')), public_path('img/logo-foco7-dark.png'));
+        } elseif ($request->boolean('remover_logo_light_upload') || $request->boolean('remover_logo_light') || $request->input('remover_logo_light_upload') == '1' || $request->input('remover_logo_light') == '1') {
+            CmsSetting::set('site_logo_clara', '', 'branding');
+            CmsSetting::set('site_logo_light', '', 'branding');
         }
 
         // 4. Upload de Favicon com Drag & Drop
@@ -138,6 +143,8 @@ class ConfiguracoesController extends Controller
             CmsSetting::set('site_favicon', $favUrl, 'branding');
             @copy(public_path(ltrim($favUrl, '/\\')), public_path('img/favicon.png'));
             @copy(public_path(ltrim($favUrl, '/\\')), public_path('favicon.ico'));
+        } elseif ($request->boolean('remover_favicon_upload') || $request->boolean('remover_favicon') || $request->input('remover_favicon_upload') == '1' || $request->input('remover_favicon') == '1') {
+            CmsSetting::set('site_favicon', '', 'branding');
         }
 
         return response()->json([

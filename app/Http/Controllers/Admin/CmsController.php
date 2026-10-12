@@ -56,7 +56,7 @@ class CmsController extends Controller
             @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
 
             $dados['hero_bg_imagem'] = '/uploads/banners/' . $fileName;
-        } elseif ($request->boolean('remover_hero_bg')) {
+        } elseif ($request->boolean('remover_hero_bg') || $request->boolean('remover_hero_bg_upload') || $request->input('remover_hero_bg') == '1' || $request->input('remover_hero_bg_upload') == '1') {
             $dados['hero_bg_imagem'] = '';
         }
 
@@ -78,7 +78,7 @@ class CmsController extends Controller
             @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
 
             $dados['secao_app_mockup_imagem'] = '/uploads/app/' . $fileName;
-        } elseif ($request->boolean('remover_app_mockup') || $request->boolean('remover_app_mockup_upload')) {
+        } elseif ($request->boolean('remover_app_mockup') || $request->boolean('remover_app_mockup_upload') || $request->input('remover_app_mockup') == '1' || $request->input('remover_app_mockup_upload') == '1') {
             $dados['secao_app_mockup_imagem'] = '';
         }
 
@@ -138,6 +138,8 @@ class CmsController extends Controller
             @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
 
             $validated['imagem'] = '/uploads/banners/' . $fileName;
+        } elseif ($request->boolean('remover_imagem_upload') || $request->boolean('remover_imagem') || $request->input('remover_imagem_upload') == '1' || $request->input('remover_imagem') == '1') {
+            $validated['imagem'] = null;
         }
 
         $id = $request->input('banner_id');
@@ -264,10 +266,22 @@ class CmsController extends Controller
             'estrelas' => 'required|integer|min:1|max:5',
             'ordem' => 'nullable|numeric',
         ]);
-
         if ($request->hasFile('foto_upload')) {
-            $path = $request->file('foto_upload')->store('uploads/depoimentos', 'public');
-            $validated['foto'] = '/storage/' . $path;
+            $uploadPath = public_path('uploads/depoimentos');
+            if (!\Illuminate\Support\Facades\File::isDirectory($uploadPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($uploadPath, 0755, true, true);
+            }
+            $file = $request->file('foto_upload');
+            $fileName = 'depoimento_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $fileName);
+            $storageDir = storage_path('app/public/uploads/depoimentos');
+            if (!\Illuminate\Support\Facades\File::isDirectory($storageDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($storageDir, 0755, true, true);
+            }
+            @copy($uploadPath . '/' . $fileName, $storageDir . '/' . $fileName);
+            $validated['foto'] = '/uploads/depoimentos/' . $fileName;
+        } elseif ($request->boolean('remover_foto_upload') || $request->boolean('remover_foto') || $request->input('remover_foto_upload') == '1' || $request->input('remover_foto') == '1') {
+            $validated['foto'] = null;
         }
 
         $id = $request->input('depoimento_id');
