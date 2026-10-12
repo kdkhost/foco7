@@ -4,6 +4,19 @@
 @section('page_title', 'Filiais & Localidades de Atendimento')
 @section('page_description', 'Gerencie as filiais físicas e pontos de atendimento exibidos no mapa interativo da Landing Page pública.')
 
+@section('styles')
+<!-- Leaflet.js CSS para OpenStreetMap 100% Gratuito (Sem Google Maps) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+    #miniMapaFilialAdmin {
+        height: 220px;
+        width: 100%;
+        border-radius: 8px;
+        z-index: 1;
+    }
+</style>
+@endsection
+
 @section('content')
 <!-- KPIS DE FILIAIS (SMALL BOXES ADMINLTE 4) -->
 <div class="row g-3 mb-4">
@@ -159,7 +172,7 @@
                     </td>
                     <td class="text-end">
                         <div class="btn-group btn-group-sm">
-                            <a href="{{ $filial->rota_url }}" target="_blank" class="btn btn-outline-info" title="Ver Rota no Google Maps" data-bs-toggle="tooltip">
+                            <a href="{{ $filial->rota_osm_url ?? $filial->rota_url }}" target="_blank" class="btn btn-outline-info" title="Ver Rota no OpenStreetMap (Sem custos)" data-bs-toggle="tooltip">
                                 <i class="fas fa-directions"></i>
                             </a>
                             <button type="button" class="btn btn-outline-secondary" onclick="editarFilial({{ $filial->id }})" title="Editar Filial" data-bs-toggle="tooltip">
@@ -268,11 +281,11 @@
                             <input type="text" name="horario_atendimento" id="filial_horario" class="form-control" value="Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00">
                         </div>
 
-                        <!-- COORDENADAS GPS & ROTA -->
+                        <!-- COORDENADAS GPS & ROTA OPENSTREETMAP -->
                         <div class="col-12">
                             <div class="p-3 rounded border bg-body-tertiary">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="small fw-bold text-body"><i class="fas fa-map-pin text-danger me-1"></i> Coordenadas Geográficas (GPS para o Marcador do Mapa)</span>
+                                    <span class="small fw-bold text-body"><i class="fas fa-map-pin text-danger me-1"></i> Coordenadas Geográficas (GPS OpenStreetMap - Sem Custos)</span>
                                     <button type="button" class="btn btn-sm btn-outline-danger" id="btnBuscarCoordenadas">
                                         <i class="fas fa-crosshairs me-1"></i> Preencher Coordenadas pelo Endereço
                                     </button>
@@ -288,7 +301,18 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small text-secondary">Link Personalizado de Rota (Opcional)</label>
-                                        <input type="url" name="link_rota" id="filial_link_rota" class="form-control form-control-sm" placeholder="Deixe em branco para gerar Google Maps automático">
+                                        <input type="url" name="link_rota" id="filial_link_rota" class="form-control form-control-sm" placeholder="Deixe em branco para OpenStreetMap gratuito">
+                                    </div>
+                                </div>
+
+                                <!-- MINI-MAPA INTERATIVO OPENSTREETMAP NO MODAL -->
+                                <div class="mt-3">
+                                    <div id="miniMapaFilialAdmin" class="border shadow-sm rounded"></div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted"><i class="fas fa-info-circle text-primary me-1"></i> <strong>OpenStreetMap Gratuito:</strong> Clique no mapa ou arraste o marcador para ajustar as coordenadas.</small>
+                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" id="btnRecentrarMiniMapa" title="Centralizar na localização">
+                                            <i class="fas fa-location-crosshairs me-1"></i> Focar Coordenadas
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -338,7 +362,88 @@
 @endsection
 
 @section('scripts')
+<!-- Leaflet.js JS para OpenStreetMap 100% Gratuito (Sem Google Maps) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+    var miniMap = null;
+    var miniMarker = null;
+
+    function initMiniMap() {
+        if (miniMap) return;
+        var mapContainer = document.getElementById('miniMapaFilialAdmin');
+        if (!mapContainer) return;
+
+        miniMap = L.map('miniMapaFilialAdmin', {
+            center: [-14.235, -51.9253],
+            zoom: 4,
+            scrollWheelZoom: true
+        });
+
+        // Camada Oficial 100% Gratuita OpenStreetMap (Zero Custo / Sem Google Maps)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(miniMap);
+
+        // Ao clicar no mapa, define a posição do marcador e preenche os inputs
+        miniMap.on('click', function (e) {
+            atualizarPosicaoMarcador(e.latlng.lat, e.latlng.lng, true);
+        });
+    }
+
+    function atualizarPosicaoMarcador(lat, lng, atualizarInputs) {
+        if (!miniMap) return;
+        lat = parseFloat(lat);
+        lng = parseFloat(lng);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        if (atualizarInputs) {
+            $('#filial_latitude').val(lat.toFixed(7));
+            $('#filial_longitude').val(lng.toFixed(7));
+        }
+
+        if (miniMarker) {
+            miniMarker.setLatLng([lat, lng]);
+        } else {
+            miniMarker = L.marker([lat, lng], { draggable: true }).addTo(miniMap);
+            miniMarker.on('dragend', function (e) {
+                var pos = e.target.getLatLng();
+                $('#filial_latitude').val(pos.lat.toFixed(7));
+                $('#filial_longitude').val(pos.lng.toFixed(7));
+            });
+        }
+    }
+
+    function reposicionarMiniMapaParaInputs() {
+        var lat = parseFloat($('#filial_latitude').val());
+        var lng = parseFloat($('#filial_longitude').val());
+        if (!isNaN(lat) && !isNaN(lng) && miniMap) {
+            atualizarPosicaoMarcador(lat, lng, false);
+            miniMap.setView([lat, lng], 15);
+        } else if (miniMap) {
+            if (miniMarker) {
+                miniMap.removeLayer(miniMarker);
+                miniMarker = null;
+            }
+            miniMap.setView([-14.235, -51.9253], 4);
+        }
+    }
+
+    // Ajusta o tamanho do mapa Leaflet quando o modal Bootstrap for exibido
+    $('#modalFilial').on('shown.bs.modal', function () {
+        initMiniMap();
+        setTimeout(function () {
+            if (miniMap) {
+                miniMap.invalidateSize();
+                reposicionarMiniMapaParaInputs();
+            }
+        }, 200);
+    });
+
+    $('#btnRecentrarMiniMapa').on('click', function () {
+        reposicionarMiniMapaParaInputs();
+    });
+
     function abrirModalNovaFilial() {
         $('#filial_id').val('');
         $('#formFilial')[0].reset();
@@ -346,6 +451,11 @@
         $('#filial_destaque').prop('checked', false);
         $('#filial_ordem').val('0');
         $('#filial_horario').val('Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00');
+
+        if (miniMarker && miniMap) {
+            miniMap.removeLayer(miniMarker);
+            miniMarker = null;
+        }
 
         if (window.FocoDropzone) {
             window.FocoDropzone.reset('#formFilial .foco-dropzone');
@@ -468,9 +578,13 @@
         }).done(function (data) {
             $btn.prop('disabled', false).html(origText);
             if (data && data.length > 0) {
-                $('#filial_latitude').val(parseFloat(data[0].lat).toFixed(7));
-                $('#filial_longitude').val(parseFloat(data[0].lon).toFixed(7));
-                window.foco7Notify.success('Coordenadas GPS encontradas e preenchidas!');
+                var lat = parseFloat(data[0].lat);
+                var lon = parseFloat(data[0].lon);
+                $('#filial_latitude').val(lat.toFixed(7));
+                $('#filial_longitude').val(lon.toFixed(7));
+                atualizarPosicaoMarcador(lat, lon, false);
+                if (miniMap) miniMap.flyTo([lat, lon], 15);
+                window.foco7Notify.success('Coordenadas GPS encontradas via OpenStreetMap!');
             } else {
                 // Fallback: busca apenas pela cidade e estado
                 $.getJSON('https://nominatim.openstreetmap.org/search', {
@@ -480,11 +594,15 @@
                     countrycodes: 'br'
                 }).done(function (dataCity) {
                     if (dataCity && dataCity.length > 0) {
-                        $('#filial_latitude').val(parseFloat(dataCity[0].lat).toFixed(7));
-                        $('#filial_longitude').val(parseFloat(dataCity[0].lon).toFixed(7));
-                        window.foco7Notify.info('Coordenadas aproximadas da cidade preenchidas.');
+                        var latC = parseFloat(dataCity[0].lat);
+                        var lonC = parseFloat(dataCity[0].lon);
+                        $('#filial_latitude').val(latC.toFixed(7));
+                        $('#filial_longitude').val(lonC.toFixed(7));
+                        atualizarPosicaoMarcador(latC, lonC, false);
+                        if (miniMap) miniMap.flyTo([latC, lonC], 13);
+                        window.foco7Notify.info('Coordenadas aproximadas da cidade preenchidas via OpenStreetMap.');
                     } else {
-                        window.foco7Notify.error('Não foi possível localizar as coordenadas. Insira manualmente.');
+                        window.foco7Notify.error('Não foi possível localizar as coordenadas no OpenStreetMap. Insira manualmente.');
                     }
                 });
             }

@@ -377,19 +377,20 @@ public_html/
 
 ---
 
-## 📍 Módulo 30: Unidades, Filiais & Mapa Interativo do Brasil com Rotas e Presença Nacional
+## 📍 Módulo 30: Unidades, Filiais & Mapa Interativo OpenStreetMap (100% Gratuito / Sem Custos de API)
 
 ### 1. Painel Administrativo de Filiais (`/admin/filiais`)
 - **Gestão Completa (CRUD AJAX):** Cadastro, edição, ordenação e exclusão de unidades de atendimento com formulário modal interativo e zero recarregamento de página.
-- **Geocodificação Automática GPS:** Botão "Buscar Coordenadas GPS" que consulta via AJAX a API OpenStreetMap Nominatim e preenche automaticamente Latitude e Longitude a partir do endereço, cidade e CEP digitados.
+- **Mini-Mapa Interativo OpenStreetMap no Modal:** Visualização com Leaflet.js permitindo arrastar o marcador ou clicar diretamente em qualquer ponto do mapa para definir Latitude e Longitude instantaneamente sem qualquer custo de API.
+- **Geocodificação Automática GPS (Nominatim OpenStreetMap):** Botão "Preencher Coordenadas pelo Endereço" que consulta via AJAX a API gratuita do OpenStreetMap Nominatim e preenche automaticamente Latitude e Longitude, reposicionando o marcador no mini-mapa com animação `flyTo`.
 - **Upload de Fachada/Foto:** Integração com o componente `FocoDropzone` com proporção 16:9, preview em tempo real e remoção instantânea.
 - **Toggle Rápido de Status & Destaque (Matriz):** Ativação/desativação em 1 clique e marcação de unidade Matriz com feedback via Toastr e SweetAlert2 (**zero `alert()` nativo**).
 
 ### 2. Mapa do Brasil Interativo na Landing Page (`#unidades`)
 - **Regras Idênticas à Seção de Parceiros:** Se não houver filiais ativas no banco de dados, a seção completa, o item do menu desktop ("Onde Estamos"), o link do menu drawer Android e o link do rodapé são 100% ocultados automaticamente.
-- **Leaflet.js com Camada CartoDB Voyager:** Mapa de alta definição com renderização rápida, controles de navegação e enquadramento automático (`fitBounds`) abrangendo todas as unidades cadastradas.
+- **OpenStreetMap Oficial com Leaflet.js (Zero Custo / Livre de Google Maps):** Renderização direta com tiles do OpenStreetMap (`tile.openstreetmap.org`), sem necessidade de faturamento, sem chave paga de API e sem cobranças por visualizações.
 - **Marcador Customizado com Efeito Pulso:** Pin estilizado com gradiente oficial da Foco 7 (`#d90000`) e animação de radar pulsante.
-- **Popups Informativos e Traçado de Rotas:** Ao clicar no marcador, o popup exibe foto da fachada, nome da filial, badge de Matriz/UF, endereço completo, horário de atendimento, telefone, botão de contato WhatsApp e botões diretos para traçar rota no **Google Maps** (`https://www.google.com/maps/dir/?api=1&destination=lat,lng`) e no **Waze**.
+- **Popups Informativos e Traçado de Rotas:** Ao clicar no marcador, o popup exibe foto da fachada, nome da filial, badge de Matriz/UF, endereço completo, horário de atendimento, telefone, botão de contato WhatsApp e botões para traçar rota no **OpenStreetMap Routing** (`https://www.openstreetmap.org/directions`) e em navegadores móveis (Waze/GPS).
 - **Lista Lateral com Busca em Tempo Real:** Campo de pesquisa instantânea que filtra filiais por cidade, estado ou nome, contador dinâmico de unidades visíveis, botão para resetar a visão geral do Brasil e animação suave `flyTo` ao clicar no card de qualquer filial.
 
 ---

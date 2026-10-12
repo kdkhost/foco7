@@ -79,7 +79,20 @@ class Filial extends Model
     }
 
     /**
-     * URL direta para traçar rota no Google Maps
+     * URL direta para traçar rota no OpenStreetMap (100% gratuito e sem custos)
+     */
+    public function getRotaOsmUrlAttribute()
+    {
+        if (!empty($this->latitude) && !empty($this->longitude)) {
+            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}";
+        }
+
+        $destinoFormatado = urlencode("{$this->endereco}, {$this->bairro}, {$this->cidade} - {$this->estado}, Brasil");
+        return "https://www.openstreetmap.org/search?query={$destinoFormatado}";
+    }
+
+    /**
+     * URL direta para traçar rota (OpenStreetMap / Link Personalizado ou Navegador)
      */
     public function getRotaUrlAttribute()
     {
@@ -88,11 +101,11 @@ class Filial extends Model
         }
 
         if (!empty($this->latitude) && !empty($this->longitude)) {
-            return "https://www.google.com/maps/dir/?api=1&destination={$this->latitude},{$this->longitude}";
+            return "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C{$this->latitude}%2C{$this->longitude}";
         }
 
         $destinoFormatado = urlencode("{$this->endereco}, {$this->bairro}, {$this->cidade} - {$this->estado}");
-        return "https://www.google.com/maps/dir/?api=1&destination={$destinoFormatado}";
+        return "https://www.openstreetmap.org/search?query={$destinoFormatado}";
     }
 
     /**

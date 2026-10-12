@@ -1047,7 +1047,7 @@
                                     <button type="button" class="btn btn-sm btn-outline-danger w-50 py-1 fw-bold" onclick="event.stopPropagation(); focarFilialNoMapa({{ $f->id }}, {{ $f->latitude ?? 'null' }}, {{ $f->longitude ?? 'null' }})">
                                         <i class="fas fa-crosshairs me-1"></i> Ver no Mapa
                                     </button>
-                                    <a href="{{ $f->rota_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-50 py-1 fw-bold text-white text-center text-decoration-none" onclick="event.stopPropagation();">
+                                    <a href="{{ $f->rota_osm_url ?? $f->rota_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-50 py-1 fw-bold text-white text-center text-decoration-none" onclick="event.stopPropagation();" title="Traçar Rota no OpenStreetMap (Sem custos)">
                                         <i class="fas fa-route me-1"></i> Como Chegar
                                     </a>
                                 </div>
@@ -2760,10 +2760,9 @@
                 scrollWheelZoom: false
             });
 
-            // Camada de alta qualidade CartoDB Voyager
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
+            // Camada Oficial 100% Gratuita OpenStreetMap (Zero Custo / Sem Google Maps)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
                 maxZoom: 19
             }).addTo(map);
 
@@ -2800,7 +2799,8 @@
                         const icone = criarIconeFoco7(filial.destaque);
                         const marker = L.marker([lat, lng], { icon: icone }).addTo(map);
 
-                        const rotaUrl = filial.link_rota || `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                        const rotaOsmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=%2C${lat}%2C${lng}`;
+                        const rotaUrl = filial.link_rota || rotaOsmUrl;
                         const wazeUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
                         const telLimpo = filial.whatsapp ? filial.whatsapp.replace(/\D/g, '') : '';
                         const waUrl = telLimpo ? `https://wa.me/55${telLimpo}?text=Ol%C3%A1!%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20a%20unidade%20${encodeURIComponent(filial.nome)}` : '';
@@ -2827,7 +2827,7 @@
                                     ${filial.whatsapp ? `<span><i class="fab fa-whatsapp" style="color: #22c55e; margin-left: 6px; margin-right: 3px;"></i> ${filial.whatsapp}</span>` : ''}
                                 </div>` : ''}
                                 <div style="display: flex; gap: 6px; margin-top: 10px;">
-                                    <a href="${rotaUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #d90000; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 8px rgba(217,0,0,0.4);">
+                                    <a href="${rotaUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; background: #d90000; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 8px rgba(217,0,0,0.4);" title="Traçar Rota no OpenStreetMap">
                                         <i class="fas fa-route"></i> Traçar Rota
                                     </a>
                                     <a href="${wazeUrl}" target="_blank" rel="noopener noreferrer" style="background: #334155; color: #fff; padding: 7px 10px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px;" title="Abrir no Waze">
