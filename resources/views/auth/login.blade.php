@@ -148,16 +148,21 @@
                      data-logo-light="{{ asset(\App\Models\CmsSetting::getLogo('claro')) }}"
                      alt="Foco 7" height="68" class="mb-2">
             </a>
-            <p class="small text-secondary mt-1 mb-0">Portal de Gestão & Área do Cliente</p>
+            <p class="small text-secondary mt-1 mb-0" id="loginSubText">Portal de Gestão &amp; Área do Cliente</p>
         </div>
 
-        <form action="{{ route('login.post') }}" method="POST" class="ajax-form">
+        <form action="{{ route('login.post') }}" method="POST" class="ajax-form" id="formLogin">
             @csrf
+            <!-- Honeypot invisível contra bots de força bruta -->
+            <div class="d-none" aria-hidden="true">
+                <input type="text" name="_hp_security_check" value="" tabindex="-1" autocomplete="off">
+            </div>
+
             <div class="mb-3">
                 <label class="form-label small fw-bold">E-mail de Acesso</label>
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-secondary text-secondary"><i class="fas fa-envelope"></i></span>
-                    <input type="email" name="email" id="email" class="form-control bg-dark text-white border-secondary" required placeholder="seu@email.com">
+                    <input type="email" name="email" id="email" class="form-control bg-dark text-white border-secondary" required placeholder="seu@email.com" autocomplete="username">
                 </div>
             </div>
 
@@ -165,7 +170,10 @@
                 <label class="form-label small fw-bold">Senha</label>
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-secondary text-secondary"><i class="fas fa-lock"></i></span>
-                    <input type="password" name="password" id="password" class="form-control bg-dark text-white border-secondary" required placeholder="••••••••">
+                    <input type="password" name="password" id="password" class="form-control bg-dark text-white border-secondary" required placeholder="••••••••" autocomplete="current-password">
+                    <button class="btn btn-outline-secondary border-secondary btn-toggle-password" type="button" data-target="#password" title="Visualizar / Ocultar Senha" tabindex="-1">
+                        <i class="fas fa-eye text-secondary"></i>
+                    </button>
                 </div>
             </div>
 
@@ -177,10 +185,15 @@
                 <a href="{{ route('password.request') }}" class="small link-esqueceu-senha text-decoration-none">Esqueceu a senha?</a>
             </div>
 
-            <button type="submit" class="btn-foco">
+            <button type="submit" class="btn-foco" id="btnSubmitLogin">
                 <i class="fas fa-sign-in-alt me-1"></i> ENTRAR NO SISTEMA
             </button>
         </form>
+
+        <div class="text-center mt-3">
+            <span class="small text-secondary">Ainda não tem conta? </span>
+            <a href="{{ route('register') }}" class="small text-danger fw-bold text-decoration-none">Cadastre-se aqui</a>
+        </div>
 
         <!-- Atalhos Rápidos para Demonstração -->
         <div class="mt-4 pt-3 border-top border-secondary text-center small text-secondary">
@@ -218,19 +231,43 @@
             window.foco7Notify.info('Credenciais preenchidas!');
         }
 
-        // Alternância de Tema com LocalStorage
+        // Alternar visualização da senha
+        $(document).on('click', '.btn-toggle-password', function (e) {
+            e.preventDefault();
+            var target = $(this).data('target');
+            var $input = $(target);
+            var $icon = $(this).find('i');
+            if ($input.attr('type') === 'password') {
+                $input.attr('type', 'text');
+                $icon.removeClass('fa-eye').addClass('fa-eye-slash text-danger');
+            } else {
+                $input.attr('type', 'password');
+                $icon.removeClass('fa-eye-slash text-danger').addClass('fa-eye text-secondary');
+            }
+        });
+
+        // Alternância de Tema com LocalStorage e sincronização imediata da Logo
         $(function () {
             var currentTheme = localStorage.getItem('foco7_theme') || 'dark';
 
             function applyTheme(theme) {
+                var $logo = $('#loginBrandLogo');
                 if (theme === 'light') {
                     $('body').addClass('light-theme');
                     $('#themeIcon').removeClass('fa-moon').addClass('fa-sun');
-                    $('#logoSub').removeClass('text-white').addClass('text-dark');
+                    $('#loginSubText').removeClass('text-white').addClass('text-secondary');
+                    var logoLight = $logo.data('logo-light');
+                    if (logoLight) {
+                        $logo.attr('src', logoLight);
+                    }
                 } else {
                     $('body').removeClass('light-theme');
                     $('#themeIcon').removeClass('fa-sun').addClass('fa-moon');
-                    $('#logoSub').removeClass('text-dark').addClass('text-white');
+                    $('#loginSubText').removeClass('text-dark').addClass('text-secondary');
+                    var logoDark = $logo.data('logo-dark');
+                    if (logoDark) {
+                        $logo.attr('src', logoDark);
+                    }
                 }
             }
 

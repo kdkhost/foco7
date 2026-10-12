@@ -30,16 +30,45 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        body.light-theme {
+            background-color: #f4f6f9;
+            color: #0f172a;
+        }
+        body.light-theme .reset-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+        }
+        body.light-theme .reset-card .form-label {
+            color: #0f172a !important;
+        }
+        body.light-theme .form-control {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-theme .input-group-text {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-theme .theme-toggle-btn {
+            border-color: #cbd5e1;
+            color: #0f172a;
         }
         .reset-card {
             max-width: 440px;
             width: 100%;
-            background: #121722;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 35px 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             position: relative;
+            color: #f8fafc;
         }
         .btn-foco {
             background: var(--foco-red);
@@ -69,29 +98,60 @@
             color: var(--foco-red);
             font-size: 28px;
         }
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: inherit;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <div class="reset-card">
+        <!-- Alternador Dark / Light Mode -->
+        <button type="button" class="theme-toggle-btn" id="themeToggle" title="Alternar Modo Escuro / Claro">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+
         <div class="text-center mb-4">
             <div class="icon-shield-reset">
                 <i class="fas fa-key"></i>
             </div>
-            <img src="{{ asset('/img/logo-foco7.png') }}" alt="Foco 7" height="42" class="mb-2" onerror="this.onerror=null; this.src='{{ asset('/img/logo-foco7-dark.png') }}';">
+            <a href="{{ route('site.home') }}">
+                <img id="emailBrandLogo"
+                     src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}"
+                     data-logo-dark="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}"
+                     data-logo-light="{{ asset(\App\Models\CmsSetting::getLogo('claro')) }}"
+                     alt="Foco 7" height="42" class="mb-2">
+            </a>
             <h5 class="fw-bold mb-1">Esqueceu sua senha?</h5>
             <p class="small text-secondary mb-0">Informe o e-mail cadastrado e enviaremos instruções com link seguro para você redefinir sua senha.</p>
         </div>
 
         <form action="{{ route('password.email') }}" method="POST" id="formResetEmail">
             @csrf
+            <!-- Honeypot invisível contra bots de força bruta -->
+            <div class="d-none" aria-hidden="true">
+                <input type="text" name="_hp_security_check" value="" tabindex="-1" autocomplete="off">
+            </div>
+
             <div class="mb-4">
                 <label class="form-label small fw-bold">E-mail Cadastrado</label>
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-secondary text-secondary">
                         <i class="fas fa-envelope"></i>
                     </span>
-                    <input type="email" name="email" id="email" class="form-control bg-dark text-white border-secondary" required placeholder="seu@email.com" autofocus>
+                    <input type="email" name="email" id="email" class="form-control bg-dark text-white border-secondary" required placeholder="seu@email.com" autofocus autocomplete="email">
                 </div>
                 <div class="form-text small text-secondary">Você receberá um link temporário com validade de 60 minutos.</div>
             </div>
@@ -116,6 +176,36 @@
 
     <script>
         $(function () {
+            // Sincronização do tema e da logo
+            var currentTheme = localStorage.getItem('foco7_theme') || 'dark';
+
+            function applyTheme(theme) {
+                var $logo = $('#emailBrandLogo');
+                if (theme === 'light') {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('fa-moon').addClass('fa-sun');
+                    var logoLight = $logo.data('logo-light');
+                    if (logoLight) {
+                        $logo.attr('src', logoLight);
+                    }
+                } else {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('fa-sun').addClass('fa-moon');
+                    var logoDark = $logo.data('logo-dark');
+                    if (logoDark) {
+                        $logo.attr('src', logoDark);
+                    }
+                }
+            }
+
+            applyTheme(currentTheme);
+
+            $('#themeToggle').on('click', function () {
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('foco7_theme', currentTheme);
+                applyTheme(currentTheme);
+            });
+
             $('#formResetEmail').on('submit', function (e) {
                 e.preventDefault();
                 var $form = $(this);

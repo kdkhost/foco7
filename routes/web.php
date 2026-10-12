@@ -48,17 +48,19 @@ Route::get('/faturas/carne/{codigo}/pdf', [CheckoutController::class, 'downloadC
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1')->name('login.post');
+Route::get('/cadastro', [AuthController::class, 'cadastroForm'])->name('register');
+Route::post('/cadastro', [AuthController::class, 'cadastro'])->middleware('throttle:5,1')->name('register.post');
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/auth/status', [AuthController::class, 'statusAuth'])->name('auth.status');
-Route::post('/auth/rapido/login', [AuthController::class, 'loginRapidoAjax'])->name('auth.rapido.login');
-Route::post('/auth/rapido/cadastro', [AuthController::class, 'cadastroRapidoAjax'])->name('auth.rapido.cadastro');
+Route::post('/auth/rapido/login', [AuthController::class, 'loginRapidoAjax'])->middleware('throttle:10,1')->name('auth.rapido.login');
+Route::post('/auth/rapido/cadastro', [AuthController::class, 'cadastroRapidoAjax'])->middleware('throttle:5,1')->name('auth.rapido.cadastro');
 
 // Esqueci minha senha & Redefinição
 Route::get('/esqueci-senha', [ResetPasswordController::class, 'esqueciSenhaForm'])->name('password.request');
-Route::post('/esqueci-senha', [ResetPasswordController::class, 'enviarLinkRecuperacao'])->name('password.email');
+Route::post('/esqueci-senha', [ResetPasswordController::class, 'enviarLinkRecuperacao'])->middleware('throttle:5,1')->name('password.email');
 Route::get('/redefinir-senha/{token}', [ResetPasswordController::class, 'redefinirSenhaForm'])->name('password.reset');
-Route::post('/redefinir-senha', [ResetPasswordController::class, 'atualizarSenha'])->name('password.update');
+Route::post('/redefinir-senha', [ResetPasswordController::class, 'atualizarSenha'])->middleware('throttle:10,1')->name('password.update');
 
 /*
 |--------------------------------------------------------------------------
@@ -136,6 +138,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/obter/{id}', [FaturasController::class, 'obter'])->name('admin.faturas.obter');
         Route::post('/', [FaturasController::class, 'salvar'])->name('admin.faturas.salvar');
         Route::post('/status/{id}', [FaturasController::class, 'alterarStatus'])->name('admin.faturas.status');
+        Route::post('/estornar/{id}', [FaturasController::class, 'estornar'])->name('admin.faturas.estornar');
         Route::post('/antecipar/{id}', [FaturasController::class, 'anteciparParcela'])->name('admin.faturas.antecipar');
         Route::post('/antecipar-lote', [FaturasController::class, 'anteciparLote'])->name('admin.faturas.antecipar_lote');
         Route::delete('/{id}', [FaturasController::class, 'excluir'])->name('admin.faturas.excluir');

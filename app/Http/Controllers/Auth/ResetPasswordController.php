@@ -27,6 +27,10 @@ class ResetPasswordController extends Controller
      */
     public function enviarLinkRecuperacao(Request $request)
     {
+        if (!empty($request->input('_hp_security_check'))) {
+            return response()->json(['success' => false, 'message' => 'Requisição bloqueada por segurança.'], 403);
+        }
+
         $request->validate([
             'email' => 'required|email',
         ], [
@@ -119,6 +123,20 @@ class ResetPasswordController extends Controller
      */
     public function atualizarSenha(Request $request)
     {
+        if (!empty($request->input('_hp_security_check'))) {
+            return response()->json(['success' => false, 'message' => 'Requisição bloqueada por segurança.'], 403);
+        }
+
+        $throttleTokenKey = 'pwd-update|' . $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleTokenKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleTokenKey);
+            $msg = "Muitas tentativas de redefinição de senha a partir deste IP. Aguarde {$seconds} segundos por segurança.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 429);
+            }
+            return back()->withErrors(['email' => $msg]);
+        }
+
         $request->validate([
             'token' => 'required|string',
             'email' => 'required|email',
@@ -130,6 +148,8 @@ class ResetPasswordController extends Controller
             'password.min' => 'A senha deve ter no mínimo 8 caracteres.',
             'password.confirmed' => 'A confirmação de senha não coincide com a nova senha digitada.',
         ]);
+
+        RateLimiter::hit($throttleTokenKey, 60);
 
         $email = strtolower(trim($request->input('email')));
         $token = $request->input('token');

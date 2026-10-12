@@ -133,21 +133,45 @@
                         </td>
                         <td class="fw-bold text-success fs-6">{{ $fat->valor_formatado }}</td>
                         <td>
-                            <div class="dropdown d-inline-block">
-                                <button class="btn btn-sm dropdown-toggle border-0 p-0" type="button" data-bs-toggle="dropdown">
-                                    {!! $fat->status_badge !!}
-                                </button>
-                                <ul class="dropdown-menu shadow">
-                                    <li><h6 class="dropdown-header">Alterar Status</h6></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pago')"><i class="fas fa-check-circle text-success me-2"></i> Marcar como Paga</a></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pendente')"><i class="fas fa-clock text-warning me-2"></i> Marcar como Pendente</a></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'cancelado')"><i class="fas fa-ban text-danger me-2"></i> Marcar como Cancelada</a></li>
-                                </ul>
-                            </div>
+                            @if($fat->status === 'pago')
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm dropdown-toggle border-0 p-0" type="button" data-bs-toggle="dropdown" title="Fatura Paga (Alteração direta bloqueada por auditoria)">
+                                        {!! $fat->status_badge !!}
+                                    </button>
+                                    <ul class="dropdown-menu shadow">
+                                        <li><h6 class="dropdown-header"><i class="fas fa-shield-alt text-success me-1"></i> Auditoria Contábil</h6></li>
+                                        <li><span class="dropdown-item-text small text-muted">Status quitado não pode ser alterado diretamente.</span></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger fw-bold" href="javascript:void(0)" onclick="estornarFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', {{ $fat->valor }})">
+                                                <i class="fas fa-undo me-2"></i> Estornar Fatura Manualmente
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @elseif($fat->status === 'estornado')
+                                {!! $fat->status_badge !!}
+                            @else
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm dropdown-toggle border-0 p-0" type="button" data-bs-toggle="dropdown">
+                                        {!! $fat->status_badge !!}
+                                    </button>
+                                    <ul class="dropdown-menu shadow">
+                                        <li><h6 class="dropdown-header">Alterar Status</h6></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pago')"><i class="fas fa-check-circle text-success me-2"></i> Marcar como Paga</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pendente')"><i class="fas fa-clock text-warning me-2"></i> Marcar como Pendente</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'cancelado')"><i class="fas fa-ban text-danger me-2"></i> Marcar como Cancelada</a></li>
+                                    </ul>
+                                </div>
+                            @endif
                         </td>
                         <td class="text-end">
                             <div class="btn-group">
-                                @if($fat->status !== 'pago')
+                                @if($fat->status === 'pago')
+                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="estornarFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', {{ $fat->valor }})" title="Estornar Fatura (Recalcula Receita)">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                @elseif($fat->status !== 'estornado')
                                     <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirModalAnteciparFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', {{ $fat->valor }}, {{ $fat->numero_parcela ?? 1 }})" title="Antecipar / Quitar com Desconto">
                                         <i class="fas fa-hand-holding-usd"></i>
                                     </button>
@@ -424,6 +448,55 @@
             error: function (xhr) {
                 $btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Confirmar & Liquidar Parcela');
                 window.foco7Notify.error(xhr.responseJSON?.message || 'Erro ao processar antecipação.');
+            }
+        });
+    }
+
+    // Função de Estorno Manual de Fatura Paga com Recálculo Contábil
+    function estornarFatura(id, codigo, cliente, valor) {
+        const valorFormatado = parseFloat(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        Swal.fire({
+            title: 'Estornar Fatura Paga?',
+            html: `Você está prestes a estornar a fatura quitada <strong>${codigo}</strong> do cliente <strong>${cliente}</strong> no valor de <strong>R$ ${valorFormatado}</strong>.<br><br><div class="alert alert-warning text-start p-2 mb-0 small"><i class="fas fa-exclamation-triangle me-1"></i> <strong>Auditoria Contábil:</strong> O valor será deduzido do faturamento da receita do sistema e o status será gravado como Estornado.</div>`,
+            icon: 'warning',
+            input: 'text',
+            inputPlaceholder: 'Justificativa do estorno (obrigatório, mín. 3 letras)',
+            inputValidator: (value) => {
+                if (!value || value.trim().length < 3) {
+                    return 'Informe uma justificativa válida com pelo menos 3 caracteres!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-undo me-1"></i> Confirmar Estorno',
+            cancelButtonText: 'Cancelar Ação'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/admin/faturas/estornar/${id}`,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: {
+                        motivo: result.value.trim()
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Fatura Estornada!',
+                                text: res.message,
+                                confirmButtonColor: '#28a745'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao processar estorno da fatura.');
+                    }
+                });
             }
         });
     }

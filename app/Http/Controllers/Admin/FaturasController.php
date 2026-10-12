@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Fatura;
 use App\Models\User;
 use App\Models\Plano;
+use App\Models\Notificacao;
 use Illuminate\Support\Str;
 
 class FaturasController extends Controller
@@ -123,6 +124,15 @@ class FaturasController extends Controller
         ]);
 
         $fatura = Fatura::findOrFail($id);
+
+        // Bloqueio contábil: fatura já quitada não pode ter status alterado diretamente
+        if ($fatura->status === 'pago') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Faturas já quitadas não podem ter o status alterado manualmente. Para cancelar e anular a receita, utilize a função formal de "Estornar Fatura".',
+            ], 422);
+        }
+
         $novoStatus = $request->input('status');
         $fatura->status = $novoStatus;
 
@@ -138,6 +148,56 @@ class FaturasController extends Controller
             'success' => true,
             'status' => $fatura->status,
             'message' => 'Status da fatura alterado para ' . ucfirst($fatura->status) . '!',
+        ]);
+    }
+
+    /**
+     * Realiza o estorno manual de uma fatura paga, registrando motivo e recalculando a receita contábil
+     */
+    public function estornar(Request $request, $id)
+    {
+        $request->validate([
+            'motivo' => 'required|string|min:3|max:255',
+        ], [
+            'motivo.required' => 'Informe a justificativa do estorno.',
+            'motivo.min' => 'A justificativa deve conter no mínimo 3 caracteres.',
+        ]);
+
+        $fatura = Fatura::with('user')->findOrFail($id);
+
+        if ($fatura->status !== 'pago') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Apenas faturas com status "Pago" podem ser estornadas.',
+            ], 422);
+        }
+
+        $motivo = trim($request->input('motivo'));
+        $valorEstornado = (float) $fatura->valor;
+
+        $fatura->status = 'estornado';
+        $fatura->descricao = trim($fatura->descricao . " [Estornado em " . date('d/m/Y H:i') . " por " . (auth()->user()->name ?? 'Administrador') . " - Motivo: {$motivo}]");
+        $fatura->save();
+
+        // Registra alerta na central de notificações para auditoria contábil
+        try {
+            Notificacao::create([
+                'tipo' => 'financeiro',
+                'titulo' => 'Fatura Estornada: ' . $fatura->codigo_fatura,
+                'mensagem' => "A fatura #{$fatura->codigo_fatura} (R$ " . number_format($valorEstornado, 2, ',', '.') . ") do cliente {$fatura->user?->name} foi estornada manualmente. Motivo: {$motivo}",
+                'link' => route('admin.faturas.index'),
+                'lida' => false,
+            ]);
+        } catch (\Throwable $e) {
+            // Log sem interromper o fluxo
+            \Log::error('Falha ao gerar notificação de estorno: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Fatura estornada com sucesso! A receita referente à fatura foi recalculada na contabilidade.',
+            'fatura' => $fatura,
+            'status' => 'estornado',
         ]);
     }
 

@@ -67,10 +67,10 @@ class Fatura extends Model
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {
-            'pago' => '<span class="badge bg-success">Pago</span>',
-            'cancelado' => '<span class="badge bg-danger">Cancelado</span>',
-            'estornado' => '<span class="badge bg-secondary">Estornado</span>',
-            default => '<span class="badge bg-warning text-dark">Aguardando Pagamento</span>',
+            'pago' => '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Pago</span>',
+            'cancelado' => '<span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Cancelado</span>',
+            'estornado' => '<span class="badge bg-secondary text-white"><i class="fas fa-undo me-1"></i> Estornado</span>',
+            default => '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Aguardando Pagamento</span>',
         };
     }
 

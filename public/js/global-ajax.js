@@ -317,6 +317,21 @@
                     $f.trigger('form:cleared');
                 }
             });
+
+            // Alternador Universal de Visualização de Senha (eye / eye-slash)
+            $(document).on('click', '.btn-toggle-password', function (e) {
+                e.preventDefault();
+                var target = $(this).data('target');
+                var $input = target ? $(target) : $(this).closest('.input-group').find('input[type="password"], input[type="text"]');
+                var $icon = $(this).find('i');
+                if ($input.length && $input.attr('type') === 'password') {
+                    $input.attr('type', 'text');
+                    $icon.removeClass('fa-eye').addClass('fa-eye-slash text-danger');
+                } else if ($input.length) {
+                    $input.attr('type', 'password');
+                    $icon.removeClass('fa-eye-slash text-danger').addClass('fa-eye text-secondary');
+                }
+            });
         });
     }
 })();

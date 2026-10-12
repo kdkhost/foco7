@@ -27,8 +27,16 @@ class AuthController extends Controller
     /**
      * Processa a autenticação do usuário com proteção contra brute-force
      */
+    /**
+     * Processa a autenticação do usuário com proteção contra brute-force
+     */
     public function login(Request $request)
     {
+        // Proteção Honeypot contra robôs de força bruta
+        if (!empty($request->input('_hp_security_check'))) {
+            return response()->json(['success' => false, 'message' => 'Requisição bloqueada por segurança.'], 403);
+        }
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
@@ -38,11 +46,26 @@ class AuthController extends Controller
             'password.required' => 'Informe sua senha de acesso.',
         ]);
 
-        $throttleKey = Str::transliterate(Str::lower($request->input('email')) . '|' . $request->ip());
+        $email = Str::lower(trim($request->input('email')));
+        $throttleKey = 'login|' . Str::transliterate($email . '|' . $request->ip());
+        $ipThrottleKey = 'login-ip|' . $request->ip();
 
+        // Camada 1: Bloqueio por e-mail + IP (máx 5 tentativas)
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             $msg = "Muitas tentativas de login incorretas. Tente novamente em {$seconds} segundos.";
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 429);
+            }
+
+            return back()->withErrors(['email' => $msg]);
+        }
+
+        // Camada 2: Bloqueio por IP global contra varredura de múltiplos e-mails (máx 10 tentativas)
+        if (RateLimiter::tooManyAttempts($ipThrottleKey, 10)) {
+            $seconds = RateLimiter::availableIn($ipThrottleKey);
+            $msg = "Muitas tentativas a partir deste IP. Aguarde {$seconds} segundos por segurança.";
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $msg], 429);
@@ -55,6 +78,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'), $remember)) {
             RateLimiter::clear($throttleKey);
+            RateLimiter::clear($ipThrottleKey);
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -85,7 +109,8 @@ class AuthController extends Controller
             return redirect()->intended($redirectUrl);
         }
 
-        RateLimiter::hit($throttleKey);
+        RateLimiter::hit($throttleKey, 60);
+        RateLimiter::hit($ipThrottleKey, 60);
 
         $msg = 'E-mail ou senha incorretos.';
 
@@ -94,6 +119,85 @@ class AuthController extends Controller
         }
 
         return back()->withErrors(['email' => $msg])->withInput($request->only('email'));
+    }
+
+    /**
+     * Exibe a tela de cadastro público de novos clientes
+     */
+    public function cadastroForm()
+    {
+        if (Auth::check()) {
+            return Auth::user()->isAdmin()
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('cliente.dashboard');
+        }
+
+        return view('auth.register');
+    }
+
+    /**
+     * Processa o cadastro público com proteção anti-bruteforce e honeypot
+     */
+    public function cadastro(Request $request)
+    {
+        if (!empty($request->input('_hp_security_check'))) {
+            return response()->json(['success' => false, 'message' => 'Requisição bloqueada por segurança.'], 403);
+        }
+
+        $ipThrottleKey = 'register-ip|' . $request->ip();
+        if (RateLimiter::tooManyAttempts($ipThrottleKey, 5)) {
+            $seconds = RateLimiter::availableIn($ipThrottleKey);
+            $msg = "Muitas tentativas de cadastro recentes. Aguarde {$seconds} segundos por segurança.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 429);
+            }
+            return back()->withErrors(['email' => $msg]);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'required|email|max:120|unique:users,email',
+            'telefone' => 'required|string|max:30',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'name.required' => 'Informe seu nome completo.',
+            'email.required' => 'Informe seu e-mail.',
+            'email.email' => 'Informe um e-mail válido.',
+            'email.unique' => 'Este e-mail já está cadastrado em nosso sistema. Faça login para continuar.',
+            'telefone.required' => 'Informe seu número de WhatsApp/Telefone.',
+            'password.required' => 'Crie uma senha de acesso.',
+            'password.min' => 'A senha deve conter no mínimo 6 caracteres.',
+            'password.confirmed' => 'A confirmação de senha não confere.',
+        ]);
+
+        RateLimiter::hit($ipThrottleKey, 300);
+
+        $user = \App\Models\User::create([
+            'name' => trim($request->input('name')),
+            'email' => strtolower(trim($request->input('email'))),
+            'telefone' => trim($request->input('telefone')),
+            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
+            'role' => 'cliente',
+            'status' => 'ativo',
+        ]);
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cadastro realizado com sucesso! Bem-vindo à Foco 7.',
+                'redirect' => route('cliente.dashboard'),
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ]);
+        }
+
+        return redirect()->route('cliente.dashboard')->with('success', 'Cadastro realizado com sucesso!');
     }
 
     /**

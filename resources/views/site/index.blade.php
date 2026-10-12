@@ -1440,6 +1440,9 @@
                         <div class="tab-pane fade show active" id="pill-login" role="tabpanel">
                             <form id="formLoginRapido" action="{{ route('auth.rapido.login') }}" method="POST">
                                 @csrf
+                                <div class="d-none" aria-hidden="true">
+                                    <input type="text" name="_hp_security_check" value="" tabindex="-1" autocomplete="off">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">E-mail Cadastrado</label>
                                     <div class="input-group">
@@ -1452,6 +1455,9 @@
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
                                         <input type="password" name="password" id="loginRapidoPassword" class="form-control" required placeholder="••••••••">
+                                        <button class="btn btn-outline-secondary btn-toggle-password" type="button" data-target="#loginRapidoPassword" title="Visualizar / Ocultar Senha" tabindex="-1">
+                                            <i class="fas fa-eye text-secondary"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1467,6 +1473,9 @@
                         <div class="tab-pane fade" id="pill-cadastro" role="tabpanel">
                             <form id="formCadastroRapido" action="{{ route('auth.rapido.cadastro') }}" method="POST">
                                 @csrf
+                                <div class="d-none" aria-hidden="true">
+                                    <input type="text" name="_hp_security_check" value="" tabindex="-1" autocomplete="off">
+                                </div>
                                 <div class="mb-2">
                                     <label class="form-label small fw-bold">Seu Nome Completo *</label>
                                     <input type="text" name="name" id="cadRapidoNome" class="form-control form-control-sm" required placeholder="Ex: Roberto Carlos">
@@ -1481,7 +1490,13 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Criar uma Senha *</label>
-                                    <input type="password" name="password" id="cadRapidoPassword" class="form-control form-control-sm" required minlength="6" placeholder="Mínimo 6 caracteres">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                                        <input type="password" name="password" id="cadRapidoPassword" class="form-control form-control-sm" required minlength="6" placeholder="Mínimo 6 caracteres">
+                                        <button class="btn btn-outline-secondary btn-toggle-password" type="button" data-target="#cadRapidoPassword" title="Visualizar / Ocultar Senha" tabindex="-1">
+                                            <i class="fas fa-eye text-secondary"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <button type="submit" class="btn btn-danger w-100 fw-bold py-2" id="btnCadastroRapidoSubmit">
                                     <i class="fas fa-check-circle me-1"></i> CRIAR CONTA E CONTINUAR

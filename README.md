@@ -268,14 +268,15 @@ public_html/
 | **Módulo 24**| Modal de Leitura Detalhada de Notificações com Marcação Automática e Ação Rápida Direta | ✅ Concluído & Validado |
 | **Módulo 25**| Push OneSignal com Imagem, Small Boxes AdminLTE 4 & Alternância de Logo/Favicon na Sidebar | ✅ Concluído & Validado |
 | **Módulo 26**| Dashboard Reformulada com KPIs Animados, Contador de Visitas & Analítico Completo (Chart.js), Cancelamento de Agendamentos e Antecipação de Parcelas Financeiras | ✅ Concluído & Validado |
+| **Módulo 27**| Auditoria Contábil de Faturas (Bloqueio Direto & Estorno Manual com Recálculo da Receita), Logo Adaptável em Auth, Visualização de Senha e Proteção contra Força Bruta | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **74 testes executados, 74 aprovados (100% de sucesso), 335 asserções**.
-- Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
+- **79 testes executados, 79 aprovados (100% de sucesso), 353 asserções**.
+- Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
 
