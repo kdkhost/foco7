@@ -182,7 +182,9 @@
                         <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética</a></li>
                         <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
+                        @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#parceiros">Parceiros</a></li>
+                        @endif
                         <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                     </ul>
@@ -265,11 +267,13 @@
                     <span class="android-item-text">Aplicativo Foco 7</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
+                @if(isset($parceiros) && $parceiros->count() > 0)
                 <a href="#parceiros" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-handshake"></i></div>
                     <span class="android-item-text">Empresas Parceiras</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
+                @endif
                 <a href="#faq" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-circle-question"></i></div>
                     <span class="android-item-text">Dúvidas Frequentes</span>
@@ -1110,7 +1114,9 @@
                         <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-sparkles me-1"></i> Estética Automotiva</a></li>
                         <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
                         <li class="mb-2"><a href="#app">Aplicativo</a></li>
+                        @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
+                        @endif
                         <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
                         <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos & LGPD</a></li>
                     </ul>
