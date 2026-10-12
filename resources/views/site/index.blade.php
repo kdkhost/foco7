@@ -162,6 +162,7 @@
                         <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética</a></li>
                         <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
                         <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#parceiros">Parceiros</a></li>
                         <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                     </ul>
@@ -242,6 +243,11 @@
                 <a href="#app" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-mobile-screen-button"></i></div>
                     <span class="android-item-text">Aplicativo Foco 7</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                <a href="#parceiros" class="android-nav-item">
+                    <div class="android-item-icon"><i class="fas fa-handshake"></i></div>
+                    <span class="android-item-text">Empresas Parceiras</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 <a href="#faq" class="android-nav-item">
@@ -872,7 +878,63 @@
         </div>
     </section>
 
-    <!-- 10. PERGUNTAS FREQUENTES (FAQ) -->
+    @if(isset($parceiros) && $parceiros->count() > 0)
+    <!-- 10. EMPRESAS PARCEIRAS & TECNOLOGIAS HOMOLOGADAS (CARROSSEL INFINITO) -->
+    <section id="parceiros" class="section-parceiros">
+        <div class="container position-relative">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-danger fw-bold text-uppercase small">{{ $configs['secao_parceiros_badge'] ?? 'Ecossistema & Homologações' }}</span>
+                <h2 class="display-6 fw-black mt-2" style="color: var(--foco-title);">{{ $configs['secao_parceiros_titulo'] ?? 'Empresas Parceiras & Tecnologias Homologadas' }}</h2>
+                <p class="text-secondary small mt-2 mb-0">{{ $configs['secao_parceiros_subtitulo'] ?? 'Conectados às principais seguradoras, fabricantes de rastreadores e operadoras de telecomunicação do Brasil.' }}</p>
+            </div>
+
+            <!-- CARROSSEL TOUCH & DRAG INFINITO DE PARCEIROS -->
+            <div class="parceiros-carousel-container position-relative">
+                <!-- Botão Anterior -->
+                <button type="button" class="swiper-btn-parceiros swiper-btn-prev" id="btnParceirosPrev" aria-label="Parceiro Anterior" title="Parceiro Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Container Principal Swiper -->
+                <div class="swiper swiper-parceiros">
+                    <div class="swiper-wrapper">
+                        @foreach($parceiros as $parceiro)
+                        <div class="swiper-slide h-auto">
+                            @if(!empty($parceiro->link))
+                            <a href="{{ $parceiro->link }}" target="_blank" rel="noopener noreferrer" class="card-parceiro h-100" title="{{ $parceiro->nome }} - Visitar site oficial">
+                            @else
+                            <div class="card-parceiro h-100" title="{{ $parceiro->nome }}">
+                            @endif
+                                <div class="parceiro-logo-wrapper">
+                                    <img src="{{ $parceiro->logo_url }}" alt="{{ $parceiro->nome }}" class="parceiro-logo-img" loading="lazy" onerror="this.src='/img/logo.png'">
+                                </div>
+                                <h6 class="parceiro-nome mb-1">{{ $parceiro->nome }}</h6>
+                                @if(!empty($parceiro->categoria))
+                                <span class="parceiro-categoria">{{ $parceiro->categoria }}</span>
+                                @endif
+                            @if(!empty($parceiro->link))
+                            </a>
+                            @else
+                            </div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Indicadores de Paginação (Bullets) -->
+                    <div class="swiper-pagination swiper-pagination-parceiros mt-4 position-relative"></div>
+                </div>
+
+                <!-- Botão Próximo -->
+                <button type="button" class="swiper-btn-parceiros swiper-btn-next" id="btnParceirosNext" aria-label="Próximo Parceiro" title="Próximo Parceiro">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- 11. PERGUNTAS FREQUENTES (FAQ) -->
     <section id="faq" class="section-faq">
         <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">
@@ -1031,6 +1093,7 @@
                         <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-sparkles me-1"></i> Estética Automotiva</a></li>
                         <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
                         <li class="mb-2"><a href="#app">Aplicativo</a></li>
+                        <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
                         <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
                         <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos & LGPD</a></li>
                     </ul>
@@ -2472,6 +2535,56 @@
                         // Telas widescreen (>= 1280px): 4 por vez na tela
                         1280: {
                             slidesPerView: 4,
+                            spaceBetween: 24,
+                        }
+                    }
+                });
+            }
+
+            // ========================================================
+            // CARROSSEL DE PARCEIROS: INFINITO, TOUCH, MOUSE DRAG & RESPONSIVO
+            // ========================================================
+            if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-parceiros')) {
+                var swiperParceiros = new Swiper('.swiper-parceiros', {
+                    slidesPerView: 2,
+                    spaceBetween: 16,
+                    loop: true,
+                    grabCursor: true,
+                    simulateTouch: true,
+                    touchRatio: 1.2,
+                    speed: 700,
+                    autoplay: {
+                        delay: 3500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-parceiros',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '#btnParceirosNext',
+                        prevEl: '#btnParceirosPrev',
+                    },
+                    breakpoints: {
+                        0: {
+                            slidesPerView: 2,
+                            spaceBetween: 12,
+                        },
+                        576: {
+                            slidesPerView: 3,
+                            spaceBetween: 16,
+                        },
+                        768: {
+                            slidesPerView: 4,
+                            spaceBetween: 20,
+                        },
+                        1024: {
+                            slidesPerView: 5,
+                            spaceBetween: 24,
+                        },
+                        1280: {
+                            slidesPerView: 6,
                             spaceBetween: 24,
                         }
                     }

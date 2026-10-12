@@ -9,6 +9,7 @@ use App\Models\BannerSlide;
 use App\Models\Plano;
 use App\Models\Faq;
 use App\Models\Depoimento;
+use App\Models\Parceiro;
 use App\Models\SeoConfig;
 use App\Models\Agendamento;
 use App\Models\ServicoEstetica;
@@ -32,6 +33,7 @@ class SiteController extends Controller
         $servicosEstetica = ServicoEstetica::where('ativo', true)->orderBy('ordem')->get();
         $faqs = Faq::ativo()->get();
         $depoimentos = Depoimento::ativo()->get();
+        $parceiros = Parceiro::ativo()->ordenado()->get();
         $seo = SeoConfig::paraPagina('home');
 
         $logoFundoEscuro = CmsSetting::getLogo('escuro');
@@ -207,9 +209,14 @@ class SiteController extends Controller
             'recaptcha_site_key' => CmsSetting::get('recaptcha_site_key', ''),
             'recaptcha_secret_key' => CmsSetting::get('recaptcha_secret_key', ''),
             'recaptcha_ativo' => CmsSetting::get('recaptcha_ativo', '0'),
+
+            // Seção Parceiros & Homologações
+            'secao_parceiros_badge' => CmsSetting::get('secao_parceiros_badge', 'Ecossistema & Homologações'),
+            'secao_parceiros_titulo' => CmsSetting::get('secao_parceiros_titulo', 'Empresas Parceiras & Tecnologias Homologadas'),
+            'secao_parceiros_subtitulo' => CmsSetting::get('secao_parceiros_subtitulo', 'Conectados às principais seguradoras, fabricantes de rastreadores e operadoras de telecomunicação do Brasil.'),
         ];
 
-        return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'seo', 'configs'));
+        return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'parceiros', 'seo', 'configs'));
     }
 
     /**

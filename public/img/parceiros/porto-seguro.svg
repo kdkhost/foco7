@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <g fill="none" fill-rule="evenodd" transform="translate(10, 10)">
+    <circle cx="16" cy="20" r="14" fill="#d90000" opacity="0.15"/>
+    <path d="M16 9 L25 15 L25 24 C25 29 16 33 16 33 C16 33 7 29 7 24 L7 15 Z" fill="#d90000"/>
+    <text x="36" y="27" font-family="'Outfit', -apple-system, sans-serif" font-size="18" font-weight="800" fill="currentColor" letter-spacing="0.5">PORTO SEGURO</text>
+  </g>
+</svg>

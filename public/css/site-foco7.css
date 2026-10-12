@@ -2798,4 +2798,195 @@ img, svg, video, canvas, audio, iframe, embed, object {
     transform: translateY(-1px);
 }
 
+/* ==============================================================================
+   11. SEÇÃO DE PARCEIROS & HOMOLOGAÇÕES (CARROSSEL INFINITO TOUCH & DRAG)
+   ============================================================================== */
+.section-parceiros {
+    background: #ffffff;
+    padding: 85px 0 95px 0;
+    border-bottom: 1px solid var(--foco-border);
+    position: relative;
+    overflow: hidden;
+}
+
+[data-bs-theme="dark"] .section-parceiros {
+    background: #0f121a;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.parceiros-carousel-container {
+    position: relative;
+    padding: 0 16px;
+}
+
+.swiper-parceiros {
+    width: 100%;
+    padding: 16px 4px 34px 4px !important;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.swiper-parceiros:active,
+.swiper-parceiros.swiper-grabbing {
+    cursor: grabbing;
+}
+
+.swiper-parceiros .swiper-slide {
+    height: auto;
+    display: flex;
+    box-sizing: border-box;
+}
+
+.card-parceiro {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid var(--foco-border);
+    border-radius: 18px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    text-decoration: none !important;
+    color: inherit;
+    min-height: 140px;
+}
+
+[data-bs-theme="dark"] .card-parceiro {
+    background: #171c28;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-parceiro:hover {
+    background: #ffffff;
+    border-color: rgba(var(--bs-primary-rgb), 0.45);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme="dark"] .card-parceiro:hover {
+    background: #1e2434;
+    border-color: var(--foco-red);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.parceiro-logo-wrapper {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.85rem;
+    padding: 4px 8px;
+}
+
+.parceiro-logo-img {
+    max-width: 100%;
+    max-height: 52px;
+    object-fit: contain;
+    filter: grayscale(80%) opacity(85%);
+    transition: all 0.35s ease;
+}
+
+.card-parceiro:hover .parceiro-logo-img {
+    filter: grayscale(0%) opacity(100%);
+    transform: scale(1.05);
+}
+
+.parceiro-nome {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--foco-title);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+}
+
+.parceiro-categoria {
+    font-size: 0.73rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+}
+
+[data-bs-theme="dark"] .parceiro-categoria {
+    color: #94a3b8;
+}
+
+/* SETAS DE NAVEGAÇÃO DOS PARCEIROS */
+.swiper-btn-parceiros {
+    position: absolute;
+    top: calc(50% - 20px);
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid var(--foco-border);
+    color: var(--foco-title);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-bs-theme="dark"] .swiper-btn-parceiros {
+    background: #1e2434;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.swiper-btn-parceiros:hover {
+    background: var(--foco-red);
+    border-color: var(--foco-red);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(var(--bs-primary-rgb), 0.35);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.swiper-btn-parceiros.swiper-btn-prev {
+    left: -8px;
+}
+
+.swiper-btn-parceiros.swiper-btn-next {
+    right: -8px;
+}
+
+@media (max-width: 768px) {
+    .swiper-btn-parceiros {
+        display: none !important;
+    }
+    .parceiros-carousel-container {
+        padding: 0 4px;
+    }
+}
+
+/* PAGINAÇÃO EM BULLETS DOS PARCEIROS */
+.swiper-pagination-parceiros .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+    background: #cbd5e1;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.swiper-pagination-parceiros .swiper-pagination-bullet-active {
+    width: 24px;
+    border-radius: 4px;
+    background: var(--foco-red);
+    opacity: 1;
+}
+
+
 

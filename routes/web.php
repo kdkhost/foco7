@@ -114,6 +114,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/{id}', [DepoimentosController::class, 'excluir'])->name('admin.depoimentos.excluir');
     });
 
+    // Parceiros & Marcas Homologadas (Carrossel Infinito CMS)
+    Route::prefix('parceiros')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ParceirosController::class, 'index'])->name('admin.parceiros.index');
+        Route::get('/obter/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'obter'])->name('admin.parceiros.obter');
+        Route::post('/salvar', [\App\Http\Controllers\Admin\ParceirosController::class, 'salvar'])->name('admin.parceiros.salvar');
+        Route::post('/toggle/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'toggle'])->name('admin.parceiros.toggle');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'excluir'])->name('admin.parceiros.excluir');
+    });
+
     // Estética Automotiva (Serviços & Pacotes)
     Route::prefix('estetica')->group(function () {
         Route::get('/', [ServicosEsteticaController::class, 'index'])->name('admin.estetica.index');
@@ -227,6 +236,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/', [ConfiguracoesController::class, 'index'])->name('admin.configuracoes.index');
         Route::post('/salvar', [ConfiguracoesController::class, 'salvar'])->name('admin.configuracoes.salvar');
         Route::post('/testar-smtp', [ConfiguracoesController::class, 'testarSmtp'])->name('admin.configuracoes.testar_smtp');
+        Route::post('/testar-geoip', [ConfiguracoesController::class, 'testarGeoip'])->name('admin.configuracoes.testar_geoip');
     });
 
     // Central de Notificações (Web Push, E-mails e Alertas em Tempo Real)

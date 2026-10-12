@@ -275,18 +275,55 @@ public_html/
 | **Módulo 26**| Dashboard Reformulada com KPIs Animados, Contador de Visitas & Analítico Completo (Chart.js), Cancelamento de Agendamentos e Antecipação de Parcelas Financeiras | ✅ Concluído & Validado |
 | **Módulo 27**| Auditoria Contábil de Faturas (Bloqueio Direto & Estorno Manual com Recálculo da Receita), Logo Adaptável em Auth, Visualização de Senha e Proteção contra Força Bruta | ✅ Concluído & Validado |
 | **Módulo 28**| Área do Cliente Completa: Cancelamento de Agendamentos Online com Notificação Automática, Gestão Cadastral Completa, Alteração Segura de Senha com Botões de Olho, Avatar com Drag & Drop e Alternância Dinâmica de Logo/Favicon na Sidebar (Compactada e no Hover) | ✅ Concluído & Validado |
+| **Módulo 29**| Blindagem Geográfica para as Américas (Prevenção de Ataques, Scanners e Injeções de Países Europeus/Asiáticos com Painel de Controle, Whitelist e Simulador AJAX) & Seção de Empresas Parceiras em Carrossel Infinito Touch & Drag (Gerenciamento CMS, Logos Vetorizadas Oficiais e Suporte aos Modos Claro/Escuro) | ✅ Concluído & Validado |
+
+---
+
+## 🌎 Módulo 29: Bloqueio Geográfico (Américas) & Carrossel Infinito de Parceiros
+
+### 1. Bloqueio Geográfico para as Américas (Geo-Restrição)
+- **Objetivo:** Blindar o sistema contra tráfego malicioso, bots automatizados, scanners de vulnerabilidades e tentativas de injeção provenientes de servidores fora do continente americano (Europa, Ásia, África e Oceania).
+- **Cobertura Territorial:** Abrange todas as nações da América do Sul (Brasil, Argentina, Chile, Colômbia, etc.), América do Norte (Estados Unidos, Canadá, México), América Central e Caribe.
+- **Detecção Multicamadas de Alta Precisão:**
+  - Identificação de cabeçalhos de borda Cloudflare (`CF-IPCountry`, `X-Country-Code`).
+  - Consulta georreferenciada de IP com cache de 24 horas por endereço.
+  - Reconhecimento automático de IPs locais (`127.0.0.1`, `::1`) e faixas privadas (`192.168.*`, `10.*`).
+  - Isenção automática de rotas críticas: Webhooks de pagamento bancário (`/webhook/*`), instalador (`/instalar*`) e bypass autenticado.
+- **Painel Administrativo (`/admin/configuracoes`):**
+  - Botão de ativação/desativação instantânea do Geo-bloqueio.
+  - Configuração de lista branca de IPs permitidos (*Whitelist* com suporte a curingas).
+  - Simulador interativo em tempo real via AJAX: permite digitar qualquer IP ou código de país e obter diagnóstico imediato de aprovação/bloqueio com badge colorido.
+- **Tela de Bloqueio Amigável (HTTP 403 Forbidden):**
+  - Página estilizada com o padrão visual da Foco 7 (`resources/views/errors/geoblock.blade.php`), informando com clareza o motivo da restrição geográfica, exibindo o IP e o país detectado do visitante, com botão de contato humanizado via WhatsApp para desvio de falsos positivos.
+
+### 2. Seção de Empresas Parceiras no Carrossel Infinito (Landing Page & CMS)
+- **Apresentação na Landing Page:**
+  - Carrossel infinito contínuo construído com **Swiper 11** com as mesmas regras do carrossel de depoimentos.
+  - Suporte completo a **Touch & Drag** (mouse no computador e arrasto fluido no celular/tablet).
+  - Autoplay suave com desaceleração e pausa automática ao passar o ponteiro do mouse (*Pause on Mouse Enter*).
+  - Responsividade total: 2 logotipos em smartphones, 3 a 4 em tablets e 5 a 6 em monitores widescreen.
+  - Botões de navegação estilizados e paginação sutil em bullets com a paleta oficial da Foco 7.
+  - Logotipos vetorizados de alta definição (SVGs oficiais homologados: Cobli, Sascar, Porto Seguro, Mapfre, Tokio Marine, Teltonika, Suntech, Queclink).
+  - Adaptação dinâmica para **Modo Escuro (Dark Mode)** e **Modo Claro (Light Mode)**.
+- **Painel Administrativo Dedicado (`/admin/parceiros`):**
+  - Small Boxes com KPIs em tempo real (Total de marcas, ativas no carrossel e inativas).
+  - Tabela responsiva com logo, nome, categoria/descrição, ordem de exibição, link externo seguro (`target="_blank" rel="noopener noreferrer"`) e status ativo.
+  - Alternância de ativação em 1 clique via AJAX com confirmação por SweetAlert2/Toastr.
+  - Upload intuitivo de logomarca via **FocoDropzone** com drag & drop e visualização imediata da imagem.
+  - Edição dos títulos e subtítulos da seção diretamente na aba de seções do CMS (`/admin/cms`).
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **84 testes executados, 84 aprovados (100% de sucesso), 375 asserções**.
-- Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
+- **93 testes executados, 93 aprovados (100% de sucesso), 419 asserções**.
+- Cobertura de rotas públicas, moderação de depoimentos, bloqueio geográfico de países fora das Américas, liberação de países americanos, bypass por whitelist de IP, rotas de webhook isentas de bloqueio geográfico, CRUD e toggle de parceiros via AJAX, carrossel infinito de parceiros, moderação de depoimentos com toggle AJAX e exclusão SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
 
 ## 🔒 Segurança e Otimização para cPanel
+- **Blindagem Geográfica:** Restrição regional para as Américas gerenciável pelo painel administrativo com proteção ativa contra vetores de ataque transcontinentais.
 - **Cabeçalhos de Segurança Estritos:** Middleware `SecurityHeaders` injeta proteção contra Clickjacking (`X-Frame-Options: SAMEORIGIN`), MIME-Sniffing (`X-Content-Type-Options: nosniff`) e XSS (`X-XSS-Protection`).
 - **Proteção contra Força Bruta:** Limitação de taxa de requisições (*Rate Limiting*) em rotas de login e autenticação sensíveis.
 - **Isenção de CSRF Segura:** Rotas `/webhook/*` isentas de CSRF para integração com APIs externas (Mercado Pago e Efí PRO).

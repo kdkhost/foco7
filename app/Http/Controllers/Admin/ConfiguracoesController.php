@@ -60,6 +60,11 @@ class ConfiguracoesController extends Controller
             'recaptcha_site_key' => CmsSetting::get('recaptcha_site_key', ''),
             'recaptcha_secret_key' => CmsSetting::get('recaptcha_secret_key', ''),
             'recaptcha_ativo' => CmsSetting::get('recaptcha_ativo', '0'),
+
+            // Bloqueio Geográfico & Proteção Regional (Apenas Américas)
+            'geoblock_ativo' => CmsSetting::get('geoblock_ativo', '1'),
+            'geoblock_regioes' => CmsSetting::get('geoblock_regioes', 'Americas'),
+            'geoblock_ips_liberados' => CmsSetting::get('geoblock_ips_liberados', '127.0.0.1,::1'),
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -80,6 +85,7 @@ class ConfiguracoesController extends Controller
             'mail_username', 'mail_from_address', 'mail_from_name',
             'social_instagram', 'social_facebook', 'social_linkedin', 'social_youtube',
             'recaptcha_site_key', 'recaptcha_secret_key',
+            'geoblock_regioes', 'geoblock_ips_liberados',
         ];
 
         foreach ($camposTexto as $campo) {
@@ -88,8 +94,9 @@ class ConfiguracoesController extends Controller
             }
         }
 
-        // Status do reCAPTCHA
+        // Status do reCAPTCHA e Geo-Bloqueio
         CmsSetting::set('recaptcha_ativo', $request->has('recaptcha_ativo') ? '1' : '0', 'sistema');
+        CmsSetting::set('geoblock_ativo', $request->has('geoblock_ativo') ? '1' : '0', 'sistema');
 
         // Senha SMTP (só atualiza se preenchida)
         if ($request->filled('mail_password')) {
@@ -221,5 +228,20 @@ class ConfiguracoesController extends Controller
                 'message' => 'Falha na conexão SMTP: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Testa ou simula bloqueio geográfico por IP ou código de país via AJAX
+     */
+    public function testarGeoip(Request $request)
+    {
+        $termo = $request->input('ip') ?? $request->input('termo', 'BR');
+        $resultado = \App\Services\GeoIpService::simular($termo);
+
+        return response()->json([
+            'success' => true,
+            'resultado' => $resultado,
+            'dados' => $resultado,
+        ]);
     }
 }

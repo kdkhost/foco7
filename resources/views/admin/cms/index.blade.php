@@ -889,6 +889,43 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- 5. SEÇÃO PARCEIROS & HOMOLOGAÇÕES (CARROSSEL INFINITO) -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-handshake me-2"></i> Seção Parceiros & Tecnologias Homologadas (Carrossel Infinito)</h6>
+                            <a href="{{ route('admin.parceiros.index') }}" class="btn btn-sm btn-outline-danger fw-bold">
+                                <i class="fas fa-external-link-alt me-1"></i> Gerenciar Logotipos dos Parceiros
+                            </a>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge Superior</label>
+                                    <input type="text" name="secao_parceiros_badge" class="form-control" value="{{ $settings['secao_parceiros_badge'] ?? 'Ecossistema & Homologações' }}">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
+                                    <input type="text" name="secao_parceiros_titulo" class="form-control" value="{{ $settings['secao_parceiros_titulo'] ?? 'Empresas Parceiras & Tecnologias Homologadas' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Subtítulo Explicativo</label>
+                                    <input type="text" name="secao_parceiros_subtitulo" class="form-control" value="{{ $settings['secao_parceiros_subtitulo'] ?? 'Conectados às principais seguradoras, fabricantes de rastreadores e operadoras de telecomunicação do Brasil.' }}">
+                                </div>
+                            </div>
+                            <div class="alert alert-light border mt-3 mb-0 d-flex align-items-center gap-3">
+                                <div class="text-danger fs-3"><i class="fas fa-info-circle"></i></div>
+                                <div class="small">
+                                    <strong>Carrossel Infinito na Landing Page:</strong> Os parceiros cadastrados em <a href="{{ route('admin.parceiros.index') }}" class="fw-bold text-danger">Empresas Parceiras</a> serão exibidos dinamicamente com suporte a rolagem contínua infinita, touch & drag (mouse e celular) e pausa ao passar o mouse.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-body-tertiary p-3 text-end">
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                                <i class="fas fa-save me-1"></i> SALVAR TEXTOS DA SEÇÃO DE PARCEIROS
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
 

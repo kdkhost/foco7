@@ -30,7 +30,12 @@
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="recaptcha-tab" data-bs-toggle="tab" data-bs-target="#tab-recaptcha" type="button">
-                    <i class="fas fa-shield-alt text-danger me-1"></i> reCAPTCHA v3 & Segurança
+                    <i class="fas fa-shield-alt text-danger me-1"></i> reCAPTCHA v3
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="geoblock-tab" data-bs-toggle="tab" data-bs-target="#tab-geoblock" type="button">
+                    <i class="fas fa-globe-americas text-danger me-1"></i> Bloqueio Geográfico (Américas)
                 </button>
             </li>
         </ul>
@@ -354,6 +359,97 @@
                     </div>
                 </div>
 
+                <!-- ABA 6: BLOQUEIO GEOGRÁFICO & PROTEÇÃO REGIONAL (AMÉRICAS) -->
+                <div class="tab-pane fade" id="tab-geoblock" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card border border-light-subtle shadow-none p-3 bg-body-secondary mb-3">
+                                <div class="form-check form-switch fs-5 mb-2">
+                                    <input class="form-check-input" type="checkbox" name="geoblock_ativo" id="geoblockAtivoSwitch" value="1" {{ $configs['geoblock_ativo'] == '1' ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold fs-6 text-body" for="geoblockAtivoSwitch">
+                                        Ativar Bloqueio Geográfico Restrito às Américas
+                                    </label>
+                                </div>
+                                <p class="text-body-secondary small mb-0">
+                                    Ao manter ativo, visitantes originários de fora das Américas (como países europeus, asiáticos e africanos) são bloqueados preventivamente com status HTTP 403, neutralizando tentativas automatizadas de injeção, varreduras de portas e força bruta.
+                                </p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Continentes &amp; Regiões com Acesso Autorizado</label>
+                                    <div class="p-3 bg-body rounded border">
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
+                                                <i class="fas fa-check-circle me-1"></i> América do Sul (Brasil, Argentina, Chile, etc.)
+                                            </span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
+                                                <i class="fas fa-check-circle me-1"></i> América do Norte (EUA, Canadá, México)
+                                            </span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
+                                                <i class="fas fa-check-circle me-1"></i> América Central &amp; Caribe
+                                            </span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle p-2">
+                                                <i class="fas fa-ban me-1"></i> Europa (Bloqueado)
+                                            </span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle p-2">
+                                                <i class="fas fa-ban me-1"></i> Ásia / África / Oceania (Bloqueado)
+                                            </span>
+                                        </div>
+                                        <input type="hidden" name="geoblock_regioes" value="Americas">
+                                        <small class="text-secondary">O tráfego de toda a extensão do continente americano permanece 100% livre e fluido.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Lista Branca de IPs Isentos de Bloqueio (Whitelist)</label>
+                                    <textarea name="geoblock_ips_liberados" id="geoblockIpsLiberados" rows="3" class="form-control font-monospace small" placeholder="127.0.0.1, ::1, 177.192.4.34">{{ $configs['geoblock_ips_liberados'] }}</textarea>
+                                    <div class="form-text small">
+                                        Insira endereços IP ou ranges com curinga (ex: <code>177.192.*</code>) separados por vírgula ou linha. Esses IPs nunca serão bloqueados, mesmo que estejam operando via VPN estrangeira.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SIMULADOR & TESTADOR DE GEOIP AO VIVO -->
+                        <div class="col-lg-4">
+                            <div class="card bg-dark text-white border-secondary p-3">
+                                <h6 class="fw-bold text-white mb-2">
+                                    <i class="fas fa-vial text-danger me-2"></i> Simulador de Bloqueio GeoIP
+                                </h6>
+                                <p class="small text-white-50 mb-3">
+                                    Teste em tempo real como o sistema reagirá a requisições de diferentes países ou IPs.
+                                </p>
+
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold text-white">Selecione ou Digite um País / IP:</label>
+                                    <select class="form-select form-select-sm mb-2" id="selectSimularPais">
+                                        <option value="DE">🇩🇪 Alemanha (Europa) - Alvo Comum</option>
+                                        <option value="FR">🇫🇷 França (Europa)</option>
+                                        <option value="RU">🇷🇺 Rússia (Europa/Ásia)</option>
+                                        <option value="NL">🇳🇱 Holanda (Europa)</option>
+                                        <option value="GB">🇬🇧 Reino Unido (Europa)</option>
+                                        <option value="CN">🇨🇳 China (Ásia)</option>
+                                        <option value="BR" selected>🇧🇷 Brasil (América do Sul) - Permitido</option>
+                                        <option value="US">🇺🇸 Estados Unidos (América do Norte) - Permitido</option>
+                                        <option value="AR">🇦🇷 Argentina (América do Sul) - Permitido</option>
+                                    </select>
+                                    <input type="text" id="inputSimularIp" class="form-control form-control-sm font-monospace" placeholder="Ou digite um IP específico (ex: 185.220.101.5)">
+                                </div>
+
+                                <button type="button" class="btn btn-outline-danger btn-sm w-100 fw-bold mt-2" id="btnTestarGeoip">
+                                    <i class="fas fa-search-location me-1"></i> TESTAR REGRA DE ACESSO
+                                </button>
+
+                                <div id="boxResultadoGeoip" class="mt-3 p-2 rounded small d-none border">
+                                    <div class="fw-bold mb-1" id="resGeoTitulo"></div>
+                                    <div class="text-white-50" id="resGeoDetalhe"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="mt-4 pt-3 border-top text-end">
@@ -438,6 +534,50 @@
                         confirmButtonColor: '#d90000'
                     });
                     window.foco7Notify.error(msg);
+                }
+            });
+        });
+
+        // Teste de GeoIP via AJAX
+        $('#btnTestarGeoip').on('click', function () {
+            var $btn = $(this);
+            var ipDigitado = $('#inputSimularIp').val().trim();
+            var termo = ipDigitado || $('#selectSimularPais').val();
+
+            var origHtml = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Analisando Origem...');
+
+            $.ajax({
+                url: "{{ route('admin.configuracoes.testar_geoip') }}",
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    termo: termo
+                },
+                dataType: 'json',
+                success: function (res) {
+                    $btn.prop('disabled', false).html(origHtml);
+                    if (res.success && res.resultado) {
+                        var r = res.resultado;
+                        var $box = $('#boxResultadoGeoip');
+                        $box.removeClass('d-none border-success border-danger bg-success-subtle bg-danger-subtle');
+
+                        if (r.is_americas) {
+                            $box.addClass('border-success bg-success bg-opacity-10');
+                            $('#resGeoTitulo').html('<i class="fas fa-check-circle text-success me-1"></i> ' + r.resultado).removeClass('text-danger').addClass('text-success');
+                        } else {
+                            $box.addClass('border-danger bg-danger bg-opacity-10');
+                            $('#resGeoTitulo').html('<i class="fas fa-ban text-danger me-1"></i> ' + r.resultado).removeClass('text-success').addClass('text-danger');
+                        }
+
+                        var detalhe = (r.nome || r.pais || termo) + ' (' + (r.codigo || '') + ') &bull; ' + (r.continente || 'Continente avaliado');
+                        $('#resGeoDetalhe').html(detalhe);
+                        window.foco7Notify.info('Teste GeoIP concluído para: ' + (r.nome || r.pais || termo));
+                    }
+                },
+                error: function () {
+                    $btn.prop('disabled', false).html(origHtml);
+                    window.foco7Notify.error('Falha ao simular localização GeoIP.');
                 }
             });
         });

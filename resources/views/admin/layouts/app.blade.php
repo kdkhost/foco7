@@ -317,7 +317,7 @@
                             <li class="nav-header">Site &amp; Comunicação</li>
 
                             @php
-                                $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*') || request()->routeIs('admin.depoimentos.*');
+                                $isCmsActive = request()->routeIs('admin.cms.*') || request()->routeIs('admin.seo.*') || request()->routeIs('admin.depoimentos.*') || request()->routeIs('admin.parceiros.*');
                             @endphp
                             <li class="nav-item {{ $isCmsActive ? 'menu-open' : '' }}">
                                 <a href="javascript:void(0)" class="nav-link {{ $isCmsActive ? 'active' : '' }}">
@@ -332,6 +332,12 @@
                                         <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.index') ? 'active' : '' }}">
                                             <i class="nav-icon far fa-circle"></i>
                                             <p>Editor Geral (CMS)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.parceiros.index') }}" class="nav-link {{ request()->routeIs('admin.parceiros.*') ? 'active' : '' }}">
+                                            <i class="nav-icon far fa-circle"></i>
+                                            <p>Empresas Parceiras</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

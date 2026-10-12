@@ -93,7 +93,14 @@ class DatabaseSeeder extends Seeder
             ['chave' => 'efi_ativo', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ativar Efí PRO (Gerencianet)'],
             ['chave' => 'efi_sandbox', 'valor' => '1', 'grupo' => 'gateways', 'tipo' => 'boolean', 'descricao' => 'Ambiente Sandbox Efí PRO'],
 
+            // Bloqueio Geográfico & Proteção Regional (Apenas Américas)
+            ['chave' => 'geoblock_ativo', 'valor' => '1', 'grupo' => 'seguranca', 'tipo' => 'boolean', 'descricao' => 'Ativar Bloqueio Geográfico (Apenas Américas)'],
+            ['chave' => 'geoblock_regioes', 'valor' => 'Americas', 'grupo' => 'seguranca', 'tipo' => 'text', 'descricao' => 'Continentes e Regiões Permitidas'],
+            ['chave' => 'geoblock_ips_liberados', 'valor' => '127.0.0.1,::1,177.192.4.34', 'grupo' => 'seguranca', 'tipo' => 'textarea', 'descricao' => 'Lista branca de IPs isentos de bloqueio'],
+
             // Textos das Seções do Site (Gerenciamento Total via CMS)
+            ['chave' => 'secao_parceiros_titulo', 'valor' => 'Nossos Parceiros & Tecnologias Homologadas', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção de Parceiros'],
+            ['chave' => 'secao_parceiros_subtitulo', 'valor' => 'Integração de alta performance com os principais fabricantes de telemetria, hardwares IoT e seguradoras líderes.', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Subtítulo da seção de Parceiros'],
             ['chave' => 'secao_sobre_titulo', 'valor' => 'Mais de 10 Anos de Autoridade em Segurança Veicular', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Título da seção Sobre'],
             ['chave' => 'secao_sobre_subtitulo', 'valor' => 'A Foco 7 nasceu com a missão de transformar tecnologia de rastreamento em tranquilidade real.', 'grupo' => 'secoes', 'tipo' => 'text', 'descricao' => 'Subtítulo da seção Sobre'],
             ['chave' => 'secao_sobre_texto', 'valor' => 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.', 'grupo' => 'secoes', 'tipo' => 'textarea', 'descricao' => 'Texto descritivo da seção Sobre'],
@@ -503,5 +510,8 @@ class DatabaseSeeder extends Seeder
 
         // 11. Rotinas Oficiais da Central de Cron
         $this->call(CronJobsSeeder::class);
+
+        // 12. Empresas Parceiras Homologadas
+        $this->call(ParceirosSeeder::class);
     }
 }
