@@ -143,7 +143,7 @@
                                     <span class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">Fundo Escuro</span>
                                 </div>
                                 <p class="small text-secondary mb-2" style="font-size: 0.78rem;">
-                                    Letras brancas/claras. Exibido no rodapé do site, na barra lateral do painel admin e temas escuros.
+                                    Letras brancas/claras. Exibido na barra lateral do painel admin, blocos e cabeçalhos escuros.
                                 </p>
                                 <div class="foco-dropzone"
                                      data-input-name="logo_upload"
@@ -168,7 +168,7 @@
                                     <span class="badge bg-secondary-subtle text-dark border font-monospace" style="font-size: 0.7rem;">Fundo Claro</span>
                                 </div>
                                 <p class="small text-muted mb-2" style="font-size: 0.78rem;">
-                                    Letras pretas/escuras. Exibido no topo/navbar da Landing Page, termos de privacidade e páginas claras.
+                                    Letras pretas/escuras. Exibido no topo/navbar, no rodapé do site, termos de privacidade e páginas claras.
                                 </p>
                                 <div class="foco-dropzone"
                                      data-input-name="logo_light_upload"

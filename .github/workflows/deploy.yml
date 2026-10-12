@@ -1,0 +1,23 @@
+name: Deploy Automático para o Servidor cPanel (Foco 7)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Sincronizar Arquivos com o Servidor
+    runs-on: ubuntu-latest
+    if: github.repository == 'kdkhost/foco7'
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validar Configuração de Deploy
+        run: |
+          echo "Commit disparado com sucesso para a branch master."
+          echo "Repositório preparado para deploy automático no cPanel via Git Version Control (.cpanel.yml)."

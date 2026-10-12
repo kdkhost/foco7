@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/fococomb/public_html/
+    - /bin/rsync -av --exclude='.git' --exclude='.env' --exclude='storage/logs/*.log' ./ $DEPLOYPATH
+    - /bin/chmod -R 755 $DEPLOYPATH/public
+    - /bin/chmod -R 775 $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache
