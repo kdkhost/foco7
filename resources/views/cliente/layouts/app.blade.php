@@ -103,6 +103,11 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item {{ request()->routeIs('cliente.perfil*') ? 'active' : '' }}" href="{{ route('cliente.perfil') }}">
+                                    <i class="fas fa-user-cog me-2 text-danger"></i> Meu Perfil &amp; Senha
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item {{ request()->routeIs('cliente.faturas.*') ? 'active' : '' }}" href="{{ route('cliente.faturas.index') }}">
                                     <i class="fas fa-file-invoice-dollar me-2 text-danger"></i> Minhas Faturas
                                 </a>
@@ -125,10 +130,11 @@
 
         <!-- SIDEBAR DO ADMINLTE 4 (ÁREA DO CLIENTE) -->
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-            <div class="sidebar-brand d-flex align-items-center justify-content-start px-3 py-3 border-bottom border-secondary">
-                <a href="{{ route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2 w-100">
-                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image">
-                    <span class="badge bg-primary ms-auto small">CLIENTE</span>
+            <div class="sidebar-brand d-flex align-items-center justify-content-between px-3 py-3 border-bottom border-secondary">
+                <a href="{{ route('cliente.dashboard') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2">
+                    <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image logo-sidebar-full" id="sidebarLogoFull">
+                    <img src="{{ asset('img/favicon.png') }}" alt="Foco 7" height="32" width="32" class="brand-image logo-sidebar-favicon" id="sidebarLogoFavicon" style="object-fit: contain;">
+                    <span class="badge bg-primary ms-1 small brand-badge">CLIENTE</span>
                 </a>
             </div>
 
@@ -139,6 +145,13 @@
                             <a href="{{ route('cliente.dashboard') }}" class="nav-link {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Painel do Assinante</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('cliente.perfil') }}" class="nav-link {{ request()->routeIs('cliente.perfil*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p>Meu Perfil &amp; Senha</p>
                             </a>
                         </li>
 
@@ -251,6 +264,51 @@
             @if(session('info'))
                 window.foco7Notify.info("{{ session('info') }}");
             @endif
+
+            // Sincronização e Alternância Automática de Logo Completa para Favicon quando a Sidebar for Compactada e no Hover
+            function sincronizarLogoSidebar(forceFull) {
+                const isCollapsed = document.body.classList.contains('sidebar-collapse');
+                const isHovered = $('.app-sidebar:hover').length > 0 || forceFull === true;
+                const logoFull = document.getElementById('sidebarLogoFull');
+                const logoFavicon = document.getElementById('sidebarLogoFavicon');
+                const brandBadge = document.querySelector('.sidebar-brand .brand-badge');
+
+                if (logoFull && logoFavicon) {
+                    if (isCollapsed && !isHovered) {
+                        logoFull.style.setProperty('display', 'none', 'important');
+                        logoFavicon.style.setProperty('display', 'inline-block', 'important');
+                        if (brandBadge) brandBadge.style.setProperty('display', 'none', 'important');
+                    } else {
+                        logoFull.style.setProperty('display', 'inline-block', 'important');
+                        logoFavicon.style.setProperty('display', 'none', 'important');
+                        if (brandBadge) brandBadge.style.setProperty('display', 'inline-block', 'important');
+                    }
+                }
+            }
+
+            sincronizarLogoSidebar();
+            const sidebarObserver = new MutationObserver(function() {
+                sincronizarLogoSidebar();
+            });
+            sidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            const $sidebar = $('.app-sidebar');
+            $sidebar.on('mouseenter', function() {
+                if (document.body.classList.contains('sidebar-collapse')) {
+                    sincronizarLogoSidebar(true);
+                }
+            });
+
+            $sidebar.on('mouseleave', function() {
+                if (document.body.classList.contains('sidebar-collapse')) {
+                    sincronizarLogoSidebar(false);
+                }
+            });
+
+            $(document).on('click', '[data-lte-toggle="sidebar"]', function() {
+                setTimeout(sincronizarLogoSidebar, 40);
+                setTimeout(sincronizarLogoSidebar, 200);
+            });
         });
     </script>
 

@@ -204,7 +204,7 @@
                     <img src="{{ asset(\App\Models\CmsSetting::getLogo('escuro')) }}" alt="Foco 7" height="34" class="brand-image logo-sidebar-full" id="sidebarLogoFull">
 
                     <!-- Favicon Oficial da Foco 7 (Exibido automaticamente quando a sidebar for compactada) -->
-                    <img src="{{ asset('img/favicon.png') }}" alt="Foco 7" height="32" width="32" class="brand-image logo-sidebar-favicon" id="sidebarLogoFavicon" style="display: none; object-fit: contain;">
+                    <img src="{{ asset('img/favicon.png') }}" alt="Foco 7" height="32" width="32" class="brand-image logo-sidebar-favicon" id="sidebarLogoFavicon" style="object-fit: contain;">
 
                     <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} ms-1 small brand-badge">
                         {{ auth()->user()->role === 'admin' ? 'ADMIN' : 'CLIENTE' }}
@@ -720,15 +720,16 @@
             setInterval(sincronizarNotificacoesAdmin, 25000);
             @endif
 
-            // Sincronização e Alternância Automática de Logo Completa para Favicon quando a Sidebar for Compactada
-            function sincronizarLogoSidebar() {
+            // Sincronização e Alternância Automática de Logo Completa para Favicon quando a Sidebar for Compactada e no Hover
+            function sincronizarLogoSidebar(forceFull) {
                 const isCollapsed = document.body.classList.contains('sidebar-collapse');
+                const isHovered = $('.app-sidebar:hover').length > 0 || forceFull === true;
                 const logoFull = document.getElementById('sidebarLogoFull');
                 const logoFavicon = document.getElementById('sidebarLogoFavicon');
                 const brandBadge = document.querySelector('.sidebar-brand .brand-badge');
 
                 if (logoFull && logoFavicon) {
-                    if (isCollapsed) {
+                    if (isCollapsed && !isHovered) {
                         logoFull.style.setProperty('display', 'none', 'important');
                         logoFavicon.style.setProperty('display', 'inline-block', 'important');
                         if (brandBadge) brandBadge.style.setProperty('display', 'none', 'important');
@@ -744,6 +745,19 @@
                 sincronizarLogoSidebar();
             });
             sidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            const $sidebar = $('.app-sidebar');
+            $sidebar.on('mouseenter', function() {
+                if (document.body.classList.contains('sidebar-collapse')) {
+                    sincronizarLogoSidebar(true);
+                }
+            });
+
+            $sidebar.on('mouseleave', function() {
+                if (document.body.classList.contains('sidebar-collapse')) {
+                    sincronizarLogoSidebar(false);
+                }
+            });
 
             $(document).on('click', '[data-lte-toggle="sidebar"]', function() {
                 setTimeout(sincronizarLogoSidebar, 40);

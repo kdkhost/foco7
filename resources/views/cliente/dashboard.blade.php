@@ -161,6 +161,13 @@
                             @if($ag->valor)
                                 <div class="small fw-bold text-body mt-1">R$ {{ number_format($ag->valor, 2, ',', '.') }}</div>
                             @endif
+                            @if(in_array($ag->status, ['pendente', 'confirmado']))
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 btn-cancelar-agendamento-cli" data-id="{{ $ag->id }}" data-servico="{{ $ag->tipo_servico }}">
+                                        <i class="fas fa-times me-1"></i> Cancelar
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     @empty
@@ -361,6 +368,60 @@
                         msg = xhr.responseJSON.message;
                     }
                     window.foco7Notify.error(msg);
+                }
+            });
+        });
+
+        // Cancelamento de agendamento pelo cliente com SweetAlert2
+        $(document).on('click', '.btn-cancelar-agendamento-cli', function () {
+            var agId = $(this).data('id');
+            var servicoNome = $(this).data('servico') || 'este atendimento';
+
+            Swal.fire({
+                title: 'Cancelar Agendamento?',
+                text: 'Deseja realmente cancelar o agendamento de ' + servicoNome + '? O horário reservado será liberado.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d90000',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, cancelar agendamento',
+                cancelButtonText: 'Voltar',
+                reverseButtons: true
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Cancelando...',
+                        text: 'Aguarde um instante...',
+                        allowOutsideClick: false,
+                        didOpen: function () {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/cliente/agendamentos/' + agId + '/cancelar',
+                        type: 'POST',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        success: function (res) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Agendamento Cancelado!',
+                                text: res.message,
+                                confirmButtonColor: '#d90000'
+                            }).then(function () {
+                                location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Erro ao processar o cancelamento.';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Atenção',
+                                text: msg,
+                                confirmButtonColor: '#d90000'
+                            });
+                        }
+                    });
                 }
             });
         });

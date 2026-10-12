@@ -265,6 +265,11 @@ Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function (
     Route::get('/', fn () => redirect()->route('cliente.dashboard'));
     Route::get('/dashboard', [ClienteDashboardController::class, 'index'])->name('cliente.dashboard');
     Route::post('/agendamentos/solicitar', [ClienteDashboardController::class, 'solicitarAgendamento'])->name('cliente.agendamentos.solicitar');
+    Route::post('/agendamentos/{id}/cancelar', [ClienteDashboardController::class, 'cancelarAgendamento'])->name('cliente.agendamentos.cancelar');
     Route::get('/faturas', [ClienteFaturasController::class, 'index'])->name('cliente.faturas.index');
     Route::get('/faturas/{codigo}', [ClienteFaturasController::class, 'detalhes'])->name('cliente.faturas.detalhes');
+    Route::get('/perfil', [ClienteDashboardController::class, 'perfil'])->name('cliente.perfil');
+    Route::post('/perfil/dados', [ClienteDashboardController::class, 'salvarDados'])->name('cliente.perfil.dados');
+    Route::post('/perfil/senha', [ClienteDashboardController::class, 'alterarSenha'])->name('cliente.perfil.senha');
+    Route::post('/perfil/avatar', [ClienteDashboardController::class, 'salvarAvatar'])->name('cliente.perfil.avatar');
 });

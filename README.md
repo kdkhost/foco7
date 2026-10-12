@@ -234,7 +234,12 @@ public_html/
 ### Módulo 25: Notificações Push via OneSignal com Imagem, Small Boxes AdminLTE 4 & Logo Compacta com Favicon
 - **Web Push via OneSignal com Imagem:** Implementação da camada `OneSignalService` com integração à API REST v1 oficial do OneSignal (`/api/v1/notifications`), disparando notificações instantâneas com imagem de banner (`chrome_web_image` e `big_picture`), ícone oficial da Foco 7 e links de redirecionamento. Painel administrativo em `/admin/notificacoes` com gestão de App ID, REST API Key, switch de ativação, preview em tempo real da imagem do push e botão de inscrição de dispositivo via OneSignal SDK v16.
 - **Padronização Oficial AdminLTE 4 (`small-box`):** Substituição dos cards da Central de Notificações pelos componentes oficiais `small-box` do AdminLTE 4 (`text-bg-danger`, `text-bg-warning`, `text-bg-primary`, `text-bg-success`), garantindo tipografia legível, ícones translúcidos no background e barra inferior de ação rápida para filtragem.
-- **Alternância Automática de Logo por Favicon na Sidebar:** Quando a barra lateral é compactada (classe `sidebar-collapse` no body via botão hambúrguer ou resolução adaptativa), a logo completa horizontal é substituída automaticamente pelo favicon quadrado da Foco 7 de forma centralizada e sem distorções, retornando à logo completa com transição suave ao expandir.
+### Módulo 28: Área do Cliente Completa: Cancelamento de Agendamentos, Gestão Cadastral, Alteração Segura de Senha & Sidebar Responsiva
+- **Cancelamento de Agendamentos pelo Assinante:** O cliente pode cancelar seus próprios agendamentos pendentes ou confirmados diretamente na sua Dashboard com confirmação visual via SweetAlert2 (**zero `alert()` nativo**). O cancelamento libera instantaneamente o horário no FullCalendar 6 e gera uma notificação prioritária automática na Central de Notificações do Administrador.
+- **Gestão Cadastral & Endereço Completo:** Nova área `/cliente/perfil` permitindo ao cliente manter atualizados seu Nome, WhatsApp/Telefone, CPF/CNPJ, CEP com preenchimento automático via ViaCEP e endereço completo de instalação/cobrança.
+- **Alteração Segura de Senha com Olho de Visualização:** Aba dedicada de segurança com validação estrita da senha atual via `Hash::check()`, campos de nova senha e confirmação com botões visuais para alternar visibilidade (olho aberto/fechado) e feedback imediato via AJAX.
+- **Upload de Avatar com FocoDropzone:** Suporte a upload por arrastar e soltar (drag & drop), validação de dimensões 1:1, preview em tempo real e opção de remoção imediata.
+- **Alternância Dinâmica de Logo/Favicon na Sidebar da Área do Cliente:** Unificação total com o painel administrativo: a logo completa horizontal alterna automaticamente para o favicon oficial quadrado quando a sidebar é compactada e restaura a logo completa com expansão fluida ao passar o mouse por cima (hover).
 
 ---
 
@@ -266,16 +271,17 @@ public_html/
 | **Módulo 22**| Gestão Universal de Ícones de Planos (FontAwesome 6, Flaticon UIcons, Bootstrap Icons & SVG Livre com Preview ao Vivo) | ✅ Concluído & Validado |
 | **Módulo 23**| Limpeza Automática da Central de Notificações & Reset Universal de Formulários | ✅ Concluído & Validado |
 | **Módulo 24**| Modal de Leitura Detalhada de Notificações com Marcação Automática e Ação Rápida Direta | ✅ Concluído & Validado |
-| **Módulo 25**| Push OneSignal com Imagem, Small Boxes AdminLTE 4 & Alternância de Logo/Favicon na Sidebar | ✅ Concluído & Validado |
+| **Módulo 25**| Push OneSignal com Imagem, Small Boxes AdminLTE 4 & Alternância Dinâmica de Logo/Favicon na Sidebar (Compactada e no Hover) | ✅ Concluído & Validado |
 | **Módulo 26**| Dashboard Reformulada com KPIs Animados, Contador de Visitas & Analítico Completo (Chart.js), Cancelamento de Agendamentos e Antecipação de Parcelas Financeiras | ✅ Concluído & Validado |
 | **Módulo 27**| Auditoria Contábil de Faturas (Bloqueio Direto & Estorno Manual com Recálculo da Receita), Logo Adaptável em Auth, Visualização de Senha e Proteção contra Força Bruta | ✅ Concluído & Validado |
+| **Módulo 28**| Área do Cliente Completa: Cancelamento de Agendamentos Online com Notificação Automática, Gestão Cadastral Completa, Alteração Segura de Senha com Botões de Olho, Avatar com Drag & Drop e Alternância Dinâmica de Logo/Favicon na Sidebar (Compactada e no Hover) | ✅ Concluído & Validado |
 
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/`):
-- **79 testes executados, 79 aprovados (100% de sucesso), 353 asserções**.
+- **84 testes executados, 84 aprovados (100% de sucesso), 375 asserções**.
 - Cobertura de rotas públicas, moderação de depoimentos, toggle AJAX e exclusão com SweetAlert2, anti-spam honeypot, bloqueio de injeções SQL/XSS, validação Google reCAPTCHA v3, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), cálculo de taxas repassadas, fluxo de agendamento online, cancelamento de agendamentos com liberação de horário no calendário, formulário de contato, notificações Web Push e transacionais por e-mail, abertura e marcação de lida de notificações, contador de visitas com respeito à LGPD (hash SHA-256) e analítico de tráfego, antecipação individual e em lote de faturas com desconto, bloqueio de alteração direta de faturas quitadas com estorno manual e recálculo da receita contábil, proteção contra força bruta no login/cadastro/redefinição com Rate Limiting duplo e Honeypots, webhooks isentos de CSRF, templates de e-mail, CRUD de estética, clientes e faturas, edição no CMS, sincronização de paleta visual oficial Foco 7, cabeçalhos de segurança HTTP e isolamento ACL.
 
 ---
