@@ -142,18 +142,32 @@
                             </thead>
                             <tbody>
                                 @foreach($depoimentos as $dep)
+                                    @php
+                                        $partesNome = array_filter(explode(' ', trim($dep->nome_cliente)));
+                                        $primeiraLetra = !empty($partesNome) ? mb_substr(array_shift($partesNome), 0, 1, 'UTF-8') : 'C';
+                                        $segundaLetra = !empty($partesNome) ? mb_substr(array_pop($partesNome), 0, 1, 'UTF-8') : '';
+                                        $iniciais = mb_strtoupper($primeiraLetra . $segundaLetra, 'UTF-8');
+                                    @endphp
                                     <tr id="dep-row-{{ $dep->id }}" class="{{ !$dep->ativo ? 'bg-warning bg-opacity-10' : '' }}">
                                         <td>
-                                            @if($dep->foto)
-                                                <img src="{{ asset($dep->foto) }}" alt="{{ $dep->nome_cliente }}" class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');">
-                                                <div class="bg-secondary bg-opacity-25 text-body fw-bold rounded-circle d-none align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                                                    {{ substr($dep->nome_cliente, 0, 1) }}
-                                                </div>
-                                            @else
-                                                <div class="bg-secondary bg-opacity-25 text-body fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                                                    {{ substr($dep->nome_cliente, 0, 1) }}
-                                                </div>
-                                            @endif
+                                            <div class="avatar-cliente-container position-relative d-inline-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                                @if(!empty($dep->foto))
+                                                    <img src="{{ asset($dep->foto) }}" 
+                                                         alt="{{ $dep->nome_cliente }}" 
+                                                         class="rounded-circle border" 
+                                                         style="width: 42px; height: 42px; object-fit: cover;" 
+                                                         onerror="this.style.setProperty('display', 'none', 'important'); if(this.nextElementSibling) this.nextElementSibling.style.setProperty('display', 'inline-flex', 'important');">
+                                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fw-bold rounded-circle align-items-center justify-content-center" 
+                                                         style="width: 42px; height: 42px; font-size: 0.9rem; display: none !important;">
+                                                        {{ $iniciais }}
+                                                    </div>
+                                                @else
+                                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fw-bold rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                                         style="width: 42px; height: 42px; font-size: 0.9rem;">
+                                                        {{ $iniciais }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="fw-bold text-body">{{ $dep->nome_cliente }}</div>

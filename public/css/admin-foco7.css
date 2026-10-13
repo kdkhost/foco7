@@ -309,10 +309,15 @@ i.text-primary {
     aspect-ratio: 1 / 1 !important;
 }
 
-.rounded-circle:not(img) {
+.rounded-circle:not(img):not(.d-none) {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+}
+
+/* Proteção global de elementos ocultos */
+.d-none {
+    display: none !important;
 }
 
 .badge-circle,

@@ -101,10 +101,23 @@
                     @forelse($clientes as $cli)
                     <tr>
                         <td>
+                            @php
+                                $partesCli = array_filter(explode(' ', trim($cli->name)));
+                                $pLetra = !empty($partesCli) ? mb_substr(array_shift($partesCli), 0, 1, 'UTF-8') : 'C';
+                                $sLetra = !empty($partesCli) ? mb_substr(array_pop($partesCli), 0, 1, 'UTF-8') : '';
+                                $iniciaisCli = mb_strtoupper($pLetra . $sLetra, 'UTF-8');
+                            @endphp
                             <div class="d-flex align-items-center gap-2">
-                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px;">
-                                    {{ substr($cli->name, 0, 1) }}
-                                </div>
+                                @if(!empty($cli->avatar))
+                                    <img src="{{ asset(ltrim($cli->avatar, '/')) }}" alt="{{ $cli->name }}" class="rounded-circle border" style="width: 38px; height: 38px; object-fit: cover;" onerror="this.style.setProperty('display', 'none', 'important'); if(this.nextElementSibling) this.nextElementSibling.style.setProperty('display', 'inline-flex', 'important');">
+                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-circle align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 0.85rem; display: none !important;">
+                                        {{ $iniciaisCli }}
+                                    </div>
+                                @else
+                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 0.85rem;">
+                                        {{ $iniciaisCli }}
+                                    </div>
+                                @endif
                                 <div>
                                     <div class="fw-bold">{{ $cli->name }}</div>
                                     <small class="text-secondary">Cadastrado em {{ $cli->created_at->format('d/m/Y') }}</small>

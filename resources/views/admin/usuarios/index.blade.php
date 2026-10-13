@@ -183,15 +183,22 @@
                     <!-- USUÁRIO (AVATAR + NOME + EMAIL) -->
                     <td class="ps-3 py-3">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="position-relative">
-                                @if($u->avatar)
-                                    <img src="{{ asset(ltrim($u->avatar, '/')) }}" alt="{{ $u->name }}" class="rounded-circle border border-danger p-05 object-fit-cover shadow-sm" style="width: 44px; height: 44px; object-fit: cover;">
+                                @php
+                                    $partesU = array_filter(explode(' ', trim($u->name)));
+                                    $pU = !empty($partesU) ? mb_substr(array_shift($partesU), 0, 1, 'UTF-8') : 'U';
+                                    $sU = !empty($partesU) ? mb_substr(array_pop($partesU), 0, 1, 'UTF-8') : '';
+                                    $iniciaisU = mb_strtoupper($pU . $sU, 'UTF-8');
+                                @endphp
+                                @if(!empty($u->avatar))
+                                    <img src="{{ asset(ltrim($u->avatar, '/')) }}" alt="{{ $u->name }}" class="rounded-circle border border-danger p-05 object-fit-cover shadow-sm" style="width: 44px; height: 44px; object-fit: cover;" onerror="this.style.setProperty('display', 'none', 'important'); if(this.nextElementSibling) this.nextElementSibling.style.setProperty('display', 'inline-flex', 'important');">
+                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-circle align-items-center justify-content-center fw-bold shadow-sm" style="width: 44px; height: 44px; font-size: 0.95rem; display: none !important;">
+                                        {{ $iniciaisU }}
+                                    </div>
                                 @else
-                                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 44px; height: 44px;">
-                                        {{ strtoupper(substr($u->name, 0, 1)) }}
+                                    <div class="bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 44px; height: 44px; font-size: 0.95rem;">
+                                        {{ $iniciaisU }}
                                     </div>
                                 @endif
-                            </div>
                             <div>
                                 <div class="fw-bold">{{ $u->name }}</div>
                                 <div class="text-secondary small">{{ $u->email }}</div>
