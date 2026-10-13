@@ -83,6 +83,7 @@ class ConfiguracoesController extends Controller
             'desenvolvedor_nome' => CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad'),
             'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736'),
             'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5591980510736'),
+            'desenvolvedor_telegram' => CmsSetting::get('desenvolvedor_telegram', 'marcelobrad'),
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -105,7 +106,7 @@ class ConfiguracoesController extends Controller
             'recaptcha_site_key', 'recaptcha_secret_key',
             'geoblock_regioes', 'geoblock_ips_liberados',
             'admin_email_notificacoes', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_imagem_padrao',
-            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp',
+            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp', 'desenvolvedor_telegram',
         ];
 
         foreach ($camposTexto as $campo) {

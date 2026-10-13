@@ -133,15 +133,19 @@
                             </p>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label small fw-bold">Nome do Desenvolvedor</label>
                             <input type="text" name="desenvolvedor_nome" class="form-control" value="{{ $configs['desenvolvedor_nome'] ?? 'Marcelo Brad' }}" placeholder="Ex: Marcelo Brad">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold">WhatsApp do Desenvolvedor (DDI + DDD + Número)</label>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp (DDI + DDD + Número)</label>
                             <input type="text" name="desenvolvedor_whatsapp" class="form-control" value="{{ $configs['desenvolvedor_whatsapp'] ?? '5591980510736' }}" placeholder="Ex: 5591980510736">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold"><i class="fab fa-telegram-plane text-info me-1"></i> Telegram (Usuário ou Link)</label>
+                            <input type="text" name="desenvolvedor_telegram" class="form-control" value="{{ $configs['desenvolvedor_telegram'] ?? 'marcelobrad' }}" placeholder="Ex: marcelobrad">
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label small fw-bold">Link / Site do Desenvolvedor</label>
                             <input type="text" name="desenvolvedor_link" class="form-control" value="{{ $configs['desenvolvedor_link'] ?? 'https://wa.me/5591980510736' }}" placeholder="Ex: https://wa.me/5591980510736">
                         </div>

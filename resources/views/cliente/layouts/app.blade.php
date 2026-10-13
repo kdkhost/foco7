@@ -246,11 +246,6 @@
                             {{ $footerDevNome }}
                         </a>
                     </span>
-
-                    <!-- Botão para voltar ao topo (Integrado no rodapé) -->
-                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle btn-scroll-top" title="Voltar ao Topo" data-bs-toggle="tooltip">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
                 </div>
             </div>
         </footer>

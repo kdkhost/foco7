@@ -510,6 +510,10 @@
             $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736');
             $footerDevWhatsClean = preg_replace('/\D/', '', $footerDevWhats);
             $footerDevWhatsUrl = 'https://wa.me/' . ($footerDevWhatsClean ?: '5591980510736') . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');
+
+            $footerDevTelegram = \App\Models\CmsSetting::get('desenvolvedor_telegram', 'marcelobrad');
+            $footerDevTelegramClean = ltrim(preg_replace('/^https?:\/\/t\.me\//i', '', trim($footerDevTelegram)), '@');
+            $footerDevTelegramUrl = 'https://t.me/' . ($footerDevTelegramClean ?: 'marcelobrad');
         @endphp
         <footer class="app-footer foco7-admin-footer">
             <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 py-3 px-4">
@@ -520,39 +524,86 @@
                     <span class="small text-muted d-none d-lg-inline">&bull; Todos os direitos reservados.</span>
                 </div>
 
-                <!-- LADO DIREITO: BOTÃO DE SUPORTE COM DESENVOLVEDOR + LINK DO DESENVOLVEDOR + BOTÃO VOLTAR AO TOPO -->
+                <!-- LADO DIREITO: LINK DO DESENVOLVEDOR (ABRE O BOX DE CONTATO) -->
                 <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3 text-footer-actions">
-                    <!-- Botão para falar com o desenvolvedor -->
-                    <a href="{{ $footerDevWhatsUrl }}" 
-                       target="_blank" 
-                       class="btn btn-sm btn-foco7-dev-support d-inline-flex align-items-center gap-1 shadow-sm" 
-                       title="Falar diretamente com o Desenvolvedor via WhatsApp" 
-                       data-bs-toggle="tooltip" 
-                       data-bs-placement="top">
-                        <i class="fab fa-whatsapp text-success fs-6"></i>
-                        <span>Falar com o Desenvolvedor</span>
-                    </a>
-
-                    <!-- Link com nome do desenvolvedor -->
                     <span class="small text-footer-dev">
                         Desenvolvido por 
-                        <a href="{{ $footerDevLink }}" target="_blank" class="fw-bold text-decoration-none footer-dev-link" title="Visitar link do desenvolvedor" data-bs-toggle="tooltip">
+                        <a href="javascript:void(0)" onclick="toggleBoxDevContato()" class="fw-bold text-decoration-none footer-dev-link text-danger" title="Falar com o desenvolvedor (WhatsApp ou Telegram)" data-bs-toggle="tooltip">
                             {{ $footerDevNome }}
                         </a>
                     </span>
-
-                    <!-- Botão para voltar ao topo (Integrado no rodapé) -->
-                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle btn-scroll-top" title="Voltar ao Topo" data-bs-toggle="tooltip">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
                 </div>
             </div>
         </footer>
 
-        <!-- BOTÃO FLUTUANTE VOLTAR AO TOPO -->
+        <!-- BOTÃO FLUTUANTE VOLTAR AO TOPO (80px ACIMA CONFORME SOLICITADO) -->
         <button type="button" id="btnScrollTopFloat" class="btn btn-primary rounded-circle shadow-lg btn-scroll-top-float" title="Voltar ao Topo" data-bs-toggle="tooltip" data-bs-placement="left">
             <i class="fas fa-chevron-up"></i>
         </button>
+
+        <!-- BOTÃO FLUTUANTE WHATSAPP DO DESENVOLVEDOR -->
+        <button type="button" id="btnDevWhatsFloat" class="btn btn-dev-whats-float shadow-lg" title="Falar com o Desenvolvedor" onclick="toggleBoxDevContato()" data-bs-toggle="tooltip" data-bs-placement="left">
+            <i class="fab fa-whatsapp fs-4"></i>
+        </button>
+
+        <!-- BOX FLUTUANTE DE SELEÇÃO: WHATSAPP VS TELEGRAM -->
+        <div id="boxDevContato" class="box-dev-contato shadow-lg border" style="display: none;">
+            <div class="box-dev-header d-flex align-items-center justify-content-between p-3 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="position-relative">
+                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 13px;">
+                            {{ strtoupper(substr($footerDevNome, 0, 2)) }}
+                        </div>
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width: 10px; height: 10px;" title="Online"></span>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-body fs-6">{{ $footerDevNome }}</h6>
+                        <small class="text-success fw-semibold" style="font-size: 11px;">
+                            <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Desenvolvedor &amp; Suporte
+                        </small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-sm" onclick="fecharBoxDevContato()" aria-label="Fechar"></button>
+            </div>
+
+            <div class="box-dev-body p-3">
+                <p class="small text-secondary mb-3">
+                    Selecione o canal para atendimento direto com o desenvolvedor:
+                </p>
+
+                <!-- OPÇÃO 1: WHATSAPP -->
+                <a href="{{ $footerDevWhatsUrl }}" target="_blank" class="dev-canal-card dev-canal-whatsapp text-decoration-none d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 shadow-sm" onclick="fecharBoxDevContato()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="canal-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                            <i class="fab fa-whatsapp fs-4"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-body">WhatsApp</strong>
+                            <span class="small text-secondary font-monospace">{{ $footerDevWhats ? ('+' . substr($footerDevWhatsClean, 0, 2) . ' (' . substr($footerDevWhatsClean, 2, 2) . ') ' . substr($footerDevWhatsClean, 4)) : 'Conversar agora' }}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right text-success fs-5"></i>
+                </a>
+
+                <!-- OPÇÃO 2: TELEGRAM -->
+                <a href="{{ $footerDevTelegramUrl }}" target="_blank" class="dev-canal-card dev-canal-telegram text-decoration-none d-flex align-items-center justify-content-between p-3 rounded-3 shadow-sm" onclick="fecharBoxDevContato()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="canal-icon text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; background-color: #0088cc;">
+                            <i class="fab fa-telegram-plane fs-4"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-body">Telegram</strong>
+                            <span class="small text-secondary font-monospace">{{ '@' . $footerDevTelegramClean }}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right text-info fs-5"></i>
+                </a>
+            </div>
+
+            <div class="box-dev-footer p-2 text-center bg-body-tertiary border-top rounded-bottom small text-secondary">
+                <i class="fas fa-shield-alt text-danger me-1"></i> Atendimento exclusivo para o administrador
+            </div>
+        </div>
 
     </div>
 
@@ -889,12 +940,39 @@
                 }
             });
 
-            $(document).on('click', '.btn-scroll-top, #btnScrollTopFloat', function (e) {
+            $(document).on('click', '#btnScrollTopFloat', function (e) {
                 e.preventDefault();
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
                 });
+            });
+
+            // CONTROLE DO BOX FLUTUANTE DE CONTATO DO DESENVOLVEDOR (WHATSAPP & TELEGRAM)
+            window.abrirBoxDevContato = function () {
+                $('#boxDevContato').stop(true, true).fadeIn(200);
+            };
+
+            window.fecharBoxDevContato = function () {
+                $('#boxDevContato').stop(true, true).fadeOut(150);
+            };
+
+            window.toggleBoxDevContato = function () {
+                $('#boxDevContato').stop(true, true).fadeToggle(200);
+            };
+
+            // Fecha ao clicar fora do box
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#boxDevContato, #btnDevWhatsFloat, .footer-dev-link').length) {
+                    fecharBoxDevContato();
+                }
+            });
+
+            // Fecha com tecla ESC
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' || e.keyCode === 27) {
+                    fecharBoxDevContato();
+                }
             });
         });
     </script>

@@ -464,6 +464,11 @@ public_html/
 - **Controle Interativo de Menus com Seta (Treeview):** Delegação de eventos nativa com jQuery para expansão e recolhimento animado (`slideToggle`) de submenus da sidebar (`Atendimentos`, `Financeiro`, `Gestão do Site`, `Templates de E-mail`, `Configurações`), com rotação fluida da seta indicadora (`.nav-arrow`) e abertura automática ao descompactar a sidebar.
 - **Cobrança por Carnê Integrada à Efí PRO:** Reorganização estrutural do portal de pagamentos (`/admin/gateways`), alocando a emissão e parametrização de carnês em PDF como sub-aba nativa dentro da guia da Efí PRO (Gerencianet), preservando sincronização bidirecional de abas via URL Hash (`#tab-carne`).
 
+### 7. Navegação e Contato Flutuante (Voltar ao Topo & Desenvolvedor)
+- **Botão Flutuante Voltar ao Topo (`#btnScrollTopFloat`):** Posicionado a `80px` do rodapé com transição suave, eliminando a sobreposição visual anterior e removendo botões redundantes duplicados nos rodapés.
+- **Botão Flutuante WhatsApp do Desenvolvedor (`#btnDevWhatsFloat`):** Posicionado a `20px` da base inferior direita com efeito de pulso suave. Ao ser clicado (ou ao clicar nos créditos do desenvolvedor no rodapé), aciona o **Box Flutuante de Seleção de Canal** (`#boxDevContato`).
+- **Box Flutuante de Seleção (WhatsApp & Telegram):** Permite ao administrador escolher instantaneamente entre conversar via WhatsApp ou Telegram com o desenvolvedor, com estilização moderna, compatibilidade com Dark/Light mode, e fechamento ágil via clique externo ou tecla `ESC`. Os dados de contato (WhatsApp e Telegram) são configuráveis dinamicamente via CMS em `/admin/configuracoes`.
+
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
