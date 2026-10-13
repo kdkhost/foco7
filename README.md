@@ -469,6 +469,10 @@ public_html/
 - **Botão Flutuante WhatsApp do Desenvolvedor (`#btnDevWhatsFloat`):** Posicionado a `20px` da base inferior direita com efeito de pulso suave. Ao ser clicado (ou ao clicar nos créditos do desenvolvedor no rodapé), aciona o **Box Flutuante de Seleção de Canal** (`#boxDevContato`).
 - **Box Flutuante de Seleção (WhatsApp & Telegram):** Permite ao administrador escolher instantaneamente entre conversar via WhatsApp ou Telegram com o desenvolvedor, com estilização moderna, compatibilidade com Dark/Light mode, e fechamento ágil via clique externo ou tecla `ESC`. Os dados de contato (WhatsApp e Telegram) são configuráveis dinamicamente via CMS em `/admin/configuracoes`.
 
+### 8. Padronização Oficial AdminLTE 4 de Cards, Cabeçalhos e Card-Tools
+- **Estrutura Canônica Universal:** Todos os cards das listagens e painéis administrativos (Filiais, Parceiros, Clientes, Faturas, Usuários, Notificações, Depoimentos, Cron Jobs, SEO, E-mails e Dashboard) foram padronizados rigorosamente com a convenção oficial do AdminLTE 4 (`.card-header` com `.card-title` à esquerda e `.card-tools ms-auto` à extrema direita).
+- **Alinhamento e Responsividade 100%:** Eliminação definitiva de quebras de linha ou botões flutuando no meio dos cards em telas ultra-widescreen (2560px+) e dispositivos móveis, garantindo consistência visual em todo o ecossistema do painel administrativo e da área do cliente.
+
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade

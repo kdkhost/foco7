@@ -1307,29 +1307,58 @@ body.dark-mode .btn-foco7-dev-support:hover {
 }
 
 /* ==============================================================================
-   PADRONIZAÇÃO GLOBAL DE CARDS, CABEÇALHOS & AÇÕES ALINHADAS À DIREITA
+   PADRONIZAÇÃO GLOBAL OFICIAL ADMINLTE 4: CARDS, CABEÇALHOS & CARD-TOOLS
    ============================================================================== */
 .card {
-    width: 100%;
+    width: 100% !important;
 }
 
 .card-header,
 .card-footer {
     width: 100% !important;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 }
 
-.card-header.d-flex,
-.card-header.d-inline-flex {
+/* O card-header no AdminLTE 4 / Bootstrap 5 é um container flex de ponta a ponta */
+.card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative;
     width: 100% !important;
 }
 
-/* Garante que grupos de botões e ações no cabeçalho fiquem sempre alinhados à extrema direita */
+/* Título e elementos iniciais à esquerda no cabeçalho */
+.card-header > .card-title,
+.card-header > h1,
+.card-header > h2,
+.card-header > h3,
+.card-header > h4,
+.card-header > h5,
+.card-header > h6,
+.card-header > div:first-child:not(.card-tools):not(.card-header-actions):not(.card-actions):not(.ms-auto) {
+    margin-bottom: 0 !important;
+}
+
+/* Card tools e grupo de ações alinhados estritamente à extrema direita */
+.card-tools,
+.card-header-actions,
+.card-header .card-tools,
 .card-header .card-header-actions,
 .card-header .card-actions,
+.card-header > .ms-auto,
 .card-header > div:last-child:not(:first-child),
-.card-header > span.badge:last-child:not(:first-child) {
-    margin-left: auto;
+.card-header > span.badge:last-child:not(:first-child),
+.card-header > button:last-child:not(:first-child),
+.card-header > a:last-child:not(:first-child) {
+    margin-left: auto !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-tools.ms-auto {
+    margin-left: auto !important;
 }
 
 

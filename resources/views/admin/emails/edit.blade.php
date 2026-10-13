@@ -107,7 +107,7 @@
                 </div>
 
                 <!-- SELETOR DE DISPOSITIVOS -->
-                <div class="btn-group btn-group-sm" role="group" aria-label="Seletor de Dispositivo">
+                <div class="card-tools ms-auto btn-group btn-group-sm" role="group" aria-label="Seletor de Dispositivo">
                     <button type="button" class="btn btn-outline-light active btn-device" data-device="desktop" title="Computador / Desktop (Largura 100%)">
                         <i class="fas fa-desktop me-1"></i> <span class="d-none d-sm-inline">Desktop</span>
                     </button>

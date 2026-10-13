@@ -124,7 +124,7 @@
                             </a>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2 ms-auto">
+                        <div class="card-tools ms-auto d-flex align-items-center gap-2">
                             <label class="small text-secondary mb-0">Tipo:</label>
                             <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href = '{{ route('admin.notificacoes.index', ['status' => $status]) }}&tipo=' + this.value">
                                 <option value="todos" {{ $tipo === 'todos' ? 'selected' : '' }}>Todos os Tipos</option>

@@ -96,7 +96,22 @@
 </div>
 
 <!-- TABELA DE FATURAS -->
-<div class="card shadow-sm border-0">
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="card-title fw-bold mb-0 text-body">
+                <i class="fas fa-file-invoice-dollar text-danger me-2"></i> Histórico de Faturas & Mensalidades
+            </h5>
+            <span class="badge bg-body-secondary text-body border px-2 py-1 small">
+                {{ $faturas->total() }} registros
+            </span>
+        </div>
+        <div class="card-tools ms-auto d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalFatura()">
+                <i class="fas fa-file-invoice-dollar me-1"></i> Lançar Nova Fatura
+            </button>
+        </div>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

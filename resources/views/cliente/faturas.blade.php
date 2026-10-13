@@ -6,10 +6,15 @@
 
 @section('content')
 <div class="card border-0 shadow-sm rounded-3">
-    <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center py-3">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex justify-content-between align-items-center py-3">
         <div>
-            <h5 class="fw-bold mb-1"><i class="fas fa-receipt text-danger me-2"></i> Histórico de Faturas & Recibos</h5>
+            <h5 class="card-title fw-bold mb-1 text-body"><i class="fas fa-receipt text-danger me-2"></i> Histórico de Faturas &amp; Recibos</h5>
             <small class="text-secondary">Consulte mensalidades em aberto e comprovantes de quitação.</small>
+        </div>
+        <div class="card-tools ms-auto">
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                {{ $faturas->total() }} faturas
+            </span>
         </div>
     </div>
 

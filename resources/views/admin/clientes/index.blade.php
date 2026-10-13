@@ -82,7 +82,22 @@
 </div>
 
 <!-- TABELA DE CLIENTES -->
-<div class="card shadow-sm border-0">
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="card-title fw-bold mb-0 text-body">
+                <i class="fas fa-users text-danger me-2"></i> Base de Clientes Cadastrados
+            </h5>
+            <span class="badge bg-body-secondary text-body border px-2 py-1 small">
+                {{ $clientes->total() }} clientes
+            </span>
+        </div>
+        <div class="card-tools ms-auto d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalCliente()">
+                <i class="fas fa-user-plus me-1"></i> Cadastrar Novo Cliente
+            </button>
+        </div>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

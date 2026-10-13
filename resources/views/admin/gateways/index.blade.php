@@ -745,7 +745,7 @@
                                 <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-clock-rotate-left me-2"></i> Régua de Cobrança Automatizada para Mensalidades</h6>
                                 <small class="text-body-secondary">Disparos preventivos pré-vencimento, cobrança no vencimento e régua de atrasos com cálculo automático de multa e juros de mora.</small>
                             </div>
-                            <div class="d-flex align-items-center gap-2 ms-auto">
+                            <div class="card-tools ms-auto d-flex align-items-center gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="executarReguaCobrancaAgora()">
                                     <i class="fas fa-play me-1"></i> Processar Régua Agora
                                 </button>

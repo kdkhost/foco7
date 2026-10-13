@@ -241,7 +241,7 @@
             <h6 class="fw-bold mb-0 text-body"><i class="fas fa-tasks text-danger me-2"></i> Rotinas Agendadas & Tarefas Cadastradas</h6>
             <small class="text-secondary">Todas as tarefas ativas abaixo são processadas pelo agendador do Laravel automaticamente.</small>
         </div>
-        <div class="ms-auto">
+        <div class="card-tools ms-auto">
             <button type="button" class="btn btn-novo-cron btn-sm px-3" onclick="abrirModalNovoCron()">
                 <i class="fas fa-plus me-1"></i> Cadastrar Outra Tarefa
             </button>
@@ -345,7 +345,7 @@
             <i class="fas fa-file-alt text-danger"></i>
             <span class="fw-bold">Histórico de Saída do Agendador (storage/logs/cron.log)</span>
         </div>
-        <div class="ms-auto">
+        <div class="card-tools ms-auto">
             <button type="button" class="btn btn-sm btn-outline-light" onclick="atualizarStatusCron(true)">
                 <i class="fas fa-sync-alt me-1"></i> Recarregar Logs
             </button>

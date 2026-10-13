@@ -98,7 +98,7 @@
                     </a>
                 </div>
 
-                <form action="{{ route('admin.depoimentos.index') }}" method="GET" class="d-flex align-items-center gap-2 ms-auto">
+                <form action="{{ route('admin.depoimentos.index') }}" method="GET" class="card-tools d-flex align-items-center gap-2 ms-auto">
                     <input type="hidden" name="status" value="{{ $status }}">
                     <div class="input-group input-group-sm" style="width: 250px;">
                         <input type="text" name="busca" class="form-control" placeholder="Buscar por cliente ou texto..." value="{{ $busca }}">

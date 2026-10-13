@@ -42,14 +42,16 @@
     <!-- Formulário de Meta Tags da Página Selecionada -->
     <div class="col-lg-7">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent py-3 d-flex align-items-center justify-content-between">
-                <h5 class="fw-bold mb-0 text-body">
+            <div class="card-header w-100 bg-transparent py-3 d-flex align-items-center justify-content-between">
+                <h5 class="card-title fw-bold mb-0 text-body">
                     <i class="{{ $paginas[$pagina]['icone'] ?? 'fas fa-sliders-h' }} text-danger me-2"></i> 
                     Meta Tags &amp; Open Graph: <span class="text-danger">{{ $paginas[$pagina]['nome'] ?? ucfirst($pagina) }}</span>
                 </h5>
-                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 font-monospace">
-                    pagina={{ $pagina }}
-                </span>
+                <div class="card-tools ms-auto">
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 font-monospace">
+                        pagina={{ $pagina }}
+                    </span>
+                </div>
             </div>
             <div class="card-body p-4">
                 <form action="{{ route('admin.seo.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form" id="formSeo">
@@ -151,9 +153,11 @@
     <div class="col-lg-5">
         <!-- SEO SCORE EM TEMPO REAL -->
         <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-body"><i class="fas fa-chart-line text-danger me-2"></i> SEO Score em Tempo Real</h5>
-                <span id="seo-score-status" class="badge bg-success">Excelente</span>
+            <div class="card-header w-100 bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0 text-body"><i class="fas fa-chart-line text-danger me-2"></i> SEO Score em Tempo Real</h5>
+                <div class="card-tools ms-auto">
+                    <span id="seo-score-status" class="badge bg-success">Excelente</span>
+                </div>
             </div>
             <div class="card-body p-4 text-center">
                 <h1 class="display-4 fw-black text-danger mb-2" id="seo-score-value">{{ $seo->seo_score ?? 90 }}/100</h1>
@@ -166,9 +170,11 @@
 
         <!-- PRÉVIA NO GOOGLE (SERP PREVIEW) -->
         <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-transparent py-3 d-flex align-items-center justify-content-between">
-                <h6 class="fw-bold mb-0 text-body"><i class="fab fa-google text-danger me-2"></i> Prévia nos Resultados do Google (SERP)</h6>
-                <span class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">Snippet Google</span>
+            <div class="card-header w-100 bg-transparent py-3 d-flex align-items-center justify-content-between">
+                <h6 class="card-title fw-bold mb-0 text-body"><i class="fab fa-google text-danger me-2"></i> Prévia nos Resultados do Google (SERP)</h6>
+                <div class="card-tools ms-auto">
+                    <span class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">Snippet Google</span>
+                </div>
             </div>
             <div class="card-body p-3 bg-body-tertiary rounded-bottom border-top">
                 <div class="p-3 bg-body rounded border shadow-sm">
@@ -190,11 +196,13 @@
 
         <!-- PRÉVIA EM REDES SOCIAIS & WHATSAPP (OPEN GRAPH CARD) -->
         <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-transparent py-3 d-flex align-items-center justify-content-between">
-                <h6 class="fw-bold mb-0 text-body">
+            <div class="card-header w-100 bg-transparent py-3 d-flex align-items-center justify-content-between">
+                <h6 class="card-title fw-bold mb-0 text-body">
                     <i class="fab fa-whatsapp text-success me-2"></i> Prévia no WhatsApp &amp; Redes Sociais
                 </h6>
-                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" style="font-size: 0.7rem;">Open Graph</span>
+                <div class="card-tools ms-auto">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" style="font-size: 0.7rem;">Open Graph</span>
+                </div>
             </div>
             <div class="card-body p-3 bg-body-tertiary rounded-bottom border-top">
                 <!-- Card Estilo WhatsApp / Facebook Link Preview -->

@@ -154,17 +154,27 @@
                     </a>
                 @endif
             </div>
-            <div class="col text-end">
-                <button type="button" class="btn btn-danger fw-bold px-3" id="btnNovoUsuario">
-                    <i class="fas fa-user-plus me-1"></i> NOVO USUÁRIO
-                </button>
-            </div>
         </form>
     </div>
 </div>
 
 <!-- TABELA DE USUÁRIOS -->
 <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3 px-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="card-title fw-bold mb-0 text-body">
+                <i class="fas fa-users-cog text-danger me-2"></i> Usuários &amp; Administradores do Sistema
+            </h5>
+            <span class="badge bg-body-secondary text-body border px-2 py-1 small">
+                {{ $usuarios->total() }} cadastrados
+            </span>
+        </div>
+        <div class="card-tools ms-auto d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger fw-bold shadow-sm px-3" id="btnNovoUsuario">
+                <i class="fas fa-user-plus me-1"></i> Novo Usuário
+            </button>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">

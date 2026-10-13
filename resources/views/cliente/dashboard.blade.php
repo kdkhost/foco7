@@ -86,9 +86,11 @@
     <!-- Mensalidades / Faturas -->
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
-                <h5 class="fw-bold mb-0"><i class="fas fa-file-invoice text-danger me-2"></i> Mensalidades / Faturas</h5>
-                <a href="{{ route('cliente.faturas.index') }}" class="btn btn-sm btn-outline-danger">Ver Todas</a>
+            <div class="card-header w-100 bg-transparent d-flex justify-content-between align-items-center py-3">
+                <h5 class="card-title fw-bold mb-0"><i class="fas fa-file-invoice text-danger me-2"></i> Mensalidades / Faturas</h5>
+                <div class="card-tools ms-auto">
+                    <a href="{{ route('cliente.faturas.index') }}" class="btn btn-sm btn-outline-danger">Ver Todas</a>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -134,11 +136,13 @@
     <!-- Meus Agendamentos -->
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
-                <h5 class="fw-bold mb-0"><i class="fas fa-calendar-alt text-danger me-2"></i> Meus Agendamentos</h5>
-                <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalAgendamentoCliente()">
-                    <i class="fas fa-plus me-1"></i> Solicitar Agendamento
-                </button>
+            <div class="card-header w-100 bg-transparent d-flex justify-content-between align-items-center py-3">
+                <h5 class="card-title fw-bold mb-0"><i class="fas fa-calendar-alt text-danger me-2"></i> Meus Agendamentos</h5>
+                <div class="card-tools ms-auto">
+                    <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalAgendamentoCliente()">
+                        <i class="fas fa-plus me-1"></i> Solicitar Agendamento
+                    </button>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">

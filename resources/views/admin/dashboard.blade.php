@@ -279,13 +279,15 @@
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
                 <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
-                        <h5 class="fw-bold mb-0 text-body">
+                    <div class="card-header w-100 bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <h5 class="card-title fw-bold mb-0 text-body">
                             <i class="fas fa-calendar-check text-danger me-2"></i> Próximas Instalações &amp; Suportes
                         </h5>
-                        <a href="{{ route('admin.agendamentos.index') }}" class="btn btn-sm btn-outline-danger">
-                            Agenda Completa <i class="fas fa-arrow-right ms-1"></i>
-                        </a>
+                        <div class="card-tools ms-auto">
+                            <a href="{{ route('admin.agendamentos.index') }}" class="btn btn-sm btn-outline-danger">
+                                Agenda Completa <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -344,13 +346,13 @@
             <!-- ========================================================================= -->
             <div class="col-lg-6">
                 <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <div class="card-header w-100 bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
                         <div>
-                            <h5 class="fw-bold mb-0 text-body">
+                            <h5 class="card-title fw-bold mb-0 text-body">
                                 <i class="fas fa-file-invoice-dollar text-success me-2"></i> Faturas &amp; Mensalidades
                             </h5>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="card-tools ms-auto d-flex align-items-center gap-2">
                             <span class="badge bg-danger">{{ $faturasPendentes }} Pendentes</span>
                             <a href="{{ route('admin.faturas.index') }}" class="btn btn-sm btn-outline-secondary">
                                 Ver Todas <i class="fas fa-arrow-right ms-1"></i>
