@@ -35,6 +35,16 @@
         70% { transform: scale(1.1); box-shadow: 0 0 0 9px rgba(255, 193, 7, 0); }
         100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
     }
+    .pulse-dot-inline {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        background-color: #00ff88;
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
+        animation: pulseAnimationGreen 1.8s infinite;
+        vertical-align: middle;
+    }
 
     /* Terminal de Logs */
     .terminal-container {
@@ -193,9 +203,14 @@
     <div class="col-12 col-lg-4">
         <div class="card border shadow-sm h-100">
             <div class="card-body p-3 d-flex flex-column justify-content-center">
-                <span class="text-secondary small mb-1"><i class="fas fa-clock me-1"></i> Horário Atual do Servidor</span>
-                <h5 id="serverTime" class="mb-0 fw-bold text-body font-monospace">{{ date('d/m/Y H:i:s') }}</h5>
-                <small class="text-secondary mt-1">Sincronizado automaticamente com o fuso horário da hospedagem</small>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-secondary small"><i class="fas fa-clock text-danger me-1"></i> Horário Atual (São Paulo)</span>
+                    <span class="badge bg-success-subtle text-success small py-1 px-2 d-inline-flex align-items-center gap-1">
+                        <span class="pulse-dot-inline"></span> Tempo Real
+                    </span>
+                </div>
+                <h5 id="serverTime" class="mb-0 fw-bold text-body font-monospace" data-server-ts="{{ $timestampServidorMs ?? (now()->setTimezone('America/Sao_Paulo')->getTimestamp() * 1000) }}">{{ $horarioServidorSp ?? now()->setTimezone('America/Sao_Paulo')->format('d/m/Y H:i:s') }}</h5>
+                <small class="text-secondary mt-1">Sincronizado continuamente com o fuso de São Paulo (UTC-3)</small>
             </div>
         </div>
     </div>
@@ -705,7 +720,15 @@
                     }
 
                     $('#heartbeatDate').text(res.ultimo_batimento);
-                    $('#serverTime').text(res.horario_servidor);
+                    
+                    if (res.timestamp_ms) {
+                        serverTimestampBase = res.timestamp_ms;
+                        localTimestampBase = Date.now();
+                        serverOffsetMs = serverTimestampBase - localTimestampBase;
+                        atualizarRelogioServidor();
+                    } else if (res.horario_servidor) {
+                        $('#serverTime').text(res.horario_servidor);
+                    }
 
                     if (res.jobs) {
                         $.each(res.jobs, function(id, job) {
@@ -734,6 +757,36 @@
             }
         });
     }
+
+    // =========================================================================
+    // RELÓGIO EM TEMPO REAL SINCRONIZADO COM SÃO PAULO (UTC-3)
+    // =========================================================================
+    let serverTimestampBase = parseInt($('#serverTime').data('server-ts')) || Date.now();
+    let localTimestampBase = Date.now();
+    let serverOffsetMs = serverTimestampBase - localTimestampBase;
+
+    function formatarDataHoraSaoPaulo(dateObj) {
+        return new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).format(dateObj);
+    }
+
+    function atualizarRelogioServidor() {
+        const agoraServidor = new Date(Date.now() + serverOffsetMs);
+        const formatado = formatarDataHoraSaoPaulo(agoraServidor);
+        $('#serverTime').text(formatado);
+    }
+
+    // Dispara a cada 1 segundo em tempo real
+    atualizarRelogioServidor();
+    setInterval(atualizarRelogioServidor, 1000);
 
     // Auto-atualização periódica em background a cada 30 segundos
     setInterval(function() {

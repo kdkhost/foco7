@@ -49,7 +49,11 @@ class CronController extends Controller
             }
         }
 
-        return view('admin.cron.index', compact('comandoCpanel', 'cronJobs', 'cronAtivo', 'ultimoBatimento', 'diffEmSegundos', 'logRecente'));
+        $agoraSp = now()->setTimezone('America/Sao_Paulo');
+        $horarioServidorSp = $agoraSp->format('d/m/Y H:i:s');
+        $timestampServidorMs = $agoraSp->getTimestamp() * 1000;
+
+        return view('admin.cron.index', compact('comandoCpanel', 'cronJobs', 'cronAtivo', 'ultimoBatimento', 'diffEmSegundos', 'logRecente', 'horarioServidorSp', 'timestampServidorMs'));
     }
 
     /**
@@ -87,12 +91,15 @@ class CronController extends Controller
             }
         }
 
+        $agoraSp = now()->setTimezone('America/Sao_Paulo');
+
         return response()->json([
             'success' => true,
             'cron_ativo' => $cronAtivo,
             'ultimo_batimento' => $ultimoBatimento,
             'diff_segundos' => $diffEmSegundos,
-            'horario_servidor' => date('d/m/Y H:i:s'),
+            'horario_servidor' => $agoraSp->format('d/m/Y H:i:s'),
+            'timestamp_ms' => $agoraSp->getTimestamp() * 1000,
             'log_recente' => $logRecente ?: 'Nenhum registro encontrado no arquivo storage/logs/cron.log',
             'jobs' => $jobsData,
         ]);

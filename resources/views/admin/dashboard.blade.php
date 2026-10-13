@@ -11,14 +11,13 @@
 
 @section('page_actions')
 <div class="d-inline-flex flex-wrap align-items-center justify-content-sm-end gap-2">
-    <!-- Relógio em Tempo Real de Alta Fidelidade -->
-    <div class="badge bg-body border px-3 py-2 d-inline-flex align-items-center gap-2 shadow-sm rounded-pill" id="badgeRelogioTempoReal" title="Horário Oficial de Brasília em Tempo Real">
+    <div class="badge bg-body border px-3 py-2 d-inline-flex align-items-center gap-2 shadow-sm rounded-pill" id="badgeRelogioTempoReal" title="Horário Oficial de Brasília / São Paulo em Tempo Real" data-server-ts="{{ now()->setTimezone('America/Sao_Paulo')->getTimestamp() * 1000 }}">
         <span class="spinner-grow spinner-grow-sm text-danger" style="width: 7px; height: 7px;" role="status"></span>
         <i class="far fa-calendar-alt text-danger opacity-75"></i>
-        <span id="dataAdminDashboard" class="fw-semibold text-body">{{ date('d/m/Y') }}</span>
+        <span id="dataAdminDashboard" class="fw-semibold text-body">{{ now()->setTimezone('America/Sao_Paulo')->format('d/m/Y') }}</span>
         <span class="text-secondary opacity-50">&bull;</span>
         <i class="far fa-clock text-danger opacity-75"></i>
-        <span id="relogioAdminDashboard" class="font-monospace fw-bold text-danger fs-6">{{ date('H:i:s') }}</span>
+        <span id="relogioAdminDashboard" class="font-monospace fw-bold text-danger fs-6">{{ now()->setTimezone('America/Sao_Paulo')->format('H:i:s') }}</span>
     </div>
 
     <!-- Botões de Ação Rápida -->
@@ -497,26 +496,45 @@
     // =========================================================================
     // RELÓGIO & DATA EM TEMPO REAL DE ALTA PRECISÃO (PADRÃO BRASILEIRO)
     // =========================================================================
-    function atualizarRelogioTempoReal() {
-        const agora = new Date();
-        const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-        const diaSemana = diasSemana[agora.getDay()];
-        const dia = String(agora.getDate()).padStart(2, '0');
-        const mes = String(agora.getMonth() + 1).padStart(2, '0');
-        const ano = agora.getFullYear();
-        const horas = String(agora.getHours()).padStart(2, '0');
-        const minutos = String(agora.getMinutes()).padStart(2, '0');
-        const segundos = String(agora.getSeconds()).padStart(2, '0');
+    // RELÓGIO & DATA EM TEMPO REAL SINCRONIZADO COM SÃO PAULO / BRASÍLIA (UTC-3)
+    // =========================================================================
+    const badgeRelogio = document.getElementById('badgeRelogioTempoReal');
+    let dashServerTsBase = badgeRelogio ? (parseInt(badgeRelogio.getAttribute('data-server-ts')) || Date.now()) : Date.now();
+    let dashLocalTsBase = Date.now();
+    let dashServerOffsetMs = dashServerTsBase - dashLocalTsBase;
 
+    const dashFmtData = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const dashFmtHora = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+    const dashFmtSemana = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        weekday: 'long'
+    });
+
+    function atualizarRelogioTempoReal() {
+        const agoraSp = new Date(Date.now() + dashServerOffsetMs);
         const elData = document.getElementById('dataAdminDashboard');
         const elRelogio = document.getElementById('relogioAdminDashboard');
 
         if (elData) {
-            elData.textContent = `${dia}/${mes}/${ano}`;
-            elData.parentElement.setAttribute('title', `${diaSemana}, ${dia}/${mes}/${ano} - Horário Oficial de Brasília`);
+            const dataStr = dashFmtData.format(agoraSp);
+            let diaSemana = dashFmtSemana.format(agoraSp);
+            diaSemana = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
+            elData.textContent = dataStr;
+            elData.parentElement.setAttribute('title', `${diaSemana}, ${dataStr} - Horário Oficial de Brasília / São Paulo`);
         }
         if (elRelogio) {
-            elRelogio.textContent = `${horas}:${minutos}:${segundos}`;
+            elRelogio.textContent = dashFmtHora.format(agoraSp);
         }
     }
     atualizarRelogioTempoReal();
