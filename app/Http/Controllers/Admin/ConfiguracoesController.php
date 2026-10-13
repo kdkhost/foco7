@@ -78,6 +78,11 @@ class ConfiguracoesController extends Controller
             'notificar_email_contatos' => CmsSetting::get('notificar_email_contatos', '1') == '1',
             'notificar_email_agendamentos' => CmsSetting::get('notificar_email_agendamentos', '1') == '1',
             'notificacoes_push_ativas' => CmsSetting::get('notificacoes_push_ativas', '1') == '1',
+
+            // Desenvolvedor do Sistema & Suporte Técnico
+            'desenvolvedor_nome' => CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad'),
+            'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736'),
+            'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5591980510736'),
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -100,6 +105,7 @@ class ConfiguracoesController extends Controller
             'recaptcha_site_key', 'recaptcha_secret_key',
             'geoblock_regioes', 'geoblock_ips_liberados',
             'admin_email_notificacoes', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_imagem_padrao',
+            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp',
         ];
 
         foreach ($camposTexto as $campo) {

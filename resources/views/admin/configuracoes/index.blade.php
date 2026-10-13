@@ -123,6 +123,28 @@
                             <label class="form-label small fw-bold">CEP</label>
                             <input type="text" name="endereco_cep" class="form-control mask-cep" value="{{ $configs['endereco_cep'] }}">
                         </div>
+
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold border-bottom pb-2 text-danger d-flex align-items-center gap-2">
+                                <i class="fas fa-code"></i> Créditos & Desenvolvedor do Sistema (Exibição no Rodapé)
+                            </h6>
+                            <p class="small text-secondary mb-3">
+                                Configure o nome, link e WhatsApp do desenvolvedor exibidos no rodapé do painel administrativo e da área do cliente.
+                            </p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Nome do Desenvolvedor</label>
+                            <input type="text" name="desenvolvedor_nome" class="form-control" value="{{ $configs['desenvolvedor_nome'] ?? 'Marcelo Brad' }}" placeholder="Ex: Marcelo Brad">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">WhatsApp do Desenvolvedor (DDI + DDD + Número)</label>
+                            <input type="text" name="desenvolvedor_whatsapp" class="form-control" value="{{ $configs['desenvolvedor_whatsapp'] ?? '5591980510736' }}" placeholder="Ex: 5591980510736">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Link / Site do Desenvolvedor</label>
+                            <input type="text" name="desenvolvedor_link" class="form-control" value="{{ $configs['desenvolvedor_link'] ?? 'https://wa.me/5591980510736' }}" placeholder="Ex: https://wa.me/5591980510736">
+                        </div>
                     </div>
                 </div>
 

@@ -207,10 +207,68 @@
             </div>
         </main>
 
-        <!-- RODAPÉ DO PAINEL (ADMINLTE 4) -->
-        <footer class="app-footer border-top py-3 text-center small text-secondary">
-            &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Painel do Assinante de Alta Performance.
+        <!-- RODAPÉ DO PAINEL DO CLIENTE -->
+        @php
+            $footerSiteNome = \App\Models\CmsSetting::get('site_nome', 'Foco 7 Rastreamento & Segurança');
+            $footerDevNome = \App\Models\CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad');
+            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736');
+            
+            $empresaWhats = \App\Models\CmsSetting::get('contato_whatsapp', '559180510736');
+            $empresaWhatsClean = preg_replace('/\D/', '', $empresaWhats);
+            $empresaWhatsUrl = 'https://wa.me/' . ($empresaWhatsClean ?: '559180510736') . '?text=' . urlencode('Olá, sou cliente Foco 7 e gostaria de suporte para meu veículo/serviço.');
+        @endphp
+        <footer class="app-footer foco7-admin-footer">
+            <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 py-3 px-4">
+                <!-- LADO ESQUERDO: DIREITOS COM NOME DA EMPRESA -->
+                <div class="d-flex align-items-center gap-2 text-footer-brand text-center text-md-start">
+                    <img src="{{ asset('img/favicon.png') }}" alt="{{ $footerSiteNome }}" width="20" height="20" class="rounded">
+                    <span class="small fw-semibold">&copy; {{ date('Y') }} <strong>{{ $footerSiteNome }}</strong>.</span>
+                    <span class="small text-muted d-none d-lg-inline">&bull; Todos os direitos reservados.</span>
+                </div>
+
+                <!-- LADO DIREITO: BOTÃO DE SUPORTE COM A EMPRESA + LINK DO DESENVOLVEDOR + BOTÃO VOLTAR AO TOPO -->
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3 text-footer-actions">
+                    <!-- Botão de suporte para falar com a empresa -->
+                    <a href="{{ $empresaWhatsUrl }}" 
+                       target="_blank" 
+                       class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3" 
+                       title="Falar com o Suporte Oficial da Foco 7 via WhatsApp" 
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="top">
+                        <i class="fab fa-whatsapp fs-6"></i>
+                        <span>Suporte Foco 7</span>
+                    </a>
+
+                    <!-- Link com nome do desenvolvedor -->
+                    <span class="small text-footer-dev">
+                        Desenvolvido por 
+                        <a href="{{ $footerDevLink }}" target="_blank" class="fw-bold text-decoration-none footer-dev-link" title="Visitar link do desenvolvedor" data-bs-toggle="tooltip">
+                            {{ $footerDevNome }}
+                        </a>
+                    </span>
+
+                    <!-- Botão para voltar ao topo (Integrado no rodapé) -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle btn-scroll-top" title="Voltar ao Topo" data-bs-toggle="tooltip">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
         </footer>
+
+        <!-- BOTÃO FLUTUANTE VOLTAR AO TOPO -->
+        <button type="button" id="btnScrollTopFloat" class="btn btn-primary rounded-circle shadow-lg btn-scroll-top-float" title="Voltar ao Topo" data-bs-toggle="tooltip" data-bs-placement="left">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+
+        <!-- BOTÃO FLUTUANTE SUPORTE DO CLIENTE COM A EMPRESA -->
+        <a href="{{ $empresaWhatsUrl }}" 
+           target="_blank" 
+           id="btnSuporteFloatCliente" 
+           class="btn btn-success rounded-pill shadow-lg btn-suporte-float-cliente d-inline-flex align-items-center gap-2" 
+           title="Falar com o Suporte Oficial Foco 7">
+            <i class="fab fa-whatsapp fs-5"></i>
+            <span class="d-none d-sm-inline fw-semibold small">Suporte 24h</span>
+        </a>
 
     </div>
 
@@ -312,6 +370,23 @@
             $(document).on('click', '[data-lte-toggle="sidebar"]', function() {
                 setTimeout(sincronizarLogoSidebar, 40);
                 setTimeout(sincronizarLogoSidebar, 200);
+            });
+
+            // COMPORTAMENTO UNIVERSAL DO BOTÃO VOLTAR AO TOPO (SCROLL TO TOP)
+            $(window).on('scroll', function () {
+                if ($(this).scrollTop() > 180) {
+                    $('#btnScrollTopFloat').addClass('show');
+                } else {
+                    $('#btnScrollTopFloat').removeClass('show');
+                }
+            });
+
+            $(document).on('click', '.btn-scroll-top, #btnScrollTopFloat', function (e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
