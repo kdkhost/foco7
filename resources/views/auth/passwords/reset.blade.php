@@ -4,8 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Criar Nova Senha | Foco 7 Rastreamento</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    @php
+        $seo = \App\Models\SeoConfig::paraPagina('reset');
+        $siteNome = \App\Models\CmsSetting::get('site_nome', 'Foco 7 Rastreamento & Segurança');
+        $favicon = \App\Models\CmsSetting::get('site_favicon', '/img/favicon.png');
+        $ogImgUrl = !empty($seo->og_image) ? asset(ltrim($seo->og_image, '/')) : asset('img/og-foco7.jpg');
+        $canonicalUrl = $seo->canonical_url ?: url()->current();
+    @endphp
+
+    <!-- SEO Meta Tags Completo (Controlado pelo Painel Admin) -->
+    <title>{{ $seo->meta_title ?? 'Criar Nova Senha & Redefinição de Acesso | Foco 7' }}</title>
+    <meta name="description" content="{{ $seo->meta_description ?? 'Defina uma nova senha forte para acessar sua conta na Foco 7 Rastreamento.' }}">
+    @if(!empty($seo->meta_keywords))
+    <meta name="keywords" content="{{ $seo->meta_keywords }}">
+    @endif
+    <meta name="robots" content="{{ $seo->robots ?? 'noindex, follow' }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $seo->og_title ?: $seo->meta_title }}">
+    <meta property="og:description" content="{{ $seo->og_description ?: $seo->meta_description }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:site_name" content="{{ $siteNome }}">
+    <meta property="og:image" content="{{ $ogImgUrl }}">
+    <meta property="og:image:secure_url" content="{{ $ogImgUrl }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $seo->og_title ?: $seo->meta_title }}">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seo->og_title ?: $seo->meta_title }}">
+    <meta name="twitter:description" content="{{ $seo->og_description ?: $seo->meta_description }}">
+    <meta name="twitter:image" content="{{ $ogImgUrl }}">
+
+    <link rel="icon" type="image/png" href="{{ asset(ltrim($favicon, '/')) }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Bootstrap 5.3 & FontAwesome 6 -->

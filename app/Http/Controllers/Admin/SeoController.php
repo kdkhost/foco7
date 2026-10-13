@@ -11,24 +11,47 @@ class SeoController extends Controller
     /**
      * Exibe o painel de gerenciamento de SEO com Score em tempo real
      */
-    public function index()
+    public function index(Request $request)
     {
-        $seo = SeoConfig::firstOrCreate(
-            ['pagina' => 'home'],
-            [
-                'meta_title' => 'Foco 7 | Rastreamento Veicular 24 Horas, Bloqueio e Ronda Tática',
-                'meta_description' => 'Proteja seu carro, moto ou frota com o rastreador mais confiável do Norte e Nordeste. Bloqueio imediato pelo celular, ronda tática ágil e planos a partir de R$ 49,90/mês.',
-                'meta_keywords' => 'rastreador veicular, rastreamento de carros, rastreamento de motos, ronda tática, bloqueio veicular, foco 7',
-                'og_title' => 'Foco 7 Rastreamento Veicular - Proteger Hoje para Viver em Paz',
-                'og_description' => 'Tecnologia de rastreamento de alta precisão com suporte de ronda tática presencial.',
-                'og_image' => '/img/og-foco7.jpg',
-                'canonical_url' => 'https://foco7.com.br',
-                'robots' => 'index, follow',
-                'seo_score' => 95,
-            ]
-        );
+        $pagina = $request->query('pagina', 'home');
+        if (!in_array($pagina, ['home', 'login', 'cadastro', 'reset'])) {
+            $pagina = 'home';
+        }
 
-        return view('admin.seo.index', compact('seo'));
+        $seo = SeoConfig::paraPagina($pagina);
+
+        $paginas = [
+            'home' => [
+                'chave' => 'home',
+                'nome' => 'Página Inicial (Landing Page)',
+                'icone' => 'fas fa-home',
+                'url' => url('/'),
+                'badge' => 'Principal',
+            ],
+            'login' => [
+                'chave' => 'login',
+                'nome' => 'Página de Login & Acesso',
+                'icone' => 'fas fa-sign-in-alt',
+                'url' => route('login'),
+                'badge' => 'Autenticação',
+            ],
+            'cadastro' => [
+                'chave' => 'cadastro',
+                'nome' => 'Página de Cadastro & Registro',
+                'icone' => 'fas fa-user-plus',
+                'url' => route('register'),
+                'badge' => 'Novos Clientes',
+            ],
+            'reset' => [
+                'chave' => 'reset',
+                'nome' => 'Recuperação de Senha',
+                'icone' => 'fas fa-key',
+                'url' => route('password.request'),
+                'badge' => 'Segurança',
+            ],
+        ];
+
+        return view('admin.seo.index', compact('seo', 'pagina', 'paginas'));
     }
 
     /**
@@ -36,7 +59,13 @@ class SeoController extends Controller
      */
     public function salvar(Request $request)
     {
+        $pagina = $request->input('pagina', 'home');
+        if (!in_array($pagina, ['home', 'login', 'cadastro', 'reset'])) {
+            $pagina = 'home';
+        }
+
         $validated = $request->validate([
+            'pagina' => 'nullable|string|in:home,login,cadastro,reset',
             'meta_title' => 'required|string|max:255',
             'meta_description' => 'required|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
@@ -46,11 +75,18 @@ class SeoController extends Controller
             'robots' => 'required|string|max:50',
         ]);
 
+        $seoAtual = SeoConfig::paraPagina($pagina);
+        $validated['pagina'] = $pagina;
+
         if ($request->hasFile('og_image_upload')) {
-            $path = $request->file('og_image_upload')->store('uploads/seo', 'public');
+            $file = $request->file('og_image_upload');
+            $fileName = 'og_' . $pagina . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/seo', $fileName, 'public');
             $validated['og_image'] = '/storage/' . $path;
         } elseif ($request->boolean('remover_og_image_upload') || $request->boolean('remover_og_image')) {
             $validated['og_image'] = '';
+        } else {
+            $validated['og_image'] = $seoAtual->og_image ?? '/img/og-foco7.jpg';
         }
 
         $score = $this->calcularScore(
@@ -64,12 +100,13 @@ class SeoController extends Controller
 
         $validated['seo_score'] = $score['pontos'];
 
-        $seo = SeoConfig::updateOrCreate(['pagina' => 'home'], $validated);
+        $seo = SeoConfig::updateOrCreate(['pagina' => $pagina], $validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Configurações de SEO salvas com sucesso!',
+            'message' => 'Configurações de SEO da página ' . strtoupper($pagina) . ' salvas com sucesso!',
             'score' => $score,
+            'seo' => $seo,
         ]);
     }
 
