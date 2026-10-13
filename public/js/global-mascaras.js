@@ -323,7 +323,7 @@
     // =========================================================================
     // APLICADOR CENTRAL DE MÁSCARA POR TIPO
     // =========================================================================
-    function aplicarMascara(input, tipo, valorOriginal) {
+    function aplicarMascara(input, tipo, valorOriginal, dispararBuscaCep) {
         var valor = valorOriginal !== undefined ? valorOriginal : input.value;
         var formatado = valor;
 
@@ -358,8 +358,8 @@
             input.value = formatado;
         }
 
-        // Se for CEP e tiver completado 8 dígitos, busca imediatamente sem necessidade de clique
-        if (tipo === 'cep') {
+        // Se for CEP e tiver completado 8 dígitos, busca imediatamente APENAS se for digitação/interação ativa do usuário
+        if (tipo === 'cep' && dispararBuscaCep === true) {
             var limpo = formatado.replace(/\D/g, '');
             if (limpo.length === 8) {
                 consultarViaCepEmTempoReal(limpo, input);
@@ -371,18 +371,19 @@
     // DELEGAÇÃO GLOBAL DE EVENTOS (INPUT & PASTE EM TEMPO REAL)
     // =========================================================================
 
-    // Evento INPUT (digitação contínua em tempo real)
+    // Evento INPUT (digitação contínua em tempo real pelo usuário)
     document.addEventListener('input', function (e) {
         var input = e.target;
         if (!input || input.tagName !== 'INPUT') return;
 
         var tipo = obterTipoMascara(input);
         if (tipo) {
-            aplicarMascara(input, tipo);
+            // Passa dispararBuscaCep = true porque o usuário está ativamente interagindo
+            aplicarMascara(input, tipo, undefined, true);
         }
     }, true);
 
-    // Evento PASTE (colagem de texto com formatação imediata)
+    // Evento PASTE (colagem de texto com formatação imediata pelo usuário)
     document.addEventListener('paste', function (e) {
         var input = e.target;
         if (!input || input.tagName !== 'INPUT') return;
@@ -392,20 +393,26 @@
             var textoColado = (e.clipboardData || window.clipboardData)?.getData('text');
             if (textoColado !== undefined && textoColado !== null) {
                 e.preventDefault();
-                aplicarMascara(input, tipo, textoColado);
+                // Passa dispararBuscaCep = true porque é ação explícita do usuário
+                aplicarMascara(input, tipo, textoColado, true);
                 input.dispatchEvent(new Event('input', { bubbles: true }));
                 input.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
     }, true);
 
-    // Formata campos pré-preenchidos no carregamento do DOM
+    // Formata campos pré-preenchidos no carregamento do DOM (SEM disparar requisições ou alertas)
     function inicializarCamposExistentes() {
         var inputs = document.querySelectorAll('input');
         inputs.forEach(function (input) {
             var tipo = obterTipoMascara(input);
             if (tipo && input.value) {
-                aplicarMascara(input, tipo);
+                // Se for CEP já preenchido na inicialização, memoriza o valor para evitar re-busca automática
+                if (tipo === 'cep') {
+                    ultimoCepBuscado = String(input.value).replace(/\D/g, '');
+                }
+                // dispararBuscaCep = false (apenas formata a máscara sem consultar API externa)
+                aplicarMascara(input, tipo, undefined, false);
             }
         });
     }
@@ -424,11 +431,11 @@
                     if (node.nodeType === 1) {
                         if (node.tagName === 'INPUT') {
                             var tipo = obterTipoMascara(node);
-                            if (tipo && node.value) aplicarMascara(node, tipo);
+                            if (tipo && node.value) aplicarMascara(node, tipo, undefined, false);
                         } else if (node.querySelectorAll) {
                             node.querySelectorAll('input').forEach(function (inp) {
                                 var tipo = obterTipoMascara(inp);
-                                if (tipo && inp.value) aplicarMascara(inp, tipo);
+                                if (tipo && inp.value) aplicarMascara(inp, tipo, undefined, false);
                             });
                         }
                     }
