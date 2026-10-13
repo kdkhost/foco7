@@ -309,12 +309,6 @@
                                             <p>Gateways de Pagamento</p>
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link">
-                                            <i class="nav-icon far fa-circle"></i>
-                                            <p>Carnês em PDF (Efí PRO)</p>
-                                        </a>
-                                    </li>
                                 </ul>
                             </li>
 
