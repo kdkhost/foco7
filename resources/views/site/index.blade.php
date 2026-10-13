@@ -1265,7 +1265,7 @@
                 </div>
             </div>
             <div class="border-top border-light-subtle mt-5 pt-4 text-center small text-secondary">
-                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade &amp; Termos (LGPD)</a> &bull; <a href="{{ route('login') }}" class="text-danger fw-semibold ms-2 text-decoration-none"><i class="fas fa-user-lock me-1"></i> Área do Cliente</a>
+                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade &amp; Termos (LGPD)</a>
             </div>
         </div>
     </footer>
