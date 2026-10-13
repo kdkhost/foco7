@@ -257,7 +257,7 @@
                         <div class="mt-3 pt-2 border-top">
                             <h6 class="small fw-bold text-uppercase text-secondary mb-2">Páginas Mais Acessadas:</h6>
                             <ul class="list-unstyled mb-0 small">
-                                @forelse($analytics['paginas_populares'] as $pag)
+                                @forelse($analytics['paginas_populares'] ?? [] as $pag)
                                     <li class="d-flex justify-content-between align-items-center mb-1">
                                         <span class="text-body text-truncate" style="max-width: 75%;">
                                             <i class="fas fa-link text-danger me-1"></i> {{ $pag->rota ?: '/' }}
