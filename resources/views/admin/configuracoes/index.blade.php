@@ -275,7 +275,7 @@
                                 </p>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-white">E-mail de Destino</label>
-                                    <input type="email" id="emailDestinoTeste" class="form-control form-control-sm" value="{{ auth()->user()->email }}" placeholder="seu-email@dominio.com">
+                                    <input type="email" id="emailDestinoTeste" class="form-control form-control-sm" value="" autocomplete="off" data-lpignore="true" placeholder="Digite o e-mail para teste...">
                                 </div>
                                 <button type="button" class="btn btn-warning w-100 fw-bold" id="btnTestarSmtp">
                                     <i class="fas fa-vial me-1"></i> TESTAR ENVIO VIA AJAX
@@ -548,10 +548,13 @@
             }
         });
 
+        // O campo de e-mail de teste de disparo deve permanecer sempre limpo sem armazenar nada
+        $('#emailDestinoTeste').val('');
+
         // Teste de Disparo SMTP via AJAX
         $('#btnTestarSmtp').on('click', function () {
             var $btn = $(this);
-            var emailDestino = $('#emailDestinoTeste').val();
+            var emailDestino = $('#emailDestinoTeste').val().trim();
 
             if (!emailDestino) {
                 window.foco7Notify.warning('Digite um e-mail de destino para o teste.');
@@ -612,6 +615,9 @@
                         confirmButtonColor: '#d90000'
                     });
                     window.foco7Notify.error(msg);
+                },
+                complete: function () {
+                    $('#emailDestinoTeste').val('');
                 }
             });
         });

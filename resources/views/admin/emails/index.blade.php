@@ -137,7 +137,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">E-mail de Destino</label>
-                        <input type="email" name="email_destinatario" class="form-control" value="{{ auth()->user()->email }}" required placeholder="seuemail@empresa.com">
+                        <input type="email" name="email_destinatario" id="modalEmailDestinatario" class="form-control" value="" autocomplete="off" data-lpignore="true" required placeholder="Digite o e-mail de destino...">
                         <small class="text-secondary">O e-mail será compilado na rota única oficial com o layout master responsivo e enviado via SMTP exclusivo.</small>
                     </div>
                 </div>
@@ -154,13 +154,28 @@
 @section('scripts')
 <script>
     function abrirModalTesteGlobal() {
+        $('#modalEmailDestinatario').val('');
         new bootstrap.Modal(document.getElementById('modalTesteEmail')).show();
     }
 
     function dispararTesteIndividual(chave, nome) {
         $('#modalTemplateChave').val(chave);
+        $('#modalEmailDestinatario').val('');
         new bootstrap.Modal(document.getElementById('modalTesteEmail')).show();
     }
+
+    $(function () {
+        $('#modalEmailDestinatario').val('');
+        var modalEl = document.getElementById('modalTesteEmail');
+        if (modalEl) {
+            modalEl.addEventListener('show.bs.modal', function () {
+                $('#modalEmailDestinatario').val('');
+            });
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                $('#modalEmailDestinatario').val('');
+            });
+        }
+    });
 
     function excluirTemplate(chave, nome) {
         window.foco7Confirm('Excluir Template?', 'Deseja realmente remover o template personalizado "' + nome + '"?', function() {

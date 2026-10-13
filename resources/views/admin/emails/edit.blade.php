@@ -157,7 +157,7 @@
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label small fw-bold">E-mail de Destino</label>
-                        <input type="email" name="email_destinatario" class="form-control" value="{{ auth()->user()->email }}" required placeholder="seuemail@empresa.com">
+                        <input type="email" name="email_destinatario" id="modalEmailDestinatarioEdit" class="form-control" value="" autocomplete="off" data-lpignore="true" required placeholder="Digite o e-mail de destino...">
                         <small class="text-secondary">O e-mail será disparado com o assunto e corpo atuais do editor compilados no layout oficial.</small>
                     </div>
                 </div>
@@ -365,6 +365,18 @@
                 $label.html('<i class="fas fa-mobile-alt text-danger me-1"></i> Modo: Smartphone Mobile (375px)');
             }
         });
+
+        // Garante que o campo de e-mail de destino do modal de teste permaneça sempre limpo
+        $('#modalEmailDestinatarioEdit').val('');
+        var modalTesteEl = document.getElementById('modalTeste');
+        if (modalTesteEl) {
+            modalTesteEl.addEventListener('show.bs.modal', function () {
+                $('#modalEmailDestinatarioEdit').val('');
+            });
+            modalTesteEl.addEventListener('hidden.bs.modal', function () {
+                $('#modalEmailDestinatarioEdit').val('');
+            });
+        }
     });
 </script>
 @endsection
