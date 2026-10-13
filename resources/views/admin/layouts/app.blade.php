@@ -312,7 +312,7 @@
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}#tab-carne" class="nav-link">
                                             <i class="nav-icon far fa-circle"></i>
-                                            <p>Carnês em PDF</p>
+                                            <p>Carnês em PDF (Efí PRO)</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -791,6 +791,36 @@
                 setTimeout(sincronizarLogoSidebar, 200);
             });
             sincronizarLogoSidebar();
+
+            // CONTROLE ROBUSTO DE EXPANSÃO / RECOLHIMENTO DE MENUS COM SETA (TREEVIEW)
+            $(document).on('click', '.sidebar-menu .nav-item > a.nav-link', function (e) {
+                var $link = $(this);
+                var $parent = $link.parent('.nav-item');
+                var $treeview = $parent.children('.nav-treeview');
+
+                if ($treeview.length > 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Se a sidebar estiver compactada, descompacta para exibir o submenu adequadamente
+                    if ($('body').hasClass('sidebar-collapse')) {
+                        $('body').removeClass('sidebar-collapse');
+                        sincronizarLogoSidebar(true);
+                    }
+
+                    if ($parent.hasClass('menu-open')) {
+                        $treeview.stop(true, true).slideUp(200, function () {
+                            $parent.removeClass('menu-open');
+                        });
+                    } else {
+                        $parent.addClass('menu-open');
+                        $treeview.stop(true, true).slideDown(200);
+                    }
+                }
+            });
+
+            // Garante que menus já abertos pela rota ativa estejam visíveis
+            $('.sidebar-menu .nav-item.menu-open > .nav-treeview').show();
         });
     </script>
 

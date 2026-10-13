@@ -460,6 +460,10 @@ public_html/
 - **Preenchimento Contextual Inteligente:** Localiza os campos de Logradouro, Bairro, Cidade e UF dentro do container mais próximo (form, modal ou card).
 - **Foco e Seleção Automática no Número:** Move o foco diretamente para o campo Número com notificação suave Toastr confirmando a localização do endereço.
 
+### 6. Treeview Interativo da Sidebar (AdminLTE 4) & Cobrança por Carnê Integrada à Efí PRO
+- **Controle Interativo de Menus com Seta (Treeview):** Delegação de eventos nativa com jQuery para expansão e recolhimento animado (`slideToggle`) de submenus da sidebar (`Atendimentos`, `Financeiro`, `Gestão do Site`, `Templates de E-mail`, `Configurações`), com rotação fluida da seta indicadora (`.nav-arrow`) e abertura automática ao descompactar a sidebar.
+- **Cobrança por Carnê Integrada à Efí PRO:** Reorganização estrutural do portal de pagamentos (`/admin/gateways`), alocando a emissão e parametrização de carnês em PDF como sub-aba nativa dentro da guia da Efí PRO (Gerencianet), preservando sincronização bidirecional de abas via URL Hash (`#tab-carne`).
+
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade

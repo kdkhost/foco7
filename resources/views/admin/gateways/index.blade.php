@@ -16,12 +16,7 @@
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="efi-tab" data-bs-toggle="tab" data-bs-target="#tab-efipro" type="button" role="tab">
-                    <i class="fas fa-bolt text-warning me-2"></i> Efí PRO (Gerencianet)
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link fw-semibold" id="carne-tab" data-bs-toggle="tab" data-bs-target="#tab-carne" type="button" role="tab">
-                    <i class="fas fa-book text-success me-2"></i> Cobrança por Carnê
+                    <i class="fas fa-bolt text-warning me-2"></i> Efí PRO (Gerencianet &amp; Carnês)
                 </button>
             </li>
             <li class="nav-item">
@@ -216,24 +211,48 @@
             </div>
 
             <!-- ===================================================================
-                 GUIA 2: EFÍ PRO (GERENCIANET - PIX, BOLETO, CARTÃO E CERTIFICADO PEM)
+                 GUIA 2: EFÍ PRO (GERENCIANET - PIX, BOLETO, CARTÃO & CARNÊS)
                  =================================================================== -->
             <div class="tab-pane fade" id="tab-efipro" role="tabpanel">
-                <form action="{{ route('admin.gateways.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
-                    @csrf
-
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
-                        <div>
-                            <h5 class="fw-bold mb-1 text-warning"><i class="fas fa-bolt me-2"></i> Integração Efí PRO (Gerencianet)</h5>
-                            <p class="text-secondary small mb-0">API Oficial do Banco Central para PIX com confirmação em tempo real, Boletos e Cartão.</p>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="form-check form-switch fs-5 mb-0">
-                                <input class="form-check-input" type="checkbox" name="efi_ativo" id="efi_ativo" value="1" {{ $configs['efi_ativo'] ? 'checked' : '' }}>
-                                <label class="form-check-label fs-6 fw-bold" for="efi_ativo">Gateway Ativo</label>
-                            </div>
-                        </div>
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-warning"><i class="fas fa-bolt me-2"></i> Integração Efí PRO (Gerencianet)</h5>
+                        <p class="text-secondary small mb-0">API Oficial do Banco Central para PIX instantâneo, Boletos Bancários, Cartão de Crédito e Emissão de Carnês em PDF.</p>
                     </div>
+                </div>
+
+                <!-- SUB-GUIAS INTERNAS EFÍ PRO -->
+                <ul class="nav nav-pills mb-4 bg-body-secondary p-1 rounded-3 gap-2" id="efiSubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold px-3 py-2" id="efi-credenciais-tab" data-bs-toggle="pill" data-bs-target="#subtab-efi-credenciais" type="button" role="tab">
+                            <i class="fas fa-key text-warning me-2"></i> Credenciais &amp; Checkout Transparente
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold px-3 py-2" id="efi-carne-tab" data-bs-toggle="pill" data-bs-target="#tab-carne" type="button" role="tab">
+                            <i class="fas fa-book text-success me-2"></i> Cobrança por Carnê (Efí PRO)
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="efiSubTabsContent">
+                    <!-- SUB-ABA 1: CREDENCIAIS & CHECKOUT TRANSPARENTE EFÍ PRO -->
+                    <div class="tab-pane fade show active" id="subtab-efi-credenciais" role="tabpanel">
+                        <form action="{{ route('admin.gateways.salvar') }}" method="POST" enctype="multipart/form-data" class="ajax-form">
+                            @csrf
+
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-warning"><i class="fas fa-plug me-2"></i> Status do Gateway &amp; Modos de Operação</h6>
+                                    <p class="text-secondary small mb-0">Defina se a integração está ativa e selecione entre ambientes de Homologação ou Produção.</p>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="form-check form-switch fs-5 mb-0">
+                                        <input class="form-check-input" type="checkbox" name="efi_ativo" id="efi_ativo" value="1" {{ $configs['efi_ativo'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fs-6 fw-bold" for="efi_ativo">Gateway Ativo</label>
+                                    </div>
+                                </div>
+                            </div>
 
                     <!-- SELETOR DINÂMICO DE AMBIENTE EFÍ PRO -->
                     <div class="card bg-body-tertiary border mb-4">
@@ -440,9 +459,7 @@
                 </form>
             </div>
 
-            <!-- ===================================================================
-                 GUIA 3: COBRANÇA POR CARNÊ (EFÍ PRO PARA CLIENTES EXISTENTES)
-                 =================================================================== -->
+            <!-- SUB-ABA 2: COBRANÇA POR CARNÊ (EXCLUSIVA EFÍ PRO) -->
             <div class="tab-pane fade" id="tab-carne" role="tabpanel">
                 <div class="row g-4">
                     <!-- CONFIGURAÇÕES DE CARNÊ -->
@@ -564,6 +581,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
             <!-- ===================================================================
                  GUIA 4: GATEWAY PADRÃO & REPASSE DE TAXAS AO CLIENTE
@@ -1138,5 +1157,54 @@
             }
         });
     }
+
+    // Sincronização automática de abas principais e sub-abas via Hash da URL (ex: #tab-carne, #carne, #tab-efipro)
+    function sincronizarAbasPorHash() {
+        var hash = window.location.hash;
+        if (!hash) return;
+
+        if (hash === '#tab-carne' || hash === '#carne') {
+            var efiBtn = document.getElementById('efi-tab');
+            if (efiBtn) {
+                bootstrap.Tab.getOrCreateInstance(efiBtn).show();
+            }
+            var carneBtn = document.getElementById('efi-carne-tab');
+            if (carneBtn) {
+                bootstrap.Tab.getOrCreateInstance(carneBtn).show();
+            }
+            // Rolagem suave até a área de emissão de carnê se necessário
+            setTimeout(function() {
+                var el = document.getElementById('tab-carne');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 150);
+        } else if (hash === '#tab-efipro' || hash === '#efipro') {
+            var efiBtn = document.getElementById('efi-tab');
+            if (efiBtn) {
+                bootstrap.Tab.getOrCreateInstance(efiBtn).show();
+            }
+        } else if (hash === '#tab-mercadopago' || hash === '#mercadopago') {
+            var mpBtn = document.getElementById('mp-tab');
+            if (mpBtn) {
+                bootstrap.Tab.getOrCreateInstance(mpBtn).show();
+            }
+        } else if (hash === '#tab-taxas' || hash === '#taxas') {
+            var taxasBtn = document.getElementById('taxas-tab');
+            if (taxasBtn) {
+                bootstrap.Tab.getOrCreateInstance(taxasBtn).show();
+            }
+        } else if (hash === '#tab-regua' || hash === '#regua') {
+            var reguaBtn = document.getElementById('regua-tab');
+            if (reguaBtn) {
+                bootstrap.Tab.getOrCreateInstance(reguaBtn).show();
+            }
+        }
+    }
+
+    $(document).ready(function() {
+        sincronizarAbasPorHash();
+        $(window).on('hashchange', sincronizarAbasPorHash);
+    });
 </script>
 @endsection
