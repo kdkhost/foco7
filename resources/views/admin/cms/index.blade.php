@@ -934,14 +934,13 @@
                 <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
                     @csrf
                     <div class="card border mb-4">
-                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-user-shield me-2"></i> Banner de Consentimento LGPD (Cookies) & Termos Legais</h6>
-                                <small class="text-secondary">Controle o banner flutuante do site e gerencie o conteúdo oficial da Política de Privacidade.</small>
+                        <div class="card-header bg-body-tertiary py-3 d-flex align-items-center">
+                            <h6 class="card-title fw-bold mb-0 text-danger"><i class="fas fa-user-shield me-2"></i> Banner de Consentimento LGPD (Cookies) &amp; Termos Legais</h6>
+                            <div class="card-tools ms-auto">
+                                <a href="{{ route('site.privacidade') }}" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                                    <i class="fas fa-external-link-alt me-1"></i> Visualizar Página de Termos
+                                </a>
                             </div>
-                            <a href="{{ route('site.privacidade') }}" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
-                                <i class="fas fa-external-link-alt me-1"></i> Visualizar Página de Termos
-                            </a>
                         </div>
                         <div class="card-body p-4">
                             <!-- CONTROLE DO BANNER FLUTUANTE -->
