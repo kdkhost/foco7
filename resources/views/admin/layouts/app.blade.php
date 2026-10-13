@@ -789,7 +789,7 @@
             // CONTROLE ROBUSTO DE EXPANSÃO / RECOLHIMENTO DE MENUS COM SETA (TREEVIEW)
             $(document).on('click', '.sidebar-menu .nav-item > a.nav-link', function (e) {
                 var $link = $(this);
-                var $parent = $link.parent('.nav-item');
+                var $parent = $link.closest('.nav-item');
                 var $treeview = $parent.children('.nav-treeview');
 
                 if ($treeview.length > 0) {
@@ -799,22 +799,19 @@
                     // Se a sidebar estiver compactada, descompacta para exibir o submenu adequadamente
                     if ($('body').hasClass('sidebar-collapse')) {
                         $('body').removeClass('sidebar-collapse');
-                        sincronizarLogoSidebar(true);
+                        if (typeof sincronizarLogoSidebar === 'function') {
+                            sincronizarLogoSidebar(true);
+                        }
                     }
 
-                    if ($parent.hasClass('menu-open')) {
-                        $treeview.stop(true, true).slideUp(200, function () {
-                            $parent.removeClass('menu-open');
-                        });
-                    } else {
-                        $parent.addClass('menu-open');
-                        $treeview.stop(true, true).slideDown(200);
-                    }
+                    // Limpa qualquer estilo inline antigo e alterna a classe menu-open
+                    $treeview.removeAttr('style');
+                    $parent.toggleClass('menu-open');
                 }
             });
 
-            // Garante que menus já abertos pela rota ativa estejam visíveis
-            $('.sidebar-menu .nav-item.menu-open > .nav-treeview').show();
+            // Limpa resíduos de style inline de todos os treeviews
+            $('.sidebar-menu .nav-treeview').removeAttr('style');
         });
     </script>
 

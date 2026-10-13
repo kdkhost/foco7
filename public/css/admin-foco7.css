@@ -71,16 +71,28 @@ html[data-bs-theme="dark"] {
     transform: rotate(90deg);
 }
 
-/* Controle de exibição do Treeview da Sidebar */
+/* Controle de exibição e animação do Treeview da Sidebar */
 .sidebar-menu .nav-treeview {
-    display: none;
+    display: none !important;
     list-style: none;
     padding-left: 0.5rem;
     margin: 0;
 }
 
 .sidebar-menu .nav-item.menu-open > .nav-treeview {
-    display: block;
+    display: block !important;
+    animation: foco7TreeviewFadeIn 0.2s ease-in-out;
+}
+
+@keyframes foco7TreeviewFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .sidebar-menu .nav-treeview .nav-link {
