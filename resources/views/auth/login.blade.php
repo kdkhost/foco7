@@ -278,6 +278,16 @@
                 localStorage.setItem('foco7_theme', currentTheme);
                 applyTheme(currentTheme);
             });
+
+            @if(request('motivo') === 'inatividade' || session('warning'))
+            Swal.fire({
+                icon: 'info',
+                title: 'Sessão Expirada por Inatividade',
+                text: "{{ session('warning') ?: 'Sua sessão foi desconectada por inatividade para sua segurança. Faça login novamente para continuar.' }}",
+                confirmButtonColor: '#d90000',
+                confirmButtonText: '<i class="fas fa-lock-open me-1"></i> Fazer Login Novamente'
+            });
+            @endif
         });
     </script>
 </body>

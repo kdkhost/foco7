@@ -421,11 +421,52 @@ public_html/
 
 ---
 
+## 🛡️ Módulo 33: Segurança de Sessão (Auto-Logout), Relógio em Tempo Real, Blindagem de Cobranças & Máscaras Globais em Tempo Real
+
+### 1. Desconexão Automática por Inatividade (Anti-Session Hijacking)
+- **Configuração Flexível no Painel Admin (`/admin/configuracoes`):** Aba dedicada "Sessão & Desconexão" permitindo definir o tempo limite de inatividade em minutos (com atalhos rápidos de 10 min, 15 min, 30 min padrão, 1h e 2h).
+- **Proteção Ativa em 2 Camadas:**
+  - **Camada Frontend (`global-sessao.js`):** Monitora eventos de interação (`mousemove`, `mousedown`, `keydown`, `scroll`, `touchstart`, `click`). Faltando 60 segundos para o limite, dispara modal SweetAlert2 com timer regressivo em segundos:
+    - Botão "Continuar Conectado": renova a sessão via heartbeat seguro (`POST /auth/ping-sessao`) com Toastr de confirmação.
+    - Botão "Desconectar Agora" ou tempo esgotado: executa logout formal (`POST /logout?motivo=inatividade`) e redireciona para a tela de login.
+  - **Camada Backend (`CheckSessionInactivity` Middleware):** Inviolável contra pausas de script ou reabertura de abas antigas. Valida o timestamp de última atividade no grupo `web`, invalidando a sessão no servidor e retornando status HTTP 401 para AJAX ou redirecionando para `/login?motivo=inatividade` com aviso explicativo SweetAlert2.
+
+### 2. Relógio e Data em Tempo Real nas Dashboards (Padrão Brasileiro)
+- **Dashboard Administrativa & Central do Assinante:**
+  - Componente de relógio com segundos (`HH:mm:ss`) e data brasileira (`DD/MM/AAAA` com dia da semana) atualizado segundo a segundo (`setInterval(..., 1000)`).
+  - Indicador visual em tempo real com micro-animação pulsante suave, exibindo precisão absoluta no horário oficial de Brasília.
+
+### 3. Blindagem Absoluta contra Reenvio de Cobrança para Faturas Quitadas
+- **Prevenção de Cobranças em Duplicidade:**
+  - Métodos utilitários no Model `Fatura`: `isPaga()`, `isQuitada()` e `isLiquidadaOuCancelada()`, identificando status `pago`, `quitada`, `liquidada`, ou presença de `data_pagamento`.
+  - **Régua de Cobrança Automatizada (`ReguaCobrancaService`):**
+    - `processarFila()`: Filtra e exclui sumariamente qualquer fatura com `data_pagamento` ou status quitado/cancelado.
+    - `dispararEtapa()`: Guarda estrita e intransponível que bloqueia o disparo e registra log de segurança caso a fatura já se encontre quitada ou liquidada.
+  - **Comandos de Cron (`EnviarLembretesFaturas` e `VerificarFaturasVencidas`):** Ignoram rigorosamente faturas já quitadas, impedindo disparos de lembretes preventivos ou atualizações indevidas de encargos para pagamentos já liquidados.
+
+### 4. Motor Global de Máscaras e Formatações em Tempo Real (`global-mascaras.js`)
+- **Delegação Global de Eventos (Event Delegation):** Escuta ativa nos eventos `input` e `paste` no nível do documento, garantindo funcionamento instantâneo em 100% dos campos, inclusive em modais recém-abertos, componentes Summernote e formulários carregados via AJAX.
+- **Padrões Brasileiros Formatados Instantaneamente:**
+  - **Documentos (CPF / CNPJ):** Formatação dinâmica que transiciona perfeitamente de CPF (`000.000.000-00`) para CNPJ (`00.000.000/0001-00`) durante a digitação ou colagem de 12 a 14 dígitos.
+  - **Valores Monetários (R$):** Formatação de centavos em tempo real (`R$ 0,00` até `R$ 999.999.999,99`), suportando digitação contínua e colagem direta de valores.
+  - **Datas:** Padrão estrito brasileiro `DD/MM/AAAA`.
+  - **Horários:** Padrão de 24 horas `HH:MM` ou `HH:MM:SS`.
+  - **Data e Hora Combinadas:** Formato `DD/MM/AAAA HH:MM` ou `DD/MM/AAAA HH:MM:SS`.
+  - **Telefones & Celulares:** Dinâmico entre fixo `(99) 9999-9999` e móvel `(99) 99999-9999`.
+  - **Placas de Veículos:** Padrão tradicional (`ABC-1234`) e Mercosul (`ABC1D23`).
+
+### 5. Autopreenchimento de Endereço em Tempo Real Durante a Digitação do CEP (ViaCEP)
+- **Consulta Instantânea sem Dependência de Blur:** Ao digitar ou colar o 8º dígito numérico do CEP (`00000-000`), o sistema dispara automaticamente a consulta assíncrona ao ViaCEP.
+- **Preenchimento Contextual Inteligente:** Localiza os campos de Logradouro, Bairro, Cidade e UF dentro do container mais próximo (form, modal ou card).
+- **Foco e Seleção Automática no Número:** Move o foco diretamente para o campo Número com notificação suave Toastr confirmando a localização do endereço.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
-- **126 testes executados, 126 aprovados (100% de sucesso), 591 asserções**.
-- Cobertura completa: Usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, régua de cobrança pré e pós-vencimento, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks e isolamento ACL.
+- **133 testes executados, 133 aprovados (100% de sucesso), 614 asserções**.
+- Cobertura completa: Segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks e isolamento ACL.
 
 ---
 

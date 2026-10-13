@@ -65,6 +65,9 @@ class ConfiguracoesController extends Controller
             'geoblock_ativo' => CmsSetting::get('geoblock_ativo', '1'),
             'geoblock_regioes' => CmsSetting::get('geoblock_regioes', 'Americas'),
             'geoblock_ips_liberados' => CmsSetting::get('geoblock_ips_liberados', '127.0.0.1,::1'),
+
+            // Segurança de Sessão & Desconexão por Inatividade
+            'sessao_inatividade_minutos' => (int) CmsSetting::get('sessao_inatividade_minutos', 30),
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -92,6 +95,12 @@ class ConfiguracoesController extends Controller
             if ($request->has($campo)) {
                 CmsSetting::set($campo, trim((string)$request->input($campo, '')), 'sistema');
             }
+        }
+
+        // Tempo de inatividade da sessão (mínimo 1 minuto, padrão 30)
+        if ($request->has('sessao_inatividade_minutos')) {
+            $minutos = max(1, min(1440, (int) $request->input('sessao_inatividade_minutos', 30)));
+            CmsSetting::set('sessao_inatividade_minutos', $minutos, 'seguranca');
         }
 
         // Status do reCAPTCHA e Geo-Bloqueio

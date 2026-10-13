@@ -38,6 +38,11 @@
                     <i class="fas fa-globe-americas text-danger me-1"></i> Bloqueio Geográfico (Américas)
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="sessao-tab" data-bs-toggle="tab" data-bs-target="#tab-sessao" type="button">
+                    <i class="fas fa-user-lock text-danger me-1"></i> Sessão &amp; Desconexão
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -450,6 +455,68 @@
                     </div>
                 </div>
 
+                <!-- ABA 7: SEGURANÇA DE SESSÃO & AUTO-LOGOUT POR INATIVIDADE -->
+                <div class="tab-pane fade" id="tab-sessao" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card border border-light-subtle shadow-none p-3 bg-body-secondary mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-danger text-white rounded-circle p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                        <i class="fas fa-user-lock fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold text-body mb-1">Encerramento Automático de Sessão por Inatividade (Anti-Session Hijacking)</h6>
+                                        <p class="text-secondary small mb-0">
+                                            Desconecta automaticamente o usuário após o tempo sem nenhuma interação no sistema (clique, digitação, rolagem), prevenindo que terceiros acessem dados caso o dispositivo seja deixado aberto.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Tempo Limite de Inatividade (em Minutos) *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-stopwatch text-danger"></i></span>
+                                        <input type="number" name="sessao_inatividade_minutos" id="sessaoInatividadeInput" 
+                                               class="form-control" min="1" max="1440" step="1" 
+                                               value="{{ $configs['sessao_inatividade_minutos'] ?? 30 }}" required>
+                                        <span class="input-group-text">minutos</span>
+                                    </div>
+                                    <div class="form-text small">
+                                        Recomendado: 15 a 30 minutos em ambientes administrativos de alta segurança.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Atalhos de Seleção Rápida</label>
+                                    <div class="d-flex flex-wrap gap-2 pt-1">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-tempo-sessao" data-minutos="10">10 min</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-tempo-sessao" data-minutos="15">15 min</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-tempo-sessao" data-minutos="30">30 min (Padrão)</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-tempo-sessao" data-minutos="60">1 hora</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-tempo-sessao" data-minutos="120">2 horas</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card bg-dark text-white border-secondary p-3">
+                                <h6 class="fw-bold text-white mb-2">
+                                    <i class="fas fa-shield-alt text-danger me-2"></i> Proteção Ativa em 2 Níveis
+                                </h6>
+                                <p class="small text-white-50 mb-2">
+                                    <strong>1. Frontend com Aviso Preventivo:</strong> O navegador monitora movimentos, cliques e digitação. Faltando 60 segundos para o limite, um modal de confirmação SweetAlert2 é disparado para permitir continuar conectado ou desconectar imediatamente.
+                                </p>
+                                <p class="small text-white-50 mb-0">
+                                    <strong>2. Backend com Middleware Inviolável:</strong> Mesmo que o JavaScript seja pausado ou a aba seja reaberta horas depois, o servidor valida o timestamp de atividade e barra requisições antigas, forçando novo login seguro.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="mt-4 pt-3 border-top text-end">
@@ -470,6 +537,17 @@
     }
 
     $(function () {
+        // Atalhos de seleção rápida do tempo de inatividade
+        $('.btn-tempo-sessao').on('click', function () {
+            var min = $(this).data('minutos');
+            $('#sessaoInatividadeInput').val(min).trigger('change');
+            $('.btn-tempo-sessao').removeClass('btn-danger').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('btn-danger');
+            if (window.foco7Notify) {
+                window.foco7Notify.info('Tempo selecionado: ' + min + ' minutos');
+            }
+        });
+
         // Teste de Disparo SMTP via AJAX
         $('#btnTestarSmtp').on('click', function () {
             var $btn = $(this);

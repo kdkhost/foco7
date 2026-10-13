@@ -181,7 +181,7 @@ class GeoRestricaoEParceirosTest extends TestCase
         $responseIndex->assertSee('Ativos no Carrossel Infinito');
 
         // 2. Cadastro de Parceiro
-        $fakeLogo = UploadedFile::fake()->image('parceiro_teste.png', 200, 100);
+        $fakeLogo = UploadedFile::fake()->create('parceiro_teste.png', 10, 'image/png');
         $responseStore = $this->actingAs($admin)->post(route('admin.parceiros.salvar'), [
             'nome' => 'Parceiro Tech Brasil',
             'categoria' => 'Hardware & GPS',

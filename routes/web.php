@@ -60,6 +60,7 @@ Route::get('/cadastro', [AuthController::class, 'cadastroForm'])->name('register
 Route::post('/cadastro', [AuthController::class, 'cadastro'])->middleware('throttle:5,1')->name('register.post');
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/auth/status', [AuthController::class, 'statusAuth'])->name('auth.status');
+Route::match(['get', 'post'], '/auth/ping-sessao', [AuthController::class, 'pingSessao'])->name('auth.ping_sessao');
 Route::post('/auth/rapido/login', [AuthController::class, 'loginRapidoAjax'])->middleware('throttle:10,1')->name('auth.rapido.login');
 Route::post('/auth/rapido/cadastro', [AuthController::class, 'cadastroRapidoAjax'])->middleware('throttle:5,1')->name('auth.rapido.cadastro');
 

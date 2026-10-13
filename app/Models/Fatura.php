@@ -120,9 +120,35 @@ class Fatura extends Model
         return 0;
     }
 
+    /**
+     * Verifica se a fatura já está paga/quitada
+     */
+    public function isPaga(): bool
+    {
+        $st = strtolower((string) $this->status);
+        return in_array($st, ['pago', 'paga', 'quitada', 'liquidada']) || !empty($this->data_pagamento);
+    }
+
+    /**
+     * Alias semântico para isPaga()
+     */
+    public function isQuitada(): bool
+    {
+        return $this->isPaga();
+    }
+
+    /**
+     * Verifica se a fatura está encerrada (paga, estornada ou cancelada)
+     */
+    public function isLiquidadaOuCancelada(): bool
+    {
+        $st = strtolower((string) $this->status);
+        return $this->isPaga() || in_array($st, ['cancelado', 'cancelada', 'estornado', 'estornada']);
+    }
+
     public function isVencida(): bool
     {
-        if ($this->status === 'pago' || $this->status === 'cancelado' || $this->status === 'estornado') {
+        if ($this->isLiquidadaOuCancelada()) {
             return false;
         }
 

@@ -21,6 +21,8 @@ class EnviarLembretesFaturas extends Command
 
         $faturas = Fatura::with(['user', 'plano'])
             ->where('status', 'pendente')
+            ->whereNull('data_pagamento')
+            ->whereNotIn('status', ['pago', 'paga', 'quitada', 'liquidada', 'cancelado', 'cancelada', 'estornado', 'estornada'])
             ->whereDate('data_vencimento', $alvoData)
             ->get();
 
@@ -40,6 +42,11 @@ class EnviarLembretesFaturas extends Command
 
         $enviados = 0;
         foreach ($faturas as $fatura) {
+            // Ignora estritamente se a fatura já estiver quitada ou cancelada
+            if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
+                continue;
+            }
+
             if ($fatura->user && !empty($fatura->user->email)) {
                 $sucesso = EmailTemplateService::enviar($fatura->user->email, 'lembrete_vencimento', [
                     'cliente_nome' => $fatura->user->name,

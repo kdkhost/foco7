@@ -36,9 +36,13 @@
                 </h2>
                 <p class="text-secondary small mb-0">Métricas em tempo real, visitantes únicos, agendamentos e faturamento da Foco 7.</p>
             </div>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <span class="badge bg-body-secondary text-body border p-2 small">
-                    <i class="far fa-calendar-alt text-danger me-1"></i> {{ date('d/m/Y') }} &bull; <span id="relogioAdminDashboard">{{ date('H:i') }}</span>
+                <span class="badge bg-body-secondary text-body border px-3 py-2 small d-inline-flex align-items-center gap-2 shadow-sm" id="badgeRelogioTempoReal" title="Horário Oficial de Brasília em Tempo Real">
+                    <span class="spinner-grow spinner-grow-sm text-danger" style="width: 7px; height: 7px;" role="status"></span>
+                    <i class="far fa-calendar-alt text-danger"></i>
+                    <span id="dataAdminDashboard" class="fw-semibold">{{ date('d/m/Y') }}</span>
+                    <span class="text-secondary">&bull;</span>
+                    <i class="far fa-clock text-danger"></i>
+                    <span id="relogioAdminDashboard" class="font-monospace fw-bold fs-6 text-danger">{{ date('H:i:s') }}</span>
                 </span>
                 <a href="{{ route('admin.agendamentos.index') }}" class="btn btn-outline-danger btn-sm fw-semibold">
                     <i class="fas fa-calendar-plus me-1"></i> Novo Agendamento
@@ -482,15 +486,33 @@
 <!-- Chart.js Oficial CDN para os Gráficos Analíticos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<script>
-    // Relógio em tempo real no cabeçalho
-    setInterval(function() {
-        const d = new Date();
-        const h = String(d.getHours()).padStart(2, '0');
-        const m = String(d.getMinutes()).padStart(2, '0');
-        const relogio = document.getElementById('relogioAdminDashboard');
-        if (relogio) relogio.textContent = `${h}:${m}`;
-    }, 1000);
+    // =========================================================================
+    // RELÓGIO & DATA EM TEMPO REAL DE ALTA PRECISÃO (PADRÃO BRASILEIRO)
+    // =========================================================================
+    function atualizarRelogioTempoReal() {
+        const agora = new Date();
+        const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        const diaSemana = diasSemana[agora.getDay()];
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const mes = String(agora.getMonth() + 1).padStart(2, '0');
+        const ano = agora.getFullYear();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+
+        const elData = document.getElementById('dataAdminDashboard');
+        const elRelogio = document.getElementById('relogioAdminDashboard');
+
+        if (elData) {
+            elData.textContent = `${dia}/${mes}/${ano}`;
+            elData.parentElement.setAttribute('title', `${diaSemana}, ${dia}/${mes}/${ano} - Horário Oficial de Brasília`);
+        }
+        if (elRelogio) {
+            elRelogio.textContent = `${horas}:${minutos}:${segundos}`;
+        }
+    }
+    atualizarRelogioTempoReal();
+    setInterval(atualizarRelogioTempoReal, 1000);
 
     // =========================================================================
     // ANIMAÇÃO DE NÚMEROS SUAVE (COUNTUP ANIMADO) PARA OS KPIS

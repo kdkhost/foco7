@@ -527,10 +527,14 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js"></script>
 
     <!-- Scripts Globais Foco 7 (com quebra automatica de cache) -->
+    <script>
+        window.foco7SessionTimeoutMinutes = {{ (int) \App\Models\CmsSetting::get('sessao_inatividade_minutos', 30) }};
+    </script>
     <script src="{{ asset('js/global-ajax.js') }}?v={{ file_exists(public_path('js/global-ajax.js')) ? filemtime(public_path('js/global-ajax.js')) : time() }}"></script>
     <script src="{{ asset('js/global-mascaras.js') }}?v={{ file_exists(public_path('js/global-mascaras.js')) ? filemtime(public_path('js/global-mascaras.js')) : time() }}"></script>
     <script src="{{ asset('js/global-dropzone.js') }}?v={{ file_exists(public_path('js/global-dropzone.js')) ? filemtime(public_path('js/global-dropzone.js')) : time() }}"></script>
     <script src="{{ asset('js/global-summernote.js') }}?v={{ file_exists(public_path('js/global-summernote.js')) ? filemtime(public_path('js/global-summernote.js')) : time() }}"></script>
+    <script src="{{ asset('js/global-sessao.js') }}?v={{ file_exists(public_path('js/global-sessao.js')) ? filemtime(public_path('js/global-sessao.js')) : time() }}"></script>
 
     <script>
         // Alternador Dark / Light Mode oficial AdminLTE 4 & Bootstrap 5

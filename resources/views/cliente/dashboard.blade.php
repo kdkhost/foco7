@@ -5,6 +5,14 @@
 @section('page_description', 'Painel exclusivo do cliente Foco 7. Consulte suas mensalidades, agendamentos e suporte.')
 
 @section('page_actions')
+    <span class="badge bg-body-secondary text-body border px-3 py-2 small d-inline-flex align-items-center gap-2 shadow-sm me-2" title="Horário Oficial de Brasília em Tempo Real">
+        <span class="spinner-grow spinner-grow-sm text-danger" style="width: 7px; height: 7px;" role="status"></span>
+        <i class="far fa-calendar-alt text-danger"></i>
+        <span id="dataClienteDashboard" class="fw-semibold">{{ date('d/m/Y') }}</span>
+        <span class="text-secondary">&bull;</span>
+        <i class="far fa-clock text-danger"></i>
+        <span id="relogioClienteDashboard" class="font-monospace fw-bold text-danger">{{ date('H:i:s') }}</span>
+    </span>
     <a href="https://wa.me/{{ \App\Models\CmsSetting::get('contato_whatsapp', '559180510736') }}?text={{ urlencode('Olá, sou cliente Foco 7 e preciso de suporte técnico.') }}" target="_blank" class="btn btn-outline-success fw-bold">
         <i class="fab fa-whatsapp me-1"></i> Suporte WhatsApp 24h
     </a>
@@ -425,6 +433,25 @@
                 }
             });
         });
+
+        // Relógio em Tempo Real
+        function atualizarRelogioCliente() {
+            const agora = new Date();
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const ano = agora.getFullYear();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            const segundos = String(agora.getSeconds()).padStart(2, '0');
+
+            const elData = document.getElementById('dataClienteDashboard');
+            const elRelogio = document.getElementById('relogioClienteDashboard');
+
+            if (elData) elData.textContent = `${dia}/${mes}/${ano}`;
+            if (elRelogio) elRelogio.textContent = `${horas}:${minutos}:${segundos}`;
+        }
+        atualizarRelogioCliente();
+        setInterval(atualizarRelogioCliente, 1000);
     });
 </script>
 @endsection

@@ -283,15 +283,22 @@ class ReguaCobrancaService
         $metricas['mensalidades_geradas'] = $resRecorrencia['total_geradas'];
         $metricas['logs'] = array_merge($metricas['logs'], $resRecorrencia['detalhes']);
 
-        // 2. Busca todas as faturas abertas (pendentes ou vencidas)
+        // 2. Busca todas as faturas abertas (excluindo estritamente faturas pagas, quitadas ou canceladas)
         $faturasAbertas = Fatura::with(['user', 'plano'])
             ->whereIn('status', ['pendente', 'vencida'])
+            ->whereNull('data_pagamento')
+            ->whereNotIn('status', ['pago', 'paga', 'quitada', 'liquidada', 'cancelado', 'cancelada', 'estornado', 'estornada'])
             ->whereNotNull('data_vencimento')
             ->get();
 
         $hoje = now()->startOfDay();
 
         foreach ($faturasAbertas as $fatura) {
+            // Guarda defensiva: se por concorrência a fatura já estiver quitada ou cancelada, ignora
+            if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
+                continue;
+            }
+
             $venc = $fatura->data_vencimento->copy()->startOfDay();
 
             // CASO A: FATURA A VENCER (PRÉ-VENCIMENTO)
@@ -427,6 +434,12 @@ class ReguaCobrancaService
      */
     public static function dispararEtapa(Fatura $fatura, string $etapa, array $encargosExtras = []): bool
     {
+        // BLINDAGEM DE SEGURANÇA: Faturas já quitadas, pagas ou canceladas NUNCA recebem cobrança para evitar duplicidade
+        if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
+            Log::info("Cobrança bloqueada para evitar duplicidade: A fatura #{$fatura->codigo_fatura} já se encontra quitada/liquidada (status: {$fatura->status}, data_pagamento: " . ($fatura->data_pagamento ? $fatura->data_pagamento->format('d/m/Y H:i') : 'null') . ").");
+            return false;
+        }
+
         $cliente = $fatura->user;
         if (!$cliente || empty($cliente->email)) {
             return false;

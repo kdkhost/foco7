@@ -227,7 +227,42 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'Sessão encerrada com sucesso.');
+        $motivo = $request->input('motivo', $request->query('motivo'));
+        $msg = ($motivo === 'inatividade')
+            ? 'Sua sessão foi encerrada por inatividade para sua segurança. Faça login novamente.'
+            : 'Sessão encerrada com sucesso.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'redirect' => route('login', $motivo ? ['motivo' => $motivo] : []),
+            ]);
+        }
+
+        return redirect()->route('login', $motivo ? ['motivo' => $motivo] : [])
+            ->with($motivo === 'inatividade' ? 'warning' : 'success', $msg);
+    }
+
+    /**
+     * Atualiza a atividade da sessão ativa (Ping de Heartbeat)
+     */
+    public function pingSessao(Request $request)
+    {
+        if (Auth::check()) {
+            $request->session()->put('foco7_ultima_atividade', now()->timestamp);
+            return response()->json([
+                'success' => true,
+                'authenticated' => true,
+                'timestamp' => now()->timestamp,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'authenticated' => false,
+            'redirect' => route('login', ['motivo' => 'inatividade']),
+        ], 401);
     }
 
     /**

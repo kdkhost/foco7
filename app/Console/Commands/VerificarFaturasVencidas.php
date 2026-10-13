@@ -19,6 +19,8 @@ class VerificarFaturasVencidas extends Command
 
         $faturas = Fatura::with(['user', 'plano'])
             ->where('status', 'pendente')
+            ->whereNull('data_pagamento')
+            ->whereNotIn('status', ['pago', 'paga', 'quitada', 'liquidada', 'cancelado', 'cancelada', 'estornado', 'estornada'])
             ->where('data_vencimento', '<', $hoje)
             ->get();
 
@@ -39,6 +41,11 @@ class VerificarFaturasVencidas extends Command
         $processadas = 0;
         $params = \App\Services\ReguaCobrancaService::obterParametros();
         foreach ($faturas as $fatura) {
+            // Ignora estritamente se a fatura já estiver quitada ou cancelada
+            if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
+                continue;
+            }
+
             $fatura->status = 'vencida';
             $encargos = \App\Services\ReguaCobrancaService::calcularEncargos($fatura, $params);
             $fatura->valor_multa = $encargos['valor_multa'];

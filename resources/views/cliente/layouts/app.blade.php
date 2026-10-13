@@ -222,9 +222,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Scripts Globais Foco 7 -->
-    <script src="{{ asset('js/global-ajax.js') }}"></script>
-    <script src="{{ asset('js/global-mascaras.js') }}"></script>
-    <script src="{{ asset('js/global-dropzone.js') }}"></script>
+    <script>
+        window.foco7SessionTimeoutMinutes = {{ (int) \App\Models\CmsSetting::get('sessao_inatividade_minutos', 30) }};
+    </script>
+    <script src="{{ asset('js/global-ajax.js') }}?v={{ file_exists(public_path('js/global-ajax.js')) ? filemtime(public_path('js/global-ajax.js')) : time() }}"></script>
+    <script src="{{ asset('js/global-mascaras.js') }}?v={{ file_exists(public_path('js/global-mascaras.js')) ? filemtime(public_path('js/global-mascaras.js')) : time() }}"></script>
+    <script src="{{ asset('js/global-dropzone.js') }}?v={{ file_exists(public_path('js/global-dropzone.js')) ? filemtime(public_path('js/global-dropzone.js')) : time() }}"></script>
+    <script src="{{ asset('js/global-sessao.js') }}?v={{ file_exists(public_path('js/global-sessao.js')) ? filemtime(public_path('js/global-sessao.js')) : time() }}"></script>
 
     <script>
         // Alternador Dark / Light Mode no Painel do Cliente (AdminLTE 4)

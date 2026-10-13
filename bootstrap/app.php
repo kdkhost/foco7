@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\GeoRestricao::class,
             \App\Http\Middleware\ModoManutencao::class,
             \App\Http\Middleware\RegistrarVisita::class,
+            \App\Http\Middleware\CheckSessionInactivity::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
