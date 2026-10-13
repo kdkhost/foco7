@@ -1235,18 +1235,7 @@
                         <li class="mb-2"><a href="#inicio">Início</a></li>
                         <li class="mb-2"><a href="#riscos">Benefícios</a></li>
                         <li class="mb-2"><a href="#sobre">Sobre Nós</a></li>
-                        <li class="mb-2"><a href="#planos">Planos & Preços</a></li>
-                        <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-sparkles me-1"></i> Estética Automotiva</a></li>
-                        <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
-                        <li class="mb-2"><a href="#app">Aplicativo</a></li>
-                        @if(isset($parceiros) && $parceiros->count() > 0)
-                        <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
-                        @endif
-                        @if(isset($filiais) && $filiais->count() > 0)
-                        <li class="mb-2"><a href="#unidades">Onde Estamos / Filiais</a></li>
-                        @endif
-                        <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
-                        <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos & LGPD</a></li>
+                        <li class="mb-2"><a href="#planos">Planos &amp; Preços</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-6">
@@ -1258,16 +1247,25 @@
                         <li class="mb-2"><i class="fas fa-clock text-danger me-2"></i> {{ $configs['horario'] }}</li>
                     </ul>
                 </div>
-                <div class="col-lg-3">
-                    <h5>Área Segura</h5>
-                    <p class="small text-secondary">Acesso exclusivo para clientes e operadores de frota.</p>
-                    <a href="{{ route('login') }}" class="btn btn-outline-danger w-100 py-2 mb-2 fw-semibold">
-                        <i class="fas fa-user-lock me-1"></i> Acessar Painel / Área do Cliente
-                    </a>
+                <div class="col-lg-3 col-12">
+                    <h5>Serviços &amp; Recursos</h5>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-spray-can-sparkles me-1"></i> Estética Automotiva</a></li>
+                        <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
+                        <li class="mb-2"><a href="#app">Aplicativo</a></li>
+                        @if(isset($parceiros) && $parceiros->count() > 0)
+                        <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
+                        @endif
+                        @if(isset($filiais) && $filiais->count() > 0)
+                        <li class="mb-2"><a href="#unidades">Onde Estamos / Filiais</a></li>
+                        @endif
+                        <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
+                        <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos &amp; LGPD</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="border-top border-light-subtle mt-5 pt-4 text-center small text-secondary">
-                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade & Termos (LGPD)</a>
+                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade &amp; Termos (LGPD)</a> &bull; <a href="{{ route('login') }}" class="text-danger fw-semibold ms-2 text-decoration-none"><i class="fas fa-user-lock me-1"></i> Área do Cliente</a>
             </div>
         </div>
     </footer>
@@ -2199,6 +2197,104 @@
                     }
                 }
             });
+
+            // ========================================================
+            // SCROLLSPY INTELIGENTE & NAVEGAÇÃO SUAVE DA LANDING PAGE
+            // Sincroniza em tempo real o item ativo com a seção na tela
+            // ========================================================
+            var secoesScroll = ['inicio', 'riscos', 'sobre', 'planos', 'estetica', 'ronda', 'app', 'parceiros', 'unidades', 'faq', 'contato'];
+
+            function definirMenuAtivo(hash) {
+                $('.foco-navbar .nav-link').each(function () {
+                    var href = $(this).attr('href');
+                    if (href === hash) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+
+                $('#menuDrawerAndroid .android-nav-item').each(function () {
+                    var href = $(this).attr('href');
+                    if (href === hash) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+            }
+
+            function atualizarScrollSpy() {
+                var scrollTop = $(window).scrollTop();
+                var headerH = ($('#focoHeader').outerHeight() || 80) + 40;
+                var docHeight = $(document).height();
+                var winHeight = $(window).height();
+
+                // Topo da página (< 120px)
+                if (scrollTop < 120) {
+                    definirMenuAtivo('#inicio');
+                    return;
+                }
+
+                // Fim da página / rodapé atingido: ativa a última seção (contato)
+                if (scrollTop + winHeight >= docHeight - 80) {
+                    definirMenuAtivo('#contato');
+                    return;
+                }
+
+                // Determina a seção ativa mais próxima do topo da viewport
+                var secaoAtiva = 'inicio';
+                for (var i = 0; i < secoesScroll.length; i++) {
+                    var id = secoesScroll[i];
+                    var $el = $('#' + id);
+                    if ($el.length) {
+                        var topSecao = $el.offset().top - headerH;
+                        if (scrollTop >= topSecao) {
+                            secaoAtiva = id;
+                        }
+                    }
+                }
+                definirMenuAtivo('#' + secaoAtiva);
+            }
+
+            var scrollSpyTicking = false;
+            $(window).on('scroll', function () {
+                if (!scrollSpyTicking) {
+                    window.requestAnimationFrame(function () {
+                        atualizarScrollSpy();
+                        scrollSpyTicking = false;
+                    });
+                    scrollSpyTicking = true;
+                }
+            });
+
+            // Clique suave nos links de navegação com compensação exata do header fixo
+            $(document).on('click', '.foco-navbar .nav-link[href^="#"], #menuDrawerAndroid .android-nav-item[href^="#"]', function (e) {
+                var targetHash = $(this).attr('href');
+                if (!targetHash || targetHash === '#' || targetHash === '#!') return;
+
+                var $target = $(targetHash);
+                if ($target.length) {
+                    e.preventDefault();
+                    var headerHeight = $('#focoHeader').outerHeight() || 80;
+                    var posFinal = targetHash === '#inicio' ? 0 : Math.max(0, $target.offset().top - headerHeight + 5);
+
+                    definirMenuAtivo(targetHash);
+
+                    $('html, body').stop().animate({
+                        scrollTop: posFinal
+                    }, 450, 'swing');
+
+                    var drawerEl = document.getElementById('menuDrawerAndroid');
+                    if (drawerEl) {
+                        var bsOffcanvas = bootstrap.Offcanvas.getInstance(drawerEl);
+                        if (bsOffcanvas) bsOffcanvas.hide();
+                    }
+                }
+            });
+
+            // Executa no carregamento da página
+            atualizarScrollSpy();
 
             // Controle dinâmico do botão Voltar ao Topo
             var $btnTopo = $('#btnVoltarAoTopo');

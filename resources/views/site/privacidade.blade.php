@@ -351,11 +351,7 @@
                         <li class="mb-2"><a href="{{ route('site.home') }}#inicio">Início</a></li>
                         <li class="mb-2"><a href="{{ route('site.home') }}#riscos">Benefícios</a></li>
                         <li class="mb-2"><a href="{{ route('site.home') }}#sobre">Sobre Nós</a></li>
-                        <li class="mb-2"><a href="{{ route('site.home') }}#planos">Planos & Preços</a></li>
-                        <li class="mb-2"><a href="{{ route('site.home') }}#estetica" class="text-danger fw-bold"><i class="fas fa-sparkles me-1"></i> Estética Automotiva</a></li>
-                        <li class="mb-2"><a href="{{ route('site.home') }}#ronda">Ronda Tática</a></li>
-                        <li class="mb-2"><a href="{{ route('site.home') }}#faq">Dúvidas Frequentes</a></li>
-                        <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-danger fw-bold"><i class="fas fa-shield-alt me-1"></i> Termos & LGPD</a></li>
+                        <li class="mb-2"><a href="{{ route('site.home') }}#planos">Planos &amp; Preços</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-6">
@@ -367,16 +363,18 @@
                         <li class="mb-2"><i class="fas fa-clock text-danger me-2"></i> {{ $configs['horario'] ?? 'Central 24 Horas' }}</li>
                     </ul>
                 </div>
-                <div class="col-lg-3">
-                    <h5>Área Segura</h5>
-                    <p class="small text-secondary">Acesso exclusivo para clientes e operadores de frota.</p>
-                    <a href="{{ route('login') }}" class="btn btn-outline-danger w-100 py-2 mb-2 fw-semibold">
-                        <i class="fas fa-user-lock me-1"></i> Acessar Painel / Área do Cliente
-                    </a>
+                <div class="col-lg-3 col-12">
+                    <h5>Serviços &amp; Recursos</h5>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="{{ route('site.home') }}#estetica" class="text-danger fw-bold"><i class="fas fa-spray-can-sparkles me-1"></i> Estética Automotiva</a></li>
+                        <li class="mb-2"><a href="{{ route('site.home') }}#ronda">Ronda Tática</a></li>
+                        <li class="mb-2"><a href="{{ route('site.home') }}#faq">Dúvidas Frequentes</a></li>
+                        <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos &amp; LGPD</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="border-top border-light-subtle mt-5 pt-4 text-center small text-secondary">
-                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade & Termos (LGPD)</a>
+                &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança Eletrônica. Todos os direitos reservados. &bull; <a href="{{ route('site.privacidade') }}" class="text-secondary text-decoration-underline ms-1">Política de Privacidade &amp; Termos (LGPD)</a> &bull; <a href="{{ route('login') }}" class="text-danger fw-semibold ms-2 text-decoration-none"><i class="fas fa-user-lock me-1"></i> Área do Cliente</a>
             </div>
         </div>
     </footer>

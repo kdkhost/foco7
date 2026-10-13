@@ -502,9 +502,22 @@
             </div>
         </main>
 
-        <!-- RODAPÉ DO PAINEL -->
-        <footer class="app-footer border-top py-3 text-center small text-secondary">
-            &copy; {{ date('Y') }} Foco 7 Rastreamento e Segurança. Painel Administrativo de Alta Performance.
+        <!-- RODAPÉ DO PAINEL COM DESIGN DISTINTO & ELEGÂNCIA ENTERPRISE -->
+        <footer class="app-footer foco7-admin-footer">
+            <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 py-3 px-4">
+                <div class="d-flex align-items-center gap-2 text-footer-brand">
+                    <img src="{{ asset('img/favicon.png') }}" alt="Foco 7" width="20" height="20" class="rounded">
+                    <span class="small fw-semibold">&copy; {{ date('Y') }} <strong>Foco 7</strong> Rastreamento &amp; Segurança.</span>
+                    <span class="small text-muted d-none d-lg-inline">&bull; Todos os direitos reservados.</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 text-footer-status">
+                    <span class="badge badge-footer-uptime d-inline-flex align-items-center gap-1">
+                        <span class="footer-status-dot"></span>
+                        Central Ativa &bull; 99.9% Uptime
+                    </span>
+                    <span class="small text-muted d-none d-sm-inline">Painel v2.6 Enterprise</span>
+                </div>
+            </div>
         </footer>
 
     </div>
@@ -786,7 +799,7 @@
             });
             sincronizarLogoSidebar();
 
-            // CONTROLE ROBUSTO E DEFINITIVO DE EXPANSÃO / RECOLHIMENTO DE MENUS COM SETA (TREEVIEW)
+            // CONTROLE ACCORDION SUAVE COM FECHAMENTO AUTOMÁTICO DE OUTROS MENUS
             $(document).on('click', '.app-sidebar .sidebar-menu .nav-item > a.nav-link', function (e) {
                 var $link = $(this);
                 var $parent = $link.closest('.nav-item');
@@ -804,14 +817,28 @@
                         }
                     }
 
-                    // Limpa resíduos de style inline de animações anteriores
-                    $treeview.removeAttr('style');
-
-                    // Alterna estado aberto/fechado
                     if ($parent.hasClass('menu-open')) {
-                        $parent.removeClass('menu-open');
+                        // Menu clicado já estava aberto: fecha suavemente com slideUp
+                        $treeview.stop(true, true).slideUp(220, function () {
+                            $parent.removeClass('menu-open');
+                            $treeview.removeAttr('style');
+                        });
                     } else {
+                        // ACCORDION: Fecha todos os outros menus irmãos abertos com animação suave de slideUp
+                        var $outrosAbertos = $parent.siblings('.nav-item.menu-open');
+                        $outrosAbertos.each(function () {
+                            var $outroItem = $(this);
+                            $outroItem.children('.nav-treeview').stop(true, true).slideUp(220, function () {
+                                $outroItem.removeClass('menu-open');
+                                $(this).removeAttr('style');
+                            });
+                        });
+
+                        // Abre o menu selecionado com animação suave de slideDown
                         $parent.addClass('menu-open');
+                        $treeview.hide().stop(true, true).slideDown(220, function () {
+                            $treeview.removeAttr('style');
+                        });
                     }
                 }
             });
