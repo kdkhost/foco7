@@ -111,7 +111,7 @@
             <!-- COLUNA PRINCIPAL: LISTA DE NOTIFICAÇÕES EM LARGURA TOTAL -->
             <div class="col-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                    <div class="card-header w-100 bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
                         <div class="btn-group btn-group-sm" role="group">
                             <a href="{{ route('admin.notificacoes.index', ['status' => 'todas', 'tipo' => $tipo]) }}" class="btn btn-outline-secondary {{ $status === 'todas' ? 'active' : '' }}">
                                 Todas ({{ $totalGeral }})
@@ -124,7 +124,7 @@
                             </a>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2 ms-auto">
                             <label class="small text-secondary mb-0">Tipo:</label>
                             <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href = '{{ route('admin.notificacoes.index', ['status' => $status]) }}&tipo=' + this.value">
                                 <option value="todos" {{ $tipo === 'todos' ? 'selected' : '' }}>Todos os Tipos</option>

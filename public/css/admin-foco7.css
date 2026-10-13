@@ -1188,5 +1188,31 @@ body.dark-mode .btn-foco7-dev-support:hover {
     box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
 }
 
+/* ==============================================================================
+   PADRONIZAÇÃO GLOBAL DE CARDS, CABEÇALHOS & AÇÕES ALINHADAS À DIREITA
+   ============================================================================== */
+.card {
+    width: 100%;
+}
+
+.card-header,
+.card-footer {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.card-header.d-flex,
+.card-header.d-inline-flex {
+    width: 100% !important;
+}
+
+/* Garante que grupos de botões e ações no cabeçalho fiquem sempre alinhados à extrema direita */
+.card-header .card-header-actions,
+.card-header .card-actions,
+.card-header > div:last-child:not(:first-child),
+.card-header > span.badge:last-child:not(:first-child) {
+    margin-left: auto;
+}
+
 
 

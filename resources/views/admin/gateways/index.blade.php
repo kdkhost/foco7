@@ -633,9 +633,9 @@
 
                     <!-- CARD DE REPASSE DE TAXAS -->
                     <div class="card border mb-4 shadow-sm">
-                        <div class="card-header bg-body-tertiary py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="card-header w-100 bg-body-tertiary py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <h6 class="fw-bold mb-0 text-body"><i class="fas fa-receipt text-primary me-2"></i> Repasse de Taxas Operacionais ao Cliente</h6>
-                            <div class="form-check form-switch fs-5 mb-0">
+                            <div class="form-check form-switch fs-5 mb-0 ms-auto">
                                 <input class="form-check-input" type="checkbox" name="repassar_taxas_cliente" id="repassar_taxas_cliente" value="1" {{ $configs['repassar_taxas_cliente'] ? 'checked' : '' }}>
                                 <label class="form-check-label fs-6 fw-bold text-body" for="repassar_taxas_cliente">Ativar Repasse de Custos</label>
                             </div>
@@ -740,12 +740,12 @@
                     
                     <!-- CABEÇALHO DO MÓDULO & CONTROLE MESTRE -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header w-100 bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-clock-rotate-left me-2"></i> Régua de Cobrança Automatizada para Mensalidades</h6>
                                 <small class="text-body-secondary">Disparos preventivos pré-vencimento, cobrança no vencimento e régua de atrasos com cálculo automático de multa e juros de mora.</small>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 ms-auto">
                                 <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="executarReguaCobrancaAgora()">
                                     <i class="fas fa-play me-1"></i> Processar Régua Agora
                                 </button>

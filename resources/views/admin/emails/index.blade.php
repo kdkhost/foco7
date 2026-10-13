@@ -50,9 +50,9 @@
 
 <!-- LISTA ORGANIZADA DE TEMPLATES -->
 <div class="card border shadow-sm">
-    <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center border-bottom">
+    <div class="card-header w-100 bg-transparent py-3 d-flex justify-content-between align-items-center border-bottom">
         <h6 class="fw-bold mb-0 text-body"><i class="fas fa-list-alt text-danger me-2"></i> Modelos de E-mails Cadastrados ({{ count($templates) }})</h6>
-        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Layout Master Foco 7</span>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-auto">Layout Master Foco 7</span>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">

@@ -130,11 +130,11 @@
 
 <!-- DIFERENCIAIS E SELOS DE GARANTIA DA ESTÉTICA NO SITE -->
 <div class="card shadow-sm border-0 mt-5">
-    <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+    <div class="card-header w-100 bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold mb-0 text-danger">
             <i class="fas fa-certificate me-2"></i> Diferenciais Técnicos e Selos de Garantia (Exibidos no Site)
         </h5>
-        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rodapé da Seção Estética Automotiva</span>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-auto">Rodapé da Seção Estética Automotiva</span>
     </div>
     <div class="card-body p-4">
         <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">

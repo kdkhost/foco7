@@ -85,7 +85,7 @@
 
         <!-- LISTAGEM E MODERAÇÃO -->
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+            <div class="card-header w-100 bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
                 <div class="btn-group btn-group-sm" role="group">
                     <a href="{{ route('admin.depoimentos.index', ['status' => 'todos', 'busca' => $busca]) }}" class="btn btn-outline-secondary {{ $status === 'todos' ? 'active' : '' }}">
                         Todos ({{ $totalGeral }})
@@ -98,7 +98,7 @@
                     </a>
                 </div>
 
-                <form action="{{ route('admin.depoimentos.index') }}" method="GET" class="d-flex align-items-center gap-2">
+                <form action="{{ route('admin.depoimentos.index') }}" method="GET" class="d-flex align-items-center gap-2 ms-auto">
                     <input type="hidden" name="status" value="{{ $status }}">
                     <div class="input-group input-group-sm" style="width: 250px;">
                         <input type="text" name="busca" class="form-control" placeholder="Buscar por cliente ou texto..." value="{{ $busca }}">

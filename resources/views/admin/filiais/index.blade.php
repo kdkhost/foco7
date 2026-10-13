@@ -60,7 +60,7 @@
 
 <!-- CARD PRINCIPAL DE LISTAGEM -->
 <div class="card border-0 shadow-sm rounded-3">
-    <div class="card-header bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
         <div class="d-flex align-items-center gap-2">
             <h5 class="fw-bold mb-0 text-body">
                 <i class="fas fa-map-marked-alt text-danger me-2"></i> Unidades de Atendimento no Brasil
@@ -69,7 +69,7 @@
                 {{ $filiais->total() }} cadastradas
             </span>
         </div>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-auto">
             <button type="button" class="btn btn-danger fw-bold" onclick="abrirModalNovaFilial()">
                 <i class="fas fa-plus me-1"></i> Nova Filial / Unidade
             </button>

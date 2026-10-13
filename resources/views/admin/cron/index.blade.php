@@ -159,7 +159,6 @@
         color: #ffffff;
         transform: translateY(-2px);
         box-shadow: 0 6px 18px rgba(217, 0, 0, 0.45);
-    }
 </style>
 
 <!-- STATUS HEADER / HEARTBEAT CARD -->
@@ -218,9 +217,9 @@
 
 <!-- COMANDO OFICIAL PARA CPANEL (LINHA ÚNICA) -->
 <div class="card border shadow-sm mb-4">
-    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="card-header w-100 bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span class="fw-bold"><i class="fas fa-terminal text-warning me-2"></i> Linha Mestra do Agendador (Instalada na Hospedagem cPanel)</span>
-        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> EXECUTANDO A CADA MINUTO NO CPANEL (* * * * *)</span>
+        <span class="badge bg-success ms-auto"><i class="fas fa-check-circle me-1"></i> EXECUTANDO A CADA MINUTO NO CPANEL (* * * * *)</span>
     </div>
     <div class="card-body p-4 bg-body-tertiary">
         <p class="small text-secondary mb-2">
@@ -237,12 +236,12 @@
 
 <!-- ROTINAS AGENDADAS COM DISPARO SOB DEMANDA -->
 <div class="card border shadow-sm mb-4">
-    <div class="card-header bg-transparent py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="card-header w-100 bg-transparent py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
             <h6 class="fw-bold mb-0 text-body"><i class="fas fa-tasks text-danger me-2"></i> Rotinas Agendadas & Tarefas Cadastradas</h6>
             <small class="text-secondary">Todas as tarefas ativas abaixo são processadas pelo agendador do Laravel automaticamente.</small>
         </div>
-        <div>
+        <div class="ms-auto">
             <button type="button" class="btn btn-novo-cron btn-sm px-3" onclick="abrirModalNovoCron()">
                 <i class="fas fa-plus me-1"></i> Cadastrar Outra Tarefa
             </button>
@@ -341,12 +340,12 @@
 
 <!-- CONSOLE DE LOGS EM TEMPO REAL -->
 <div class="card border shadow-sm">
-    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="card-header w-100 bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
             <i class="fas fa-file-alt text-danger"></i>
             <span class="fw-bold">Histórico de Saída do Agendador (storage/logs/cron.log)</span>
         </div>
-        <div>
+        <div class="ms-auto">
             <button type="button" class="btn btn-sm btn-outline-light" onclick="atualizarStatusCron(true)">
                 <i class="fas fa-sync-alt me-1"></i> Recarregar Logs
             </button>
