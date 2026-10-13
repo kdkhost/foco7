@@ -1128,7 +1128,7 @@ body.dark-mode .btn-foco7-dev-support:hover {
 /* Botão Flutuante Voltar ao Topo (Floating Back To Top) */
 .btn-scroll-top-float {
     position: fixed;
-    bottom: 136px !important; /* acima do botão WhatsApp/Suporte (80px + 56px) */
+    bottom: 186px !important; /* ~2cm acima do rodapé: footer(52px)+gap(78px)+whats(56px) */
     right: 24px;
     width: 44px;
     height: 44px;
@@ -1168,7 +1168,7 @@ body.dark-mode .btn-foco7-dev-support:hover {
 /* Botão Flutuante WhatsApp do Desenvolvedor (Painel Administrativo) */
 .btn-dev-whats-float {
     position: fixed;
-    bottom: 80px; /* 80px acima do rodapé — acima do nome do desenvolvedor */
+    bottom: 130px; /* ~2cm acima do rodapé (footer ≈52px + 78px de respiro) */
     right: 24px;
     width: 48px;
     height: 48px;
@@ -1213,7 +1213,7 @@ body.dark-mode .btn-foco7-dev-support:hover {
 /* Box Flutuante de Seleção: WhatsApp vs Telegram */
 .box-dev-contato {
     position: fixed;
-    bottom: 138px; /* alinhado acima do botão WhatsApp */
+    bottom: 188px; /* alinhado acima do botão WhatsApp (130px + 58px) */
     right: 24px;
     width: 330px;
     max-width: calc(100vw - 32px);

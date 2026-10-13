@@ -506,12 +506,12 @@
         @php
             $footerSiteNome = \App\Models\CmsSetting::get('site_nome', 'Foco 7 Rastreamento & Segurança');
             $footerDevNome = \App\Models\CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad');
-            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5591980510736');
-            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736');
+            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5521981325441');
+            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441');
             $footerDevWhatsClean = preg_replace('/\D/', '', $footerDevWhats);
-            $footerDevWhatsUrl = 'https://wa.me/' . ($footerDevWhatsClean ?: '5591980510736') . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');
+            $footerDevWhatsUrl = 'https://wa.me/' . ($footerDevWhatsClean ?: '5521981325441') . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');
 
-            $footerDevTelegram = \App\Models\CmsSetting::get('desenvolvedor_telegram', 'marcelobrad');
+            $footerDevTelegram = \App\Models\CmsSetting::get('desenvolvedor_telegram', 'MARCELO_BRAD');
             $footerDevTelegramClean = ltrim(preg_replace('/^https?:\/\/t\.me\//i', '', trim($footerDevTelegram)), '@');
             $footerDevTelegramUrl = 'https://t.me/' . ($footerDevTelegramClean ?: 'marcelobrad');
         @endphp
