@@ -223,7 +223,7 @@
 
             <div class="sidebar-wrapper">
                 <nav class="mt-2">
-                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                    <ul class="nav sidebar-menu flex-column" role="menu" data-accordion="false">
                         @if(auth()->user()->role === 'admin')
                             <!-- TOPO DE ACESSO RÁPIDO -->
                             <li class="nav-item">
@@ -786,8 +786,8 @@
             });
             sincronizarLogoSidebar();
 
-            // CONTROLE ROBUSTO DE EXPANSÃO / RECOLHIMENTO DE MENUS COM SETA (TREEVIEW)
-            $(document).on('click', '.sidebar-menu .nav-item > a.nav-link', function (e) {
+            // CONTROLE ROBUSTO E DEFINITIVO DE EXPANSÃO / RECOLHIMENTO DE MENUS COM SETA (TREEVIEW)
+            $(document).on('click', '.app-sidebar .sidebar-menu .nav-item > a.nav-link', function (e) {
                 var $link = $(this);
                 var $parent = $link.closest('.nav-item');
                 var $treeview = $parent.children('.nav-treeview');
@@ -804,14 +804,20 @@
                         }
                     }
 
-                    // Limpa qualquer estilo inline antigo e alterna a classe menu-open
+                    // Limpa resíduos de style inline de animações anteriores
                     $treeview.removeAttr('style');
-                    $parent.toggleClass('menu-open');
+
+                    // Alterna estado aberto/fechado
+                    if ($parent.hasClass('menu-open')) {
+                        $parent.removeClass('menu-open');
+                    } else {
+                        $parent.addClass('menu-open');
+                    }
                 }
             });
 
             // Limpa resíduos de style inline de todos os treeviews
-            $('.sidebar-menu .nav-treeview').removeAttr('style');
+            $('.app-sidebar .sidebar-menu .nav-treeview').removeAttr('style');
         });
     </script>
 

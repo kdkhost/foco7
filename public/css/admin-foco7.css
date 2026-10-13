@@ -59,7 +59,7 @@ html[data-bs-theme="dark"] {
     color: #ffffff !important;
 }
 
-/* Rotação suave da seta oficial de Treeview sincronizada com o menu-open nativo */
+/* Rotação suave da seta oficial de Treeview sincronizada com o menu-open */
 .nav-arrow,
 .sidebar-menu .nav-arrow {
     transition: transform 0.25s ease;
@@ -67,19 +67,32 @@ html[data-bs-theme="dark"] {
 }
 
 .menu-open > .nav-link .nav-arrow,
-.sidebar-menu .nav-item.menu-open > .nav-link .nav-arrow {
-    transform: rotate(90deg);
+.sidebar-menu .nav-item.menu-open > .nav-link .nav-arrow,
+.app-sidebar .sidebar-menu .nav-item.menu-open > .nav-link .nav-arrow,
+.app-sidebar .nav-item.menu-open > .nav-link .nav-arrow {
+    transform: rotate(90deg) !important;
+}
+
+/* Itens que possuem submenu com seta */
+.sidebar-menu .nav-item:has(> .nav-treeview) > a.nav-link,
+.app-sidebar .sidebar-menu .nav-item:has(> .nav-treeview) > a.nav-link {
+    cursor: pointer !important;
+    user-select: none;
 }
 
 /* Controle de exibição e animação do Treeview da Sidebar */
-.sidebar-menu .nav-treeview {
+.sidebar-menu .nav-treeview,
+.app-sidebar .sidebar-menu .nav-treeview,
+.app-sidebar .nav-treeview {
     display: none !important;
     list-style: none;
     padding-left: 0.5rem;
     margin: 0;
 }
 
-.sidebar-menu .nav-item.menu-open > .nav-treeview {
+.sidebar-menu .nav-item.menu-open > .nav-treeview,
+.app-sidebar .sidebar-menu .nav-item.menu-open > .nav-treeview,
+.app-sidebar .nav-item.menu-open > .nav-treeview {
     display: block !important;
     animation: foco7TreeviewFadeIn 0.2s ease-in-out;
 }
