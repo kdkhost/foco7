@@ -487,14 +487,14 @@
 
         <!-- CONTEÚDO PRINCIPAL -->
         <main class="app-main">
-            <div class="app-content-header mb-4">
+            <div class="app-content-header mb-3">
                 <div class="container-fluid">
-                    <div class="row align-items-center">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0 fw-bold">@yield('page_title', 'Painel Administrativo')</h3>
+                    <div class="row align-items-center g-2">
+                        <div class="col-md-5 col-lg-5">
+                            <h3 class="mb-0 fw-bold text-body fs-4">@yield('page_title', 'Painel Administrativo')</h3>
                             <p class="text-secondary small mb-0">@yield('page_description', '')</p>
                         </div>
-                        <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                        <div class="col-md-7 col-lg-7 text-md-end mt-2 mt-md-0">
                             @yield('page_actions')
                         </div>
                     </div>

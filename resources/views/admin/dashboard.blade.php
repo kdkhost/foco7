@@ -1,8 +1,38 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard')
-@section('page_title', 'Visão Geral & Métricas da Foco 7')
-@section('page_description', 'Acompanhamento em tempo real de clientes, faturamento, agendamentos, visitas e analítico completo.')
+@section('title', 'Painel de Controle & Analítico')
+@section('page_title')
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fas fa-tachometer-alt text-danger"></i>
+        <span>Painel de Controle &amp; Analítico</span>
+    </span>
+@endsection
+@section('page_description', 'Visão Geral e métricas em tempo real: clientes, faturamento, agendamentos e tráfego da Foco 7.')
+
+@section('page_actions')
+<div class="d-inline-flex flex-wrap align-items-center justify-content-sm-end gap-2">
+    <!-- Relógio em Tempo Real de Alta Fidelidade -->
+    <div class="badge bg-body border px-3 py-2 d-inline-flex align-items-center gap-2 shadow-sm rounded-pill" id="badgeRelogioTempoReal" title="Horário Oficial de Brasília em Tempo Real">
+        <span class="spinner-grow spinner-grow-sm text-danger" style="width: 7px; height: 7px;" role="status"></span>
+        <i class="far fa-calendar-alt text-danger opacity-75"></i>
+        <span id="dataAdminDashboard" class="fw-semibold text-body">{{ date('d/m/Y') }}</span>
+        <span class="text-secondary opacity-50">&bull;</span>
+        <i class="far fa-clock text-danger opacity-75"></i>
+        <span id="relogioAdminDashboard" class="font-monospace fw-bold text-danger fs-6">{{ date('H:i:s') }}</span>
+    </div>
+
+    <!-- Botões de Ação Rápida -->
+    <a href="{{ route('admin.agendamentos.index') }}" class="btn btn-sm btn-outline-danger fw-semibold shadow-sm">
+        <i class="fas fa-calendar-plus me-1"></i> Novo Agendamento
+    </a>
+    <a href="{{ route('admin.faturas.index') }}" class="btn btn-sm btn-outline-success fw-semibold shadow-sm">
+        <i class="fas fa-file-invoice-dollar me-1"></i> Lançar Fatura
+    </a>
+    <a href="{{ route('site.home') }}" target="_blank" class="btn btn-sm btn-danger fw-bold shadow-sm px-3">
+        <i class="fas fa-external-link-alt me-1"></i> Ver Site
+    </a>
+</div>
+@endsection
 
 @push('styles')
 <style>
@@ -27,49 +57,26 @@
 @endpush
 
 @section('content')
-<div class="content-header pb-2">
-    <div class="container-fluid">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
-            <div>
-                <h2 class="m-0 fw-bold fs-3 text-body">
-                    <i class="fas fa-tachometer-alt text-danger me-2"></i> Painel de Controle &amp; Analítico
-                </h2>
-                <p class="text-secondary small mb-0">Métricas em tempo real, visitantes únicos, agendamentos e faturamento da Foco 7.</p>
-            </div>
-                <span class="badge bg-body-secondary text-body border px-3 py-2 small d-inline-flex align-items-center gap-2 shadow-sm" id="badgeRelogioTempoReal" title="Horário Oficial de Brasília em Tempo Real">
-                    <span class="spinner-grow spinner-grow-sm text-danger" style="width: 7px; height: 7px;" role="status"></span>
-                    <i class="far fa-calendar-alt text-danger"></i>
-                    <span id="dataAdminDashboard" class="fw-semibold">{{ date('d/m/Y') }}</span>
-                    <span class="text-secondary">&bull;</span>
-                    <i class="far fa-clock text-danger"></i>
-                    <span id="relogioAdminDashboard" class="font-monospace fw-bold fs-6 text-danger">{{ date('H:i:s') }}</span>
-                </span>
-                <a href="{{ route('admin.agendamentos.index') }}" class="btn btn-outline-danger btn-sm fw-semibold">
-                    <i class="fas fa-calendar-plus me-1"></i> Novo Agendamento
-                </a>
-                <a href="{{ route('admin.faturas.index') }}" class="btn btn-outline-success btn-sm fw-semibold">
-                    <i class="fas fa-file-invoice-dollar me-1"></i> Lançar Fatura
-                </a>
-                <a href="{{ route('site.home') }}" target="_blank" class="btn btn-danger btn-sm fw-semibold">
-                    <i class="fas fa-external-link-alt me-1"></i> Ver Landing Page
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <section class="content">
     <div class="container-fluid">
 
         <!-- ALERTA DE MODO MANUTENÇÃO CASO ATIVO -->
         @if($modoManutencao)
-            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-3 mb-4 p-3 rounded-3" role="alert">
-                <i class="fas fa-tools fs-3 text-warning"></i>
-                <div class="flex-grow-1">
-                    <h6 class="fw-bold mb-0 text-dark">O Site está atualmente em Modo de Manutenção!</h6>
-                    <small class="text-dark opacity-75">Visitantes comuns estão vendo a tela de manutenção. Apenas administradores e IPs autorizados têm acesso.</small>
+            <div class="card border border-warning border-opacity-25 bg-warning bg-opacity-10 shadow-sm mb-4 rounded-3 p-3" role="alert">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                            <i class="fas fa-tools fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-body">O Site está atualmente em Modo de Manutenção</h6>
+                            <p class="text-secondary small mb-0">Visitantes comuns estão sendo direcionados para a tela de manutenção. Apenas IPs autorizados e administradores têm acesso público.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.manutencao.index') }}" class="btn btn-sm btn-warning text-dark fw-bold px-3">
+                        <i class="fas fa-cog me-1"></i> Gerenciar Manutenção
+                    </a>
                 </div>
-                <a href="{{ route('admin.manutencao.index') }}" class="btn btn-sm btn-dark fw-bold">Gerenciar Manutenção</a>
             </div>
         @endif
 
@@ -486,6 +493,7 @@
 <!-- Chart.js Oficial CDN para os Gráficos Analíticos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
+<script>
     // =========================================================================
     // RELÓGIO & DATA EM TEMPO REAL DE ALTA PRECISÃO (PADRÃO BRASILEIRO)
     // =========================================================================
