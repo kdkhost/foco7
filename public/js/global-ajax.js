@@ -8,13 +8,27 @@
 (function () {
     'use strict';
 
+    function getSwalThemeOptions() {
+        var isDark = (document.documentElement.getAttribute('data-bs-theme') === 'dark') ||
+                     (document.body && document.body.classList.contains('dark-mode')) ||
+                     (localStorage.getItem('foco7_admin_theme') === 'dark');
+        return {
+            background: isDark ? '#212529' : '#ffffff',
+            color: isDark ? '#f8f9fa' : '#212529',
+            cancelButtonColor: isDark ? '#495057' : '#6c757d'
+        };
+    }
+
     // 1. BLINDAGEM CONTRA ALERT NATIVO (Regra Global Estrita)
     window.alert = function (message) {
         if (typeof Swal !== 'undefined') {
+            var themeOpts = getSwalThemeOptions();
             Swal.fire({
                 title: 'Atenção',
                 html: message,
                 icon: 'info',
+                background: themeOpts.background,
+                color: themeOpts.color,
                 confirmButtonColor: '#d90000',
                 confirmButtonText: 'OK'
             });
@@ -76,13 +90,16 @@
             return;
         }
 
+        var themeOpts = getSwalThemeOptions();
         Swal.fire({
             title: titulo || 'Tem certeza?',
             text: texto || 'Esta ação não poderá ser desfeita.',
             icon: icone || 'warning',
+            background: themeOpts.background,
+            color: themeOpts.color,
             showCancelButton: true,
             confirmButtonColor: '#d90000',
-            cancelButtonColor: '#6c757d',
+            cancelButtonColor: themeOpts.cancelButtonColor,
             confirmButtonText: 'Sim, confirmar!',
             cancelButtonText: 'Cancelar',
             reverseButtons: true,

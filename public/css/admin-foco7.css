@@ -783,3 +783,141 @@ body.sidebar-collapse .app-sidebar:hover .sidebar-brand .logo-sidebar-favicon {
     }
 }
 
+/* ==============================================================================
+   SWEETALERT2 - ADAPTAÇÃO GLOBAL AO TEMA ATIVO (DARK MODE & LIGHT MODE)
+   ============================================================================== */
+
+/* MODO ESCURO (DARK MODE) */
+[data-bs-theme="dark"] .swal2-popup,
+body.dark-mode .swal2-popup,
+html[data-bs-theme="dark"] .swal2-popup {
+    background-color: #212529 !important;
+    color: #f8f9fa !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75) !important;
+}
+
+[data-bs-theme="dark"] .swal2-title,
+body.dark-mode .swal2-title,
+html[data-bs-theme="dark"] .swal2-title {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .swal2-html-container,
+body.dark-mode .swal2-html-container,
+html[data-bs-theme="dark"] .swal2-html-container,
+[data-bs-theme="dark"] .swal2-content,
+body.dark-mode .swal2-content,
+html[data-bs-theme="dark"] .swal2-content {
+    color: #dee2e6 !important;
+}
+
+[data-bs-theme="dark"] .swal2-popup p,
+body.dark-mode .swal2-popup p,
+html[data-bs-theme="dark"] .swal2-popup p {
+    color: #dee2e6 !important;
+}
+
+[data-bs-theme="dark"] .swal2-popup .text-muted,
+body.dark-mode .swal2-popup .text-muted,
+html[data-bs-theme="dark"] .swal2-popup .text-muted,
+[data-bs-theme="dark"] .swal2-popup .text-secondary,
+body.dark-mode .swal2-popup .text-secondary,
+html[data-bs-theme="dark"] .swal2-popup .text-secondary {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .swal2-popup .bg-body-secondary,
+[data-bs-theme="dark"] .swal2-popup .bg-body-tertiary,
+body.dark-mode .swal2-popup .bg-body-secondary,
+body.dark-mode .swal2-popup .bg-body-tertiary {
+    background-color: #2b3035 !important;
+    color: #f8f9fa !important;
+    border-color: #495057 !important;
+}
+
+/* Ícones SweetAlert2 no Dark Mode */
+[data-bs-theme="dark"] .swal2-icon.swal2-warning,
+body.dark-mode .swal2-icon.swal2-warning {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+[data-bs-theme="dark"] .swal2-icon.swal2-success,
+body.dark-mode .swal2-icon.swal2-success {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+
+[data-bs-theme="dark"] .swal2-icon.swal2-error,
+body.dark-mode .swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+[data-bs-theme="dark"] .swal2-icon.swal2-info,
+body.dark-mode .swal2-icon.swal2-info {
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+}
+
+[data-bs-theme="dark"] .swal2-icon.swal2-question,
+body.dark-mode .swal2-icon.swal2-question {
+    border-color: #94a3b8 !important;
+    color: #94a3b8 !important;
+}
+
+/* Botões SweetAlert2 no Dark Mode */
+[data-bs-theme="dark"] .swal2-cancel,
+body.dark-mode .swal2-cancel {
+    background-color: #495057 !important;
+    border-color: #495057 !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .swal2-cancel:hover,
+body.dark-mode .swal2-cancel:hover {
+    background-color: #343a40 !important;
+    border-color: #343a40 !important;
+}
+
+/* Inputs / Textareas SweetAlert2 no Dark Mode */
+[data-bs-theme="dark"] .swal2-input,
+[data-bs-theme="dark"] .swal2-textarea,
+[data-bs-theme="dark"] .swal2-select,
+body.dark-mode .swal2-input,
+body.dark-mode .swal2-textarea,
+body.dark-mode .swal2-select {
+    background-color: #2b3035 !important;
+    color: #ffffff !important;
+    border-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .swal2-close,
+body.dark-mode .swal2-close {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .swal2-close:hover,
+body.dark-mode .swal2-close:hover {
+    color: #ffffff !important;
+}
+
+/* MODO CLARO (GARANTE CONTRASTE NÍTIDO) */
+[data-bs-theme="light"] .swal2-popup,
+body:not(.dark-mode) .swal2-popup {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-bs-theme="light"] .swal2-title,
+body:not(.dark-mode) .swal2-title {
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .swal2-html-container,
+body:not(.dark-mode) .swal2-html-container {
+    color: #495057 !important;
+}
+

@@ -105,27 +105,40 @@
         }
     }
 
+    function isDarkTheme() {
+        return (document.documentElement.getAttribute('data-bs-theme') === 'dark') ||
+               (document.body && document.body.classList.contains('dark-mode')) ||
+               (localStorage.getItem('foco7_admin_theme') === 'dark');
+    }
+
     function dispararAvisoInatividade() {
         swalAberto = true;
         var segundosRestantes = Math.round(avisoPrevioMs / 1000);
+        var isDark = isDarkTheme();
 
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: '<span class="text-danger"><i class="fas fa-user-clock me-2"></i>Sessão Expirando</span>',
                 html: `
                     <div class="text-start p-2">
-                        <p class="mb-2">Por segurança contra acesso não autorizado e roubo de sessão, sua conta será desconectada automaticamente em:</p>
+                        <p class="mb-2" style="color: ${isDark ? '#dee2e6' : '#212529'}; font-size: 0.95rem;">
+                            Por segurança contra acesso não autorizado e roubo de sessão, sua conta será desconectada automaticamente em:
+                        </p>
                         <div class="text-center my-3">
-                            <span class="badge bg-danger fs-3 px-3 py-2" id="swalContadorRegressivo">${segundosRestantes}</span>
-                            <span class="d-block text-muted small mt-1">segundos</span>
+                            <span class="badge bg-danger fs-3 px-3 py-2 shadow" id="swalContadorRegressivo">${segundosRestantes}</span>
+                            <span class="d-block small mt-1" style="color: ${isDark ? '#adb5bd' : '#6c757d'};">segundos</span>
                         </div>
-                        <p class="small text-muted mb-0">Deseja continuar conectado ao sistema?</p>
+                        <p class="small mb-0" style="color: ${isDark ? '#adb5bd' : '#495057'}; font-weight: 500;">
+                            Deseja continuar conectado ao sistema?
+                        </p>
                     </div>
                 `,
                 icon: 'warning',
+                background: isDark ? '#212529' : '#ffffff',
+                color: isDark ? '#f8f9fa' : '#212529',
                 showCancelButton: true,
                 confirmButtonColor: '#d90000',
-                cancelButtonColor: '#6c757d',
+                cancelButtonColor: isDark ? '#495057' : '#6c757d',
                 confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Continuar Conectado',
                 cancelButtonText: '<i class="fas fa-sign-out-alt me-1"></i> Desconectar Agora',
                 allowOutsideClick: false,
