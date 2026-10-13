@@ -170,7 +170,7 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}" href="{{ route('admin.configuracoes.index') }}">
-                                        <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações &amp; SMTP
+                                        <i class="fas fa-sliders-h me-2 text-danger"></i> Configurações do Sistema
                                     </a>
                                 </li>
                             @else
@@ -423,7 +423,7 @@
                                     <li class="nav-item">
                                         <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
                                             <i class="nav-icon far fa-circle"></i>
-                                            <p>Sistema &amp; SMTP</p>
+                                            <p>Configurações do Sistema</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">

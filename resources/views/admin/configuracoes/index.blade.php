@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Configurações do Sistema & SMTP')
+@section('title', 'Configurações do Sistema | Foco 7')
 @section('page_title', 'Configurações Gerais & E-mail')
-@section('page_description', 'Gerencie dados institucionais, identidade visual, redes sociais e servidor SMTP.')
+@section('page_description', 'Gerencie dados institucionais, logotipos, servidor SMTP, notificações OneSignal, segurança e bloqueios.')
 
 @section('content')
 <div class="card shadow-sm border-0">
@@ -21,6 +21,11 @@
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="smtp-tab" data-bs-toggle="tab" data-bs-target="#tab-smtp" type="button">
                     <i class="fas fa-envelope-open-text text-danger me-1"></i> Servidor SMTP
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="notificacoes-tab" data-bs-toggle="tab" data-bs-target="#tab-notificacoes" type="button">
+                    <i class="fas fa-bell text-danger me-1"></i> Notificações &amp; OneSignal
                 </button>
             </li>
             <li class="nav-item">
@@ -286,7 +291,140 @@
                     </div>
                 </div>
 
-                <!-- ABA 4: REDES SOCIAIS -->
+                <!-- ABA 4: NOTIFICAÇÕES & PUSH ONESIGNAL -->
+                <div class="tab-pane fade" id="tab-notificacoes" role="tabpanel">
+                    <div class="row g-4">
+                        <!-- COLUNA ESQUERDA: CONFIGURAÇÕES PRINCIPAIS ONESIGNAL E E-MAILS -->
+                        <div class="col-lg-8">
+                            <!-- Card Push OneSignal -->
+                            <div class="card border border-light-subtle shadow-none p-3 bg-body-secondary mb-4">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-danger text-white rounded-circle p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-satellite-dish fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold text-body mb-1">Notificações Push Instantâneas (OneSignal)</h6>
+                                            <p class="text-secondary small mb-0">Envio automático de alertas push diretamente na tela de bloqueio do celular e no navegador de administradores.</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge {{ !empty($configs['onesignal_ativo']) && !empty($configs['onesignal_app_id']) ? 'bg-success' : 'bg-warning text-dark' }}">
+                                        {{ !empty($configs['onesignal_ativo']) && !empty($configs['onesignal_app_id']) ? 'Ativo & Conectado' : 'Configuração Pendente' }}
+                                    </span>
+                                </div>
+
+                                <div class="form-check form-switch fs-5 mb-3 p-2 bg-body rounded-2 border border-secondary border-opacity-25 ps-5">
+                                    <input class="form-check-input ms-n4" type="checkbox" name="onesignal_ativo" id="chkOneSignalAtivo" value="1" {{ !empty($configs['onesignal_ativo']) ? 'checked' : '' }}>
+                                    <label class="form-check-label fs-6 fw-bold" for="chkOneSignalAtivo">
+                                        Ativar Notificações Push via OneSignal
+                                    </label>
+                                    <div class="text-secondary small" style="font-size: 0.78rem;">
+                                        Quando ativado, cada novo agendamento, contato ou pagamento dispara um push imediato com banner.
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">OneSignal App ID *</label>
+                                        <input type="text" name="onesignal_app_id" id="onesignalAppId" class="form-control" value="{{ $configs['onesignal_app_id'] ?? '' }}" placeholder="Ex: b7e8a123-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                        <small class="text-secondary" style="font-size: 0.72rem;">Obtenha em seu painel OneSignal em Settings &gt; Keys &amp; IDs.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">OneSignal REST API Key *</label>
+                                        <div class="input-group">
+                                            <input type="password" name="onesignal_rest_api_key" id="onesignalApiKey" class="form-control" value="{{ $configs['onesignal_rest_api_key'] ?? '' }}" placeholder="Ex: os_v2_app_xxxxxxxx...">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('onesignalApiKey')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <small class="text-secondary" style="font-size: 0.72rem;">Chave secreta para autorizar o disparo seguro via backend.</small>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">URL da Imagem do Push (Banner/Header)</label>
+                                        <input type="text" name="onesignal_imagem_padrao" id="onesignalImagemInput" class="form-control" value="{{ $configs['onesignal_imagem_padrao'] ?? asset('img/og-foco7.jpg') }}" placeholder="https://foco7.com.br/img/og-foco7.jpg">
+                                        <small class="text-secondary" style="font-size: 0.72rem;">Banner exibido no topo da notificação push no celular (Android/iOS) e computador.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Preferências de E-mail de Notificações -->
+                            <div class="card border border-light-subtle shadow-none p-3 bg-body-secondary mb-3">
+                                <h6 class="fw-bold text-body mb-3">
+                                    <i class="fas fa-envelope-circle-check text-danger me-2"></i> Canais &amp; Preferências de Alerta por E-mail
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">E-mail de Destino do Administrador *</label>
+                                    <input type="email" name="admin_email_notificacoes" class="form-control" value="{{ $configs['admin_email_notificacoes'] ?? '' }}" required placeholder="gestao@foco7.com.br">
+                                    <small class="text-secondary" style="font-size: 0.75rem;">Endereço oficial que receberá cópia de todos os novos atendimentos e alertas.</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" name="notificar_email_contatos" id="chkNotifContatos" value="1" {{ !empty($configs['notificar_email_contatos']) ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold" for="chkNotifContatos">Receber e-mail em novas mensagens de contato do site</label>
+                                </div>
+
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" name="notificar_email_agendamentos" id="chkNotifAgendamentos" value="1" {{ !empty($configs['notificar_email_agendamentos']) ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold" for="chkNotifAgendamentos">Receber e-mail em novos agendamentos e instalações</label>
+                                </div>
+
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="notificacoes_push_ativas" id="chkPushNativo" value="1" {{ !empty($configs['notificacoes_push_ativas']) ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold" for="chkPushNativo">Emitir notificações sonoras e push nativo no painel administrativo</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUNA DIREITA: PREVIEW DO PUSH & TESTE RÁPIDO -->
+                        <div class="col-lg-4">
+                            <!-- Preview Visual do Push -->
+                            <div class="card bg-dark text-white border-secondary p-3 mb-3">
+                                <h6 class="fw-bold text-white mb-2">
+                                    <i class="fas fa-mobile-screen text-danger me-2"></i> Pré-visualização do Push
+                                </h6>
+                                <p class="small text-white-50 mb-3" style="font-size: 0.78rem;">
+                                    Assim que um evento ocorrer, o alerta aparecerá desta forma no smartphone:
+                                </p>
+
+                                <div class="p-2 rounded bg-black border border-secondary">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <img src="{{ asset('img/favicon.png') }}" width="20" height="20" alt="Foco 7" style="object-fit: contain;">
+                                        <span class="small fw-bold text-white" style="font-size: 0.75rem;">Foco 7 Rastreamento</span>
+                                        <span class="ms-auto text-white-50" style="font-size: 0.68rem;">agora</span>
+                                    </div>
+                                    <img id="previewImagemPush" src="{{ $configs['onesignal_imagem_padrao'] ?? asset('img/og-foco7.jpg') }}" alt="Preview Push" class="img-fluid rounded mb-2" style="max-height: 120px; width: 100%; object-fit: cover;">
+                                    <div class="fw-bold small text-white">Novo Agendamento Confirmado!</div>
+                                    <div class="text-white-50 small" style="font-size: 0.75rem;">Cliente Carlos Silva agendou Rastreamento para amanhã às 14:00.</div>
+                                </div>
+
+                                <button type="button" class="btn btn-outline-danger btn-sm w-100 fw-bold mt-3" id="btnInscreverDispositivoOneSignal">
+                                    <i class="fas fa-mobile-screen-button me-1"></i> Inscrever Este Dispositivo no OneSignal
+                                </button>
+                            </div>
+
+                            <!-- Teste de Notificação Instantâneo -->
+                            <div class="card bg-dark text-white border-secondary p-3">
+                                <h6 class="fw-bold text-white mb-2">
+                                    <i class="fas fa-vial text-warning me-2"></i> Teste de Notificação
+                                </h6>
+                                <p class="small text-white-50 mb-3" style="font-size: 0.78rem;">
+                                    Dispare uma notificação de validação para certificar que o OneSignal e os canais estão entregando.
+                                </p>
+                                <button type="button" class="btn btn-warning btn-sm w-100 fw-bold" id="btnDispararTesteNotifConfig">
+                                    <i class="fas fa-paper-plane me-1"></i> Disparar Teste de Alerta
+                                </button>
+                                <a href="{{ route('admin.notificacoes.index') }}" class="btn btn-outline-light btn-sm w-100 mt-2">
+                                    <i class="fas fa-external-link-alt me-1"></i> Ir para Central de Notificações
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 5: REDES SOCIAIS -->
                 <div class="tab-pane fade" id="tab-sociais" role="tabpanel">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -665,6 +803,90 @@
                 }
             });
         });
+
+        // Atualização em tempo real do preview do Push OneSignal
+        $('#onesignalImagemInput').on('input change', function () {
+            var url = $(this).val().trim() || '{{ asset("img/og-foco7.jpg") }}';
+            $('#previewImagemPush').attr('src', url);
+        });
+
+        // Teste rápido de notificação / push a partir das configurações
+        $('#btnDispararTesteNotifConfig').on('click', function () {
+            var $btn = $(this);
+            var origHtml = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Disparando Teste...');
+
+            $.ajax({
+                url: "{{ route('admin.notificacoes.teste') }}",
+                type: 'POST',
+                data: { _token: $('meta[name="csrf-token"]').attr('content') },
+                dataType: 'json',
+                success: function (res) {
+                    $btn.prop('disabled', false).html(origHtml);
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Teste Disparado!',
+                            text: res.message,
+                            icon: 'success',
+                            confirmButtonColor: '#d90000',
+                            confirmButtonText: 'Excelente'
+                        });
+                        window.foco7Notify.success(res.message);
+                    }
+                },
+                error: function () {
+                    $btn.prop('disabled', false).html(origHtml);
+                    window.foco7Notify.error('Erro ao disparar teste de notificação.');
+                }
+            });
+        });
+
+        // Inscrição do dispositivo no OneSignal
+        $('#btnInscreverDispositivoOneSignal').on('click', function () {
+            var appId = $('#onesignalAppId').val().trim();
+            if (!appId) {
+                Swal.fire({
+                    title: 'App ID Necessário',
+                    text: 'Preencha o campo "OneSignal App ID" e salve as configurações antes de inscrever o dispositivo.',
+                    icon: 'warning',
+                    confirmButtonColor: '#d90000'
+                });
+                return;
+            }
+
+            if (window.OneSignalDeferred) {
+                window.OneSignalDeferred.push(async function(OneSignal) {
+                    await OneSignal.login("admin-{{ auth()->id() }}");
+                    await OneSignal.User.PushSubscription.optIn();
+                    Swal.fire({
+                        title: 'Dispositivo Inscrito!',
+                        text: 'Este dispositivo foi vinculado com sucesso para receber notificações push da Foco 7.',
+                        icon: 'success',
+                        confirmButtonColor: '#d90000'
+                    });
+                });
+            } else if ("Notification" in window) {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === 'granted') {
+                        Swal.fire({
+                            title: 'Permissão Concedida!',
+                            text: 'Notificações no navegador ativadas para este dispositivo.',
+                            icon: 'success',
+                            confirmButtonColor: '#d90000'
+                        });
+                    }
+                });
+            }
+        });
+
+        // Navegação direta por hash na URL (ex: #tab-notificacoes ou #tab-smtp)
+        var hash = window.location.hash;
+        if (hash) {
+            var $targetTabBtn = $('button[data-bs-target="' + hash + '"]');
+            if ($targetTabBtn.length) {
+                $targetTabBtn.tab('show');
+            }
+        }
     });
 </script>
 @endsection

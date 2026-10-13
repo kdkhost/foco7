@@ -13,11 +13,14 @@
                 <p class="text-secondary small mb-0">Mensagens do site, agendamentos, avaliações e alertas em tempo real no seu celular e e-mail.</p>
             </div>
             <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                <a href="{{ route('admin.configuracoes.index') }}#tab-notificacoes" class="btn btn-outline-danger me-2" title="Configurar credenciais OneSignal e preferências de e-mail nas Configurações">
+                    <i class="fas fa-sliders-h me-1"></i> Configurações &amp; OneSignal
+                </a>
                 <button type="button" class="btn btn-outline-danger me-2" id="btnAtivarPushNativo">
                     <i class="fas fa-mobile-screen-button me-1"></i> <span id="lblStatusPush">Ativar Notificações no Celular</span>
                 </button>
                 <button type="button" class="btn btn-primary me-2" onclick="dispararNotificacaoTeste()">
-                    <i class="fas fa-paper-plane me-1"></i> Testar Push & E-mail
+                    <i class="fas fa-paper-plane me-1"></i> Testar Push &amp; E-mail
                 </button>
                 <button type="button" class="btn btn-outline-secondary me-2" onclick="marcarTodasComoLidas()">
                     <i class="fas fa-check-double me-1"></i> Marcar Todas Lidas
@@ -105,8 +108,8 @@
         </div>
 
         <div class="row g-4">
-            <!-- COLUNA PRINCIPAL: LISTA DE NOTIFICAÇÕES -->
-            <div class="col-lg-8">
+            <!-- COLUNA PRINCIPAL: LISTA DE NOTIFICAÇÕES EM LARGURA TOTAL -->
+            <div class="col-12">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
                         <div class="btn-group btn-group-sm" role="group">
@@ -169,8 +172,8 @@
                                                 <div class="bg-body-secondary p-2 rounded-2 mb-2 border border-secondary border-opacity-25 small text-body">
                                                     <div class="row g-2">
                                                         @foreach($notif->dados as $key => $val)
-                                                            @if(is_scalar($val) && $key !== 'mensagem')
-                                                                <div class="col-sm-6">
+                                                             @if(is_scalar($val) && $key !== 'mensagem')
+                                                                <div class="col-sm-6 col-md-4">
                                                                     <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $val }}
                                                                 </div>
                                                             @endif
@@ -211,103 +214,6 @@
                         @endif
                     </div>
                 </div>
-            </div>
-
-            <!-- COLUNA LATERAL: CANAIS DE NOTIFICAÇÃO PUSH ONESIGNAL & E-MAIL -->
-            <div class="col-lg-4">
-                <form id="formConfigNotificacoes" action="{{ route('admin.notificacoes.salvar_config') }}" method="POST">
-                    @csrf
-
-                    <!-- CARD PUSH VIA ONESIGNAL COM IMAGEM -->
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="fw-bold mb-0 text-body">
-                                <i class="fas fa-bell text-danger me-2"></i> Push via OneSignal
-                            </h6>
-                            <span class="badge {{ !empty($onesignalConfig['ativo']) && !empty($onesignalConfig['app_id']) ? 'bg-success' : 'bg-warning text-dark' }}">
-                                {{ !empty($onesignalConfig['ativo']) && !empty($onesignalConfig['app_id']) ? 'Ativo & Conectado' : 'Configuração Pendente' }}
-                            </span>
-                        </div>
-                        <div class="card-body p-3">
-                            <div class="form-check form-switch mb-3 p-2 bg-body-secondary rounded-2 border border-secondary border-opacity-25 ps-5">
-                                <input class="form-check-input ms-n4" type="checkbox" name="onesignal_ativo" id="chkOneSignalAtivo" value="1" {{ !empty($onesignalConfig['ativo']) ? 'checked' : '' }}>
-                                <label class="form-check-label small fw-bold" for="chkOneSignalAtivo">
-                                    Ativar Notificações Push via OneSignal
-                                </label>
-                                <div class="text-body-secondary small" style="font-size: 0.75rem;">
-                                    Envia alertas instantâneos no celular e desktop com suporte oficial a imagens.
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-body">OneSignal App ID *</label>
-                                <input type="text" name="onesignal_app_id" class="form-control form-control-sm" value="{{ $onesignalConfig['app_id'] ?? '' }}" placeholder="Ex: b7e8a123-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
-                                <small class="text-body-secondary" style="font-size: 0.72rem;">Obtenha no painel do OneSignal em Settings > Keys &amp; IDs.</small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-body">OneSignal REST API Key *</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="password" name="onesignal_rest_api_key" id="inputOneSignalApiKey" class="form-control" value="{{ $onesignalConfig['rest_api_key'] ?? '' }}" placeholder="Ex: os_v2_app_xxxxxxxx...">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeApiKey()">
-                                        <i class="fas fa-eye" id="iconeToggleApiKey"></i>
-                                    </button>
-                                </div>
-                                <small class="text-body-secondary" style="font-size: 0.72rem;">Chave secreta para autorizar o envio direto via backend.</small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-body">URL da Imagem do Push (Banner/Imagem)</label>
-                                <input type="text" name="onesignal_imagem_padrao" id="onesignalImagemInput" class="form-control form-control-sm" value="{{ $onesignalConfig['imagem_padrao'] ?? asset('img/og-foco7.jpg') }}" placeholder="https://foco7.com.br/img/og-foco7.jpg">
-                                <small class="text-body-secondary" style="font-size: 0.72rem;">Imagem exibida no topo do alerta push no celular e computador.</small>
-                                
-                                <!-- Preview da Imagem do Push -->
-                                <div class="mt-2 p-2 rounded-2 bg-body-tertiary border text-center">
-                                    <span class="text-secondary small d-block mb-1" style="font-size: 0.7rem;">Preview da Imagem do Push:</span>
-                                    <img id="previewImagemPush" src="{{ $onesignalConfig['imagem_padrao'] ?? asset('img/og-foco7.jpg') }}" alt="Preview Push" class="img-fluid rounded shadow-sm" style="max-height: 110px; width: 100%; object-fit: cover;">
-                                </div>
-                            </div>
-
-                            <div class="d-grid gap-2 mb-2">
-                                <button type="button" class="btn btn-outline-danger btn-sm fw-semibold" id="btnInscreverOneSignal">
-                                    <i class="fas fa-mobile-screen-button me-1"></i> Inscrever Este Dispositivo no OneSignal
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CARD PREFERÊNCIAS DE E-MAIL DO ADMINISTRADOR -->
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-header bg-transparent border-bottom py-3">
-                            <h6 class="fw-bold mb-0 text-body">
-                                <i class="fas fa-envelope text-primary me-2"></i> E-mail de Notificações
-                            </h6>
-                        </div>
-                        <div class="card-body p-3">
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-secondary">E-mail de Destino do Administrador *</label>
-                                <input type="email" name="admin_email_notificacoes" class="form-control" value="{{ $adminEmail }}" required placeholder="seu-email@foco7.com.br">
-                                <small class="text-muted" style="font-size: 0.75rem;">Todas as novas mensagens e agendamentos serão enviados para este endereço.</small>
-                            </div>
-
-                            <div class="form-check form-switch mb-2">
-                                <input class="form-check-input" type="checkbox" name="notificar_email_contatos" id="chkNotifContatos" value="1" {{ \App\Models\CmsSetting::get('notificar_email_contatos', '1') == '1' ? 'checked' : '' }}>
-                                <label class="form-check-label small" for="chkNotifContatos">Notificar por e-mail em novas mensagens de contato</label>
-                            </div>
-
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" name="notificar_email_agendamentos" id="chkNotifAgendamentos" value="1" {{ \App\Models\CmsSetting::get('notificar_email_agendamentos', '1') == '1' ? 'checked' : '' }}>
-                                <label class="form-check-label small" for="chkNotifAgendamentos">Notificar por e-mail em novos agendamentos</label>
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnSalvarConfigNotif">
-                                    <i class="fas fa-save me-1"></i> Salvar Preferências
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
 
@@ -388,48 +294,6 @@
 
 @section('scripts')
 <script>
-    // Alterna visibilidade da REST API Key do OneSignal
-    function toggleVisibilidadeApiKey() {
-        const input = document.getElementById('inputOneSignalApiKey');
-        const icone = document.getElementById('iconeToggleApiKey');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icone.className = 'fas fa-eye-slash';
-        } else {
-            input.type = 'password';
-            icone.className = 'fas fa-eye';
-        }
-    }
-
-    // Atualiza preview da imagem do Push em tempo real
-    $(document).on('input change', '#onesignalImagemInput', function () {
-        const url = $(this).val().trim();
-        if (url) {
-            $('#previewImagemPush').attr('src', url);
-        }
-    });
-
-    // Inscrição do dispositivo via OneSignal SDK Web
-    $(document).on('click', '#btnInscreverOneSignal', async function () {
-        if (window.OneSignalDeferred) {
-            window.OneSignalDeferred.push(async function(OneSignal) {
-                try {
-                    await OneSignal.Slidedown.promptPush();
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Inscrição OneSignal',
-                        text: 'Por favor, autorize o recebimento de notificações na tela para ativar alertas instantâneos com imagem neste dispositivo!',
-                        confirmButtonColor: '#d90000'
-                    });
-                } catch (e) {
-                    solicitarPermissaoPush();
-                }
-            });
-        } else {
-            solicitarPermissaoPush();
-        }
-    });
-
     // Inicialização do status do Web Push no dispositivo
     function atualizarStatusPermissaoPush() {
         const badge = document.getElementById('badgePermissaoPush');
@@ -768,28 +632,6 @@
         });
     }
 
-    // Salva preferências de e-mail e push
-    $('#formConfigNotificacoes').on('submit', function (e) {
-        e.preventDefault();
-        const $btn = $('#btnSalvarConfigNotif');
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando...');
-
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function (res) {
-                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Preferências');
-                if (res.success) {
-                    toastr.success(res.message);
-                }
-            },
-            error: function (xhr) {
-                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Preferências');
-                toastr.error('Erro ao salvar preferências.');
-            }
-        });
-    });
 
     function atualizarBadgesContador(count) {
         $('#cardCountNaoLidas').text(count);

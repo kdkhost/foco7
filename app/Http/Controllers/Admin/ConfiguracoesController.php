@@ -68,6 +68,16 @@ class ConfiguracoesController extends Controller
 
             // Segurança de Sessão & Desconexão por Inatividade
             'sessao_inatividade_minutos' => (int) CmsSetting::get('sessao_inatividade_minutos', 30),
+
+            // Notificações Push & Canais (OneSignal e E-mail de Alerta)
+            'onesignal_ativo' => CmsSetting::get('onesignal_ativo', '0') == '1',
+            'onesignal_app_id' => CmsSetting::get('onesignal_app_id', ''),
+            'onesignal_rest_api_key' => CmsSetting::get('onesignal_rest_api_key', ''),
+            'onesignal_imagem_padrao' => CmsSetting::get('onesignal_imagem_padrao', asset('img/og-foco7.jpg')),
+            'admin_email_notificacoes' => CmsSetting::get('admin_email_notificacoes') ?: CmsSetting::get('contato_email', 'contato@foco7.com.br'),
+            'notificar_email_contatos' => CmsSetting::get('notificar_email_contatos', '1') == '1',
+            'notificar_email_agendamentos' => CmsSetting::get('notificar_email_agendamentos', '1') == '1',
+            'notificacoes_push_ativas' => CmsSetting::get('notificacoes_push_ativas', '1') == '1',
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -89,6 +99,7 @@ class ConfiguracoesController extends Controller
             'social_instagram', 'social_facebook', 'social_linkedin', 'social_youtube',
             'recaptcha_site_key', 'recaptcha_secret_key',
             'geoblock_regioes', 'geoblock_ips_liberados',
+            'admin_email_notificacoes', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_imagem_padrao',
         ];
 
         foreach ($camposTexto as $campo) {
@@ -106,6 +117,12 @@ class ConfiguracoesController extends Controller
         // Status do reCAPTCHA e Geo-Bloqueio
         CmsSetting::set('recaptcha_ativo', $request->has('recaptcha_ativo') ? '1' : '0', 'sistema');
         CmsSetting::set('geoblock_ativo', $request->has('geoblock_ativo') ? '1' : '0', 'sistema');
+
+        // Preferências de Notificação & Push OneSignal
+        CmsSetting::set('onesignal_ativo', $request->has('onesignal_ativo') ? '1' : '0', 'notificacoes');
+        CmsSetting::set('notificar_email_contatos', $request->has('notificar_email_contatos') ? '1' : '0', 'notificacoes');
+        CmsSetting::set('notificar_email_agendamentos', $request->has('notificar_email_agendamentos') ? '1' : '0', 'notificacoes');
+        CmsSetting::set('notificacoes_push_ativas', $request->has('notificacoes_push_ativas') ? '1' : '0', 'notificacoes');
 
         // Senha SMTP (só atualiza se preenchida)
         if ($request->filled('mail_password')) {
