@@ -45,9 +45,21 @@ class Foco7SystemTest extends TestCase
      */
     public function test_instalador_web_carrega_com_sucesso(): void
     {
-        $response = $this->get('/instalar');
-        $response->assertStatus(200);
-        $response->assertSee('Assistente de Instalação');
+        $lockFile = storage_path('installed.lock');
+        $tinhaLock = file_exists($lockFile);
+        if ($tinhaLock) {
+            @unlink($lockFile);
+        }
+
+        try {
+            $response = $this->get('/instalar');
+            $response->assertStatus(200);
+            $response->assertSee('Assistente de Instalação');
+        } finally {
+            if ($tinhaLock) {
+                @touch($lockFile);
+            }
+        }
     }
 
     /**
