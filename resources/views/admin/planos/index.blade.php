@@ -120,80 +120,18 @@
                             <input type="text" name="taxa_adesao" id="taxa_adesao" class="form-control mask-moeda" placeholder="R$ 0,00">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
-                                <span>Ícone do Plano (FontAwesome, Flaticon ou Livre)</span>
-                                <span id="iconePreviewContainer" class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 rounded d-inline-flex align-items-center justify-content-center" style="font-size: 1.35rem; min-width: 42px; min-height: 42px; border: 1px solid rgba(217,0,0,0.2);">
-                                    <span id="iconePreviewContent"><i class="fas fa-icons text-muted" style="opacity: 0.4;"></i></span>
-                                </span>
-                            </label>
-                            
-                            <!-- Seleção rápida por catálogo -->
-                            <select id="icone_seletor" class="form-select form-select-sm mb-2" onchange="selecionarIconePredefinido(this.value)">
-                                <option value="">-- Escolha um Ícone Popular ou Digite Livremente Abaixo --</option>
-                                <optgroup label="🚗 Veículos (FontAwesome & Flaticon)">
-                                    <option value="fa-car">🚗 FontAwesome: Carro Passeio (fa-car)</option>
-                                    <option value="fa-motorcycle">🏍️ FontAwesome: Moto / Duas Rodas (fa-motorcycle)</option>
-                                    <option value="fa-truck">🚚 FontAwesome: Caminhão Pesado (fa-truck)</option>
-                                    <option value="fa-truck-pickup">🛻 FontAwesome: Caminhonete / Pickup (fa-truck-pickup)</option>
-                                    <option value="fa-van-shuttle">🚐 FontAwesome: Van / Utilitário (fa-van-shuttle)</option>
-                                    <option value="fa-bus">🚌 FontAwesome: Ônibus / Passageiros (fa-bus)</option>
-                                    <option value="fa-ship">🚤 FontAwesome: Barco / Náutico (fa-ship)</option>
-                                    <option value="fa-tractor">🚜 FontAwesome: Trator / Agrícola (fa-tractor)</option>
-                                    <option value="fi fi-rr-car">🚘 Flaticon: Carro Moderno (fi fi-rr-car)</option>
-                                    <option value="fi fi-rr-motorcycle">🛵 Flaticon: Moto (fi fi-rr-motorcycle)</option>
-                                    <option value="fi fi-rr-truck-side">🚛 Flaticon: Caminhão Lateral (fi fi-rr-truck-side)</option>
-                                </optgroup>
-                                <optgroup label="🛡️ Segurança & Rastreamento">
-                                    <option value="fa-shield-alt">🛡️ FontAwesome: Escudo Proteção (fa-shield-alt)</option>
-                                    <option value="fa-satellite-dish">📡 FontAwesome: Satélite GPS (fa-satellite-dish)</option>
-                                    <option value="fa-location-dot">📍 FontAwesome: GPS Localização (fa-location-dot)</option>
-                                    <option value="fa-mobile-screen">📱 FontAwesome: App Celular (fa-mobile-screen)</option>
-                                    <option value="fa-key">🔑 FontAwesome: Bloqueio / Ignição (fa-key)</option>
-                                    <option value="fa-bell">🔔 FontAwesome: Alertas em Tempo Real (fa-bell)</option>
-                                    <option value="fa-lock">🔒 FontAwesome: Bloqueador Remoto (fa-lock)</option>
-                                    <option value="fi fi-rr-shield-check">🛡️ Flaticon: Escudo Seguro (fi fi-rr-shield-check)</option>
-                                    <option value="fi fi-rr-marker">📍 Flaticon: Pin Localização (fi fi-rr-marker)</option>
-                                    <option value="fi fi-rr-smartphone">📱 Flaticon: Smartphone (fi fi-rr-smartphone)</option>
-                                </optgroup>
-                                <optgroup label="📦 Frotas & Gestão">
-                                    <option value="fa-boxes-stacked">📦 FontAwesome: Frotas & Cargas (fa-boxes-stacked)</option>
-                                    <option value="fa-route">🗺️ FontAwesome: Rotas & Trajetos (fa-route)</option>
-                                    <option value="fa-tachometer-alt">⏱️ FontAwesome: Telemetria (fa-tachometer-alt)</option>
-                                    <option value="fa-gas-pump">⛽ FontAwesome: Combustível (fa-gas-pump)</option>
-                                    <option value="fi fi-rr-chart-histogram">📊 Flaticon: Relatórios (fi fi-rr-chart-histogram)</option>
-                                    <option value="fi fi-rr-box-alt">📦 Flaticon: Pacotes / Cargas (fi fi-rr-box-alt)</option>
-                                </optgroup>
-                                <optgroup label="⭐ Destaques & Premium">
-                                    <option value="fa-crown">👑 FontAwesome: VIP / Supremo (fa-crown)</option>
-                                    <option value="fa-star">⭐ FontAwesome: Estrela Destaque (fa-star)</option>
-                                    <option value="fa-bolt">⚡ FontAwesome: Alta Performance (fa-bolt)</option>
-                                    <option value="fa-gem">💎 FontAwesome: Diamante Exclusivo (fa-gem)</option>
-                                    <option value="fi fi-rr-crown">👑 Flaticon: Coroa VIP (fi fi-rr-crown)</option>
-                                    <option value="fi fi-rr-sparkles">✨ Flaticon: Brilho Especial (fi fi-rr-sparkles)</option>
-                                </optgroup>
-                                <option value="custom">✏️ Digitar Classe Livre / Personalizada (FontAwesome, Flaticon, SVG...)</option>
-                            </select>
-
-                            <!-- Campo de entrada livre (aceita FontAwesome, Flaticon, SVG ou qualquer classe) -->
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-body-tertiary"><i class="fas fa-terminal"></i></span>
-                                <input type="text" name="icone" id="icone" class="form-control" value="" placeholder="Ex: fa-truck-monster, fi fi-rr-car, bi bi-shield-check" oninput="onIconeInput(this.value)">
-                                <button class="btn btn-outline-secondary" type="button" onclick="testarIconeRapido('fa-solid fa-car')" title="Exemplo FontAwesome">FA</button>
-                                <button class="btn btn-outline-secondary" type="button" onclick="testarIconeRapido('fi fi-rr-car')" title="Exemplo Flaticon">Flaticon</button>
+                            <label class="form-label small fw-bold">Ícone do Plano</label>
+                            <div class="input-group foco-icon-picker-group shadow-sm">
+                                <button type="button" class="btn btn-light border foco-icon-preview-btn d-inline-flex align-items-center justify-content-center px-3" title="Clique para escolher o ícone">
+                                    <span id="iconePreviewContent"><i class="fas fa-car text-danger" style="font-size: 1.25rem;"></i></span>
+                                </button>
+                                <input type="text" name="icone" id="icone" class="form-control foco-icon-picker-ready" value="" placeholder="Selecione um ícone visualmente..." oninput="atualizarPreviewIcone(this.value)" style="cursor: pointer;" title="Clique para abrir o seletor visual de ícones">
+                                <button type="button" class="btn btn-outline-danger fw-semibold btn-abrir-icon-picker d-inline-flex align-items-center gap-1" title="Abrir Seletor Visual de Ícones">
+                                    <i class="fas fa-icons"></i> <span>Escolher</span>
+                                </button>
                             </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-1 flex-wrap gap-1">
-                                <span class="text-secondary" style="font-size: 0.72rem;">
-                                    Aceita <strong>qualquer</strong> classe: FontAwesome (<code>fa-solid fa-car</code>), Flaticon (<code>fi fi-rr-car</code>), Bootstrap ou SVG.
-                                </span>
-                                <div class="d-flex gap-2" style="font-size: 0.72rem;">
-                                    <a href="https://fontawesome.com/icons?m=free" target="_blank" rel="noopener" class="text-decoration-none text-danger fw-bold">
-                                        <i class="fab fa-font-awesome"></i> FontAwesome <i class="fas fa-external-link-alt" style="font-size: 0.65rem;"></i>
-                                    </a>
-                                    <a href="https://www.flaticon.com/uicons" target="_blank" rel="noopener" class="text-decoration-none text-danger fw-bold">
-                                        <i class="fas fa-icons"></i> Flaticon <i class="fas fa-external-link-alt" style="font-size: 0.65rem;"></i>
-                                    </a>
-                                </div>
+                            <div class="form-text small text-secondary">
+                                Clique em <strong>Escolher</strong> para abrir o catálogo visual de ícones com busca instantânea.
                             </div>
                         </div>
                         <div class="col-md-6">

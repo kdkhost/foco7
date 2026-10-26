@@ -243,8 +243,16 @@
                             <input type="text" name="nome" id="servico_nome" class="form-control" required placeholder="Ex: Vitrificação Cerâmica 9H">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Ícone FontAwesome</label>
-                            <input type="text" name="icone" id="servico_icone" class="form-control" placeholder="fa-shield-halved">
+                            <label class="form-label small fw-bold">Ícone do Serviço</label>
+                            <div class="input-group foco-icon-picker-group shadow-sm">
+                                <button type="button" class="btn btn-light border foco-icon-preview-btn d-inline-flex align-items-center justify-content-center px-2" title="Clique para trocar de ícone" style="min-width: 40px;">
+                                    <i class="fas fa-shield-halved text-danger fa-fw foco-icon-preview-tag" style="font-size: 1.15rem;"></i>
+                                </button>
+                                <input type="text" name="icone" id="servico_icone" class="form-control foco-icon-picker-ready" placeholder="fa-shield-halved" style="cursor: pointer;" title="Clique para escolher o ícone">
+                                <button type="button" class="btn btn-outline-danger fw-semibold btn-abrir-icon-picker d-inline-flex align-items-center gap-1" title="Abrir Seletor Visual de Ícones">
+                                    <i class="fas fa-icons"></i> <span>Escolher</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Subtítulo / Resumo Comercial</label>

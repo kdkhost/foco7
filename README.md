@@ -543,6 +543,31 @@ public_html/
 
 ---
 
+## 🎨 Módulo 35: Componente Global de Seleção Visual de Ícones (Global Icon Picker) no Painel Administrativo
+
+### 1. Seletor Visual de Ícones Interativo (`global-icon-picker.js`)
+- **Fim da Digitação Manual de Classes:** Em todo o painel administrativo, os campos de ícones deixam de exigir que o administrador digite nomes técnicos como `fa-car`, `fa-truck` ou `fa-shield-halved`.
+- **Enriquecimento Automático de Inputs:**
+  - Qualquer campo com `name` ou `id` contendo `icone` (ou com a classe `.foco-icon-picker`) é transformado dinamicamente em um **Input Group Visual**.
+  - **Preview em Tempo Real:** Exibe à esquerda um badge/botão com o ícone renderizado grande na cor temática da empresa (`var(--admin-primary)`).
+  - **Botão "Escolher":** Botão visual à direita com ícone de paleta de ícones (`.btn-abrir-icon-picker`) que abre o catálogo interativo.
+  - **Interação Intuitiva:** O usuário pode clicar no botão "Escolher", no preview ou no próprio campo para abrir a grade visual de seleção.
+
+### 2. Modal Global com Busca Inteligente e Categorias
+- **Modal Responsivo (`#modalGlobalIconPicker`):**
+  - **Pesquisa Instantânea em Tempo Real:** Busca por termos e sinônimos em português e inglês (ex: `carro`, `moto`, `caminhão`, `van`, `frota`, `escudo`, `segurança`, `bloqueio`, `chave`, `mapa`, `satélite`, `dinheiro`, `troféu`, `vitrificação`, `polimento`, `headset`, etc.).
+  - **Filtros Rápidos por Categorias:**
+    - *Todos*: Catálogo completo com mais de 80 ícones selecionados.
+    - *Veículos & Transporte*: Carros, motos, caminhões, picapes, vans, frotas, cargas, tratores, telemetria e combustível.
+    - *Segurança & Proteção*: Escudos, bloqueios, chaves, alarmes, sirenes, viaturas, biometria e alertas.
+    - *GPS & Tecnologia*: Antenas satelitais, GPS, mapas, rotas, cercas virtuais, celulares, chips multioperadora e 4G.
+    - *Métricas & Negócios*: Troféus, medalhas, certificados, estrelas, gráficos, parcerias, filiais e economia.
+    - *Estética & Cuidados*: Vitrificação, polimento, lavagem, hidrorrepelência, estúdio próprio e ferramentas.
+    - *Atendimento & Geral*: Central 24h, telefones, chamadas urgentes, prontidão, histórico e agendamentos.
+  - **Seleção Instantânea:** Ao clicar no ícone desejado, o campo é preenchido, o preview é atualizado imediatamente e o modal se fecha com notificação de confirmação via Toastr.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):

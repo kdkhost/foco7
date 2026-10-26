@@ -627,6 +627,7 @@
     <script src="{{ asset('js/global-dropzone.js') }}?v={{ file_exists(public_path('js/global-dropzone.js')) ? filemtime(public_path('js/global-dropzone.js')) : time() }}"></script>
     <script src="{{ asset('js/global-summernote.js') }}?v={{ file_exists(public_path('js/global-summernote.js')) ? filemtime(public_path('js/global-summernote.js')) : time() }}"></script>
     <script src="{{ asset('js/global-sessao.js') }}?v={{ file_exists(public_path('js/global-sessao.js')) ? filemtime(public_path('js/global-sessao.js')) : time() }}"></script>
+    <script src="{{ asset('js/global-icon-picker.js') }}?v={{ file_exists(public_path('js/global-icon-picker.js')) ? filemtime(public_path('js/global-icon-picker.js')) : time() }}"></script>
 
     <script>
         // Alternador Dark / Light Mode oficial AdminLTE 4 & Bootstrap 5
