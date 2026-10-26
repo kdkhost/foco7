@@ -1650,8 +1650,8 @@ img, svg, video, canvas, audio, iframe, embed, object {
    ============================================================================== */
 .foco-whatsapp-float {
     position: fixed;
-    bottom: 25px;
-    right: 25px;
+    bottom: 95px;
+    right: 24px;
     width: 62px;
     height: 62px;
     background: #25d366;
@@ -1712,8 +1712,8 @@ img, svg, video, canvas, audio, iframe, embed, object {
 
 .foco-btn-topo {
     position: fixed;
-    bottom: 98px;
-    right: 32px;
+    bottom: 170px;
+    right: 30px;
     width: 48px;
     height: 48px;
     background: #ffffff;
@@ -1850,7 +1850,7 @@ img, svg, video, canvas, audio, iframe, embed, object {
         height: 52px;
         font-size: 26px;
         right: 16px;
-        bottom: 16px;
+        bottom: 85px;
     }
     .foco-whatsapp-float .whatsapp-tooltip {
         display: none !important;
@@ -1860,7 +1860,7 @@ img, svg, video, canvas, audio, iframe, embed, object {
         height: 42px;
         font-size: 1rem;
         right: 20px;
-        bottom: 78px;
+        bottom: 150px;
     }
     .section-risco,
     .section-sobre,
@@ -2446,7 +2446,7 @@ img, svg, video, canvas, audio, iframe, embed, object {
    ========================================================================== */
 .foco-whatsapp-float {
     position: fixed;
-    bottom: 24px;
+    bottom: 95px;
     right: 24px;
     width: 60px;
     height: 60px;
@@ -2513,7 +2513,7 @@ img, svg, video, canvas, audio, iframe, embed, object {
 /* BOX POP-UP MULTICANAIS DE SUPORTE */
 .foco-support-popup {
     position: fixed;
-    bottom: 95px;
+    bottom: 168px;
     right: 24px;
     width: 360px;
     max-width: calc(100vw - 32px);

@@ -518,7 +518,7 @@ public_html/
 - Substituição da nomenclatura legada "Ronda" por **"Central 24h"** em todos os menus, seções, modais e abas do CMS.
 
 ### 6. Reorganização Ergonômica de Menus e Rodapé Oficial
-- **Menu Superior Desktop:** Removidos os itens redundantes `Central 24h`, `App` e `Dúvidas` para preservar uma navegação mais limpa e focada em conversão (`Benefícios`, `Sobre`, `Planos`, `Estética`, `Parceiros`, `Onde Estamos`, `Contato`).
+- **Menu Superior Desktop & Drawer Mobile:** Removidos integralmente os itens `Central 24h`, `App` e `Dúvidas` tanto da barra horizontal superior quanto do menu deslizante offcanvas mobile (`#menuDrawerAndroid`), preservando uma navegação mais limpa e focada em conversão (`Benefícios`, `Sobre`, `Planos`, `Estética`, `Parceiros`, `Onde Estamos`, `Contato`).
 - **Rodapé Institucional (`foco-footer`):** Adicionada a coluna rápida de navegação contendo os links diretos para `Central 24h` (`#ronda`), `Aplicativo Foco 7` (`#app`) e `Dúvidas Frequentes` (`#faq`).
 
 ### 7. Nova Seção de Métricas & Impacto em Números (Box 7)
@@ -532,6 +532,14 @@ public_html/
     - Contador 4: Franqueados e Unidades (ex: `+45`).
     - Contador 5: Estados com Presença Foco 7 (ex: `12 Estados`).
 - **Renderização Visual no Site (`#metricas`):** Grid responsivo em estilo glassmorphism escuro com micro-interações, ícones temáticos e alta legibilidade.
+
+### 8. Elevação Ergonômica dos Botões Flutuantes (Anti-Sobreposição Google reCAPTCHA)
+- **Prevenção de Colisão com o Selo Google reCAPTCHA v3 (`.grecaptcha-badge`):**
+  - O selo flutuante do Google reCAPTCHA v3 localiza-se na extremidade inferior direita (`bottom: 14px; right: 0;`).
+  - Para eliminar sobreposição e bloqueios de clique:
+    - **Botão WhatsApp Oficial (`.foco-whatsapp-float`):** Elevado para `bottom: 95px` (desktop) e `bottom: 85px` (mobile), ficando totalmente desobstruído logo acima do selo.
+    - **Botão Voltar ao Topo (`.foco-btn-topo`):** Elevado para `bottom: 170px` (desktop) e `bottom: 150px` (mobile), perfeitamente empilhado acima do WhatsApp.
+    - **Pop-up Multicanais de Suporte (`.foco-support-popup`):** Configurado para abrir em `bottom: 168px` (desktop) e `bottom: 145px` (mobile), evitando colisões com o botão e com o selo do Google.
 
 ---
 

@@ -67,6 +67,35 @@
             box-shadow: 0 12px 32px rgba(var(--bs-primary-rgb), 0.55) !important;
             transform: translateX(-4px);
         }
+
+        /* Posicionamento dos Botões Flutuantes Acima do Selo Google reCAPTCHA */
+        .foco-whatsapp-float {
+            bottom: 95px !important;
+            right: 24px !important;
+        }
+        .foco-btn-topo {
+            bottom: 170px !important;
+            right: 30px !important;
+        }
+        .foco-support-popup {
+            bottom: 168px !important;
+            right: 24px !important;
+        }
+        @media (max-width: 991.98px) {
+            .foco-whatsapp-float {
+                bottom: 85px !important;
+                right: 16px !important;
+            }
+            .foco-btn-topo {
+                bottom: 150px !important;
+                right: 20px !important;
+            }
+            .foco-support-popup {
+                bottom: 145px !important;
+                right: 16px !important;
+            }
+        }
+
         .foco-recaptcha-box {
             background: rgba(var(--bs-primary-rgb), 0.04);
             border: 1px solid rgba(var(--bs-primary-rgb), 0.22);
@@ -260,16 +289,6 @@
                     <span class="badge bg-danger rounded-pill px-2 me-1" style="font-size: 0.65rem;">Novo</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
-                <a href="#ronda" class="android-nav-item">
-                    <div class="android-item-icon"><i class="fas fa-headset"></i></div>
-                    <span class="android-item-text">Central 24h</span>
-                    <i class="fas fa-chevron-right android-item-arrow"></i>
-                </a>
-                <a href="#app" class="android-nav-item">
-                    <div class="android-item-icon"><i class="fas fa-mobile-screen-button"></i></div>
-                    <span class="android-item-text">Aplicativo Foco 7</span>
-                    <i class="fas fa-chevron-right android-item-arrow"></i>
-                </a>
                 @if(isset($parceiros) && $parceiros->count() > 0)
                 <a href="#parceiros" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-handshake"></i></div>
@@ -284,11 +303,6 @@
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 @endif
-                <a href="#faq" class="android-nav-item">
-                    <div class="android-item-icon"><i class="fas fa-circle-question"></i></div>
-                    <span class="android-item-text">Dúvidas Frequentes</span>
-                    <i class="fas fa-chevron-right android-item-arrow"></i>
-                </a>
                 <a href="#contato" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-envelope-open-text"></i></div>
                     <span class="android-item-text">Fale Conosco</span>
