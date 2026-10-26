@@ -475,6 +475,66 @@ public_html/
 
 ---
 
+## 🎨 Módulo 34: Gestão Avançada de CMS (Simulação Hero, Riscos, Sobre Nós, Métricas de Impacto) & Planos Sob Consulta
+
+### 1. Gestão Dinâmica do Card de Simulação Rápida Hero (Box 1)
+- **Aba Dedicada no CMS (`/admin/cms#tab-simulacao`):**
+  - Controle de visibilidade global (Switch Ativar/Desativar).
+  - Configuração do Badge superior ("PROTEÇÃO ATIVA 24H"), Título ("Simulação Rápida em 1 Minuto"), Subtítulo e texto do Botão de Ação ("VER TODOS OS PLANOS").
+  - Configuração granular dos 4 blocos de veículos: **Carro**, **Moto**, **Caminhão** e **Frotas** (nome do veículo, texto de preço "A partir de R$ XX,XX", classe de ícone FontAwesome e link de destino).
+- **Integração no Frontend (`resources/views/site/index.blade.php`):** O box do Hero renderiza dinamicamente as variáveis com fallback gracioso para os valores padrão.
+
+### 2. Gestão de Segurança Preventiva / Riscos vs Soluções (Box 2)
+- **Aba de Seções do Site (`/admin/cms#tab-secoes`):**
+  - Controle de visibilidade da seção.
+  - Configuração do Badge ("SEGURANÇA PREVENTIVA"), Título Principal ("O risco não avisa antes de chegar") e Subtítulo explicativo.
+  - Edição dos 3 Cards de Riscos e Impactos:
+    - Card 1: Título ("Roubos e Furtos Constantes"), Descrição estatística, Ícone e Destaque da Solução Foco 7 ("Solução Foco 7: Localização em tempo real com precisão de metros").
+    - Card 2: Título ("Resposta Policial Demorada"), Descrição, Ícone e Destaque da Solução Foco 7 ("Solução Foco 7: Ronda Tática com viaturas de pronta resposta").
+    - Card 3: Título ("Prejuízo Financeiro Irrecuperável"), Descrição, Ícone e Destaque da Solução Foco 7 ("Solução Foco 7: 98,4% de taxa de recuperação comprovada").
+
+### 3. Gestão de Sobre Nós & Autoridade Foco 7 (Box 3)
+- **Aba de Seções do Site (`/admin/cms#tab-secoes`):**
+  - Controle de visibilidade da seção.
+  - Configuração do Badge ("MAIS DE 10 ANOS DE EXPERIÊNCIA"), Título ("Referência em Rastreamento Veicular e Segurança Eletrônica") e Texto Institucional/História da Empresa.
+  - Edição das 2 Estatísticas de Destaque:
+    - Badge 1: Valor (`+10 Anos`), Legenda (`De Mercado Sólido`) e Ícone.
+    - Badge 2: Valor (`98.4%`), Legenda (`Taxa de Recuperação`) e Ícone.
+  - Edição dos 3 Diferenciais Competitivos ("Por Que Somos a Melhor Escolha?"):
+    - Diferencial 1: Título ("Central de Operações Blindada 24 Horas") e Descrição operacional.
+    - Diferencial 2: Título ("Tecnologia 4G Multioperadora") e Descrição técnica do chip inteligente.
+    - Diferencial 3: Título ("Instalação Discreta e Sigilosa") e Descrição de preservação da garantia do veículo.
+
+### 4. Gestão de Planos com Preço "CONSULTAR" (Sob Consulta)
+- **Campo de Preço Sob Consulta no Admin de Planos (`/admin/planos`):**
+  - Switch interativo no modal de cadastro e edição: `Preço sob Consulta (Exibir "CONSULTAR")`.
+  - Ao ativar, os campos de preço mensal e taxa de adesão tornam-se opcionais na validação e na interface.
+  - Listagem de planos exibe badge azul informativo `CONSULTAR`.
+- **Apresentação no Site:**
+  - O card do plano exibe com destaque o texto `CONSULTAR` com tipografia limpa no lugar do valor `R$ XX,XX/mês` e omite taxa de adesão padrão.
+  - O botão de contratação altera seu comportamento para direcionar o cliente diretamente ao WhatsApp oficial com mensagem personalizada solicitando consultoria sobre o plano.
+
+### 5. Padronização e Nomenclatura Central 24h
+- Substituição da nomenclatura legada "Ronda" por **"Central 24h"** em todos os menus, seções, modais e abas do CMS.
+
+### 6. Reorganização Ergonômica de Menus e Rodapé Oficial
+- **Menu Superior Desktop:** Removidos os itens redundantes `Central 24h`, `App` e `Dúvidas` para preservar uma navegação mais limpa e focada em conversão (`Benefícios`, `Sobre`, `Planos`, `Estética`, `Parceiros`, `Onde Estamos`, `Contato`).
+- **Rodapé Institucional (`foco-footer`):** Adicionada a coluna rápida de navegação contendo os links diretos para `Central 24h` (`#ronda`), `Aplicativo Foco 7` (`#app`) e `Dúvidas Frequentes` (`#faq`).
+
+### 7. Nova Seção de Métricas & Impacto em Números (Box 7)
+- **Aba Dedicada no CMS (`/admin/cms#tab-metricas`):**
+  - Controle de visibilidade global da seção de métricas.
+  - Configuração do Badge ("IMPACTO EM NÚMEROS"), Título ("Resultados Reais que Constroem Nossa História") e Subtítulo.
+  - Edição dinâmica de 5 contadores estatísticos essenciais:
+    - Contador 1: Veículos Rastreados (ex: `+15.000`).
+    - Contador 2: Veículos Recuperados (ex: `98.4%` ou `+4.200`).
+    - Contador 3: Parceiros Estratégicos (ex: `+120`).
+    - Contador 4: Franqueados e Unidades (ex: `+45`).
+    - Contador 5: Estados com Presença Foco 7 (ex: `12 Estados`).
+- **Renderização Visual no Site (`#metricas`):** Grid responsivo em estilo glassmorphism escuro com micro-interações, ícones temáticos e alta legibilidade.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):

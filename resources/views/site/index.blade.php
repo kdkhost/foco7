@@ -183,15 +183,12 @@
                         <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
                         <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
                         <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#ronda">Ronda</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#app">App</a></li>
                         @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#parceiros">Parceiros</a></li>
                         @endif
                         @if(isset($filiais) && $filiais->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#unidades">Onde Estamos</a></li>
                         @endif
-                        <li class="nav-item"><a class="nav-link" href="#faq">Dúvidas</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                     </ul>
                     <div class="d-flex flex-column flex-lg-row gap-2 align-items-stretch align-items-lg-center mt-3 mt-lg-0">
@@ -264,8 +261,8 @@
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 <a href="#ronda" class="android-nav-item">
-                    <div class="android-item-icon"><i class="fas fa-motorcycle"></i></div>
-                    <span class="android-item-text">Ronda Tática 24h</span>
+                    <div class="android-item-icon"><i class="fas fa-headset"></i></div>
+                    <span class="android-item-text">Central 24h</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 <a href="#app" class="android-nav-item">
@@ -380,48 +377,50 @@
                                         @endif
                                     </div>
                                 </div>
+                                @if(($configs['hero_simulacao_ativo'] ?? '1') == '1')
                                 <div class="col-lg-5 text-center mt-4 mt-lg-0">
                                     <div class="card-simulacao-hero">
                                         <div class="text-start mb-3">
-                                            <span class="badge bg-danger px-3 py-2 rounded-pill">PROTEÇÃO ATIVA 24H</span>
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill">{{ $configs['hero_simulacao_badge'] }}</span>
                                         </div>
-                                        <h4 class="fw-bold mb-2 text-start" style="color: var(--foco-title);">Simulação Rápida em 1 Minuto</h4>
-                                        <p class="small text-secondary mb-4 text-start">Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.</p>
+                                        <h4 class="fw-bold mb-2 text-start" style="color: var(--foco-title);">{{ $configs['hero_simulacao_titulo'] }}</h4>
+                                        <p class="small text-secondary mb-4 text-start">{{ $configs['hero_simulacao_subtitulo'] }}</p>
                                         <div class="row g-2 mb-4">
                                             <div class="col-6">
-                                                <a href="#planos" class="btn-tipo-veiculo">
-                                                    <i class="fas fa-car text-danger fs-4 d-block mb-1"></i>
-                                                    <span class="fw-bold d-block">Carro</span>
-                                                    <span class="small text-secondary">A partir de R$ 69,90</span>
+                                                <a href="{{ $configs['hero_simulacao_v1_link'] }}" class="btn-tipo-veiculo">
+                                                    <i class="fas {{ $configs['hero_simulacao_v1_icone'] }} text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">{{ $configs['hero_simulacao_v1_nome'] }}</span>
+                                                    <span class="small text-secondary">{{ $configs['hero_simulacao_v1_preco'] }}</span>
                                                 </a>
                                             </div>
                                             <div class="col-6">
-                                                <a href="#planos" class="btn-tipo-veiculo">
-                                                    <i class="fas fa-motorcycle text-danger fs-4 d-block mb-1"></i>
-                                                    <span class="fw-bold d-block">Moto</span>
-                                                    <span class="small text-secondary">A partir de R$ 49,90</span>
+                                                <a href="{{ $configs['hero_simulacao_v2_link'] }}" class="btn-tipo-veiculo">
+                                                    <i class="fas {{ $configs['hero_simulacao_v2_icone'] }} text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">{{ $configs['hero_simulacao_v2_nome'] }}</span>
+                                                    <span class="small text-secondary">{{ $configs['hero_simulacao_v2_preco'] }}</span>
                                                 </a>
                                             </div>
                                             <div class="col-6">
-                                                <a href="#planos" class="btn-tipo-veiculo">
-                                                    <i class="fas fa-truck text-danger fs-4 d-block mb-1"></i>
-                                                    <span class="fw-bold d-block">Caminhão</span>
-                                                    <span class="small text-secondary">A partir de R$ 99,90</span>
+                                                <a href="{{ $configs['hero_simulacao_v3_link'] }}" class="btn-tipo-veiculo">
+                                                    <i class="fas {{ $configs['hero_simulacao_v3_icone'] }} text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">{{ $configs['hero_simulacao_v3_nome'] }}</span>
+                                                    <span class="small text-secondary">{{ $configs['hero_simulacao_v3_preco'] }}</span>
                                                 </a>
                                             </div>
                                             <div class="col-6">
-                                                <a href="#planos" class="btn-tipo-veiculo">
-                                                    <i class="fas fa-cubes text-danger fs-4 d-block mb-1"></i>
-                                                    <span class="fw-bold d-block">Frotas</span>
-                                                    <span class="small text-secondary">Condições especiais</span>
+                                                <a href="{{ $configs['hero_simulacao_v4_link'] }}" class="btn-tipo-veiculo">
+                                                    <i class="fas {{ $configs['hero_simulacao_v4_icone'] }} text-danger fs-4 d-block mb-1"></i>
+                                                    <span class="fw-bold d-block">{{ $configs['hero_simulacao_v4_nome'] }}</span>
+                                                    <span class="small text-secondary">{{ $configs['hero_simulacao_v4_preco'] }}</span>
                                                 </a>
                                             </div>
                                         </div>
-                                        <a href="#planos" class="btn-foco-primary w-100">
-                                            VER TODOS OS PLANOS E RECURSOS
+                                        <a href="{{ $configs['hero_simulacao_btn_link'] }}" class="btn-foco-primary w-100">
+                                            {{ $configs['hero_simulacao_btn_texto'] }}
                                         </a>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -471,38 +470,38 @@
     <section id="riscos" class="section-risco">
         <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">
-                <span class="text-danger fw-bold text-uppercase letter-spacing-1 small">Segurança Preventiva</span>
-                <h2 class="display-6 fw-black mt-2">O risco não avisa antes de chegar</h2>
-                <p class="text-secondary fs-5">A criminalidade evolui todos os dias. Deixar seu patrimônio desprotegido custa muito mais caro que investir em prevenção.</p>
+                <span class="text-danger fw-bold text-uppercase letter-spacing-1 small">{{ $configs['secao_riscos_badge'] }}</span>
+                <h2 class="display-6 fw-black mt-2">{{ $configs['secao_riscos_titulo'] }}</h2>
+                <p class="text-secondary fs-5">{{ $configs['secao_riscos_subtitulo'] }}</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card-risco">
-                        <div class="icon-risco"><i class="fas fa-mask"></i></div>
-                        <h4 class="fw-bold mb-3">Roubos e Furtos Constantes</h4>
-                        <p class="text-secondary">Mais de 1.000 veículos são roubados por dia no Brasil. Sem rastreador, a taxa de recuperação cai para menos de 10%.</p>
+                        <div class="icon-risco"><i class="fas {{ $configs['secao_riscos_c1_icone'] }}"></i></div>
+                        <h4 class="fw-bold mb-3">{{ $configs['secao_riscos_c1_titulo'] }}</h4>
+                        <p class="text-secondary">{{ $configs['secao_riscos_c1_desc'] }}</p>
                         <div class="d-flex align-items-center text-danger fw-semibold small mt-3">
-                            <i class="fas fa-shield-alt me-2"></i> Solução Foco 7: Localização em tempo real com precisão de metros.
+                            <i class="fas {{ $configs['secao_riscos_c1_solucao_icone'] }} me-2"></i> {{ $configs['secao_riscos_c1_solucao'] }}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-risco">
-                        <div class="icon-risco"><i class="fas fa-hourglass-half"></i></div>
-                        <h4 class="fw-bold mb-3">Resposta Policial Demorada</h4>
-                        <p class="text-secondary">Os primeiros 30 minutos após o sinistro são decisivos. Esperar sem suporte especializado reduz drasticamente as chances de resgate.</p>
+                        <div class="icon-risco"><i class="fas {{ $configs['secao_riscos_c2_icone'] }}"></i></div>
+                        <h4 class="fw-bold mb-3">{{ $configs['secao_riscos_c2_titulo'] }}</h4>
+                        <p class="text-secondary">{{ $configs['secao_riscos_c2_desc'] }}</p>
                         <div class="d-flex align-items-center text-danger fw-semibold small mt-3">
-                            <i class="fas fa-motorcycle me-2"></i> Solução Foco 7: Ronda Tática com viaturas de pronta resposta.
+                            <i class="fas {{ $configs['secao_riscos_c2_solucao_icone'] }} me-2"></i> {{ $configs['secao_riscos_c2_solucao'] }}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-risco">
-                        <div class="icon-risco"><i class="fas fa-coins"></i></div>
-                        <h4 class="fw-bold mb-3">Prejuízo Financeiro Irrecuperável</h4>
-                        <p class="text-secondary">O valor do veículo, franquias abusivas de seguro tradicional e o transtorno da perda deixam famílias e empresas desamparadas.</p>
+                        <div class="icon-risco"><i class="fas {{ $configs['secao_riscos_c3_icone'] }}"></i></div>
+                        <h4 class="fw-bold mb-3">{{ $configs['secao_riscos_c3_titulo'] }}</h4>
+                        <p class="text-secondary">{{ $configs['secao_riscos_c3_desc'] }}</p>
                         <div class="d-flex align-items-center text-danger fw-semibold small mt-3">
-                            <i class="fas fa-check-double me-2"></i> Solução Foco 7: Planos acessíveis a partir de R$ 49,90/mês.
+                            <i class="fas {{ $configs['secao_riscos_c3_solucao_icone'] }} me-2"></i> {{ $configs['secao_riscos_c3_solucao'] }}
                         </div>
                     </div>
                 </div>
@@ -515,27 +514,27 @@
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <span class="text-danger fw-bold text-uppercase small">Mais de 10 Anos de Experiência</span>
-                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">Referência em Rastreamento Veicular e Segurança Eletrônica</h2>
+                    <span class="text-danger fw-bold text-uppercase small">{{ $configs['secao_sobre_badge'] }}</span>
+                    <h2 class="display-6 fw-black mt-2 mb-4" style="color: var(--foco-title);">{{ $configs['secao_sobre_titulo'] }}</h2>
                     <p class="text-secondary fs-5 leading-relaxed">
-                        A <strong class="text-dark">Foco 7</strong> nasceu com o compromisso inegociável de salvar patrimônios e devolver a paz de espírito a condutores e empresários. Presente com forte infraestrutura no Norte e Nordeste, combinamos inteligência artificial em mapas, módulos de telemetria homologados pela Anatel e equipe tática altamente treinada.
+                        {!! nl2br(e($configs['secao_sobre_texto'])) !!}
                     </p>
                     <div class="row g-4 mt-2">
                         <div class="col-sm-6">
                             <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
-                                <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas fa-history"></i></div>
+                                <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas {{ $configs['secao_sobre_stat1_icone'] }}"></i></div>
                                 <div>
-                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">+10 Anos</h4>
-                                    <span class="small text-secondary">De Mercado Sólido</span>
+                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">{{ $configs['secao_sobre_stat1_valor'] }}</h4>
+                                    <span class="small text-secondary">{{ $configs['secao_sobre_stat1_label'] }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
-                                <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas fa-car-crash"></i></div>
+                                <div class="bg-danger text-white rounded-3 p-3 fs-3"><i class="fas {{ $configs['secao_sobre_stat2_icone'] }}"></i></div>
                                 <div>
-                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">98.4%</h4>
-                                    <span class="small text-secondary">Taxa de Recuperação</span>
+                                    <h4 class="fw-bold mb-0" style="color: var(--foco-title);">{{ $configs['secao_sobre_stat2_valor'] }}</h4>
+                                    <span class="small text-secondary">{{ $configs['secao_sobre_stat2_label'] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -543,27 +542,27 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="card-diferenciais p-4 p-md-5">
-                        <h4 class="fw-bold mb-4" style="color: var(--foco-title);"><i class="fas fa-shield-virus text-danger me-2"></i> Por Que Somos a Melhor Escolha?</h4>
+                        <h4 class="fw-bold mb-4" style="color: var(--foco-title);"><i class="fas {{ $configs['secao_sobre_dif_icone'] }} text-danger me-2"></i> {{ $configs['secao_sobre_dif_titulo'] }}</h4>
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom border-light-subtle">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Central de Operações Blindada 24 Horas</h6>
-                                    <p class="small text-secondary mb-0">Operadores de prontidão todos os dias do ano para atender chamados de emergência.</p>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">{{ $configs['secao_sobre_dif1_titulo'] }}</h6>
+                                    <p class="small text-secondary mb-0">{{ $configs['secao_sobre_dif1_desc'] }}</p>
                                 </div>
                             </li>
                             <li class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom border-light-subtle">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Tecnologia 4G Multioperadora</h6>
-                                    <p class="small text-secondary mb-0">Chip inteligente que alterna entre as melhores operadoras do país para sinal constante.</p>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">{{ $configs['secao_sobre_dif2_titulo'] }}</h6>
+                                    <p class="small text-secondary mb-0">{{ $configs['secao_sobre_dif2_desc'] }}</p>
                                 </div>
                             </li>
                             <li class="d-flex align-items-start gap-3">
                                 <i class="fas fa-check-circle text-danger mt-1 fs-5"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">Instalação Discreta e Sigilosa</h6>
-                                    <p class="small text-secondary mb-0">Técnicos certificados que instalam sem cortar chicote original e sem comprometer garantias.</p>
+                                    <h6 class="fw-bold mb-1" style="color: var(--foco-title);">{{ $configs['secao_sobre_dif3_titulo'] }}</h6>
+                                    <p class="small text-secondary mb-0">{{ $configs['secao_sobre_dif3_desc'] }}</p>
                                 </div>
                             </li>
                         </ul>
@@ -572,6 +571,73 @@
             </div>
         </div>
     </section>
+
+    <!-- 5.1 SEÇÃO IMPACTO EM NÚMEROS (CONTADORES FOCO 7 - ITEM 7) -->
+    @if(($configs['secao_metricas_ativo'] ?? '1') == '1')
+    <section id="metricas" class="section-metricas py-5" style="background: linear-gradient(135deg, #0b0f19 0%, #151b2b 100%); position: relative; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill small fw-bold text-uppercase letter-spacing-1">
+                    <i class="fas fa-chart-line me-1"></i> {{ $configs['secao_metricas_badge'] }}
+                </span>
+                <h2 class="display-6 fw-black text-white mt-3">{{ $configs['secao_metricas_titulo'] }}</h2>
+                <p class="text-white-50 fs-5 mb-0">{{ $configs['secao_metricas_subtitulo'] }}</p>
+            </div>
+            <div class="row g-4 justify-content-center text-center">
+                <!-- Métrica 1: Veículos Rastreados -->
+                <div class="col-6 col-md-4 col-lg">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <div class="text-danger fs-1 mb-2">
+                            <i class="fas {{ $configs['metrica_1_icone'] }}"></i>
+                        </div>
+                        <h2 class="display-6 fw-black text-white mb-1">{{ $configs['metrica_1_valor'] }}</h2>
+                        <span class="small fw-semibold text-white-50 text-uppercase letter-spacing-1">{{ $configs['metrica_1_label'] }}</span>
+                    </div>
+                </div>
+                <!-- Métrica 2: Veículos Recuperados -->
+                <div class="col-6 col-md-4 col-lg">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <div class="text-danger fs-1 mb-2">
+                            <i class="fas {{ $configs['metrica_2_icone'] }}"></i>
+                        </div>
+                        <h2 class="display-6 fw-black text-white mb-1">{{ $configs['metrica_2_valor'] }}</h2>
+                        <span class="small fw-semibold text-white-50 text-uppercase letter-spacing-1">{{ $configs['metrica_2_label'] }}</span>
+                    </div>
+                </div>
+                <!-- Métrica 3: Parceiros -->
+                <div class="col-6 col-md-4 col-lg">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <div class="text-danger fs-1 mb-2">
+                            <i class="fas {{ $configs['metrica_3_icone'] }}"></i>
+                        </div>
+                        <h2 class="display-6 fw-black text-white mb-1">{{ $configs['metrica_3_valor'] }}</h2>
+                        <span class="small fw-semibold text-white-50 text-uppercase letter-spacing-1">{{ $configs['metrica_3_label'] }}</span>
+                    </div>
+                </div>
+                <!-- Métrica 4: Franqueados -->
+                <div class="col-6 col-md-6 col-lg">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <div class="text-danger fs-1 mb-2">
+                            <i class="fas {{ $configs['metrica_4_icone'] }}"></i>
+                        </div>
+                        <h2 class="display-6 fw-black text-white mb-1">{{ $configs['metrica_4_valor'] }}</h2>
+                        <span class="small fw-semibold text-white-50 text-uppercase letter-spacing-1">{{ $configs['metrica_4_label'] }}</span>
+                    </div>
+                </div>
+                <!-- Métrica 5: Estados Presentes -->
+                <div class="col-6 col-md-6 col-lg">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <div class="text-danger fs-1 mb-2">
+                            <i class="fas {{ $configs['metrica_5_icone'] }}"></i>
+                        </div>
+                        <h2 class="display-6 fw-black text-white mb-1">{{ $configs['metrica_5_valor'] }}</h2>
+                        <span class="small fw-semibold text-white-50 text-uppercase letter-spacing-1">{{ $configs['metrica_5_label'] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
 
     <!-- 6. PLANOS E PREÇOS COM CHECKOUT TRANSPARENTE -->
     <section id="planos" class="section-planos">
@@ -608,14 +674,21 @@
                             <p class="plano-subtitulo">{{ $plano->subtitulo }}</p>
                         </div>
                         <div class="bloco-preco">
-                            <div>
-                                <span class="preco-valor">{{ $plano->preco_formatado }}</span>
-                                <span class="preco-periodo">/mês</span>
-                            </div>
-                            @if($plano->taxa_adesao > 0)
-                                <span class="badge-adesao badge-adesao-paga">Adesão: {{ $plano->taxa_adesao_formatada }}</span>
+                            @if($plano->is_sob_consulta)
+                                <div class="py-2">
+                                    <span class="preco-valor text-uppercase" style="font-size: 2.1rem; letter-spacing: 1px; color: var(--foco-red);">CONSULTAR</span>
+                                </div>
+                                <span class="badge-adesao badge-adesao-gratis"><i class="fas fa-headset me-1"></i> CONDIÇÃO SOB CONSULTA</span>
                             @else
-                                <span class="badge-adesao badge-adesao-gratis"><i class="fas fa-check-circle me-1"></i> ADESÃO GRÁTIS</span>
+                                <div>
+                                    <span class="preco-valor">{{ $plano->preco_formatado }}</span>
+                                    <span class="preco-periodo">/mês</span>
+                                </div>
+                                @if($plano->taxa_adesao > 0)
+                                    <span class="badge-adesao badge-adesao-paga">Adesão: {{ $plano->taxa_adesao_formatada }}</span>
+                                @else
+                                    <span class="badge-adesao badge-adesao-gratis"><i class="fas fa-check-circle me-1"></i> ADESÃO GRÁTIS</span>
+                                @endif
                             @endif
                         </div>
                         <ul class="recursos-list">
@@ -629,8 +702,9 @@
                                 style="white-space: nowrap !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; font-size: 0.85rem !important;"
                                 data-plano-id="{{ $plano->id }}"
                                 data-plano-nome="{{ $plano->nome }}"
-                                data-plano-preco="{{ $plano->preco_formatado }}">
-                            <i class="fas fa-shield-alt me-1"></i> {{ $plano->texto_botao ?: 'CONTRATAR AGORA' }}
+                                data-plano-preco="{{ $plano->is_sob_consulta ? 'CONSULTAR' : $plano->preco_formatado }}"
+                                data-sob-consulta="{{ $plano->is_sob_consulta ? '1' : '0' }}">
+                            <i class="fas {{ $plano->is_sob_consulta ? 'fa-comments' : 'fa-shield-alt' }} me-1"></i> {{ $plano->texto_botao ?: ($plano->is_sob_consulta ? 'CONSULTAR AGORA' : 'CONTRATAR AGORA') }}
                         </button>
                     </div>
                 </div>
@@ -1236,6 +1310,9 @@
                         <li class="mb-2"><a href="#riscos">Benefícios</a></li>
                         <li class="mb-2"><a href="#sobre">Sobre Nós</a></li>
                         <li class="mb-2"><a href="#planos">Planos &amp; Preços</a></li>
+                        <li class="mb-2"><a href="#ronda"><i class="fas fa-headset text-danger me-1"></i> Central 24h</a></li>
+                        <li class="mb-2"><a href="#app"><i class="fas fa-mobile-alt text-danger me-1"></i> Aplicativo</a></li>
+                        <li class="mb-2"><a href="#faq"><i class="fas fa-question-circle text-danger me-1"></i> Dúvidas (FAQ)</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-6">
@@ -1251,15 +1328,15 @@
                     <h5>Serviços &amp; Recursos</h5>
                     <ul class="list-unstyled small">
                         <li class="mb-2"><a href="#estetica" class="text-danger fw-bold"><i class="fas fa-spray-can-sparkles me-1"></i> Estética Automotiva</a></li>
-                        <li class="mb-2"><a href="#ronda">Ronda Tática</a></li>
-                        <li class="mb-2"><a href="#app">Aplicativo</a></li>
+                        <li class="mb-2"><a href="#ronda"><i class="fas fa-shield-alt text-danger me-1"></i> Central 24h</a></li>
+                        <li class="mb-2"><a href="#app"><i class="fas fa-mobile-screen-button text-danger me-1"></i> Aplicativo Mobile</a></li>
                         @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="mb-2"><a href="#parceiros">Empresas Parceiras</a></li>
                         @endif
                         @if(isset($filiais) && $filiais->count() > 0)
                         <li class="mb-2"><a href="#unidades">Onde Estamos / Filiais</a></li>
                         @endif
-                        <li class="mb-2"><a href="#faq">Dúvidas Frequentes</a></li>
+                        <li class="mb-2"><a href="#faq"><i class="fas fa-circle-question text-danger me-1"></i> Dúvidas Frequentes</a></li>
                         <li class="mb-2"><a href="{{ route('site.privacidade') }}" class="text-secondary"><i class="fas fa-shield-alt text-danger me-1"></i> Termos &amp; LGPD</a></li>
                     </ul>
                 </div>
@@ -2403,11 +2480,19 @@
                 atualizarResumoTaxas();
             });
 
-            // Modal de contratação de planos
+            // Modal de contratação de planos / Atendimento Sob Consulta
             $('.btn-contratar').on('click', function () {
+                var isSobConsulta = $(this).data('sob-consulta') == '1' || $(this).data('sob-consulta') === 1;
                 var id = $(this).data('plano-id');
                 var nome = $(this).data('plano-nome');
                 var preco = $(this).data('plano-preco');
+
+                if (isSobConsulta) {
+                    var whatsNum = '{{ $configs["whatsapp"] }}';
+                    var msg = encodeURIComponent('Olá! Gostaria de consultar valores e informações personalizadas para o ' + nome + ' da Foco 7.');
+                    window.open('https://wa.me/' + whatsNum + '?text=' + msg, '_blank');
+                    return;
+                }
 
                 $('#checkoutPlanoId').val(id);
                 $('#checkoutPlanoNome').text(nome);

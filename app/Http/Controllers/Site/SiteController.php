@@ -85,11 +85,100 @@ class SiteController extends Controller
             'hero_bg_opacidade' => $heroOpacidade,
             'hero_overlay_cor' => $heroOverlayCor,
             'hero_bg_blur' => (int) CmsSetting::get('hero_bg_blur', 0),
-            // Textos das seções gerenciados via CMS
-            'secao_sobre_titulo' => CmsSetting::get('secao_sobre_titulo', 'Protegendo seu patrimônio há mais de uma década'),
-            'secao_sobre_texto' => CmsSetting::get('secao_sobre_texto', 'A Foco 7 nasceu em Belém com o compromisso de trazer paz de espírito para motoristas, famílias e frotistas.'),
-            'secao_riscos_titulo' => CmsSetting::get('secao_riscos_titulo', 'Você sabe o real risco de rodar desprotegido?'),
-            'secao_riscos_subtitulo' => CmsSetting::get('secao_riscos_subtitulo', 'Compare a incerteza do prejuízo com a tranquilidade da tecnologia Foco 7.'),
+
+            // 1. Box Hero: Card de Simulação Rápida em 1 Minuto
+            'hero_simulacao_ativo' => CmsSetting::get('hero_simulacao_ativo', '1'),
+            'hero_simulacao_badge' => CmsSetting::get('hero_simulacao_badge', 'PROTEÇÃO ATIVA 24H'),
+            'hero_simulacao_titulo' => CmsSetting::get('hero_simulacao_titulo', 'Simulação Rápida em 1 Minuto'),
+            'hero_simulacao_subtitulo' => CmsSetting::get('hero_simulacao_subtitulo', 'Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.'),
+            'hero_simulacao_btn_texto' => CmsSetting::get('hero_simulacao_btn_texto', 'VER TODOS OS PLANOS E RECURSOS'),
+            'hero_simulacao_btn_link' => CmsSetting::get('hero_simulacao_btn_link', '#planos'),
+            // Veículo 1 (Carro)
+            'hero_simulacao_v1_nome' => CmsSetting::get('hero_simulacao_v1_nome', 'Carro'),
+            'hero_simulacao_v1_preco' => CmsSetting::get('hero_simulacao_v1_preco', 'A partir de R$ 69,90'),
+            'hero_simulacao_v1_icone' => CmsSetting::get('hero_simulacao_v1_icone', 'fa-car'),
+            'hero_simulacao_v1_link' => CmsSetting::get('hero_simulacao_v1_link', '#planos'),
+            // Veículo 2 (Moto)
+            'hero_simulacao_v2_nome' => CmsSetting::get('hero_simulacao_v2_nome', 'Moto'),
+            'hero_simulacao_v2_preco' => CmsSetting::get('hero_simulacao_v2_preco', 'A partir de R$ 49,90'),
+            'hero_simulacao_v2_icone' => CmsSetting::get('hero_simulacao_v2_icone', 'fa-motorcycle'),
+            'hero_simulacao_v2_link' => CmsSetting::get('hero_simulacao_v2_link', '#planos'),
+            // Veículo 3 (Caminhão)
+            'hero_simulacao_v3_nome' => CmsSetting::get('hero_simulacao_v3_nome', 'Caminhão'),
+            'hero_simulacao_v3_preco' => CmsSetting::get('hero_simulacao_v3_preco', 'A partir de R$ 99,90'),
+            'hero_simulacao_v3_icone' => CmsSetting::get('hero_simulacao_v3_icone', 'fa-truck'),
+            'hero_simulacao_v3_link' => CmsSetting::get('hero_simulacao_v3_link', '#planos'),
+            // Veículo 4 (Frotas)
+            'hero_simulacao_v4_nome' => CmsSetting::get('hero_simulacao_v4_nome', 'Frotas'),
+            'hero_simulacao_v4_preco' => CmsSetting::get('hero_simulacao_v4_preco', 'Condições especiais'),
+            'hero_simulacao_v4_icone' => CmsSetting::get('hero_simulacao_v4_icone', 'fa-cubes'),
+            'hero_simulacao_v4_link' => CmsSetting::get('hero_simulacao_v4_link', '#planos'),
+
+            // 2. Box Segurança Preventiva / Riscos vs Soluções Foco 7
+            'secao_riscos_badge' => CmsSetting::get('secao_riscos_badge', 'Segurança Preventiva'),
+            'secao_riscos_titulo' => CmsSetting::get('secao_riscos_titulo', 'O risco não avisa antes de chegar'),
+            'secao_riscos_subtitulo' => CmsSetting::get('secao_riscos_subtitulo', 'A criminalidade evolui todos os dias. Deixar seu patrimônio desprotegido custa muito mais caro que investir em prevenção.'),
+            // Card 1
+            'secao_riscos_c1_icone' => CmsSetting::get('secao_riscos_c1_icone', 'fa-mask'),
+            'secao_riscos_c1_titulo' => CmsSetting::get('secao_riscos_c1_titulo', 'Roubos e Furtos Constantes'),
+            'secao_riscos_c1_desc' => CmsSetting::get('secao_riscos_c1_desc', 'Mais de 1.000 veículos são roubados por dia no Brasil. Sem rastreador, a taxa de recuperação cai para menos de 10%.'),
+            'secao_riscos_c1_solucao' => CmsSetting::get('secao_riscos_c1_solucao', 'Solução Foco 7: Localização em tempo real com precisão de metros.'),
+            'secao_riscos_c1_solucao_icone' => CmsSetting::get('secao_riscos_c1_solucao_icone', 'fa-shield-alt'),
+            // Card 2
+            'secao_riscos_c2_icone' => CmsSetting::get('secao_riscos_c2_icone', 'fa-hourglass-half'),
+            'secao_riscos_c2_titulo' => CmsSetting::get('secao_riscos_c2_titulo', 'Resposta Policial Demorada'),
+            'secao_riscos_c2_desc' => CmsSetting::get('secao_riscos_c2_desc', 'Os primeiros 30 minutos após o sinistro são decisivos. Esperar sem suporte especializado reduz drasticamente as chances de resgate.'),
+            'secao_riscos_c2_solucao' => CmsSetting::get('secao_riscos_c2_solucao', 'Solução Foco 7: Ronda Tática com viaturas de pronta resposta.'),
+            'secao_riscos_c2_solucao_icone' => CmsSetting::get('secao_riscos_c2_solucao_icone', 'fa-motorcycle'),
+            // Card 3
+            'secao_riscos_c3_icone' => CmsSetting::get('secao_riscos_c3_icone', 'fa-coins'),
+            'secao_riscos_c3_titulo' => CmsSetting::get('secao_riscos_c3_titulo', 'Prejuízo Financeiro Irrecuperável'),
+            'secao_riscos_c3_desc' => CmsSetting::get('secao_riscos_c3_desc', 'O valor do veículo, franquias abusivas de seguro tradicional e o transtorno da perda deixam famílias e empresas desamparadas.'),
+            'secao_riscos_c3_solucao' => CmsSetting::get('secao_riscos_c3_solucao', 'Solução Foco 7: Planos acessíveis a partir de R$ 49,90/mês.'),
+            'secao_riscos_c3_solucao_icone' => CmsSetting::get('secao_riscos_c3_solucao_icone', 'fa-check-double'),
+
+            // 3. Box Sobre Nós & Autoridade Foco 7
+            'secao_sobre_badge' => CmsSetting::get('secao_sobre_badge', 'Mais de 10 Anos de Experiência'),
+            'secao_sobre_titulo' => CmsSetting::get('secao_sobre_titulo', 'Referência em Rastreamento Veicular e Segurança Eletrônica'),
+            'secao_sobre_texto' => CmsSetting::get('secao_sobre_texto', 'A Foco 7 nasceu com o compromisso inegociável de salvar patrimônios e devolver a paz de espírito a condutores e empresários. Presente com forte infraestrutura no Norte e Nordeste, combinamos inteligência artificial em mapas, módulos de telemetria homologados pela Anatel e equipe tática altamente treinada.'),
+            // Badges Estatísticos
+            'secao_sobre_stat1_valor' => CmsSetting::get('secao_sobre_stat1_valor', '+10 Anos'),
+            'secao_sobre_stat1_label' => CmsSetting::get('secao_sobre_stat1_label', 'De Mercado Sólido'),
+            'secao_sobre_stat1_icone' => CmsSetting::get('secao_sobre_stat1_icone', 'fa-history'),
+            'secao_sobre_stat2_valor' => CmsSetting::get('secao_sobre_stat2_valor', '98.4%'),
+            'secao_sobre_stat2_label' => CmsSetting::get('secao_sobre_stat2_label', 'Taxa de Recuperação'),
+            'secao_sobre_stat2_icone' => CmsSetting::get('secao_sobre_stat2_icone', 'fa-car-crash'),
+            // Lado Direito: Por Que Somos a Melhor Escolha?
+            'secao_sobre_dif_titulo' => CmsSetting::get('secao_sobre_dif_titulo', 'Por Que Somos a Melhor Escolha?'),
+            'secao_sobre_dif_icone' => CmsSetting::get('secao_sobre_dif_icone', 'fa-shield-virus'),
+            'secao_sobre_dif1_titulo' => CmsSetting::get('secao_sobre_dif1_titulo', 'Central de Operações Blindada 24 Horas'),
+            'secao_sobre_dif1_desc' => CmsSetting::get('secao_sobre_dif1_desc', 'Operadores de prontidão todos os dias do ano para atender chamados de emergência.'),
+            'secao_sobre_dif2_titulo' => CmsSetting::get('secao_sobre_dif2_titulo', 'Tecnologia 4G Multioperadora'),
+            'secao_sobre_dif2_desc' => CmsSetting::get('secao_sobre_dif2_desc', 'Chip inteligente que alterna entre as melhores operadoras do país para sinal constante.'),
+            'secao_sobre_dif3_titulo' => CmsSetting::get('secao_sobre_dif3_titulo', 'Instalação Discreta e Sigilosa'),
+            'secao_sobre_dif3_desc' => CmsSetting::get('secao_sobre_dif3_desc', 'Técnicos certificados que instalam sem cortar chicote original e sem comprometer garantias.'),
+
+            // 7. Box de Métricas & Impacto em Números (Veículos Rastreados, Recuperados, Parceiros, Franqueados, Estados)
+            'secao_metricas_ativo' => CmsSetting::get('secao_metricas_ativo', '1'),
+            'secao_metricas_badge' => CmsSetting::get('secao_metricas_badge', 'Autoridade Comprovada'),
+            'secao_metricas_titulo' => CmsSetting::get('secao_metricas_titulo', 'A Força da Foco 7 em Números'),
+            'secao_metricas_subtitulo' => CmsSetting::get('secao_metricas_subtitulo', 'Resultados expressivos e infraestrutura sólida para proteger quem você ama e o que você conquistou.'),
+            'metrica_1_valor' => CmsSetting::get('metrica_1_valor', '+25.000'),
+            'metrica_1_label' => CmsSetting::get('metrica_1_label', 'Veículos Rastreados'),
+            'metrica_1_icone' => CmsSetting::get('metrica_1_icone', 'fa-satellite-dish'),
+            'metrica_2_valor' => CmsSetting::get('metrica_2_valor', '+3.800'),
+            'metrica_2_label' => CmsSetting::get('metrica_2_label', 'Veículos Recuperados'),
+            'metrica_2_icone' => CmsSetting::get('metrica_2_icone', 'fa-shield-halved'),
+            'metrica_3_valor' => CmsSetting::get('metrica_3_valor', '+150'),
+            'metrica_3_label' => CmsSetting::get('metrica_3_label', 'Parceiros Homologados'),
+            'metrica_3_icone' => CmsSetting::get('metrica_3_icone', 'fa-handshake'),
+            'metrica_4_valor' => CmsSetting::get('metrica_4_valor', '+45'),
+            'metrica_4_label' => CmsSetting::get('metrica_4_label', 'Franqueados e Polos'),
+            'metrica_4_icone' => CmsSetting::get('metrica_4_icone', 'fa-building-shield'),
+            'metrica_5_valor' => CmsSetting::get('metrica_5_valor', '12 Estados'),
+            'metrica_5_label' => CmsSetting::get('metrica_5_label', 'Estados Atendidos'),
+            'metrica_5_icone' => CmsSetting::get('metrica_5_icone', 'fa-map-location-dot'),
+
             'secao_tatica_titulo' => CmsSetting::get('secao_tatica_titulo', 'Pronta Resposta Tática 24 Horas em Toda a Região'),
             'secao_tatica_texto' => CmsSetting::get('secao_tatica_texto', 'Equipes armadas e treinadas prontas para agir ao menor sinal de furto ou roubo.'),
 

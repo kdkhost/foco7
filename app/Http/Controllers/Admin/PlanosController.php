@@ -23,12 +23,15 @@ class PlanosController extends Controller
      */
     public function salvar(Request $request)
     {
+        $sobConsulta = $request->boolean('sob_consulta');
+
         $validated = $request->validate([
             'nome' => 'required|string|max:100',
             'categoria' => 'required|string|max:50',
             'subtitulo' => 'nullable|string|max:255',
-            'preco_mensal' => 'required',
+            'preco_mensal' => $sobConsulta ? 'nullable' : 'required',
             'taxa_adesao' => 'nullable',
+            'sob_consulta' => 'nullable|boolean',
             'icone' => 'nullable|string',
             'texto_botao' => 'nullable|string|max:100',
             'destaque' => 'nullable|boolean',
@@ -42,8 +45,12 @@ class PlanosController extends Controller
         ]);
 
         // Limpeza de moeda brasileira (R$ 69,90 -> 69.90)
-        $precoLimpo = str_replace(['R$', ' ', '.'], '', $validated['preco_mensal']);
-        $validated['preco_mensal'] = (float) str_replace(',', '.', $precoLimpo);
+        if (!empty($validated['preco_mensal'])) {
+            $precoLimpo = str_replace(['R$', ' ', '.'], '', $validated['preco_mensal']);
+            $validated['preco_mensal'] = (float) str_replace(',', '.', $precoLimpo);
+        } else {
+            $validated['preco_mensal'] = 0.00;
+        }
 
         if (!empty($validated['taxa_adesao'])) {
             $taxaLimpa = str_replace(['R$', ' ', '.'], '', $validated['taxa_adesao']);
@@ -60,10 +67,18 @@ class PlanosController extends Controller
             $validated['recursos'] = [];
         }
 
+        $validated['sob_consulta'] = $sobConsulta;
         $validated['destaque'] = $request->boolean('destaque');
         $validated['ativo'] = $request->boolean('ativo', true);
         $validated['slug'] = Str::slug($validated['nome']);
-        $validated['texto_botao'] = !empty(trim($request->input('texto_botao', ''))) ? trim($request->input('texto_botao')) : 'CONTRATAR AGORA';
+        $validated['texto_botao'] = !empty(trim($request->input('texto_botao', ''))) ? trim($request->input('texto_botao')) : ($sobConsulta ? 'CONSULTAR AGORA' : 'CONTRATAR AGORA');
+
+        // Garantir defensivamente que a coluna sob_consulta existe na tabela
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('planos', 'sob_consulta')) {
+            \Illuminate\Support\Facades\Schema::table('planos', function ($table) {
+                $table->boolean('sob_consulta')->default(false)->after('taxa_adesao')->index();
+            });
+        }
 
         $id = $request->input('plano_id');
 
@@ -89,6 +104,7 @@ class PlanosController extends Controller
         return response()->json([
             'success' => true,
             'plano' => $plano,
+            'sob_consulta' => (bool) $plano->is_sob_consulta,
             'recursos_texto' => is_array($plano->recursos) ? implode("\n", $plano->recursos) : '',
         ]);
     }

@@ -19,6 +19,7 @@ class Plano extends Model
         'subtitulo',
         'preco_mensal',
         'taxa_adesao',
+        'sob_consulta',
         'recursos',
         'icone',
         'texto_botao',
@@ -32,6 +33,7 @@ class Plano extends Model
         'recursos' => 'array',
         'destaque' => 'boolean',
         'ativo' => 'boolean',
+        'sob_consulta' => 'boolean',
         'preco_mensal' => 'decimal:2',
         'taxa_adesao' => 'decimal:2',
         'ordem' => 'integer',
@@ -52,8 +54,17 @@ class Plano extends Model
         return $this->hasMany(Fatura::class);
     }
 
+    public function getIsSobConsultaAttribute(): bool
+    {
+        return (bool) ($this->sob_consulta ?? false);
+    }
+
     public function getPrecoFormatadoAttribute(): string
     {
+        if ($this->is_sob_consulta) {
+            return 'CONSULTAR';
+        }
+
         return 'R$ ' . number_format($this->preco_mensal, 2, ',', '.');
     }
 

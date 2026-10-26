@@ -106,18 +106,28 @@
                 </button>
             </li>
             <li class="nav-item">
+                <button class="nav-link fw-semibold" id="simulacao-tab" data-bs-toggle="tab" data-bs-target="#tab-simulacao" type="button">
+                    <i class="fas fa-calculator text-danger me-1"></i> Simulação Hero (Box 1)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
+                    <i class="fas fa-layer-group text-danger me-1"></i> Sobre & Riscos
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#tab-metricas" type="button">
+                    <i class="fas fa-chart-line text-danger me-1"></i> Métricas em Números
+                </button>
+            </li>
+            <li class="nav-item">
                 <button class="nav-link fw-semibold" id="app-tab" data-bs-toggle="tab" data-bs-target="#tab-app" type="button">
                     <i class="fas fa-mobile-alt text-danger me-1"></i> Aplicativo Mobile
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link fw-semibold" id="ronda-tab" data-bs-toggle="tab" data-bs-target="#tab-ronda" type="button">
-                    <i class="fas fa-shield-alt text-danger me-1"></i> Ronda Tática & Etapas
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link fw-semibold" id="secoes-tab" data-bs-toggle="tab" data-bs-target="#tab-secoes" type="button">
-                    <i class="fas fa-layer-group text-danger me-1"></i> Sobre & Diferenciais
+                    <i class="fas fa-headset text-danger me-1"></i> Central 24h & Etapas
                 </button>
             </li>
             <li class="nav-item">
@@ -453,50 +463,395 @@
                 </div>
             </div>
 
-            <!-- ABA 6: TEXTOS DAS SEÇÕES DO SITE -->
+            <!-- ABA: SIMULAÇÃO HERO (CARD DO HERO BANNER - ITEM 1) -->
+            <div class="tab-pane fade" id="tab-simulacao" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-calculator me-2"></i> Box Hero: Simulação Rápida em 1 Minuto</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Topo da Página / Banner Hero</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Exibir Box de Simulação</label>
+                                    <select name="hero_simulacao_ativo" class="form-select">
+                                        <option value="1" {{ ($settings['hero_simulacao_ativo'] ?? '1') == '1' ? 'selected' : '' }}>Sim, exibir no topo</option>
+                                        <option value="0" {{ ($settings['hero_simulacao_ativo'] ?? '1') == '0' ? 'selected' : '' }}>Ocultar box</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Badge Superior</label>
+                                    <input type="text" name="hero_simulacao_badge" class="form-control" value="{{ $settings['hero_simulacao_badge'] ?? 'PROTEÇÃO ATIVA 24H' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Título do Box</label>
+                                    <input type="text" name="hero_simulacao_titulo" class="form-control" value="{{ $settings['hero_simulacao_titulo'] ?? 'Simulação Rápida em 1 Minuto' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Subtítulo / Descrição</label>
+                                    <input type="text" name="hero_simulacao_subtitulo" class="form-control" value="{{ $settings['hero_simulacao_subtitulo'] ?? 'Escolha seu tipo de veículo e receba atendimento imediato do nosso especialista.' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Texto do Botão Principal</label>
+                                    <input type="text" name="hero_simulacao_btn_texto" class="form-control" value="{{ $settings['hero_simulacao_btn_texto'] ?? 'VER TODOS OS PLANOS E RECURSOS' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Link do Botão Principal</label>
+                                    <input type="text" name="hero_simulacao_btn_link" class="form-control" value="{{ $settings['hero_simulacao_btn_link'] ?? '#planos' }}" placeholder="ex: #planos ou link whatsapp">
+                                </div>
+                            </div>
+
+                            <!-- 4 CARDS DE VEÍCULOS DA SIMULAÇÃO -->
+                            <div class="border-top pt-4">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-th-large text-danger me-2"></i> 4 Opções de Veículos da Simulação</h6>
+                                <div class="row g-3">
+                                    <!-- VEÍCULO 1 (CARRO) -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Opção 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Nome do Veículo</label>
+                                                <input type="text" name="hero_simulacao_v1_nome" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v1_nome'] ?? 'Carro' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto de Preço / Condição</label>
+                                                <input type="text" name="hero_simulacao_v1_preco" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v1_preco'] ?? 'A partir de R$ 69,90' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="hero_simulacao_v1_icone" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v1_icone'] ?? 'fa-car' }}" placeholder="ex: fa-car">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Link / Destino</label>
+                                                <input type="text" name="hero_simulacao_v1_link" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v1_link'] ?? '#planos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- VEÍCULO 2 (MOTO) -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Opção 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Nome do Veículo</label>
+                                                <input type="text" name="hero_simulacao_v2_nome" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v2_nome'] ?? 'Moto' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto de Preço / Condição</label>
+                                                <input type="text" name="hero_simulacao_v2_preco" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v2_preco'] ?? 'A partir de R$ 49,90' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="hero_simulacao_v2_icone" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v2_icone'] ?? 'fa-motorcycle' }}" placeholder="ex: fa-motorcycle">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Link / Destino</label>
+                                                <input type="text" name="hero_simulacao_v2_link" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v2_link'] ?? '#planos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- VEÍCULO 3 (CAMINHÃO) -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Opção 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Nome do Veículo</label>
+                                                <input type="text" name="hero_simulacao_v3_nome" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v3_nome'] ?? 'Caminhão' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto de Preço / Condição</label>
+                                                <input type="text" name="hero_simulacao_v3_preco" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v3_preco'] ?? 'A partir de R$ 99,90' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="hero_simulacao_v3_icone" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v3_icone'] ?? 'fa-truck' }}" placeholder="ex: fa-truck">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Link / Destino</label>
+                                                <input type="text" name="hero_simulacao_v3_link" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v3_link'] ?? '#planos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- VEÍCULO 4 (FROTAS) -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Opção 4</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Nome do Veículo</label>
+                                                <input type="text" name="hero_simulacao_v4_nome" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v4_nome'] ?? 'Frotas' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto de Preço / Condição</label>
+                                                <input type="text" name="hero_simulacao_v4_preco" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v4_preco'] ?? 'Condições especiais' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone FontAwesome</label>
+                                                <input type="text" name="hero_simulacao_v4_icone" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v4_icone'] ?? 'fa-cubes' }}" placeholder="ex: fa-cubes">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Link / Destino</label>
+                                                <input type="text" name="hero_simulacao_v4_link" class="form-control form-control-sm" value="{{ $settings['hero_simulacao_v4_link'] ?? '#planos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end mb-4">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Box de Simulação Hero
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA: TEXTOS DAS SEÇÕES SOBRE & RISCOS (ITEM 2 E ITEM 3) -->
             <div class="tab-pane fade" id="tab-secoes" role="tabpanel">
                 <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
                     @csrf
                     
-                    <!-- 1. SEÇÃO SOBRE NÓS / QUEM SOMOS -->
+                    <!-- 1. SEÇÃO SOBRE NÓS / REFERÊNCIA EM RASTREAMENTO (ITEM 3) -->
                     <div class="card border mb-4">
-                        <div class="card-header bg-body-tertiary py-3">
-                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Seção Sobre Nós / Autoridade Foco 7</h6>
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-building-circle-check me-2"></i> Box Sobre Nós & Autoridade (Item 3)</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Quem Somos & Diferenciais</span>
                         </div>
                         <div class="card-body p-4">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
-                                    <input type="text" name="secao_sobre_titulo" class="form-control" value="{{ $settings['secao_sobre_titulo'] ?? 'Mais de 10 Anos de Autoridade em Segurança Veicular' }}">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge / Tag Superior</label>
+                                    <input type="text" name="secao_sobre_badge" class="form-control" value="{{ $settings['secao_sobre_badge'] ?? 'Mais de 10 Anos de Experiência' }}">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Subtítulo</label>
-                                    <input type="text" name="secao_sobre_subtitulo" class="form-control" value="{{ $settings['secao_sobre_subtitulo'] ?? 'A Foco 7 nasceu com a missão de transformar tecnologia de rastreamento em tranquilidade real.' }}">
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
+                                    <input type="text" name="secao_sobre_titulo" class="form-control" value="{{ $settings['secao_sobre_titulo'] ?? 'Referência em Rastreamento Veicular e Segurança Eletrônica' }}">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold d-flex justify-content-between align-items-center">
-                                        <span>Texto Narrativo / História da Empresa</span>
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-edit me-1"></i> Editor Summernote</span>
-                                    </label>
-                                    <textarea name="secao_sobre_texto" id="secao_sobre_texto" class="form-control summernote" data-height="180">{{ $settings['secao_sobre_texto'] ?? 'Com sede própria e infraestrutura de ponta, monitoramos milhares de veículos em tempo real, combinando telemetria avançada, bloqueio remoto instantâneo e uma equipe de Ronda Tática presencial pronta para agir.' }}</textarea>
+                                    <label class="form-label small fw-bold">Texto Narrativo / História da Empresa</label>
+                                    <textarea name="secao_sobre_texto" class="form-control" rows="4">{{ $settings['secao_sobre_texto'] ?? 'A Foco 7 nasceu com o compromisso inegociável de salvar patrimônios e devolver a paz de espírito a condutores e empresários. Presente com forte infraestrutura no Norte e Nordeste, combinamos inteligência artificial em mapas, módulos de telemetria homologados pela Anatel e equipe tática altamente treinada.' }}</textarea>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Métrica: Anos de Experiência</label>
-                                    <input type="text" name="secao_sobre_anos" class="form-control" value="{{ $settings['secao_sobre_anos'] ?? '10+' }}">
+                            </div>
+
+                            <!-- BADGES ESTATÍSTICOS DO SOBRE NÓS -->
+                            <div class="border-top pt-3 mb-4">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-award text-danger me-2"></i> 2 Badges Estatísticos Inferiores</h6>
+                                <div class="row g-3">
+                                    <!-- ESTATÍSTICA 1 -->
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-body-secondary rounded-3 border">
+                                            <span class="badge bg-danger mb-2">Estatística 1</span>
+                                            <div class="row g-2">
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Ícone</label>
+                                                    <input type="text" name="secao_sobre_stat1_icone" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat1_icone'] ?? 'fa-history' }}" placeholder="ex: fa-history">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Valor</label>
+                                                    <input type="text" name="secao_sobre_stat1_valor" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat1_valor'] ?? '+10 Anos' }}">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Rótulo / Texto</label>
+                                                    <input type="text" name="secao_sobre_stat1_label" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat1_label'] ?? 'De Mercado Sólido' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ESTATÍSTICA 2 -->
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-body-secondary rounded-3 border">
+                                            <span class="badge bg-danger mb-2">Estatística 2</span>
+                                            <div class="row g-2">
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Ícone</label>
+                                                    <input type="text" name="secao_sobre_stat2_icone" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat2_icone'] ?? 'fa-car-crash' }}" placeholder="ex: fa-car-crash">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Valor</label>
+                                                    <input type="text" name="secao_sobre_stat2_valor" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat2_valor'] ?? '98.4%' }}">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label class="form-label small fw-bold">Rótulo / Texto</label>
+                                                    <input type="text" name="secao_sobre_stat2_label" class="form-control form-control-sm" value="{{ $settings['secao_sobre_stat2_label'] ?? 'Taxa de Recuperação' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Métrica: Veículos Monitorados</label>
-                                    <input type="text" name="secao_sobre_veiculos" class="form-control" value="{{ $settings['secao_sobre_veiculos'] ?? '15.000+' }}">
+                            </div>
+
+                            <!-- CARD DIREITO: POR QUE SOMOS A MELHOR ESCOLHA? -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-shield-virus text-danger me-2"></i> Card Direito: "Por Que Somos a Melhor Escolha?"</h6>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Título do Card</label>
+                                        <input type="text" name="secao_sobre_dif_titulo" class="form-control" value="{{ $settings['secao_sobre_dif_titulo'] ?? 'Por Que Somos a Melhor Escolha?' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Ícone do Título</label>
+                                        <input type="text" name="secao_sobre_dif_icone" class="form-control" value="{{ $settings['secao_sobre_dif_icone'] ?? 'fa-shield-virus' }}" placeholder="ex: fa-shield-virus">
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Métrica: Índice de Recuperação</label>
-                                    <input type="text" name="secao_sobre_recuperacao" class="form-control" value="{{ $settings['secao_sobre_recuperacao'] ?? '98.7%' }}">
+                                <div class="row g-3">
+                                    <!-- DIFERENCIAL 1 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Item 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_sobre_dif1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_sobre_dif1_titulo'] ?? 'Central de Operações Blindada 24 Horas' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <textarea name="secao_sobre_dif1_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_sobre_dif1_desc'] ?? 'Operadores de prontidão todos os dias do ano para atender chamados de emergência.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DIFERENCIAL 2 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Item 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_sobre_dif2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_sobre_dif2_titulo'] ?? 'Tecnologia 4G Multioperadora' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <textarea name="secao_sobre_dif2_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_sobre_dif2_desc'] ?? 'Chip inteligente que alterna entre as melhores operadoras do país para sinal constante.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DIFERENCIAL 3 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Item 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título</label>
+                                                <input type="text" name="secao_sobre_dif3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_sobre_dif3_titulo'] ?? 'Instalação Discreta e Sigilosa' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Descrição</label>
+                                                <textarea name="secao_sobre_dif3_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_sobre_dif3_desc'] ?? 'Técnicos certificados que instalam sem cortar chicote original e sem comprometer garantias.' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2. SEÇÃO ESTÉTICA AUTOMOTIVA & DIFERENCIAIS -->
+                    <!-- 2. SEÇÃO RISCOS PREVENTIVOS / O RISCO NÃO AVISA ANTES DE CHEGAR (ITEM 2) -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-shield-alt me-2"></i> Box Segurança Preventiva: Riscos vs Soluções (Item 2)</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Benefícios & Prevenção</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Badge / Tag Superior</label>
+                                    <input type="text" name="secao_riscos_badge" class="form-control" value="{{ $settings['secao_riscos_badge'] ?? 'Segurança Preventiva' }}">
+                                </div>
+                                <div class="col-md-9">
+                                    <label class="form-label small fw-bold">Título da Seção</label>
+                                    <input type="text" name="secao_riscos_titulo" class="form-control" value="{{ $settings['secao_riscos_titulo'] ?? 'O risco não avisa antes de chegar' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Subtítulo / Descrição</label>
+                                    <input type="text" name="secao_riscos_subtitulo" class="form-control" value="{{ $settings['secao_riscos_subtitulo'] ?? 'A criminalidade evolui todos os dias. Deixar seu patrimônio desprotegido custa muito mais caro que investir em prevenção.' }}">
+                                </div>
+                            </div>
+
+                            <!-- 3 CARDS DE RISCOS COM SOLUÇÕES -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-th-large text-danger me-2"></i> 3 Cards de Riscos e Solução Foco 7</h6>
+                                <div class="row g-3">
+                                    <!-- CARD 1 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Card 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone do Risco</label>
+                                                <input type="text" name="secao_riscos_c1_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c1_icone'] ?? 'fa-mask' }}" placeholder="ex: fa-mask">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título do Risco</label>
+                                                <input type="text" name="secao_riscos_c1_titulo" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c1_titulo'] ?? 'Roubos e Furtos Constantes' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Descrição do Risco</label>
+                                                <textarea name="secao_riscos_c1_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_riscos_c1_desc'] ?? 'Mais de 1.000 veículos são roubados por dia no Brasil. Sem rastreador, a taxa de recuperação cai para menos de 10%.' }}</textarea>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto da Solução Foco 7</label>
+                                                <input type="text" name="secao_riscos_c1_solucao" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c1_solucao'] ?? 'Solução Foco 7: Localização em tempo real com precisão de metros.' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Ícone da Solução</label>
+                                                <input type="text" name="secao_riscos_c1_solucao_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c1_solucao_icone'] ?? 'fa-shield-alt' }}" placeholder="ex: fa-shield-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- CARD 2 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Card 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone do Risco</label>
+                                                <input type="text" name="secao_riscos_c2_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c2_icone'] ?? 'fa-hourglass-half' }}" placeholder="ex: fa-hourglass-half">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título do Risco</label>
+                                                <input type="text" name="secao_riscos_c2_titulo" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c2_titulo'] ?? 'Resposta Policial Demorada' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Descrição do Risco</label>
+                                                <textarea name="secao_riscos_c2_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_riscos_c2_desc'] ?? 'Os primeiros 30 minutos após o sinistro são decisivos. Esperar sem suporte especializado reduz drasticamente as chances de resgate.' }}</textarea>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto da Solução Foco 7</label>
+                                                <input type="text" name="secao_riscos_c2_solucao" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c2_solucao'] ?? 'Solução Foco 7: Ronda Tática com viaturas de pronta resposta.' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Ícone da Solução</label>
+                                                <input type="text" name="secao_riscos_c2_solucao_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c2_solucao_icone'] ?? 'fa-motorcycle' }}" placeholder="ex: fa-motorcycle">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- CARD 3 -->
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Card 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone do Risco</label>
+                                                <input type="text" name="secao_riscos_c3_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c3_icone'] ?? 'fa-coins' }}" placeholder="ex: fa-coins">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Título do Risco</label>
+                                                <input type="text" name="secao_riscos_c3_titulo" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c3_titulo'] ?? 'Prejuízo Financeiro Irrecuperável' }}">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Descrição do Risco</label>
+                                                <textarea name="secao_riscos_c3_desc" class="form-control form-control-sm" rows="3">{{ $settings['secao_riscos_c3_desc'] ?? 'O valor do veículo, franquias abusivas de seguro tradicional e o transtorno da perda deixam famílias e empresas desamparadas.' }}</textarea>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Texto da Solução Foco 7</label>
+                                                <input type="text" name="secao_riscos_c3_solucao" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c3_solucao'] ?? 'Solução Foco 7: Planos acessíveis a partir de R$ 49,90/mês.' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Ícone da Solução</label>
+                                                <input type="text" name="secao_riscos_c3_solucao_icone" class="form-control form-control-sm" value="{{ $settings['secao_riscos_c3_solucao_icone'] ?? 'fa-check-double' }}" placeholder="ex: fa-check-double">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. SEÇÃO ESTÉTICA AUTOMOTIVA & DIFERENCIAIS -->
                     <div class="card border mb-4">
                         <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-car-side me-2"></i> Seção Estética Automotiva no Site</h6>
@@ -602,28 +957,148 @@
                         </div>
                     </div>
 
-                    <!-- 3. SEÇÃO RISCOS VS SOLUÇÕES -->
+                    <div class="text-end mb-4">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-save me-1"></i> Salvar Sobre Nós, Riscos & Diferenciais
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA: MÉTRICAS & ESTATÍSTICAS DE IMPACTO EM NÚMEROS (ITEM 7) -->
+            <div class="tab-pane fade" id="tab-metricas" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form">
+                    @csrf
                     <div class="card border mb-4">
-                        <div class="card-header bg-body-tertiary py-3">
-                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Seção Riscos vs Soluções</h6>
+                        <div class="card-header bg-body-tertiary py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-chart-line me-2"></i> Box de Métricas & Impacto em Números (Item 7)</h6>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Autoridade & Resultados</span>
                         </div>
                         <div class="card-body p-4">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Título da Seção</label>
-                                    <input type="text" name="secao_riscos_titulo" class="form-control" value="{{ $settings['secao_riscos_titulo'] ?? 'O Risco Não Avisa Antes de Chegar' }}">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Exibir Box de Métricas</label>
+                                    <select name="secao_metricas_ativo" class="form-select">
+                                        <option value="1" {{ ($settings['secao_metricas_ativo'] ?? '1') == '1' ? 'selected' : '' }}>Sim, exibir na página</option>
+                                        <option value="0" {{ ($settings['secao_metricas_ativo'] ?? '1') == '0' ? 'selected' : '' }}>Ocultar box</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Badge Superior</label>
+                                    <input type="text" name="secao_metricas_badge" class="form-control" value="{{ $settings['secao_metricas_badge'] ?? 'Autoridade Comprovada' }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Subtítulo</label>
-                                    <input type="text" name="secao_riscos_subtitulo" class="form-control" value="{{ $settings['secao_riscos_subtitulo'] ?? 'Todos os dias centenas de veículos são roubados ou furtados. Veja a diferença entre estar desprotegido e ter a Foco 7:' }}">
+                                    <label class="form-label small fw-bold">Título da Seção</label>
+                                    <input type="text" name="secao_metricas_titulo" class="form-control" value="{{ $settings['secao_metricas_titulo'] ?? 'A Força da Foco 7 em Números' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Subtítulo / Descrição</label>
+                                    <input type="text" name="secao_metricas_subtitulo" class="form-control" value="{{ $settings['secao_metricas_subtitulo'] ?? 'Resultados expressivos e infraestrutura sólida para proteger quem você ama e o que você conquistou.' }}">
+                                </div>
+                            </div>
+
+                            <!-- OS 5 CONTADORES ESTATÍSTICOS -->
+                            <div class="border-top pt-4">
+                                <h6 class="fw-bold text-body mb-3"><i class="fas fa-calculator text-danger me-2"></i> 5 Contadores Estatísticos (Veículos Rastreados, Recuperados, Parceiros, Franqueados, Estados)</h6>
+                                <div class="row g-3">
+                                    <!-- MÉTRICA 1: VEÍCULOS RASTREADOS -->
+                                    <div class="col-md-6 col-lg">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Contador 1</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone</label>
+                                                <input type="text" name="metrica_1_icone" class="form-control form-control-sm" value="{{ $settings['metrica_1_icone'] ?? 'fa-satellite-dish' }}" placeholder="ex: fa-satellite-dish">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Número / Valor</label>
+                                                <input type="text" name="metrica_1_valor" class="form-control form-control-sm" value="{{ $settings['metrica_1_valor'] ?? '+25.000' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Rótulo / Legenda</label>
+                                                <input type="text" name="metrica_1_label" class="form-control form-control-sm" value="{{ $settings['metrica_1_label'] ?? 'Veículos Rastreados' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- MÉTRICA 2: VEÍCULOS RECUPERADOS -->
+                                    <div class="col-md-6 col-lg">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Contador 2</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone</label>
+                                                <input type="text" name="metrica_2_icone" class="form-control form-control-sm" value="{{ $settings['metrica_2_icone'] ?? 'fa-shield-halved' }}" placeholder="ex: fa-shield-halved">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Número / Valor</label>
+                                                <input type="text" name="metrica_2_valor" class="form-control form-control-sm" value="{{ $settings['metrica_2_valor'] ?? '+3.800' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Rótulo / Legenda</label>
+                                                <input type="text" name="metrica_2_label" class="form-control form-control-sm" value="{{ $settings['metrica_2_label'] ?? 'Veículos Recuperados' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- MÉTRICA 3: PARCEIROS HOMOLOGADOS -->
+                                    <div class="col-md-6 col-lg">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Contador 3</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone</label>
+                                                <input type="text" name="metrica_3_icone" class="form-control form-control-sm" value="{{ $settings['metrica_3_icone'] ?? 'fa-handshake' }}" placeholder="ex: fa-handshake">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Número / Valor</label>
+                                                <input type="text" name="metrica_3_valor" class="form-control form-control-sm" value="{{ $settings['metrica_3_valor'] ?? '+150' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Rótulo / Legenda</label>
+                                                <input type="text" name="metrica_3_label" class="form-control form-control-sm" value="{{ $settings['metrica_3_label'] ?? 'Parceiros Homologados' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- MÉTRICA 4: FRANQUEADOS E POLOS -->
+                                    <div class="col-md-6 col-lg">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Contador 4</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone</label>
+                                                <input type="text" name="metrica_4_icone" class="form-control form-control-sm" value="{{ $settings['metrica_4_icone'] ?? 'fa-building-shield' }}" placeholder="ex: fa-building-shield">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Número / Valor</label>
+                                                <input type="text" name="metrica_4_valor" class="form-control form-control-sm" value="{{ $settings['metrica_4_valor'] ?? '+45' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Rótulo / Legenda</label>
+                                                <input type="text" name="metrica_4_label" class="form-control form-control-sm" value="{{ $settings['metrica_4_label'] ?? 'Franqueados e Polos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- MÉTRICA 5: ESTADOS PRESENTES -->
+                                    <div class="col-md-6 col-lg">
+                                        <div class="p-3 bg-body-secondary rounded-3 border h-100">
+                                            <span class="badge bg-danger mb-2">Contador 5</span>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Ícone</label>
+                                                <input type="text" name="metrica_5_icone" class="form-control form-control-sm" value="{{ $settings['metrica_5_icone'] ?? 'fa-map-location-dot' }}" placeholder="ex: fa-map-location-dot">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold">Número / Valor</label>
+                                                <input type="text" name="metrica_5_valor" class="form-control form-control-sm" value="{{ $settings['metrica_5_valor'] ?? '12 Estados' }}">
+                                            </div>
+                                            <div>
+                                                <label class="form-label small fw-bold">Rótulo / Legenda</label>
+                                                <input type="text" name="metrica_5_label" class="form-control form-control-sm" value="{{ $settings['metrica_5_label'] ?? 'Estados Atendidos' }}">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-end">
+                    <div class="text-end mb-4">
                         <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
-                            <i class="fas fa-save me-1"></i> Salvar Sobre Nós & Diferenciais
+                            <i class="fas fa-save me-1"></i> Salvar Métricas & Estatísticas de Impacto
                         </button>
                     </div>
                 </form>
