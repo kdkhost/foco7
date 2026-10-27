@@ -166,6 +166,9 @@
                         </td>
                         <td class="text-end">
                             <div class="btn-group">
+                                <a href="{{ route('admin.clientes.supervisionar', $cli->id) }}" class="btn btn-sm btn-outline-info" title="Acesso Supervisionado (Acessar painel como este cliente)" data-bs-toggle="tooltip">
+                                    <i class="fas fa-user-secret"></i>
+                                </a>
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarCliente({{ $cli->id }})" title="Editar Dados Cadastrais">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -261,9 +264,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-save me-1"></i> Gravar Cliente</button>
+                <div class="modal-footer border-top d-flex justify-content-between align-items-center">
+                    <a href="javascript:void(0)" class="btn btn-outline-info fw-bold d-none" id="btnSupervisionarModal" title="Entrar no painel do cliente em modo supervisionado">
+                        <i class="fas fa-user-secret me-1"></i> Acessar Painel do Cliente
+                    </a>
+                    <div class="ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-save me-1"></i> Gravar Cliente</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -305,6 +313,7 @@
         $('#cli_status').val('ativo');
         $('#cli_password').prop('required', true);
         $('#ajudaSenha').hide();
+        $('#btnSupervisionarModal').addClass('d-none');
         $('#modalClienteTitulo').text('Cadastrar Novo Cliente');
         new bootstrap.Modal(document.getElementById('modalCliente')).show();
     }
@@ -327,6 +336,8 @@
                 $('#cli_estado').val(c.estado);
                 $('#cli_password').val('').prop('required', false);
                 $('#ajudaSenha').show();
+
+                $('#btnSupervisionarModal').attr('href', '/admin/clientes/supervisionar/' + c.id).removeClass('d-none');
 
                 $('#modalClienteTitulo').text('Editar Cliente: ' + c.name);
                 new bootstrap.Modal(document.getElementById('modalCliente')).show();

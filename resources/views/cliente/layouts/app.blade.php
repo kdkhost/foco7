@@ -58,6 +58,27 @@
 
     <div class="app-wrapper">
 
+        <!-- BARRA DE ACESSO SUPERVISIONADO (MODO ADMINISTRADOR ATIVO) -->
+        @if(session()->has('impersonator_id'))
+            <div class="banner-supervisao-admin py-2 px-3 shadow-sm d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom">
+                <div class="d-flex align-items-center gap-2 text-white">
+                    <span class="badge bg-warning text-dark fw-bold px-2 py-1 d-flex align-items-center gap-1 shadow-sm">
+                        <i class="fas fa-user-shield"></i> MODO SUPERVISIONADO
+                    </span>
+                    <span class="small">
+                        Você está conectado como o cliente <strong>{{ auth()->user()->name }}</strong> ({{ auth()->user()->email }}). 
+                        <span class="d-none d-md-inline text-white-50">&bull; Sessão original de <strong>{{ session('impersonator_nome', 'Administrador') }}</strong> preservada.</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('admin.supervisao.voltar') }}" class="btn btn-sm btn-light text-danger fw-bold shadow-sm d-flex align-items-center gap-2 btn-voltar-admin" title="Retornar à mesma página de onde você saiu no painel administrativo">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar ao Administrador</span>
+                    </a>
+                </div>
+            </div>
+        @endif
+
         <!-- NAVBAR SUPERIOR DO ADMINLTE 4 -->
         <nav class="app-header navbar navbar-expand bg-body">
             <div class="container-fluid">
@@ -96,6 +117,15 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><span class="dropdown-item-text small text-secondary">{{ auth()->user()->email }}</span></li>
+                            @if(session()->has('impersonator_id'))
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item bg-danger text-white fw-bold d-flex align-items-center justify-content-between" href="{{ route('admin.supervisao.voltar') }}" title="Retornar à página de origem no painel administrativo">
+                                        <span><i class="fas fa-arrow-left me-2"></i> Voltar ao Administrador</span>
+                                        <i class="fas fa-chevron-right small"></i>
+                                    </a>
+                                </li>
+                            @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}" href="{{ route('cliente.dashboard') }}">
@@ -385,6 +415,14 @@
             });
         });
     </script>
+
+    <!-- BOTÃO FLUTUANTE DE VOLTAR AO ADMINISTRADOR (QUANDO EM MODO SUPERVISIONADO) -->
+    @if(session()->has('impersonator_id'))
+        <a href="{{ route('admin.supervisao.voltar') }}" class="btn btn-danger shadow-lg btn-flutuante-voltar-admin d-flex align-items-center gap-2" title="Voltar ao Painel Administrativo exatamente na mesma página de onde você saiu" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fas fa-arrow-left"></i>
+            <span>Voltar ao Administrador</span>
+        </a>
+    @endif
 
     @yield('scripts')
 </body>

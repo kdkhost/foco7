@@ -154,6 +154,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('clientes')->group(function () {
         Route::get('/', [ClientesController::class, 'index'])->name('admin.clientes.index');
         Route::get('/obter/{id}', [ClientesController::class, 'obter'])->name('admin.clientes.obter');
+        Route::get('/supervisionar/{id}', [ClientesController::class, 'supervisionar'])->name('admin.clientes.supervisionar');
         Route::post('/', [ClientesController::class, 'salvar'])->name('admin.clientes.salvar');
         Route::post('/senha/{id}', [ClientesController::class, 'alterarSenha'])->name('admin.clientes.senha');
         Route::delete('/{id}', [ClientesController::class, 'excluir'])->name('admin.clientes.excluir');
@@ -307,6 +308,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/{id}/excluir', [DepoimentosController::class, 'excluir']);
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Encerramento de Acesso Supervisionado (Retorno ao Painel do Administrador)
+|--------------------------------------------------------------------------
+*/
+Route::match(['get', 'post'], '/admin/supervisao/voltar', [ClientesController::class, 'voltarSupervisao'])
+    ->middleware('auth')
+    ->name('admin.supervisao.voltar');
 
 /*
 |--------------------------------------------------------------------------

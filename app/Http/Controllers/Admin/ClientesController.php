@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -21,9 +22,9 @@ class ClientesController extends Controller
             $busca = $request->input('busca');
             $query->where(function ($q) use ($busca) {
                 $q->where('name', 'like', "%{$busca}%")
-                  ->orWhere('email', 'like', "%{$busca}%")
-                  ->orWhere('telefone', 'like', "%{$busca}%")
-                  ->orWhere('cpf_cnpj', 'like', "%{$busca}%");
+                    ->orWhere('email', 'like', "%{$busca}%")
+                    ->orWhere('telefone', 'like', "%{$busca}%")
+                    ->orWhere('cpf_cnpj', 'like', "%{$busca}%");
             });
         }
 
@@ -94,7 +95,7 @@ class ClientesController extends Controller
             $cliente->estado = $validated['estado'];
             $cliente->status = $validated['status'];
 
-            if (!empty($validated['password'])) {
+            if (! empty($validated['password'])) {
                 $cliente->password = Hash::make($validated['password']);
             }
 
@@ -145,5 +146,76 @@ class ClientesController extends Controller
             'success' => true,
             'message' => 'Cliente removido com sucesso!',
         ]);
+    }
+
+    /**
+     * Inicia o Acesso Supervisionado ao painel do cliente
+     */
+    public function supervisionar(Request $request, $id)
+    {
+        $admin = Auth::user();
+
+        if (! $admin || ! $admin->isAdmin()) {
+            abort(403, 'Acesso restrito a administradores.');
+        }
+
+        $cliente = User::where('role', 'cliente')->findOrFail($id);
+
+        if ($cliente->status !== 'ativo') {
+            return redirect()->back()->with('error', 'Não é possível supervisionar uma conta inativa ou bloqueada.');
+        }
+
+        // Salva a URL de retorno (a página exata onde o administrador estava)
+        $retorno = $request->input('retorno') ?: url()->previous() ?: route('admin.clientes.index');
+        if (str_contains($retorno, 'supervisionar')) {
+            $retorno = route('admin.clientes.index');
+        }
+
+        session([
+            'impersonator_id' => $admin->id,
+            'impersonator_nome' => $admin->name,
+            'impersonator_email' => $admin->email,
+            'impersonator_previous_url' => $retorno,
+            'impersonator_target_id' => $cliente->id,
+            'impersonator_target_nome' => $cliente->name,
+            'impersonator_started_at' => now()->toIso8601String(),
+        ]);
+
+        Auth::login($cliente);
+
+        return redirect()->route('cliente.dashboard')
+            ->with('info', "Acesso supervisionado ativo na conta de {$cliente->name}. Para retornar ao painel administrativo exatamente onde estava, utilize o botão na barra superior.");
+    }
+
+    /**
+     * Encerra o Acesso Supervisionado e retorna o administrador à página anterior exata
+     */
+    public function voltarSupervisao(Request $request)
+    {
+        $impersonatorId = session('impersonator_id');
+        $previousUrl = session('impersonator_previous_url', route('admin.clientes.index'));
+
+        if (! $impersonatorId) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        $admin = User::where('role', 'admin')->find($impersonatorId);
+
+        if ($admin) {
+            Auth::login($admin);
+        }
+
+        session()->forget([
+            'impersonator_id',
+            'impersonator_nome',
+            'impersonator_email',
+            'impersonator_previous_url',
+            'impersonator_target_id',
+            'impersonator_target_nome',
+            'impersonator_started_at',
+        ]);
+
+        return redirect($previousUrl)
+            ->with('success', 'Acesso supervisionado encerrado com sucesso! Você retornou ao painel administrativo exatamente onde estava.');
     }
 }

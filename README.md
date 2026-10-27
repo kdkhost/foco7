@@ -691,13 +691,19 @@ public_html/
     - Desbloqueio seguro e interativo via **SweetAlert2** solicitando a **Senha Master do Desenvolvedor** (`Brad@2026`, o próprio WhatsApp `21981325441` ou chave personalizada via `.env`).
     - O backend bloqueia categoricamente qualquer tentativa de salvar ou sobrescrever os dados de autoria caso a requisição não possua a autenticação válida do desenvolvedor.
 
+- **Acesso Supervisionado (Impersonation) no Painel do Cliente com Retorno Contextual:**
+  - **Início da Supervisão:** O administrador pode acessar o painel de qualquer cliente ativo diretamente pela listagem de clientes (`/admin/clientes`) ou pelo modal de edição, com botão dedicado `<i class="fas fa-user-secret"></i>`.
+  - **Preservação de Contexto Exato:** Ao iniciar a supervisão, o sistema memoriza a URL exata em que o administrador estava navegando (incluindo parâmetros de busca, filtros de status ou paginação como `/admin/clientes?busca=João&status=ativo`).
+  - **Barra de Supervisão no Painel do Cliente:** Durante todo o período em que estiver navegando no painel do cliente, uma barra de alta visibilidade (`.banner-supervisao-admin`) fica afixada no topo com alerta sonoro visual ("MODO SUPERVISIONADO"), identificando o cliente e o administrador logado.
+  - **Função Voltar ao Administrador:** O administrador pode clicar a qualquer momento em **"Voltar ao Administrador"** (na barra superior, no menu dropdown do usuário ou no botão flutuante pulsante). A sessão do cliente é encerrada, o usuário administrador é autenticado novamente e redirecionado **exatamente para a mesma página anterior** de onde iniciou a supervisão.
+
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
-- **156 testes executados, 156 aprovados (100% de sucesso), 700 asserções**.
-- Cobertura completa: Criptografia AES-256 no banco de dados e rejeição de adulteração direta via SQL, avatar do desenvolvedor e exibição no layout, blindagem por senha master e tarja dos dados do desenvolvedor, API REST v1 versionada (ping, planos, filiais, checkout transparente, consulta de faturas, métricas administrativas e emissão de carnê dual), gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks dinâmicos e isolamento ACL.
+- **161 testes executados, 161 aprovados (100% de sucesso), 722 asserções**.
+- Cobertura completa: Acesso supervisionado (impersonation) de cliente com retorno contextual na mesma página e bloqueio para clientes comuns, criptografia AES-256 no banco de dados e rejeição de adulteração direta via SQL, avatar do desenvolvedor e exibição no layout, blindagem por senha master e tarja dos dados do desenvolvedor, API REST v1 versionada (ping, planos, filiais, checkout transparente, consulta de faturas, métricas administrativas e emissão de carnê dual), gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks dinâmicos e isolamento ACL.
 
 ---
 
