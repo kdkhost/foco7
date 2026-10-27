@@ -155,7 +155,7 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-danger">
+                <button type="submit" class="btn btn-danger fw-bold shadow-sm">
                     <i class="fas fa-filter me-1"></i> Filtrar
                 </button>
                 @if(request()->hasAny(['busca', 'role', 'status', 'two_factor']))
@@ -566,7 +566,7 @@
 
                 <div class="modal-footer bg-body-tertiary flex-shrink-0 py-3">
                     <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger px-4 fw-bold" id="btnSalvarUsuario">
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm" id="btnSalvarUsuario">
                         <i class="fas fa-save me-1"></i> SALVAR USUÁRIO
                     </button>
                 </div>
@@ -614,8 +614,8 @@
                 </div>
                 <div class="modal-footer bg-body-tertiary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning px-4 fw-bold text-dark">
-                        <i class="fas fa-check-circle me-1"></i> DEFINIR SENHA
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                        <i class="fas fa-save me-1"></i> DEFINIR SENHA
                     </button>
                 </div>
             </form>

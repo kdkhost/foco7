@@ -509,7 +509,7 @@
                                             <textarea name="carne_instrucoes" rows="3" class="form-control">{{ $configs['carne_instrucoes'] }}</textarea>
                                         </div>
                                         <div class="col-12 text-end mt-4">
-                                            <button type="submit" class="btn btn-success fw-bold">
+                                            <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4 py-2">
                                                 <i class="fas fa-save me-1"></i> Salvar Regras do Carnê
                                             </button>
                                         </div>
@@ -570,7 +570,7 @@
                                             <input type="date" name="data_primeiro_vencimento" class="form-control" required value="{{ date('Y-m-d', strtotime('+10 days')) }}">
                                         </div>
                                         <div class="col-12 text-end mt-4">
-                                            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                                            <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm">
                                                 <i class="fas fa-print me-1"></i> Gerar Carnê &amp; Enviar ao Cliente
                                             </button>
                                         </div>
@@ -724,7 +724,7 @@
                     </div>
 
                     <div class="text-end">
-                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm">
                             <i class="fas fa-save me-1"></i> Salvar Gateway Padrão & Repasse de Taxas
                         </button>
                     </div>

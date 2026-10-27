@@ -5,7 +5,7 @@
 @section('page_description', 'Cadastre, edite mensalidades, taxas de adesão e recursos exibidos na Landing Page.')
 
 @section('page_actions')
-<button type="button" class="btn btn-danger fw-bold" onclick="abrirModalPlano()">
+<button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalPlano()">
     <i class="fas fa-plus me-1"></i> Adicionar Novo Plano
 </button>
 @endsection
@@ -158,9 +158,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold">Salvar Plano</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm">
+                        <i class="fas fa-save me-1"></i> Salvar Plano
+                    </button>
                 </div>
             </form>
         </div>

@@ -559,7 +559,7 @@
         </footer>
 
         <!-- BOTÃO FLUTUANTE VOLTAR AO TOPO (80px ACIMA CONFORME SOLICITADO) -->
-        <button type="button" id="btnScrollTopFloat" class="btn btn-primary rounded-circle shadow-lg btn-scroll-top-float" title="Voltar ao Topo" data-bs-toggle="tooltip" data-bs-placement="left">
+        <button type="button" id="btnScrollTopFloat" class="btn btn-danger rounded-circle shadow-lg btn-scroll-top-float" title="Voltar ao Topo" data-bs-toggle="tooltip" data-bs-placement="left">
             <i class="fas fa-chevron-up"></i>
         </button>
 

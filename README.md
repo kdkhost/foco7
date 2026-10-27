@@ -628,6 +628,12 @@ public_html/
   - Legenda e indicadores de status com `.status-badge-pill` e `.status-dot` (`Pendente`, `Confirmado`, `Concluído`, `Cancelado`).
 - **Meu Perfil (`/admin/perfil`):**
   - Badges de perfil e 2FA padronizados no formato pílula com indicador luminoso.
+- **36.5. Padronização Universal de Botões e Ações (Design System Foco 7):**
+  - Eliminação de qualquer discrepância visual em botões principais, secundários e contextuais de todo o painel administrativo.
+  - Ações primárias e de persistência (Salvar, Gravar, Criar, Cadastrar, Liquidar, Filtrar) consolidadas no padrão corporativo `btn btn-danger fw-bold shadow-sm` com vermelho corporativo `#d90000`, hover suave e transição calibrada.
+  - Ações de cancelamento, fechamento e retorno unificadas em `btn btn-outline-secondary` com suporte otimizado a light mode e dark mode.
+  - Grupos de botões em tabelas (`.btn-group.btn-group-sm`) padronizados com altura unificada de 32px, eliminando quebras de raio de borda interno e mantendo acabamento de contorno (*outline*) homogêneo para ações de executar, editar e excluir.
+  - Módulos auditados e padronizados: CMS (slides, FAQs, depoimentos, WhatsApp), Gateways (Mercado Pago, Efí, Carnê, Régua de Cobrança), Cron Jobs, Notificações, Faturas, Clientes, Usuários, Planos, Parceiros, Agendamentos e Dashboard.
 - **Créditos & Suporte Técnico do Desenvolvedor:**
   - Contato oficial do desenvolvedor Marcelo Brad configurado com WhatsApp direto `+55 (21) 98132-5441` (`5521981325441`), Telegram `@marcelobrad` e blindagem no core impedindo sobrescrita acidental com dados da empresa cliente.
 

@@ -1731,36 +1731,64 @@ textarea.form-control {
     border-color: var(--bs-border-color, #343a40);
 }
 
-/* 8. Botões de Ação de Formulário */
-.btn-primary:not(.btn-sm):not(.page-link),
-.btn-danger:not(.btn-sm):not(.page-link) {
-    background-color: var(--admin-primary, #d90000);
-    border-color: var(--admin-primary, #d90000);
-    color: #ffffff;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.88rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: all 0.15s ease-in-out;
+/* 8. SISTEMA UNIVERSAL DE BOTÕES FOCO 7 */
+.btn {
+    font-weight: 500;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-primary:not(.btn-sm):not(.page-link):hover,
-.btn-danger:not(.btn-sm):not(.page-link):hover {
+.btn:focus,
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(217, 0, 0, 0.22) !important;
+}
+
+/* Botão Principal / Danger / Primary (Vermelho Corporativo Foco 7) */
+.btn-primary,
+.btn-danger {
+    background-color: var(--admin-primary, #d90000) !important;
+    border-color: var(--admin-primary, #d90000) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus,
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger:focus {
     background-color: var(--admin-primary-hover, #b80000) !important;
     border-color: var(--admin-primary-hover, #b80000) !important;
     color: #ffffff !important;
     transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 10px rgba(217, 0, 0, 0.25) !important;
 }
 
+/* Botões de Ação de Formulário e Modais (Padrão e Grandes) */
+.btn-primary:not(.btn-sm):not(.page-link),
+.btn-danger:not(.btn-sm):not(.page-link) {
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.88rem;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+/* Botões Secundários */
 .btn-secondary:not(.btn-sm):not(.page-link),
 .btn-outline-secondary:not(.btn-sm):not(.page-link) {
     border-radius: 0.5rem;
     padding: 0.5rem 1.2rem;
     font-size: 0.88rem;
     font-weight: 500;
-    transition: all 0.15s ease-in-out;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
 }
 
 /* Botões Compactos (btn-sm) de Tabelas e Modais */
@@ -1768,12 +1796,61 @@ textarea.form-control {
     padding: 0.28rem 0.65rem !important;
     font-size: 0.78rem !important;
     font-weight: 600 !important;
-    border-radius: 0.375rem !important;
+    border-radius: 0.375rem;
     min-height: 32px !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
+}
+
+/* Preservação perfeita da junção em Grupos de Botões (btn-group) */
+.btn-group > .btn:not(:first-child):not(:last-child),
+.btn-group-sm > .btn:not(:first-child):not(:last-child) {
+    border-radius: 0 !important;
+}
+
+.btn-group > .btn:first-child:not(:last-child),
+.btn-group-sm > .btn:first-child:not(:last-child) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: 0.375rem !important;
+    border-bottom-left-radius: 0.375rem !important;
+}
+
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group-sm > .btn:last-child:not(:first-child) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
+}
+
+/* Outline Danger */
+.btn-outline-danger {
+    color: var(--admin-primary, #d90000) !important;
+    border-color: var(--admin-primary, #d90000) !important;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:active,
+.btn-outline-danger:focus {
+    background-color: var(--admin-primary, #d90000) !important;
+    border-color: var(--admin-primary, #d90000) !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 8px rgba(217, 0, 0, 0.2) !important;
+}
+
+/* Suporte Refinado para Modo Escuro nos Botões */
+[data-bs-theme="dark"] .btn-outline-secondary {
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
 }
 
 /* ==============================================================================

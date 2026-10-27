@@ -389,8 +389,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top py-2 px-4">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success fw-bold" id="btnConfirmarAntecipacao">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnConfirmarAntecipacao">
                         <i class="fas fa-check-circle me-1"></i> Confirmar &amp; Liquidar Parcela
                     </button>
                 </div>

@@ -18,7 +18,7 @@
 @endsection
 
 @section('page_actions')
-<button type="button" class="btn btn-danger fw-bold" onclick="abrirModalAgendamento()">
+<button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalAgendamento()">
     <i class="fas fa-plus me-1"></i> Novo Agendamento
 </button>
 @endsection
@@ -167,8 +167,8 @@
                         </button>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <button type="submit" class="btn btn-danger fw-bold" id="btnSalvarAgendamento">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnSalvarAgendamento">
                             <i class="fas fa-save me-1"></i> Salvar Agendamento
                         </button>
                     </div>

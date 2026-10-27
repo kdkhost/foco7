@@ -289,7 +289,7 @@
                 </div>
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning fw-bold text-dark"><i class="fas fa-check me-1"></i> Salvar Nova Senha</button>
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm"><i class="fas fa-save me-1"></i> Salvar Nova Senha</button>
                 </div>
             </form>
         </div>

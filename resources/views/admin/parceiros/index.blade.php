@@ -235,8 +235,8 @@
                 </div>
 
                 <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold" id="btnSalvarParceiro">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnSalvarParceiro">
                         <i class="fas fa-save me-1"></i> SALVAR MARCA
                     </button>
                 </div>

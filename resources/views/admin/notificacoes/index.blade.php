@@ -19,7 +19,7 @@
                 <button type="button" class="btn btn-outline-danger me-2" id="btnAtivarPushNativo">
                     <i class="fas fa-mobile-screen-button me-1"></i> <span id="lblStatusPush">Ativar Notificações no Celular</span>
                 </button>
-                <button type="button" class="btn btn-primary me-2" onclick="dispararNotificacaoTeste()">
+                <button type="button" class="btn btn-danger fw-bold shadow-sm me-2" onclick="dispararNotificacaoTeste()">
                     <i class="fas fa-paper-plane me-1"></i> Testar Push &amp; E-mail
                 </button>
                 <button type="button" class="btn btn-outline-secondary me-2" onclick="marcarTodasComoLidas()">
@@ -195,23 +195,23 @@
                                             @endif
 
                                             <div class="d-flex align-items-center gap-2 mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-info py-1 px-2" style="font-size: 0.8rem;" onclick="event.stopPropagation(); abrirModalNotificacao({{ $notif->id }})" title="Ler mensagem completa">
+                                                <button type="button" class="btn btn-sm btn-outline-info" onclick="event.stopPropagation(); abrirModalNotificacao({{ $notif->id }})" title="Ler mensagem completa">
                                                     <i class="fas fa-eye me-1"></i> Ler
                                                 </button>
 
                                                 @if(!empty($notif->link_acao))
-                                                    <a href="{{ route('admin.notificacoes.abrir', $notif->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2 btn-abrir-modulo" data-id="{{ $notif->id }}" style="font-size: 0.8rem;" onclick="event.stopPropagation();">
+                                                    <a href="{{ route('admin.notificacoes.abrir', $notif->id) }}" class="btn btn-sm btn-outline-primary btn-abrir-modulo" data-id="{{ $notif->id }}" onclick="event.stopPropagation();">
                                                         <i class="fas fa-external-link-alt me-1"></i> Acessar Módulo
                                                     </a>
                                                 @endif
 
                                                 @if(!$notif->lida)
-                                                    <button type="button" class="btn btn-sm btn-outline-success py-1 px-2 btn-marcar-lida" style="font-size: 0.8rem;" onclick="event.stopPropagation(); marcarComoLida({{ $notif->id }})" title="Marcar como lida diretamente">
+                                                    <button type="button" class="btn btn-sm btn-outline-success btn-marcar-lida" onclick="event.stopPropagation(); marcarComoLida({{ $notif->id }})" title="Marcar como lida diretamente">
                                                         <i class="fas fa-check me-1"></i> Marcar como Lida
                                                     </button>
                                                 @endif
 
-                                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 ms-auto" style="font-size: 0.8rem;" onclick="event.stopPropagation(); excluirNotificacao({{ $notif->id }})" title="Excluir notificação">
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="event.stopPropagation(); excluirNotificacao({{ $notif->id }})" title="Excluir notificação">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
@@ -292,10 +292,10 @@
                         <span class="text-muted small" id="modalNotifIdInfo">ID: #0</span>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="#" id="modalNotifBtnAcao" class="btn btn-primary" style="display: none;">
+                        <a href="#" id="modalNotifBtnAcao" class="btn btn-danger fw-bold shadow-sm" style="display: none;">
                             <i class="fas fa-external-link-alt me-1"></i> Acessar Módulo
                         </a>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>

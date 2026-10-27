@@ -213,7 +213,7 @@
                                             <div class="btn-group btn-group-sm">
                                                 <!-- Botão de Aprovação Rápida (Toggle) -->
                                                 <button type="button" 
-                                                        class="btn {{ $dep->ativo ? 'btn-outline-warning' : 'btn-success' }}" 
+                                                        class="btn {{ $dep->ativo ? 'btn-outline-warning' : 'btn-outline-success' }}" 
                                                         id="btn-toggle-{{ $dep->id }}" 
                                                         onclick="toggleAprovacao({{ $dep->id }})" 
                                                         title="{{ $dep->ativo ? 'Desativar / Colocar em Moderação' : 'Aprovar e Publicar no Site' }}">
@@ -402,11 +402,11 @@
                     if (res.ativo) {
                         $row.removeClass('bg-warning bg-opacity-10');
                         $statusCell.html('<span class="status-badge-pill status-badge-pago"><span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Aprovado</span></span>');
-                        $btn.removeClass('btn-success').addClass('btn-outline-warning').html('<i class="fas fa-ban"></i>').attr('title', 'Desativar / Colocar em Moderação');
+                        $btn.removeClass('btn-outline-success').addClass('btn-outline-warning').html('<i class="fas fa-ban"></i>').attr('title', 'Desativar / Colocar em Moderação');
                     } else {
                         $row.addClass('bg-warning bg-opacity-10');
                         $statusCell.html('<span class="status-badge-pill status-badge-pendente"><span class="status-dot"></span><i class="fas fa-clock"></i><span>Pendente</span></span>');
-                        $btn.removeClass('btn-outline-warning').addClass('btn-success').html('<i class="fas fa-check"></i>').attr('title', 'Aprovar e Publicar no Site');
+                        $btn.removeClass('btn-outline-warning').addClass('btn-outline-success').html('<i class="fas fa-check"></i>').attr('title', 'Aprovar e Publicar no Site');
                     }
 
                     // Atualiza cards

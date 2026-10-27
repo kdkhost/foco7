@@ -323,7 +323,7 @@
                 <!-- SEÇÃO 2: SLIDES DO HERO CAROUSEL -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Slides Individuais do Hero Carousel</h5>
-                    <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalBanner()">
+                    <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="abrirModalBanner()">
                         <i class="fas fa-plus me-1"></i> Adicionar Novo Slide
                     </button>
                 </div>
@@ -349,7 +349,7 @@
                                 <td><span class="badge bg-dark">{{ $slide->texto_botao_1 ?? '-' }}</span></td>
                                 <td><span class="badge bg-dark">{{ $slide->texto_botao_2 ?? '-' }}</span></td>
                                 <td>
-                                    <div class="btn-group">
+                                    <div class="btn-group btn-group-sm">
                                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarBanner({{ $slide->id }})" title="Editar Slide">
                                             <i class="fas fa-edit"></i>
                                         </button>
@@ -369,7 +369,7 @@
             <div class="tab-pane fade" id="tab-faq" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Perguntas Frequentes (FAQ)</h5>
-                    <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalFaq()">
+                    <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="abrirModalFaq()">
                         <i class="fas fa-plus me-1"></i> Adicionar Pergunta
                     </button>
                 </div>
@@ -388,7 +388,7 @@
                                 <td class="fw-semibold">{{ $faq->pergunta }}</td>
                                 <td><span class="badge bg-secondary">{{ $faq->categoria }}</span></td>
                                 <td class="text-end">
-                                    <div class="btn-group">
+                                    <div class="btn-group btn-group-sm">
                                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarFaq({{ $faq->id }})" title="Editar FAQ">
                                             <i class="fas fa-edit"></i>
                                         </button>
@@ -408,7 +408,7 @@
             <div class="tab-pane fade" id="tab-depoimentos" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Depoimentos de Clientes</h5>
-                    <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="abrirModalDepoimento()">
+                    <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="abrirModalDepoimento()">
                         <i class="fas fa-plus me-1"></i> Adicionar Depoimento
                     </button>
                 </div>
@@ -431,7 +431,7 @@
                                     @for($i=0; $i<$dep->estrelas; $i++) <i class="fas fa-star"></i> @endfor
                                 </td>
                                 <td class="text-end">
-                                    <div class="btn-group">
+                                    <div class="btn-group btn-group-sm">
                                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarDepoimento({{ $dep->id }})" title="Editar Depoimento">
                                             <i class="fas fa-edit"></i>
                                         </button>
@@ -1673,7 +1673,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-body-tertiary p-3 text-end">
-                            <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
                                 <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO WHATSAPP & CANAIS
                             </button>
                         </div>

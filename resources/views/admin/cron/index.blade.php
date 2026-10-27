@@ -191,8 +191,8 @@
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="atualizarStatusCron(true)">
                         <i class="fas fa-sync-alt me-1" id="iconSync"></i> Atualizar Status
                     </button>
-                    <button type="button" class="btn btn-novo-cron btn-sm px-3" onclick="abrirModalNovoCron()">
-                        <i class="fas fa-plus-circle me-1"></i> Nova Tarefa Cron
+                    <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="abrirModalNovoCron()">
+                        <i class="fas fa-plus me-1"></i> Nova Tarefa Cron
                     </button>
                 </div>
             </div>
@@ -242,7 +242,7 @@
             <small class="text-secondary">Todas as tarefas ativas abaixo são processadas pelo agendador do Laravel automaticamente.</small>
         </div>
         <div class="card-tools ms-auto">
-            <button type="button" class="btn btn-novo-cron btn-sm px-3" onclick="abrirModalNovoCron()">
+            <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="abrirModalNovoCron()">
                 <i class="fas fa-plus me-1"></i> Cadastrar Outra Tarefa
             </button>
         </div>
@@ -309,22 +309,22 @@
                         </span>
                     </td>
                     <td class="text-end">
-                        <div class="d-inline-flex align-items-center gap-1">
-                            <!-- BOTÃO ANIMADO DE EXECUÇÃO SOB DEMANDA -->
-                            <button type="button" class="btn btn-cron-executar" id="btnRun_{{ $job->id }}" onclick="executarCronManual({{ $job->id }}, '{{ addslashes($job->nome) }}')">
-                                <i class="fas fa-play cron-icon"></i>
-                                <span class="cron-btn-text">Executar Agora</span>
+                        <div class="btn-group btn-group-sm">
+                            <!-- BOTÃO DE EXECUÇÃO SOB DEMANDA -->
+                            <button type="button" class="btn btn-outline-success" id="btnRun_{{ $job->id }}" onclick="executarCronManual({{ $job->id }}, '{{ addslashes($job->nome) }}')" title="Executar Rotina Agora">
+                                <i class="fas fa-play cron-icon me-1"></i>
+                                <span class="cron-btn-text">Executar</span>
                             </button>
 
                             <!-- BOTÃO DE EDIÇÃO -->
-                            <button type="button" class="btn btn-outline-secondary btn-sm" title="Editar Tarefa" onclick='abrirModalEditarCron(@json($job))'>
+                            <button type="button" class="btn btn-outline-secondary" title="Editar Tarefa" onclick='abrirModalEditarCron(@json($job))'>
                                 <i class="fas fa-edit"></i>
                             </button>
 
                             <!-- BOTÃO DE EXCLUSÃO (APENAS NÃO-SISTEMA) -->
                             @if(!$job->sistema)
-                            <button type="button" class="btn btn-outline-danger btn-sm" title="Excluir Tarefa" onclick="excluirCronJob({{ $job->id }}, '{{ addslashes($job->nome) }}')">
-                                <i class="fas fa-trash"></i>
+                            <button type="button" class="btn btn-outline-danger" title="Excluir Tarefa" onclick="excluirCronJob({{ $job->id }}, '{{ addslashes($job->nome) }}')">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                             @endif
                         </div>
@@ -436,7 +436,7 @@
 
                 <div class="modal-footer bg-body-tertiary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger fw-bold px-4" id="btnSalvarCron">
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4" id="btnSalvarCron">
                         <i class="fas fa-save me-1"></i> Salvar Tarefa
                     </button>
                 </div>
