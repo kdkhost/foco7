@@ -18,43 +18,86 @@
 @endsection
 
 @section('content')
-<!-- KPIS DE FILIAIS (SMALL BOXES ADMINLTE 4) -->
+<!-- CARDS DE MÉTRICAS -->
 <div class="row g-3 mb-4">
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="small-box text-bg-danger shadow-sm">
-            <div class="inner">
-                <h3 id="kpiTotalFiliais">{{ $totalFiliais }}</h3>
-                <p>Total de Filiais</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Total de Filiais</h6>
+                    <h3 class="fw-bold mb-0 text-body" id="kpiTotalFiliais">{{ $totalFiliais }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-building"></i>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="small-box text-bg-success shadow-sm">
-            <div class="inner">
-                <h3 id="kpiFiliaisAtivas">{{ $filiaisAtivas }}</h3>
-                <p>Ativas no Mapa</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Ativas no Mapa</h6>
+                    <h3 class="fw-bold mb-0 text-success" id="kpiFiliaisAtivas">{{ $filiaisAtivas }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-map-marker-alt"></i>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="small-box text-bg-info shadow-sm">
-            <div class="inner">
-                <h3 id="kpiTotalCidades">{{ $totalCidades }}</h3>
-                <p>Cidades Atendidas</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-city"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Cidades Atendidas</h6>
+                    <h3 class="fw-bold mb-0 text-primary" id="kpiTotalCidades">{{ $totalCidades }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-city"></i>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="small-box text-bg-secondary shadow-sm">
-            <div class="inner">
-                <h3 id="kpiFiliaisInativas">{{ $filiaisInativas }}</h3>
-                <p>Ocultas / Desativadas</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-secondary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-eye-slash"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Ocultas / Inativas</h6>
+                    <h3 class="fw-bold mb-0 text-secondary" id="kpiFiliaisInativas">{{ $filiaisInativas }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-eye-slash"></i>
         </div>
+    </div>
+</div>
+
+<!-- FILTROS & BUSCA -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-3">
+        <form method="GET" action="{{ route('admin.filiais.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-secondary"></i></span>
+                    <input type="text" name="busca" class="form-control border-start-0" placeholder="Buscar por filial, cidade, UF ou endereço..." value="{{ request('busca') }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">Todos os Status</option>
+                    <option value="ativo" {{ request('status') === 'ativo' ? 'selected' : '' }}>Ativas no Mapa</option>
+                    <option value="inativo" {{ request('status') === 'inativo' ? 'selected' : '' }}>Ocultas / Desativadas</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-danger flex-fill fw-bold">Filtrar</button>
+                @if(request()->hasAny(['busca', 'status']))
+                    <a href="{{ route('admin.filiais.index') }}" class="btn btn-outline-secondary">Limpar</a>
+                @endif
+            </div>
+        </form>
     </div>
 </div>
 
@@ -65,7 +108,7 @@
             <h5 class="card-title fw-bold mb-0 text-body">
                 <i class="fas fa-map-marked-alt text-danger me-2"></i> Unidades de Atendimento no Brasil
             </h5>
-            <span class="badge bg-body-secondary text-body border px-2 py-1 small">
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small">
                 {{ $filiais->total() }} cadastradas
             </span>
         </div>
@@ -74,33 +117,6 @@
                 <i class="fas fa-plus me-1"></i> Nova Filial / Unidade
             </button>
         </div>
-    </div>
-
-    <!-- FILTRO E BUSCA -->
-    <div class="card-body border-bottom bg-body-tertiary p-3">
-        <form method="GET" action="{{ route('admin.filiais.index') }}" class="row g-2 align-items-center">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text bg-body border-end-0 text-secondary"><i class="fas fa-search"></i></span>
-                    <input type="text" name="busca" class="form-control border-start-0" placeholder="Buscar por filial, cidade, UF ou endereço..." value="{{ request('busca') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select name="status" class="form-select">
-                    <option value="">Todos os status</option>
-                    <option value="ativo" {{ request('status') === 'ativo' ? 'selected' : '' }}>Apenas Ativas no Mapa</option>
-                    <option value="inativo" {{ request('status') === 'inativo' ? 'selected' : '' }}>Apenas Ocultas</option>
-                </select>
-            </div>
-            <div class="col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-outline-danger">
-                    <i class="fas fa-filter me-1"></i> Filtrar
-                </button>
-                @if(request()->hasAny(['busca', 'status']))
-                    <a href="{{ route('admin.filiais.index') }}" class="btn btn-outline-secondary">Limpar</a>
-                @endif
-            </div>
-        </form>
     </div>
 
     <!-- TABELA DE FILIAIS -->
@@ -164,21 +180,28 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        <div class="form-check form-switch d-inline-block">
-                            <input class="form-check-input switch-filial-status cursor-pointer" type="checkbox" role="switch"
-                                   data-id="{{ $filial->id }}" {{ $filial->ativo ? 'checked' : '' }}
-                                   title="{{ $filial->ativo ? 'Ativo no Mapa' : 'Oculto no Mapa' }}">
+                        <div class="d-inline-flex align-items-center gap-2">
+                            <span id="badge-status-{{ $filial->id }}" class="status-badge-pill {{ $filial->ativo ? 'status-badge-pago' : 'status-badge-cancelado' }}">
+                                <span class="status-dot"></span>
+                                <i class="fas {{ $filial->ativo ? 'fa-check-circle' : 'fa-eye-slash' }}"></i>
+                                <span>{{ $filial->ativo ? 'Ativa' : 'Oculta' }}</span>
+                            </span>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input switch-filial-status cursor-pointer" type="checkbox" role="switch"
+                                       data-id="{{ $filial->id }}" {{ $filial->ativo ? 'checked' : '' }}
+                                       title="{{ $filial->ativo ? 'Ocultar no Mapa' : 'Exibir no Mapa' }}">
+                            </div>
                         </div>
                     </td>
                     <td class="text-end">
-                        <div class="btn-group btn-group-sm">
-                            <a href="{{ $filial->rota_osm_url ?? $filial->rota_url }}" target="_blank" class="btn btn-outline-info" title="Ver Rota no OpenStreetMap (Sem custos)" data-bs-toggle="tooltip">
+                        <div class="btn-group">
+                            <a href="{{ $filial->rota_osm_url ?? $filial->rota_url }}" target="_blank" class="btn btn-sm btn-outline-info" title="Ver Rota no OpenStreetMap" data-bs-toggle="tooltip">
                                 <i class="fas fa-directions"></i>
                             </a>
-                            <button type="button" class="btn btn-outline-secondary" onclick="editarFilial({{ $filial->id }})" title="Editar Filial" data-bs-toggle="tooltip">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editarFilial({{ $filial->id }})" title="Editar Filial" data-bs-toggle="tooltip">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-danger" onclick="excluirFilial({{ $filial->id }}, '{{ addslashes($filial->nome) }}')" title="Excluir Filial" data-bs-toggle="tooltip">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirFilial({{ $filial->id }}, '{{ addslashes($filial->nome) }}')" title="Excluir Filial" data-bs-toggle="tooltip">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -201,14 +224,7 @@
 
     @if($filiais->hasPages())
     <div class="card-footer bg-transparent border-top py-3">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div class="small text-secondary">
-                Exibindo {{ $filiais->firstItem() }} até {{ $filiais->lastItem() }} de {{ $filiais->total() }} filiais
-            </div>
-            <div>
-                {{ $filiais->links() }}
-            </div>
-        </div>
+        {{ $filiais->links() }}
     </div>
     @endif
 </div>
@@ -506,6 +522,8 @@
     $(document).on('change', '.switch-filial-status', function () {
         var $switch = $(this);
         var id = $switch.data('id');
+        var isChecked = $switch.prop('checked');
+        var $badge = $('#badge-status-' + id);
 
         $.ajax({
             url: '/admin/filiais/toggle/' + id,
@@ -514,6 +532,17 @@
             success: function (res) {
                 if (res.success) {
                     window.foco7Notify.success(res.message);
+                    if ($badge.length) {
+                        if (isChecked) {
+                            $badge.attr('class', 'status-badge-pill status-badge-pago')
+                                  .html('<span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Ativa</span>');
+                            $switch.attr('title', 'Ocultar no Mapa');
+                        } else {
+                            $badge.attr('class', 'status-badge-pill status-badge-cancelado')
+                                  .html('<span class="status-dot"></span><i class="fas fa-eye-slash"></i><span>Oculta</span>');
+                            $switch.attr('title', 'Exibir no Mapa');
+                        }
+                    }
                 } else {
                     $switch.prop('checked', !$switch.prop('checked'));
                     window.foco7Notify.error('Falha ao alterar status.');

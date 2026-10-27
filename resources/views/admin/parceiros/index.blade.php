@@ -5,61 +5,56 @@
 @section('page_description', 'Gerencie as marcas e tecnologias exibidas no carrossel infinito da Landing Page pública.')
 
 @section('content')
-<!-- KPIS DE PARCEIROS (SMALL BOXES ADMINLTE 4) -->
+<!-- CARDS DE MÉTRICAS -->
 <div class="row g-3 mb-4">
-    <div class="col-12 col-sm-6 col-xl-4">
-        <div class="small-box text-bg-danger shadow-sm">
-            <div class="inner">
-                <h3 id="kpiTotalParceiros">{{ $totalParceiros }}</h3>
-                <p>Total de Marcas Cadastradas</p>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Total de Marcas</h6>
+                    <h3 class="fw-bold mb-0 text-body" id="kpiTotalParceiros">{{ $totalParceiros }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-handshake"></i>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-4">
-        <div class="small-box text-bg-success shadow-sm">
-            <div class="inner">
-                <h3 id="kpiParceirosAtivos">{{ $parceirosAtivos }}</h3>
-                <p>Ativos no Carrossel Infinito</p>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Ativos no Carrossel Infinito</h6>
+                    <h3 class="fw-bold mb-0 text-success" id="kpiParceirosAtivos">{{ $parceirosAtivos }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-check-circle"></i>
         </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-4">
-        <div class="small-box text-bg-secondary shadow-sm">
-            <div class="inner">
-                <h3 id="kpiParceirosInativos">{{ $parceirosInativos }}</h3>
-                <p>Pausados / Ocultos</p>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-secondary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-eye-slash"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Pausadas / Ocultas</h6>
+                    <h3 class="fw-bold mb-0 text-secondary" id="kpiParceirosInativos">{{ $parceirosInativos }}</h3>
+                </div>
             </div>
-            <i class="small-box-icon fas fa-eye-slash"></i>
         </div>
     </div>
 </div>
 
-<!-- CARD PRINCIPAL DE LISTAGEM -->
-<div class="card border-0 shadow-sm rounded-3">
-    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
-        <div class="d-flex align-items-center gap-2">
-            <h5 class="card-title fw-bold mb-0 text-body">
-                <i class="fas fa-layer-group text-danger me-2"></i> Marcas Homologadas
-            </h5>
-            <span class="badge bg-body-secondary text-body border px-2 py-1 small">
-                {{ $parceiros->total() }} no total
-            </span>
-        </div>
-        <div class="card-tools ms-auto d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalNovoParceiro()">
-                <i class="fas fa-plus me-1"></i> Nova Marca / Parceiro
-            </button>
-        </div>
-    </div>
-
-    <!-- FILTRO E BUSCA -->
-    <div class="card-body border-bottom bg-body-tertiary p-3">
+<!-- FILTROS & BUSCA -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-3">
         <form method="GET" action="{{ route('admin.parceiros.index') }}" class="row g-2 align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <div class="input-group">
-                    <span class="input-group-text bg-body border-end-0 text-secondary"><i class="fas fa-search"></i></span>
+                    <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-secondary"></i></span>
                     <input type="text" name="busca" class="form-control border-start-0" placeholder="Buscar por nome ou descrição..." value="{{ request('busca') }}">
                 </div>
             </div>
@@ -70,15 +65,32 @@
                     <option value="inativo" {{ request('status') === 'inativo' ? 'selected' : '' }}>Apenas Inativos</option>
                 </select>
             </div>
-            <div class="col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-outline-danger">
-                    <i class="fas fa-filter me-1"></i> Filtrar
-                </button>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-danger flex-fill fw-bold">Filtrar</button>
                 @if(request()->hasAny(['busca', 'status']))
                     <a href="{{ route('admin.parceiros.index') }}" class="btn btn-outline-secondary">Limpar</a>
                 @endif
             </div>
         </form>
+    </div>
+</div>
+
+<!-- CARD PRINCIPAL DE LISTAGEM -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header w-100 bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="card-title fw-bold mb-0 text-body">
+                <i class="fas fa-layer-group text-danger me-2"></i> Marcas Homologadas
+            </h5>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small">
+                {{ $parceiros->total() }} no total
+            </span>
+        </div>
+        <div class="card-tools ms-auto d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalNovoParceiro()">
+                <i class="fas fa-plus me-1"></i> Nova Marca / Parceiro
+            </button>
+        </div>
     </div>
 
     <!-- TABELA DE PARCEIROS -->
@@ -122,16 +134,23 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            <div class="form-check form-switch d-inline-block">
-                                <input class="form-check-input btn-toggle-parceiro cursor-pointer" type="checkbox" role="switch" data-id="{{ $p->id }}" {{ $p->ativo ? 'checked' : '' }}>
+                            <div class="d-inline-flex align-items-center gap-2">
+                                <span id="badge-status-parceiro-{{ $p->id }}" class="status-badge-pill {{ $p->ativo ? 'status-badge-pago' : 'status-badge-cancelado' }}">
+                                    <span class="status-dot"></span>
+                                    <i class="fas {{ $p->ativo ? 'fa-check-circle' : 'fa-eye-slash' }}"></i>
+                                    <span>{{ $p->ativo ? 'Ativo' : 'Oculto' }}</span>
+                                </span>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input btn-toggle-parceiro cursor-pointer" type="checkbox" role="switch" data-id="{{ $p->id }}" {{ $p->ativo ? 'checked' : '' }} title="{{ $p->ativo ? 'Ocultar no Site' : 'Exibir no Site' }}">
+                                </div>
                             </div>
                         </td>
                         <td class="text-end">
-                            <div class="btn-group btn-group-sm">
-                                <button type="button" class="btn btn-outline-secondary" onclick="editarParceiro({{ $p->id }})" title="Editar Informações">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editarParceiro({{ $p->id }})" title="Editar Informações">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-danger" onclick="excluirParceiro({{ $p->id }}, '{{ addslashes($p->nome) }}')" title="Excluir Marca">
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirParceiro({{ $p->id }}, '{{ addslashes($p->nome) }}')" title="Excluir Marca">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -310,6 +329,8 @@
         $(document).on('change', '.btn-toggle-parceiro', function () {
             var id = $(this).data('id');
             var $check = $(this);
+            var isChecked = $check.prop('checked');
+            var $badge = $('#badge-status-parceiro-' + id);
 
             $.ajax({
                 url: '/admin/parceiros/toggle/' + id,
@@ -317,6 +338,17 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 success: function (res) {
                     window.foco7Notify.success(res.message);
+                    if ($badge.length) {
+                        if (isChecked) {
+                            $badge.attr('class', 'status-badge-pill status-badge-pago')
+                                  .html('<span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Ativo</span>');
+                            $check.attr('title', 'Ocultar no Site');
+                        } else {
+                            $badge.attr('class', 'status-badge-pill status-badge-cancelado')
+                                  .html('<span class="status-dot"></span><i class="fas fa-eye-slash"></i><span>Oculto</span>');
+                            $check.attr('title', 'Exibir no Site');
+                        }
+                    }
                 },
                 error: function () {
                     $check.prop('checked', !$check.prop('checked'));

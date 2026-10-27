@@ -601,6 +601,26 @@ public_html/
 - **Proteção de Botões Compactos (`.btn-sm` e `.page-link`):**
   - Isolamento de regras de padding para botões grandes (`:not(.btn-sm):not(.page-link)`), garantindo que botões de tabelas e de paginação mantenham dimensões ergonômicas (32px) e perfeito alinhamento visual.
 
+### 4. Padronização Visual Universal dos Módulos Administrativos
+- **Filiais (`/admin/filiais`):**
+  - Substituição total dos `small-box` legados por 4 cards modernos de métricas com boxes coloridos de cantos arredondados (`bg-danger`, `bg-success`, `bg-primary`, `bg-secondary`).
+  - Card de busca e filtros isolado com layout limpo e responsivo.
+  - Coluna de Status com `.status-badge-pill` + `.status-dot` (`Ativa` / `Oculta`) e alternador switch AJAX em tempo real.
+  - Coluna de Ações com `.btn-group` compacto e paginação padronizada.
+- **Parceiros (`/admin/parceiros`):**
+  - Métricas modernas com caixas de ícone arredondadas e card desacoplado de filtros.
+  - Status em tempo real com `.status-badge-pill` (`Ativo` / `Oculto`) com sincronização dinâmica no toggle via AJAX.
+- **Usuários & Equipe (`/admin/usuarios`):**
+  - Cards de métricas modernos, coluna de autenticação em duas etapas com `.status-badge-pill` (`2FA Ativo` / `Sem 2FA`) e atualização dinâmica do badge de status (`Ativo` / `Inativo`) sem recarregar a página.
+- **Notificações (`/admin/notificacoes`):**
+  - Conversão dos 4 `small-box` antigos em cards elegantes e interativos de métricas (`Não Lidas`, `Contatos`, `Agendamentos`, `Depoimentos`).
+- **Depoimentos & Avaliações (`/admin/depoimentos`):**
+  - Cards de métricas padronizados, botão principal com estilo corporativo e status de moderação com `.status-badge-pill` e `.status-dot` (`Aprovado` / `Pendente`) sincronizados via AJAX.
+- **Clientes (`/admin/clientes`):**
+  - Status do cliente padronizado com `.status-badge-pill` e `.status-dot` (`Ativo` / `Bloqueado`).
+- **Dashboard Principal (`/admin`):**
+  - Todos os 4 KPIs principais convertidos para o design system unificado preservando a animação de contadores numéricos (`kpi-counter`) e badges de agendamentos (`confirmado`, `concluido`, `cancelado`, `pendente`) unificados via Model `Agendamento`.
+
 ---
 
 ## 🧪 Testes Automatizados e Garantia de Qualidade

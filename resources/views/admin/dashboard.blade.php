@@ -80,63 +80,75 @@
         @endif
 
         <!-- ========================================================================= -->
-        <!-- LINHA 1: KPIS PRINCIPAIS ANIMADOS (SMALL BOXES OFICIAIS ADMINLTE 4)      -->
+        <!-- LINHA 1: KPIS PRINCIPAIS ANIMADOS (DESIGN SYSTEM UNIFICADO)              -->
         <!-- ========================================================================= -->
         <div class="row g-3 mb-4">
             <!-- 1. Clientes Ativos -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-danger shadow-sm">
-                    <div class="inner">
-                        <h3><span class="kpi-counter" data-target="{{ $totalClientes }}">0</span></h3>
-                        <p>Clientes Ativos</p>
+                <a href="{{ route('admin.clientes.index') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Clientes Ativos</h6>
+                                <h3 class="fw-bold mb-0 text-body"><span class="kpi-counter" data-target="{{ $totalClientes }}">0</span></h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-users"></i>
-                    <a href="{{ route('admin.clientes.index') }}" class="small-box-footer link-light">
-                        Ver Clientes <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 2. Receita Este Mês -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-success shadow-sm">
-                    <div class="inner">
-                        <h3>R$ <span class="kpi-counter" data-target="{{ $faturasPagasMes }}" data-is-money="true">0,00</span></h3>
-                        <p>Receita Este Mês</p>
+                <a href="{{ route('admin.faturas.index', ['status' => 'pago']) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Receita Este Mês</h6>
+                                <h3 class="fw-bold mb-0 text-body">R$ <span class="kpi-counter" data-target="{{ $faturasPagasMes }}" data-is-money="true">0,00</span></h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-dollar-sign"></i>
-                    <a href="{{ route('admin.faturas.index', ['status' => 'pago']) }}" class="small-box-footer link-light">
-                        Ver Recebimentos <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 3. Instalações & Agendamentos -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-primary shadow-sm">
-                    <div class="inner">
-                        <h3><span class="kpi-counter" data-target="{{ $agendamentosPendentes }}">0</span></h3>
-                        <p>Instalações Pendentes</p>
+                <a href="{{ route('admin.agendamentos.index') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Instalações Pendentes</h6>
+                                <h3 class="fw-bold mb-0 text-body"><span class="kpi-counter" data-target="{{ $agendamentosPendentes }}">0</span></h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-calendar-alt"></i>
-                    <a href="{{ route('admin.agendamentos.index') }}" class="small-box-footer link-light">
-                        Agenda Completa <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 4. Visitantes Únicos Hoje -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-info shadow-sm">
-                    <div class="inner">
-                        <h3><span class="kpi-counter" data-target="{{ $analytics['unicos_hoje'] ?? 0 }}">0</span></h3>
-                        <p>Visitantes Únicos Hoje</p>
+                <a href="#secaoAnaliticoCompleto" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-info text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Visitantes Hoje</h6>
+                                <h3 class="fw-bold mb-0 text-body"><span class="kpi-counter" data-target="{{ $analytics['unicos_hoje'] ?? 0 }}">0</span></h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-chart-line"></i>
-                    <a href="#secaoAnaliticoCompleto" class="small-box-footer link-light">
-                        Ver Analítico <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
         </div>
 

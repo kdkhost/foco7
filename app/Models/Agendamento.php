@@ -52,10 +52,10 @@ class Agendamento extends Model
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {
-            'confirmado' => '<span class="badge bg-success">Confirmado</span>',
-            'concluido' => '<span class="badge bg-primary">Concluído</span>',
-            'cancelado' => '<span class="badge bg-danger">Cancelado</span>',
-            default => '<span class="badge bg-warning text-dark">Pendente</span>',
+            'confirmado' => '<span class="status-badge-pill status-badge-pago"><span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Confirmado</span></span>',
+            'concluido' => '<span class="status-badge-pill status-badge-concluido"><span class="status-dot"></span><i class="fas fa-flag-checkered"></i><span>Concluído</span></span>',
+            'cancelado' => '<span class="status-badge-pill status-badge-cancelado"><span class="status-dot"></span><i class="fas fa-ban"></i><span>Cancelado</span></span>',
+            default => '<span class="status-badge-pill status-badge-pendente"><span class="status-dot"></span><i class="fas fa-clock"></i><span>Pendente</span></span>',
         };
     }
 

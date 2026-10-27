@@ -13,7 +13,7 @@
                 <p class="text-secondary small mb-0">Moderação de avaliações enviadas por clientes no site e cadastro manual de relatos institucionais.</p>
             </div>
             <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
-                <button type="button" class="btn btn-primary shadow-sm" onclick="abrirModalDepoimento()">
+                <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalDepoimento()">
                     <i class="fas fa-plus-circle me-1"></i> Novo Depoimento
                 </button>
             </div>
@@ -27,56 +27,56 @@
         <!-- CARDS DE MÉTRICAS -->
         <div class="row g-3 mb-4">
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
-                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small text-uppercase fw-semibold">Pendentes de Moderação</span>
-                            <h3 class="fw-bold mb-0 text-warning" id="cardCountPendentes">{{ $totalPendentes }}</h3>
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-warning text-dark rounded-3 p-3 me-3 fs-3">
+                            <i class="fas fa-hourglass-half"></i>
                         </div>
-                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle icon-circle-lg">
-                            <i class="fas fa-hourglass-half fs-4"></i>
+                        <div>
+                            <h6 class="text-secondary small text-uppercase mb-1">Pendentes de Moderação</h6>
+                            <h3 class="fw-bold mb-0 text-body" id="cardCountPendentes">{{ $totalPendentes }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
-                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small text-uppercase fw-semibold">Aprovados & Publicados</span>
-                            <h3 class="fw-bold mb-0 text-success" id="cardCountAprovados">{{ $totalAprovados }}</h3>
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="bg-success bg-opacity-10 text-success rounded-circle icon-circle-lg">
-                            <i class="fas fa-check-circle fs-4"></i>
+                        <div>
+                            <h6 class="text-secondary small text-uppercase mb-1">Aprovados & Publicados</h6>
+                            <h3 class="fw-bold mb-0 text-body" id="cardCountAprovados">{{ $totalAprovados }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
-                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small text-uppercase fw-semibold">Total de Avaliações</span>
-                            <h3 class="fw-bold mb-0 text-danger">{{ $totalGeral }}</h3>
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                            <i class="fas fa-comments"></i>
                         </div>
-                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle icon-circle-lg">
-                            <i class="fas fa-comments fs-4"></i>
+                        <div>
+                            <h6 class="text-secondary small text-uppercase mb-1">Total de Avaliações</h6>
+                            <h3 class="fw-bold mb-0 text-body">{{ $totalGeral }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
-                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small text-uppercase fw-semibold">Média das Notas</span>
-                            <h3 class="fw-bold mb-0 text-primary">{{ number_format($mediaEstrelas, 1, ',', '.') }} <small class="text-warning fs-6">★</small></h3>
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                            <i class="fas fa-award"></i>
                         </div>
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle icon-circle-lg">
-                            <i class="fas fa-award fs-4"></i>
+                        <div>
+                            <h6 class="text-secondary small text-uppercase mb-1">Média das Notas</h6>
+                            <h3 class="fw-bold mb-0 text-body">{{ number_format($mediaEstrelas, 1, ',', '.') }} <small class="text-warning fs-6">★</small></h3>
                         </div>
                     </div>
                 </div>
@@ -196,12 +196,16 @@
                                         </td>
                                         <td class="text-center" id="status-cell-{{ $dep->id }}">
                                             @if($dep->ativo)
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                                                    <i class="fas fa-check-circle me-1"></i> Aprovado
+                                                <span class="status-badge-pill status-badge-pago">
+                                                    <span class="status-dot"></span>
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span>Aprovado</span>
                                                 </span>
                                             @else
-                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
-                                                    <i class="fas fa-clock me-1"></i> Pendente
+                                                <span class="status-badge-pill status-badge-pendente">
+                                                    <span class="status-dot"></span>
+                                                    <i class="fas fa-clock"></i>
+                                                    <span>Pendente</span>
                                                 </span>
                                             @endif
                                         </td>
@@ -397,11 +401,11 @@
 
                     if (res.ativo) {
                         $row.removeClass('bg-warning bg-opacity-10');
-                        $statusCell.html('<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fas fa-check-circle me-1"></i> Aprovado</span>');
+                        $statusCell.html('<span class="status-badge-pill status-badge-pago"><span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Aprovado</span></span>');
                         $btn.removeClass('btn-success').addClass('btn-outline-warning').html('<i class="fas fa-ban"></i>').attr('title', 'Desativar / Colocar em Moderação');
                     } else {
                         $row.addClass('bg-warning bg-opacity-10');
-                        $statusCell.html('<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1"><i class="fas fa-clock me-1"></i> Pendente</span>');
+                        $statusCell.html('<span class="status-badge-pill status-badge-pendente"><span class="status-dot"></span><i class="fas fa-clock"></i><span>Pendente</span></span>');
                         $btn.removeClass('btn-outline-warning').addClass('btn-success').html('<i class="fas fa-check"></i>').attr('title', 'Aprovar e Publicar no Site');
                     }
 

@@ -49,60 +49,70 @@
 @endsection
 
 @section('content')
-<!-- SMALL BOXES / MÉTRICAS ADMINLTE 4 -->
+<!-- CARDS DE MÉTRICAS -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-2-4 col-xl">
-        <div class="small-box bg-danger rounded-4 shadow-sm h-100 p-3 text-white">
-            <div class="inner">
-                <h3 class="fw-bold mb-1">{{ $metricas['total'] }}</h3>
-                <p class="mb-0 small text-white-50">Total de Usuários</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-users opacity-25"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-2-4 col-xl">
-        <div class="small-box bg-primary rounded-4 shadow-sm h-100 p-3 text-white">
-            <div class="inner">
-                <h3 class="fw-bold mb-1">{{ $metricas['admins'] }}</h3>
-                <p class="mb-0 small text-white-50">Admins &amp; Gestores</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-user-shield opacity-25"></i>
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Total de Usuários</h6>
+                    <h3 class="fw-bold mb-0 text-body">{{ $metricas['total'] }}</h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-2-4 col-xl">
-        <div class="small-box bg-info rounded-4 shadow-sm h-100 p-3 text-white">
-            <div class="inner">
-                <h3 class="fw-bold mb-1">{{ $metricas['equipe'] }}</h3>
-                <p class="mb-0 small text-white-50">Equipe / Operadores</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-headset opacity-25"></i>
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Admins &amp; Gestores</h6>
+                    <h3 class="fw-bold mb-0 text-primary">{{ $metricas['admins'] }}</h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-2-4 col-xl">
-        <div class="small-box bg-secondary rounded-4 shadow-sm h-100 p-3 text-white">
-            <div class="inner">
-                <h3 class="fw-bold mb-1">{{ $metricas['clientes'] }}</h3>
-                <p class="mb-0 small text-white-50">Clientes / Assinantes</p>
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-info text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Equipe / Operadores</h6>
+                    <h3 class="fw-bold mb-0 text-info">{{ $metricas['equipe'] }}</h3>
+                </div>
             </div>
-            <div class="icon">
-                <i class="fas fa-user-tag opacity-25"></i>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2-4 col-xl">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-secondary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-user-tag"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Clientes / Assinantes</h6>
+                    <h3 class="fw-bold mb-0 text-secondary">{{ $metricas['clientes'] }}</h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-12 col-lg-2-4 col-xl">
-        <div class="small-box bg-success rounded-4 shadow-sm h-100 p-3 text-white">
-            <div class="inner">
-                <h3 class="fw-bold mb-1">{{ $metricas['com_2fa'] }}</h3>
-                <p class="mb-0 small text-white-50">Protegidos com 2FA</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-shield-alt opacity-25"></i>
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Protegidos 2FA</h6>
+                    <h3 class="fw-bold mb-0 text-success">{{ $metricas['com_2fa'] }}</h3>
+                </div>
             </div>
         </div>
     </div>
@@ -252,12 +262,16 @@
                     <!-- 2FA -->
                     <td class="text-center">
                         @if($u->hasTwoFactor())
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" title="Autenticação de 2 Fatores Ativada">
-                                <i class="fas fa-shield-alt me-1"></i> 2FA ATIVO
+                            <span class="status-badge-pill status-badge-concluido" title="Autenticação de 2 Fatores Ativada">
+                                <span class="status-dot"></span>
+                                <i class="fas fa-shield-alt"></i>
+                                <span>2FA Ativo</span>
                             </span>
                         @else
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1" title="Sem 2FA">
-                                <i class="fas fa-shield-slash me-1"></i> Inativo
+                            <span class="status-badge-pill status-badge-cancelado" title="Sem 2FA">
+                                <span class="status-dot"></span>
+                                <i class="fas fa-shield-slash"></i>
+                                <span>Sem 2FA</span>
                             </span>
                         @endif
                     </td>
@@ -265,30 +279,41 @@
                     <!-- STATUS (TOGGLE AJAX) -->
                     <td class="text-center">
                         @if($u->id === auth()->id())
-                            <span class="badge bg-success">Conectado</span>
+                            <span class="status-badge-pill status-badge-pago">
+                                <span class="status-dot"></span>
+                                <i class="fas fa-user-check"></i>
+                                <span>Conectado</span>
+                            </span>
                         @else
-                            <div class="form-check form-switch d-inline-block">
-                                <input class="form-check-input btn-toggle-status-usuario"
-                                       type="checkbox"
-                                       role="switch"
-                                       data-id="{{ $u->id }}"
-                                       {{ $u->status === 'ativo' ? 'checked' : '' }}
-                                       title="Alternar Ativo/Inativo">
+                            <div class="d-inline-flex align-items-center gap-2">
+                                <span id="badge-status-user-{{ $u->id }}" class="status-badge-pill {{ $u->status === 'ativo' ? 'status-badge-pago' : 'status-badge-cancelado' }}">
+                                    <span class="status-dot"></span>
+                                    <i class="fas {{ $u->status === 'ativo' ? 'fa-check-circle' : 'fa-ban' }}"></i>
+                                    <span>{{ $u->status === 'ativo' ? 'Ativo' : 'Inativo' }}</span>
+                                </span>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input btn-toggle-status-usuario cursor-pointer"
+                                           type="checkbox"
+                                           role="switch"
+                                           data-id="{{ $u->id }}"
+                                           {{ $u->status === 'ativo' ? 'checked' : '' }}
+                                           title="{{ $u->status === 'ativo' ? 'Desativar Usuário' : 'Ativar Usuário' }}">
+                                </div>
                             </div>
                         @endif
                     </td>
 
                     <!-- AÇÕES -->
                     <td class="text-end pe-3">
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-primary btn-editar-usuario" data-id="{{ $u->id }}" title="Editar Usuário & Permissões">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-editar-usuario" data-id="{{ $u->id }}" title="Editar Usuário & Permissões">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-warning btn-reset-senha" data-id="{{ $u->id }}" data-nome="{{ $u->name }}" title="Redefinir Senha">
+                            <button type="button" class="btn btn-sm btn-outline-warning btn-reset-senha" data-id="{{ $u->id }}" data-nome="{{ $u->name }}" title="Redefinir Senha">
                                 <i class="fas fa-key"></i>
                             </button>
                             @if($u->id !== auth()->id())
-                                <button type="button" class="btn btn-outline-danger btn-excluir-usuario" data-id="{{ $u->id }}" data-nome="{{ $u->name }}" title="Excluir Usuário">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-excluir-usuario" data-id="{{ $u->id }}" data-nome="{{ $u->name }}" title="Excluir Usuário">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             @endif
@@ -764,12 +789,23 @@
     $(document).on('change', '.btn-toggle-status-usuario', function() {
         var id = $(this).data('id');
         var input = $(this);
+        var isAtivo = input.is(':checked');
 
         $.post("/admin/usuarios/toggle/" + id, {
             _token: "{{ csrf_token() }}"
         }, function(res) {
             if (res.success) {
                 toastr.success(res.message);
+                var badge = $('#badge-status-user-' + id);
+                if (isAtivo) {
+                    badge.removeClass('status-badge-cancelado').addClass('status-badge-pago');
+                    badge.html('<span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Ativo</span>');
+                    input.attr('title', 'Desativar Usuário');
+                } else {
+                    badge.removeClass('status-badge-pago').addClass('status-badge-cancelado');
+                    badge.html('<span class="status-dot"></span><i class="fas fa-ban"></i><span>Inativo</span>');
+                    input.attr('title', 'Ativar Usuário');
+                }
             }
         }).fail(function(xhr) {
             input.prop('checked', !input.prop('checked'));

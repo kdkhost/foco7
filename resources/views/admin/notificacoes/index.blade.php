@@ -48,62 +48,74 @@
 <section class="content">
     <div class="container-fluid">
 
-        <!-- CARDS DE MÉTRICAS DAS NOTIFICAÇÕES (PADRÃO OFICIAL ADMINLTE 4) -->
+        <!-- CARDS DE MÉTRICAS DAS NOTIFICAÇÕES -->
         <div class="row g-3 mb-4">
             <!-- 1. Não Lidas -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-danger shadow-sm">
-                    <div class="inner">
-                        <h3 id="cardCountNaoLidas">{{ $totalNaoLidas }}</h3>
-                        <p>Não Lidas</p>
+                <a href="{{ route('admin.notificacoes.index', ['status' => 'nao_lidas', 'tipo' => $tipo]) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-envelope-open-text"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Não Lidas</h6>
+                                <h3 class="fw-bold mb-0 text-body" id="cardCountNaoLidas">{{ $totalNaoLidas }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-envelope-open-text"></i>
-                    <a href="{{ route('admin.notificacoes.index', ['status' => 'nao_lidas', 'tipo' => $tipo]) }}" class="small-box-footer link-light">
-                        Ver Não Lidas <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 2. Contatos do Site -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-warning shadow-sm">
-                    <div class="inner">
-                        <h3>{{ $totalContatos }}</h3>
-                        <p>Contatos do Site</p>
+                <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'contato']) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-warning text-dark rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Contatos do Site</h6>
+                                <h3 class="fw-bold mb-0 text-body">{{ $totalContatos }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-comment-dots"></i>
-                    <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'contato']) }}" class="small-box-footer link-dark">
-                        Ver Contatos <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 3. Agendamentos -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-primary shadow-sm">
-                    <div class="inner">
-                        <h3>{{ $totalAgendamentos }}</h3>
-                        <p>Agendamentos</p>
+                <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'agendamento']) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Agendamentos</h6>
+                                <h3 class="fw-bold mb-0 text-body">{{ $totalAgendamentos }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-calendar-check"></i>
-                    <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'agendamento']) }}" class="small-box-footer link-light">
-                        Ver Agendamentos <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
 
             <!-- 4. Depoimentos / Estrelas -->
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="small-box text-bg-success shadow-sm">
-                    <div class="inner">
-                        <h3>{{ $totalDepoimentos }}</h3>
-                        <p>Depoimentos / Estrelas</p>
+                <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'depoimento']) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-secondary small text-uppercase mb-1">Depoimentos / Estrelas</h6>
+                                <h3 class="fw-bold mb-0 text-body">{{ $totalDepoimentos }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <i class="small-box-icon fas fa-star"></i>
-                    <a href="{{ route('admin.notificacoes.index', ['status' => $status, 'tipo' => 'depoimento']) }}" class="small-box-footer link-light">
-                        Ver Depoimentos <i class="fas fa-arrow-circle-right ms-1"></i>
-                    </a>
-                </div>
+                </a>
             </div>
         </div>
 

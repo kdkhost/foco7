@@ -151,9 +151,17 @@
                         </td>
                         <td>
                             @if($cli->status === 'ativo')
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Ativo</span>
+                                <span class="status-badge-pill status-badge-pago">
+                                    <span class="status-dot"></span>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Ativo</span>
+                                </span>
                             @else
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Bloqueado</span>
+                                <span class="status-badge-pill status-badge-cancelado">
+                                    <span class="status-dot"></span>
+                                    <i class="fas fa-ban"></i>
+                                    <span>Bloqueado</span>
+                                </span>
                             @endif
                         </td>
                         <td class="text-end">
