@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\CmsSetting;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
 class AdminPerfilEConfiguracoesTest extends TestCase
 {
@@ -164,5 +164,66 @@ class AdminPerfilEConfiguracoesTest extends TestCase
         // Teste de eventos do FullCalendar com status concluído
         $responseEventos = $this->actingAs($this->adminUser)->getJson('/admin/agendamentos/eventos');
         $responseEventos->assertStatus(200);
+    }
+
+    public function test_dados_desenvolvedor_ficam_tarjados_quando_sessao_bloqueada(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get('/admin/configuracoes');
+
+        $response->assertStatus(200);
+        $response->assertSee('tarja-dev-bloqueado');
+        $response->assertSee('••••••••••••');
+        $response->assertSee('Protegido por Senha Master');
+    }
+
+    public function test_desbloquear_dev_com_senha_incorreta_retorna_403(): void
+    {
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/configuracoes/desbloquear-dev', [
+            'senha' => 'senha_errada_123',
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJson([
+            'success' => false,
+        ]);
+    }
+
+    public function test_desbloquear_dev_com_senha_master_correta_libera_dados_e_sessao(): void
+    {
+        CmsSetting::set('dev_master_password', 'Brad@2026', 'seguranca');
+        CmsSetting::set('desenvolvedor_nome', 'Marcelo Brad', 'desenvolvedor');
+        CmsSetting::set('desenvolvedor_whatsapp', '5521981325441', 'desenvolvedor');
+
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/configuracoes/desbloquear-dev', [
+            'senha' => 'Brad@2026',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'dados' => [
+                'desenvolvedor_nome' => 'Marcelo Brad',
+                'desenvolvedor_whatsapp' => '5521981325441',
+            ],
+        ]);
+    }
+
+    public function test_salvar_configuracoes_sem_senha_dev_preserva_dados_oficiais(): void
+    {
+        CmsSetting::set('desenvolvedor_nome', 'Marcelo Brad', 'desenvolvedor');
+        CmsSetting::set('desenvolvedor_whatsapp', '5521981325441', 'desenvolvedor');
+
+        // Tentativa de invasão / sobrescrita sem autenticação de desenvolvedor
+        $response = $this->actingAs($this->adminUser)->postJson('/admin/configuracoes/salvar', [
+            'site_nome' => 'Foco 7 Sistema Novo',
+            'desenvolvedor_nome' => 'Hacker Invasor',
+            'desenvolvedor_whatsapp' => '11900000000',
+        ]);
+
+        $response->assertStatus(200);
+
+        // Os dados do desenvolvedor Marcelo Brad permanecem 100% blindados
+        $this->assertEquals('Marcelo Brad', CmsSetting::get('desenvolvedor_nome'));
+        $this->assertEquals('5521981325441', CmsSetting::get('desenvolvedor_whatsapp'));
     }
 }

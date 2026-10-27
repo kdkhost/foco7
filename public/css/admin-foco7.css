@@ -2131,3 +2131,39 @@ nav[role="navigation"] svg,
     background-color: #6ea8fe;
 }
 
+/* ==============================================================================
+   ÁREA RESTRITA DO DESENVOLVEDOR - CAMPOS TARJADOS E PROTEGIDOS
+   ============================================================================== */
+.tarja-dev-bloqueado {
+    filter: blur(6px) !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    pointer-events: none !important;
+    background-color: rgba(15, 23, 42, 0.08) !important;
+    cursor: not-allowed !important;
+    letter-spacing: 4px !important;
+    color: transparent !important;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6) !important;
+    transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+}
+
+[data-bs-theme="dark"] .tarja-dev-bloqueado {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: transparent !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+}
+
+.card-dev-protegido {
+    position: relative;
+    transition: all 0.25s ease-in-out;
+}
+
+.card-dev-protegido.bloqueado {
+    border-color: rgba(217, 0, 0, 0.4) !important;
+}
+
+.card-dev-protegido.desbloqueado {
+    border-color: rgba(40, 167, 69, 0.5) !important;
+}
+
+

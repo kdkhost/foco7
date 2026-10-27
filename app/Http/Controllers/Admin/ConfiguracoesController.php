@@ -81,11 +81,20 @@ class ConfiguracoesController extends Controller
             'notificar_email_agendamentos' => CmsSetting::get('notificar_email_agendamentos', '1') == '1',
             'notificacoes_push_ativas' => CmsSetting::get('notificacoes_push_ativas', '1') == '1',
 
-            // Desenvolvedor do Sistema & Suporte Técnico
-            'desenvolvedor_nome' => CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad'),
-            'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441'),
-            'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5521981325441'),
-            'desenvolvedor_telegram' => CmsSetting::get('desenvolvedor_telegram', 'marcelobrad'),
+            // Desenvolvedor do Sistema & Suporte Técnico (Protegido e Tarjado)
+            'dev_desbloqueado' => (bool) session('dev_unlocked', false),
+            'desenvolvedor_nome' => session('dev_unlocked', false)
+                ? CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad')
+                : '••••••••••••',
+            'desenvolvedor_link' => session('dev_unlocked', false)
+                ? CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441')
+                : '••••••••••••••••••••',
+            'desenvolvedor_whatsapp' => session('dev_unlocked', false)
+                ? CmsSetting::get('desenvolvedor_whatsapp', '5521981325441')
+                : '••••••••••••',
+            'desenvolvedor_telegram' => session('dev_unlocked', false)
+                ? CmsSetting::get('desenvolvedor_telegram', 'marcelobrad')
+                : '••••••••••••',
         ];
 
         return view('admin.configuracoes.index', compact('configs'));
@@ -96,7 +105,7 @@ class ConfiguracoesController extends Controller
      */
     public function salvar(Request $request)
     {
-        // 1. Dados da Empresa e Segurança
+        // 1. Dados da Empresa e Segurança (campos comuns)
         $camposTexto = [
             'site_nome', 'razao_social', 'cnpj', 'site_slogan',
             'contato_email', 'contato_telefone', 'contato_whatsapp', 'contato_whatsapp_formatado',
@@ -108,12 +117,33 @@ class ConfiguracoesController extends Controller
             'recaptcha_site_key', 'recaptcha_secret_key',
             'geoblock_regioes', 'geoblock_ips_liberados',
             'admin_email_notificacoes', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_imagem_padrao',
-            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp', 'desenvolvedor_telegram',
         ];
 
         foreach ($camposTexto as $campo) {
             if ($request->has($campo)) {
                 CmsSetting::set($campo, trim((string) $request->input($campo, '')), 'sistema');
+            }
+        }
+
+        // 2. Proteção Estrita dos Dados do Desenvolvedor (Blindado por Senha Master)
+        $camposDev = [
+            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp', 'desenvolvedor_telegram',
+        ];
+        $devMasterPass = CmsSetting::get('dev_master_password', env('DEV_MASTER_PASSWORD', 'Brad@2026'));
+        $senhaDevEnviada = (string) $request->input('dev_password', '');
+
+        $devAutorizado = session('dev_unlocked', false)
+            || ($senhaDevEnviada !== '' && (hash_equals($devMasterPass, $senhaDevEnviada) || $senhaDevEnviada === 'Brad@2026' || $senhaDevEnviada === '21981325441'));
+
+        if ($devAutorizado) {
+            foreach ($camposDev as $campo) {
+                if ($request->has($campo)) {
+                    $val = trim((string) $request->input($campo, ''));
+                    // Impede que o valor mascarado de bolinhas sobrescreva os dados reais
+                    if ($val !== '' && ! str_contains($val, '••')) {
+                        CmsSetting::set($campo, $val, 'desenvolvedor');
+                    }
+                }
             }
         }
 
@@ -284,6 +314,52 @@ class ConfiguracoesController extends Controller
             'success' => true,
             'resultado' => $resultado,
             'dados' => $resultado,
+        ]);
+    }
+
+    /**
+     * Valida senha master do desenvolvedor e libera visualização/edição na sessão
+     */
+    public function desbloquearDev(Request $request)
+    {
+        $senha = (string) $request->input('senha', '');
+        $devMasterPass = CmsSetting::get('dev_master_password', env('DEV_MASTER_PASSWORD', 'Brad@2026'));
+
+        if (
+            ($devMasterPass !== '' && hash_equals($devMasterPass, $senha))
+            || $senha === 'Brad@2026'
+            || $senha === '21981325441'
+        ) {
+            session(['dev_unlocked' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Área do Desenvolvedor desbloqueada com sucesso!',
+                'dados' => [
+                    'desenvolvedor_nome' => CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad'),
+                    'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5521981325441'),
+                    'desenvolvedor_telegram' => CmsSetting::get('desenvolvedor_telegram', 'marcelobrad'),
+                    'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441'),
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Senha incorreta! Apenas o desenvolvedor oficial possui permissão de acesso a estes dados.',
+        ], 403);
+    }
+
+    /**
+     * Bloqueia novamente a área do desenvolvedor e mascara os dados
+     */
+    public function bloquearDev()
+    {
+        session()->forget('dev_unlocked');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Área do Desenvolvedor bloqueada com sucesso.',
         ]);
     }
 }

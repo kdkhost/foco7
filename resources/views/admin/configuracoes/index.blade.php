@@ -125,29 +125,93 @@
                         </div>
 
                         <div class="col-12 mt-4">
-                            <h6 class="fw-bold border-bottom pb-2 text-danger d-flex align-items-center gap-2">
-                                <i class="fas fa-code"></i> Créditos & Desenvolvedor do Sistema (Exibição no Rodapé)
-                            </h6>
-                            <p class="small text-secondary mb-3">
-                                Configure o nome, link e WhatsApp do desenvolvedor exibidos no rodapé do painel administrativo e da área do cliente.
-                            </p>
-                        </div>
+                            <div class="card card-dev-protegido {{ $configs['dev_desbloqueado'] ? 'desbloqueado' : 'bloqueado' }} shadow-sm rounded-3 overflow-hidden border">
+                                <div class="card-header bg-body-tertiary py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-danger d-flex align-items-center gap-2">
+                                            <i class="fas fa-user-shield"></i> Créditos &amp; Desenvolvedor do Sistema (Área Restrita)
+                                        </h6>
+                                        <p class="small text-secondary mb-0">
+                                            Dados protegidos por senha master exclusiva do desenvolvedor Marcelo Brad.
+                                        </p>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} px-3 py-2 fw-bold" id="badgeStatusDev">
+                                            <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }} me-1"></i>
+                                            <span id="badgeTextoDev">{{ $configs['dev_desbloqueado'] ? 'Acesso Liberado' : 'Protegido por Senha Master' }}</span>
+                                        </span>
+                                        <button type="button" class="btn btn-sm {{ $configs['dev_desbloqueado'] ? 'btn-outline-secondary' : 'btn-danger' }} fw-bold shadow-sm" id="btnAcaoDev" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearDesenvolvedor()' : 'solicitarSenhaDesenvolvedor()' }}">
+                                            <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }} me-1"></i>
+                                            <span id="btnTextoDev">{{ $configs['dev_desbloqueado'] ? 'Bloquear Acesso' : 'Desbloquear com Senha' }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4 position-relative" id="containerCamposDev">
+                                    <input type="hidden" name="dev_password" id="dev_password_hidden" value="">
 
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold">Nome do Desenvolvedor</label>
-                            <input type="text" name="desenvolvedor_nome" class="form-control" value="{{ $configs['desenvolvedor_nome'] ?? 'Marcelo Brad' }}" placeholder="Ex: Marcelo Brad">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp (DDI + DDD + Número)</label>
-                            <input type="text" name="desenvolvedor_whatsapp" class="form-control" value="{{ $configs['desenvolvedor_whatsapp'] ?? '5521981325441' }}" placeholder="Ex: 5521981325441">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold"><i class="fab fa-telegram-plane text-info me-1"></i> Telegram (Usuário ou Link)</label>
-                            <input type="text" name="desenvolvedor_telegram" class="form-control" value="{{ $configs['desenvolvedor_telegram'] ?? 'marcelobrad' }}" placeholder="Ex: marcelobrad">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold">Link / Site do Desenvolvedor</label>
-                            <input type="text" name="desenvolvedor_link" class="form-control" value="{{ $configs['desenvolvedor_link'] ?? 'https://wa.me/5521981325441' }}" placeholder="Ex: https://wa.me/5521981325441">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-body">Nome do Desenvolvedor</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-body-tertiary"><i class="fas fa-user-tie text-danger"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
+                                                       name="desenvolvedor_nome" 
+                                                       id="dev_nome" 
+                                                       class="form-control {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                                       value="{{ $configs['desenvolvedor_nome'] }}" 
+                                                       {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                                       placeholder="Marcelo Brad">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-body"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp (DDI + DDD + Número)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-body-tertiary"><i class="fab fa-whatsapp text-success"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
+                                                       name="desenvolvedor_whatsapp" 
+                                                       id="dev_whatsapp" 
+                                                       class="form-control {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                                       value="{{ $configs['desenvolvedor_whatsapp'] }}" 
+                                                       {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                                       placeholder="5521981325441">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-body"><i class="fab fa-telegram-plane text-info me-1"></i> Telegram (Usuário ou Link)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-body-tertiary"><i class="fab fa-telegram text-info"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
+                                                       name="desenvolvedor_telegram" 
+                                                       id="dev_telegram" 
+                                                       class="form-control {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                                       value="{{ $configs['desenvolvedor_telegram'] }}" 
+                                                       {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                                       placeholder="marcelobrad">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-body"><i class="fas fa-link text-primary me-1"></i> Link / Site do Desenvolvedor</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-body-tertiary"><i class="fas fa-globe text-primary"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
+                                                       name="desenvolvedor_link" 
+                                                       id="dev_link" 
+                                                       class="form-control {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                                       value="{{ $configs['desenvolvedor_link'] }}" 
+                                                       {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                                       placeholder="https://wa.me/5521981325441">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-warning py-2 px-3 mt-3 mb-0 small d-flex align-items-center gap-2 {{ $configs['dev_desbloqueado'] ? 'd-none' : '' }}" id="alertaTarjaDev">
+                                        <i class="fas fa-shield-alt text-warning fa-lg"></i>
+                                        <div>
+                                            <strong>Campos Tarjados &amp; Bloqueados:</strong> Os dados de autoria e contato direto do desenvolvedor Marcelo Brad estão protegidos por chave master contra edições não autorizadas. Clique no botão <em>"Desbloquear com Senha"</em> para autenticar.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -914,5 +978,100 @@
             }
         }
     });
+
+    function solicitarSenhaDesenvolvedor() {
+        Swal.fire({
+            title: 'Área Restrita do Desenvolvedor',
+            html: `
+                <div class="text-start mb-2">
+                    <p class="small text-secondary mb-3">
+                        Informe a <strong>Senha Master do Desenvolvedor</strong> para remover as tarjas e liberar a visualização e edição dos dados de autoria e suporte técnico.
+                    </p>
+                </div>
+            `,
+            input: 'password',
+            inputLabel: 'Senha Master do Desenvolvedor',
+            inputPlaceholder: 'Digite sua senha master...',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+                autocomplete: 'current-password'
+            },
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-unlock me-1"></i> Desbloquear Acesso',
+            confirmButtonColor: '#d90000',
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#6c757d',
+            showLoaderOnConfirm: true,
+            preConfirm: (senha) => {
+                if (!senha || senha.trim().length === 0) {
+                    Swal.showValidationMessage('Informe a senha master do desenvolvedor!');
+                    return false;
+                }
+                return $.ajax({
+                    url: '{{ route('admin.configuracoes.desbloquear_dev') }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { senha: senha }
+                }).then(response => {
+                    if (!response.success) {
+                        throw new Error(response.message || 'Falha ao autenticar.');
+                    }
+                    return { response: response, senha: senha };
+                }).catch(error => {
+                    var msg = error.responseJSON?.message || error.message || 'Senha incorreta!';
+                    Swal.showValidationMessage(msg);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                var dados = result.value.response.dados;
+                var senha = result.value.senha;
+
+                // Preenche os campos reais e remove a tarja
+                $('#dev_nome').val(dados.desenvolvedor_nome).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#dev_whatsapp').val(dados.desenvolvedor_whatsapp).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#dev_telegram').val(dados.desenvolvedor_telegram).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#dev_link').val(dados.desenvolvedor_link).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#dev_password_hidden').val(senha);
+
+                // Atualiza visual do card, badges e botões
+                $('.card-dev-protegido').removeClass('bloqueado').addClass('desbloqueado');
+                $('#badgeStatusDev').removeClass('bg-danger').addClass('bg-success');
+                $('#badgeStatusDev i').removeClass('fa-lock').addClass('fa-unlock');
+                $('#badgeTextoDev').text('Acesso Liberado');
+                $('#btnAcaoDev').attr('onclick', 'bloquearDesenvolvedor()').removeClass('btn-danger').addClass('btn-outline-secondary');
+                $('#btnTextoDev').text('Bloquear Acesso');
+                $('#btnAcaoDev i').removeClass('fa-key').addClass('fa-lock');
+                $('#alertaTarjaDev').addClass('d-none');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Acesso Liberado!',
+                    text: 'Os dados do desenvolvedor Marcelo Brad foram desmascarados e liberados para edição nesta sessão.',
+                    confirmButtonColor: '#28a745'
+                });
+            }
+        });
+    }
+
+    function bloquearDesenvolvedor() {
+        $.ajax({
+            url: '{{ route('admin.configuracoes.bloquear_dev') }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            success: function(res) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Área Bloqueada!',
+                    text: res.message || 'Os dados do desenvolvedor foram tarjados e bloqueados novamente.',
+                    confirmButtonColor: '#d90000'
+                }).then(() => {
+                    location.reload();
+                });
+            }
+        });
+    }
 </script>
 @endsection

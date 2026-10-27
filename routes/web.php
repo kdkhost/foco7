@@ -277,6 +277,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/salvar', [ConfiguracoesController::class, 'salvar'])->name('admin.configuracoes.salvar');
         Route::post('/testar-smtp', [ConfiguracoesController::class, 'testarSmtp'])->name('admin.configuracoes.testar_smtp');
         Route::post('/testar-geoip', [ConfiguracoesController::class, 'testarGeoip'])->name('admin.configuracoes.testar_geoip');
+        Route::post('/desbloquear-dev', [ConfiguracoesController::class, 'desbloquearDev'])->name('admin.configuracoes.desbloquear_dev');
+        Route::post('/bloquear-dev', [ConfiguracoesController::class, 'bloquearDev'])->name('admin.configuracoes.bloquear_dev');
     });
 
     // Central de Notificações (Web Push, E-mails e Alertas em Tempo Real)
