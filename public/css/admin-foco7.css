@@ -1466,3 +1466,423 @@ body.dark-mode .btn-foco7-dev-support:hover {
 [data-bs-theme="dark"] .icon-picker-item.active {
     background: rgba(217, 0, 0, 0.25);
 }
+
+/* ==============================================================================
+   PADRONIZAÇÃO UNIVERSAL DE FORMULÁRIOS & CAMPOS (DESIGN SYSTEM FOCO 7)
+   Garante coerência visual, alinhamento, alturas, sombras, raio de borda e
+   estados de foco em 100% dos formulários do sistema.
+   ============================================================================== */
+
+/* 1. Labels de Formulário */
+.form-label,
+label.form-label {
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: var(--bs-body-color, #1e293b);
+    margin-bottom: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    letter-spacing: 0.1px;
+}
+
+.form-label .required,
+.form-label .text-danger {
+    color: var(--admin-primary, #d90000) !important;
+    font-weight: 700;
+}
+
+/* 2. Inputs e Selects Base */
+.form-control,
+.form-select,
+.input-group > .form-control,
+.input-group > .form-select {
+    min-height: 42px;
+    padding: 0.52rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--bs-body-color, #1e293b);
+    background-color: var(--bs-body-bg, #ffffff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.5rem !important; /* 8px padrão moderno */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease;
+}
+
+.form-control::placeholder {
+    color: var(--bs-secondary-color, #94a3b8);
+    opacity: 0.85;
+}
+
+/* Tamanhos compactos e ampliados coerentes */
+.form-control-sm,
+.form-select-sm,
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm > .input-group-text {
+    min-height: 34px !important;
+    padding: 0.25rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.form-control-lg,
+.form-select-lg,
+.input-group-lg > .form-control,
+.input-group-lg > .form-select,
+.input-group-lg > .input-group-text {
+    min-height: 48px !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.625rem !important;
+}
+
+/* Estados desabilitados e apenas leitura */
+.form-control:disabled,
+.form-control[readonly],
+.form-select:disabled {
+    background-color: var(--bs-tertiary-bg, #f1f5f9) !important;
+    border-color: var(--bs-border-color, #e2e8f0) !important;
+    color: var(--bs-secondary-color, #64748b) !important;
+    opacity: 0.85;
+    cursor: not-allowed;
+}
+
+/* Validações de Formulário */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.18) !important;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.18) !important;
+}
+
+.invalid-feedback {
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+}
+
+/* Focus Universal nos Campos */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--admin-primary, #d90000) !important;
+    box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.18) !important;
+    outline: 0 !important;
+    background-color: var(--bs-body-bg, #ffffff);
+}
+
+/* Modo Escuro para Inputs e Selects */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--bs-tertiary-bg, #2b3035);
+    border-color: var(--bs-border-color, #495057);
+    color: var(--bs-body-color, #f8f9fa);
+}
+
+[data-bs-theme="dark"] .form-control:disabled,
+[data-bs-theme="dark"] .form-control[readonly],
+[data-bs-theme="dark"] .form-select:disabled {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--bs-border-color, #343a40) !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: var(--bs-secondary-bg, #343a40);
+    border-color: var(--admin-primary-hover, #ff7676) !important;
+    box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.28) !important;
+}
+
+/* 3. Textareas */
+textarea.form-control {
+    min-height: 100px;
+    padding: 0.65rem 0.85rem;
+    resize: vertical;
+}
+
+/* 4. Input Groups (Prefixos, Sufixos e Ícones) */
+.input-group {
+    border-radius: 0.5rem;
+}
+
+.input-group-text {
+    min-height: 42px;
+    padding: 0.52rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--bs-secondary-color, #64748b);
+    background-color: var(--bs-tertiary-bg, #f8fafc);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-bs-theme="dark"] .input-group-text {
+    background-color: var(--bs-tertiary-bg, #2b3035);
+    border-color: var(--bs-border-color, #495057);
+    color: var(--bs-secondary-color, #94a3b8);
+}
+
+/* Encaixe uniforme no Input Group */
+.input-group > :first-child {
+    border-top-left-radius: 0.5rem !important;
+    border-bottom-left-radius: 0.5rem !important;
+}
+
+.input-group > :last-child {
+    border-top-right-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+}
+
+.input-group > :not(:first-child):not(:last-child) {
+    border-radius: 0 !important;
+}
+
+/* 5. Select Dropdown */
+.form-select {
+    cursor: pointer;
+}
+
+/* 6. Form Check & Switches */
+.form-check-input {
+    width: 1.15em;
+    height: 1.15em;
+    margin-top: 0.2em;
+    vertical-align: top;
+    background-color: var(--bs-body-bg, #ffffff);
+    border: 1.5px solid var(--bs-border-color, #adb5bd);
+    border-radius: 0.25em;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-check-input:checked {
+    background-color: var(--admin-primary, #d90000) !important;
+    border-color: var(--admin-primary, #d90000) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--admin-primary, #d90000);
+    box-shadow: 0 0 0 0.25rem rgba(var(--admin-primary-rgb, 217, 0, 0), 0.2);
+    outline: 0;
+}
+
+.form-switch .form-check-input {
+    width: 2.25em;
+    height: 1.25em;
+    margin-top: 0.15em;
+    border-radius: 2em;
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--bs-body-color);
+}
+
+/* 7. Modais de Formulário */
+.modal-content {
+    border-radius: 0.75rem !important;
+    border: 0;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.15rem 1.5rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    background-color: var(--bs-body-bg, #ffffff);
+}
+
+[data-bs-theme="dark"] .modal-header {
+    background-color: var(--bs-body-bg, #212529);
+    border-color: var(--bs-border-color, #343a40);
+}
+
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 0.85rem 1.5rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    background-color: var(--bs-tertiary-bg, #f8fafc);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    background-color: var(--bs-tertiary-bg, #1a1e21);
+    border-color: var(--bs-border-color, #343a40);
+}
+
+/* 8. Botões de Ação de Formulário */
+.btn-primary,
+.btn-danger {
+    background-color: var(--admin-primary, #d90000);
+    border-color: var(--admin-primary, #d90000);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.88rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary:hover,
+.btn-danger:hover {
+    background-color: var(--admin-primary-hover, #b80000) !important;
+    border-color: var(--admin-primary-hover, #b80000) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+/* ==============================================================================
+   BADGES DE STATUS UNIVERSAIS (PADRÃO PÍLULA SUAVE E ALTO CONTRASTE)
+   ============================================================================== */
+.status-badge-btn,
+.status-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.82rem;
+    font-size: 0.77rem;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 50rem !important; /* Pílula perfeita */
+    text-decoration: none !important;
+    border: 1px solid transparent;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.status-badge-btn {
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: transparent;
+}
+
+.status-badge-btn:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge-btn.dropdown-toggle::after {
+    display: none !important; /* Elimina o triângulo Bootstrap externo desengonçado */
+}
+
+.status-badge-btn .badge-caret {
+    font-size: 0.68em;
+    opacity: 0.75;
+    margin-left: 0.2rem;
+    transition: transform 0.2s ease;
+}
+
+.status-badge-btn[aria-expanded="true"] .badge-caret {
+    transform: rotate(180deg);
+}
+
+/* Cores das Pílulas de Status - Modo Claro */
+.status-badge-pago {
+    background-color: #d1e7dd !important;
+    color: #0f5132 !important;
+    border-color: #badbcc !important;
+}
+
+.status-badge-pendente {
+    background-color: #fff3cd !important;
+    color: #664d03 !important;
+    border-color: #ffecb5 !important;
+}
+
+.status-badge-vencida {
+    background-color: #f8d7da !important;
+    color: #842029 !important;
+    border-color: #f5c2c7 !important;
+}
+
+.status-badge-cancelado {
+    background-color: #e2e3e5 !important;
+    color: #41464b !important;
+    border-color: #d3d6d8 !important;
+}
+
+.status-badge-estornado {
+    background-color: #212529 !important;
+    color: #f8f9fa !important;
+    border-color: #343a40 !important;
+}
+
+.status-badge-concluido {
+    background-color: #cfe2ff !important;
+    color: #084298 !important;
+    border-color: #b6d4fe !important;
+}
+
+/* Cores das Pílulas de Status - Modo Escuro */
+[data-bs-theme="dark"] .status-badge-pago {
+    background-color: rgba(25, 135, 84, 0.25) !important;
+    color: #75b798 !important;
+    border-color: rgba(25, 135, 84, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .status-badge-pendente {
+    background-color: rgba(255, 193, 7, 0.22) !important;
+    color: #ffda6a !important;
+    border-color: rgba(255, 193, 7, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .status-badge-vencida {
+    background-color: rgba(220, 53, 69, 0.25) !important;
+    color: #ea868f !important;
+    border-color: rgba(220, 53, 69, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .status-badge-cancelado {
+    background-color: rgba(108, 117, 125, 0.25) !important;
+    color: #adb5bd !important;
+    border-color: rgba(108, 117, 125, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .status-badge-estornado {
+    background-color: #111417 !important;
+    color: #dee2e6 !important;
+    border-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .status-badge-concluido {
+    background-color: rgba(13, 110, 253, 0.25) !important;
+    color: #6ea8fe !important;
+    border-color: rgba(13, 110, 253, 0.45) !important;
+}
+

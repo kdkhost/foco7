@@ -157,10 +157,12 @@
                         <td>
                             @if($fat->status === 'pago')
                                 <div class="dropdown d-inline-block">
-                                    <button class="btn btn-sm dropdown-toggle border-0 p-0" type="button" data-bs-toggle="dropdown" title="Fatura Paga (Alteração direta bloqueada por auditoria)">
-                                        {!! $fat->status_badge !!}
+                                    <button class="status-badge-btn status-badge-pago dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Fatura Paga (Auditoria Contábil Ativa)">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Pago</span>
+                                        <i class="fas fa-chevron-down badge-caret"></i>
                                     </button>
-                                    <ul class="dropdown-menu shadow">
+                                    <ul class="dropdown-menu shadow-sm border-0 rounded-3">
                                         <li><h6 class="dropdown-header"><i class="fas fa-shield-alt text-success me-1"></i> Auditoria Contábil</h6></li>
                                         <li><span class="dropdown-item-text small text-muted">Status quitado não pode ser alterado diretamente.</span></li>
                                         <li><hr class="dropdown-divider"></li>
@@ -172,13 +174,25 @@
                                     </ul>
                                 </div>
                             @elseif($fat->status === 'estornado')
-                                {!! $fat->status_badge !!}
+                                <div class="dropdown d-inline-block">
+                                    <button class="status-badge-btn status-badge-estornado dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Fatura Estornada (Auditoria Contábil)">
+                                        <i class="fas fa-undo"></i>
+                                        <span>Estornado</span>
+                                        <i class="fas fa-chevron-down badge-caret"></i>
+                                    </button>
+                                    <ul class="dropdown-menu shadow-sm border-0 rounded-3">
+                                        <li><h6 class="dropdown-header"><i class="fas fa-shield-alt text-dark me-1"></i> Auditoria Contábil</h6></li>
+                                        <li><span class="dropdown-item-text small text-muted">Fatura estornada e deduzida da receita contábil.</span></li>
+                                    </ul>
+                                </div>
                             @else
                                 <div class="dropdown d-inline-block">
-                                    <button class="btn btn-sm dropdown-toggle border-0 p-0" type="button" data-bs-toggle="dropdown">
-                                        {!! $fat->status_badge !!}
+                                    <button class="status-badge-btn {{ $fat->status_badge_class }} dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Alterar status da fatura">
+                                        <i class="fas {{ $fat->status_badge_icon }}"></i>
+                                        <span>{{ $fat->status_badge_label }}</span>
+                                        <i class="fas fa-chevron-down badge-caret"></i>
                                     </button>
-                                    <ul class="dropdown-menu shadow">
+                                    <ul class="dropdown-menu shadow-sm border-0 rounded-3">
                                         <li><h6 class="dropdown-header">Alterar Status</h6></li>
                                         <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pago')"><i class="fas fa-check-circle text-success me-2"></i> Marcar como Paga</a></li>
                                         <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pendente')"><i class="fas fa-clock text-warning me-2"></i> Marcar como Pendente</a></li>
@@ -310,6 +324,8 @@
             </form>
         </div>
     </div>
+</div>
+
 <!-- MODAL DE ANTECIPAÇÃO DE PARCELA -->
 <div class="modal fade" id="modalAnteciparParcela" tabindex="-1" aria-labelledby="modalAnteciparParcelaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

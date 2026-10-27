@@ -158,18 +158,51 @@ class Fatura extends Model
         return $this->status === 'vencida' || ($this->data_vencimento && $this->data_vencimento->isPast());
     }
 
-    public function getStatusBadgeAttribute(): string
+    public function getStatusBadgeClassAttribute(): string
     {
         if ($this->isVencida() && $this->status !== 'cancelado') {
-            return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Vencida ('.$this->dias_atraso.'d)</span>';
+            return 'status-badge-vencida';
         }
 
         return match ($this->status) {
-            'pago' => '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Pago</span>',
-            'cancelado' => '<span class="badge bg-secondary"><i class="fas fa-ban me-1"></i> Cancelado</span>',
-            'estornado' => '<span class="badge bg-dark text-white"><i class="fas fa-undo me-1"></i> Estornado</span>',
-            default => '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Aguardando Pagamento</span>',
+            'pago' => 'status-badge-pago',
+            'cancelado' => 'status-badge-cancelado',
+            'estornado' => 'status-badge-estornado',
+            default => 'status-badge-pendente',
         };
+    }
+
+    public function getStatusBadgeIconAttribute(): string
+    {
+        if ($this->isVencida() && $this->status !== 'cancelado') {
+            return 'fa-exclamation-triangle';
+        }
+
+        return match ($this->status) {
+            'pago' => 'fa-check-circle',
+            'cancelado' => 'fa-ban',
+            'estornado' => 'fa-undo',
+            default => 'fa-clock',
+        };
+    }
+
+    public function getStatusBadgeLabelAttribute(): string
+    {
+        if ($this->isVencida() && $this->status !== 'cancelado') {
+            return 'Vencida ('.$this->dias_atraso.'d)';
+        }
+
+        return match ($this->status) {
+            'pago' => 'Pago',
+            'cancelado' => 'Cancelado',
+            'estornado' => 'Estornado',
+            default => 'Aguardando Pagamento',
+        };
+    }
+
+    public function getStatusBadgeAttribute(): string
+    {
+        return '<span class="status-badge-pill '.$this->status_badge_class.'"><i class="fas '.$this->status_badge_icon.' me-1"></i><span>'.$this->status_badge_label.'</span></span>';
     }
 
     public function isCarne(): bool

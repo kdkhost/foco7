@@ -568,6 +568,33 @@ public_html/
 
 ---
 
+## 🎨 Módulo 36: Padronização Universal de Formulários & Badges de Status (Design System Consistente)
+
+### 1. Design System Universal para Todos os Formulários do Sistema
+- **Alturas e Dimensões Coerentes:**
+  - Padrão base: altura mínima de `42px` para todos os `.form-control`, `.form-select` e `.input-group-text`.
+  - Padrão compacto (`.form-control-sm`, `.form-select-sm`): altura de `34px`.
+  - Padrão ampliado (`.form-control-lg`, `.form-select-lg`): altura de `48px`.
+- **Bordas e Acabamento Ergonômico:**
+  - Raio de curvatura uniforme de `0.5rem` (8px / `rounded-3`) em inputs, selects, textareas e input-groups.
+  - Encaixe suave em `.input-group` (cantos externos arredondados e cantos intermediários contínuos).
+- **Identidade Visual e Estados de Foco:**
+  - Foco universal com anel suave de destaque na cor corporativa Foco 7 (`#d90000`, `rgba(217, 0, 0, 0.18)`), substituindo o padrão azul nativo do navegador/Bootstrap.
+  - Suporte completo e nativo ao Dark Mode (`[data-bs-theme="dark"]`) com fundos e bordas adaptados de alto contraste.
+- **Labels, Checkboxes, Switches e Validações:**
+  - Labels com tipografia padronizada (`font-size: 0.82rem`, `font-weight: 600`) e destaque em vermelho para indicadores de obrigatoriedade.
+  - Checkboxes e Switches com acionamento estilizado na cor Foco 7.
+  - Estilização consistente de feedback de validação (`.is-invalid`, `.is-valid`, `.invalid-feedback`).
+
+### 2. Badges e Dropdowns de Status Unificados (Pílulas de Alto Contraste)
+- **Eliminação de Desalinhamentos:** Supressão total do pseudo-elemento triângulo preto externo (`.dropdown-toggle::after`) do Bootstrap.
+- **Componentes `.status-badge-btn` e `.status-badge-pill`:**
+  - Formato pílula suave (`border-radius: 50rem`) com ícones semânticos à esquerda, tipografia legível e chevron interno integrado (`.badge-caret`) com animação suave de rotação de 180° ao expandir.
+  - Cores semânticas consistentes para todos os estados (`Pago`, `Pendente / Aguardando Pagamento`, `Vencido`, `Cancelado`, `Estornado`), tanto no modo claro quanto no modo escuro.
+  - Auditoria contábil transparente no dropdown para faturas quitadas ou estornadas.
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
