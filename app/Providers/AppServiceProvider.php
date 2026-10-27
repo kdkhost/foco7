@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-
-use Illuminate\Support\Facades\View;
 use App\Models\CmsSetting;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
         View::composer(['admin.*', 'cliente.*', 'site.*', 'errors.*'], function ($view) {
             $corPrimaria = CmsSetting::get('cor_primaria', '#d90000');
             $corSecundaria = CmsSetting::get('cor_secundaria', '#11141c');

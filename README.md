@@ -586,12 +586,20 @@ public_html/
   - Checkboxes e Switches com acionamento estilizado na cor Foco 7.
   - Estilização consistente de feedback de validação (`.is-invalid`, `.is-valid`, `.invalid-feedback`).
 
-### 2. Badges e Dropdowns de Status Unificados (Pílulas de Alto Contraste)
+### 2. Badges e Dropdowns de Status Unificados (Pílulas com Status Dot)
 - **Eliminação de Desalinhamentos:** Supressão total do pseudo-elemento triângulo preto externo (`.dropdown-toggle::after`) do Bootstrap.
 - **Componentes `.status-badge-btn` e `.status-badge-pill`:**
-  - Formato pílula suave (`border-radius: 50rem`) com ícones semânticos à esquerda, tipografia legível e chevron interno integrado (`.badge-caret`) com animação suave de rotação de 180° ao expandir.
-  - Cores semânticas consistentes para todos os estados (`Pago`, `Pendente / Aguardando Pagamento`, `Vencido`, `Cancelado`, `Estornado`), tanto no modo claro quanto no modo escuro.
+  - Formato pílula moderno (`border-radius: 9999px`) com bolinha indicadora de status (`.status-dot`), ícones semânticos, tipografia legível e chevron interno integrado (`.badge-caret`) com animação suave de rotação de 180° ao expandir.
+  - Cores semânticas refinadas de alto contraste para todos os estados (`Pago`, `Pendente / Aguardando Pagamento`, `Vencido`, `Cancelado`, `Estornado`), tanto no modo claro quanto no modo escuro.
   - Auditoria contábil transparente no dropdown para faturas quitadas ou estornadas.
+
+### 3. Paginação Universal Bootstrap 5 & Blindagem de Botões
+- **Ativação Oficial no Core:** Configurado `Paginator::useBootstrapFive()` em `AppServiceProvider`, eliminando a injeção acidental do template Tailwind.
+- **Template Customizado e Tradução PT-BR:**
+  - Template oficial em `resources/views/vendor/pagination/bootstrap-5.blade.php` com tradução completa em português ("Exibindo de X a Y de Z registros").
+  - Ícones vetoriais FontAwesome (`fa-chevron-left` / `fa-chevron-right`) com escala controlada (blindagem anti-SVG gigante).
+- **Proteção de Botões Compactos (`.btn-sm` e `.page-link`):**
+  - Isolamento de regras de padding para botões grandes (`:not(.btn-sm):not(.page-link)`), garantindo que botões de tabelas e de paginação mantenham dimensões ergonômicas (32px) e perfeito alinhamento visual.
 
 ---
 

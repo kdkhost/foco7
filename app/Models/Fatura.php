@@ -202,7 +202,7 @@ class Fatura extends Model
 
     public function getStatusBadgeAttribute(): string
     {
-        return '<span class="status-badge-pill '.$this->status_badge_class.'"><i class="fas '.$this->status_badge_icon.' me-1"></i><span>'.$this->status_badge_label.'</span></span>';
+        return '<span class="status-badge-pill '.$this->status_badge_class.'"><span class="status-dot"></span><i class="fas '.$this->status_badge_icon.'"></i><span>'.$this->status_badge_label.'</span></span>';
     }
 
     public function isCarne(): bool

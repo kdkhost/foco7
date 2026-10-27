@@ -158,6 +158,7 @@
                             @if($fat->status === 'pago')
                                 <div class="dropdown d-inline-block">
                                     <button class="status-badge-btn status-badge-pago dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Fatura Paga (Auditoria Contábil Ativa)">
+                                        <span class="status-dot"></span>
                                         <i class="fas fa-check-circle"></i>
                                         <span>Pago</span>
                                         <i class="fas fa-chevron-down badge-caret"></i>
@@ -176,6 +177,7 @@
                             @elseif($fat->status === 'estornado')
                                 <div class="dropdown d-inline-block">
                                     <button class="status-badge-btn status-badge-estornado dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Fatura Estornada (Auditoria Contábil)">
+                                        <span class="status-dot"></span>
                                         <i class="fas fa-undo"></i>
                                         <span>Estornado</span>
                                         <i class="fas fa-chevron-down badge-caret"></i>
@@ -188,6 +190,7 @@
                             @else
                                 <div class="dropdown d-inline-block">
                                     <button class="status-badge-btn {{ $fat->status_badge_class }} dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Alterar status da fatura">
+                                        <span class="status-dot"></span>
                                         <i class="fas {{ $fat->status_badge_icon }}"></i>
                                         <span>{{ $fat->status_badge_label }}</span>
                                         <i class="fas fa-chevron-down badge-caret"></i>
