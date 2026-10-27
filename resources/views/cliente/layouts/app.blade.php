@@ -58,27 +58,6 @@
 
     <div class="app-wrapper">
 
-        <!-- BARRA DE ACESSO SUPERVISIONADO (MODO ADMINISTRADOR ATIVO) -->
-        @if(session()->has('impersonator_id'))
-            <div class="banner-supervisao-admin py-2 px-3 shadow-sm d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom">
-                <div class="d-flex align-items-center gap-2 text-white">
-                    <span class="badge bg-warning text-dark fw-bold px-2 py-1 d-flex align-items-center gap-1 shadow-sm">
-                        <i class="fas fa-user-shield"></i> MODO SUPERVISIONADO
-                    </span>
-                    <span class="small">
-                        Você está conectado como o cliente <strong>{{ auth()->user()->name }}</strong> ({{ auth()->user()->email }}). 
-                        <span class="d-none d-md-inline text-white-50">&bull; Sessão original de <strong>{{ session('impersonator_nome', 'Administrador') }}</strong> preservada.</span>
-                    </span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <a href="{{ route('admin.supervisao.voltar') }}" class="btn btn-sm btn-light text-danger fw-bold shadow-sm d-flex align-items-center gap-2 btn-voltar-admin" title="Retornar à mesma página de onde você saiu no painel administrativo">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Voltar ao Administrador</span>
-                    </a>
-                </div>
-            </div>
-        @endif
-
         <!-- NAVBAR SUPERIOR DO ADMINLTE 4 -->
         <nav class="app-header navbar navbar-expand bg-body">
             <div class="container-fluid">
@@ -94,6 +73,18 @@
                         </a>
                     </li>
                 </ul>
+
+                @if(session()->has('impersonator_id'))
+                    <!-- BADGE INTEGRADO CENTRAL NA NAVBAR: MODO SUPERVISIONADO -->
+                    <div class="navbar-supervisao-badge d-flex align-items-center gap-2 mx-auto px-3 py-1 rounded-pill shadow-sm" title="Você está visualizando a conta deste cliente em modo supervisionado">
+                        <span class="badge bg-warning text-dark fw-bold px-2 py-1 d-flex align-items-center gap-1">
+                            <i class="fas fa-user-shield"></i> MODO SUPERVISIONADO
+                        </span>
+                        <span class="small fw-semibold text-truncate d-none d-lg-inline" style="max-width: 260px;">
+                            Cliente: <strong>{{ auth()->user()->name }}</strong>
+                        </span>
+                    </div>
+                @endif
 
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
                     <!-- Alternador Dark / Light Mode (AdminLTE 4) -->
@@ -418,10 +409,107 @@
 
     <!-- BOTÃO FLUTUANTE DE VOLTAR AO ADMINISTRADOR (QUANDO EM MODO SUPERVISIONADO) -->
     @if(session()->has('impersonator_id'))
-        <a href="{{ route('admin.supervisao.voltar') }}" class="btn btn-danger shadow-lg btn-flutuante-voltar-admin d-flex align-items-center gap-2" title="Voltar ao Painel Administrativo exatamente na mesma página de onde você saiu" data-bs-toggle="tooltip" data-bs-placement="right">
-            <i class="fas fa-arrow-left"></i>
-            <span>Voltar ao Administrador</span>
-        </a>
+        <div id="btnFlutuanteVoltarAdminWrapper" class="btn-flutuante-voltar-admin-wrapper">
+            <a href="{{ route('admin.supervisao.voltar') }}" 
+               id="btnFlutuanteVoltarAdmin" 
+               class="btn btn-danger btn-flutuante-voltar-admin shadow-lg d-inline-flex align-items-center gap-2" 
+               title="Voltar ao Painel Administrativo exatamente na mesma página de onde você saiu (ou arraste para reposicionar)" 
+               data-bs-toggle="tooltip" 
+               data-bs-placement="left">
+                <i class="fas fa-arrow-left"></i>
+                <span class="fw-bold">Voltar ao Administrador</span>
+                <span class="badge bg-warning text-dark fw-bold ms-1 d-none d-md-inline-block">Admin</span>
+            </a>
+        </div>
+
+        <script>
+            // Arraste livre e reposicionamento inteligente do botão flutuante de supervisão
+            (function() {
+                var $wrapper = $('#btnFlutuanteVoltarAdminWrapper');
+                var $btn = $('#btnFlutuanteVoltarAdmin');
+                if (!$wrapper.length || !$btn.length) return;
+
+                // Restaurar posição salva na sessão se existir
+                try {
+                    var savedPos = sessionStorage.getItem('foco7_supervisao_btn_pos');
+                    if (savedPos) {
+                        var pos = JSON.parse(savedPos);
+                        var maxL = window.innerWidth - $wrapper.outerWidth() - 10;
+                        var maxT = window.innerHeight - $wrapper.outerHeight() - 10;
+                        var l = Math.max(10, Math.min(pos.left, maxL));
+                        var t = Math.max(10, Math.min(pos.top, maxT));
+                        $wrapper.css({ left: l + 'px', top: t + 'px', right: 'auto', bottom: 'auto' });
+                    }
+                } catch(e) {}
+
+                var isDragging = false;
+                var startX, startY, origX, origY, hasMoved = false;
+
+                function onPointerDown(e) {
+                    if (e.type === 'mousedown' && e.which !== 1) return;
+                    isDragging = true;
+                    hasMoved = false;
+                    var clientX = e.type.indexOf('touch') !== -1 ? e.originalEvent.touches[0].clientX : e.clientX;
+                    var clientY = e.type.indexOf('touch') !== -1 ? e.originalEvent.touches[0].clientY : e.clientY;
+                    startX = clientX;
+                    startY = clientY;
+
+                    var offset = $wrapper.offset();
+                    origX = offset.left - $(window).scrollLeft();
+                    origY = offset.top - $(window).scrollTop();
+
+                    $btn.css('cursor', 'grabbing');
+                    $(document).on('mousemove.supervisaoDrag touchmove.supervisaoDrag', onPointerMove);
+                    $(document).on('mouseup.supervisaoDrag touchend.supervisaoDrag', onPointerUp);
+                }
+
+                function onPointerMove(e) {
+                    if (!isDragging) return;
+                    var clientX = e.type.indexOf('touch') !== -1 ? e.originalEvent.touches[0].clientX : e.clientX;
+                    var clientY = e.type.indexOf('touch') !== -1 ? e.originalEvent.touches[0].clientY : e.clientY;
+                    var dx = clientX - startX;
+                    var dy = clientY - startY;
+
+                    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+                        hasMoved = true;
+                        var newL = origX + dx;
+                        var newT = origY + dy;
+                        var maxL = window.innerWidth - $wrapper.outerWidth() - 10;
+                        var maxT = window.innerHeight - $wrapper.outerHeight() - 10;
+                        newL = Math.max(10, Math.min(newL, maxL));
+                        newT = Math.max(10, Math.min(newT, maxT));
+                        $wrapper.css({ left: newL + 'px', top: newT + 'px', right: 'auto', bottom: 'auto' });
+                    }
+                }
+
+                function onPointerUp(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    $btn.css('cursor', '');
+                    $(document).off('.supervisaoDrag');
+
+                    if (hasMoved) {
+                        try {
+                            var offset = $wrapper.offset();
+                            var curL = offset.left - $(window).scrollLeft();
+                            var curT = offset.top - $(window).scrollTop();
+                            sessionStorage.setItem('foco7_supervisao_btn_pos', JSON.stringify({ left: curL, top: curT }));
+                        } catch(e) {}
+                    }
+                }
+
+                $wrapper.on('mousedown touchstart', onPointerDown);
+
+                $btn.on('click', function(e) {
+                    if (hasMoved) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        hasMoved = false;
+                        return false;
+                    }
+                });
+            })();
+        </script>
     @endif
 
     @yield('scripts')

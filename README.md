@@ -693,9 +693,9 @@ public_html/
 
 - **Acesso Supervisionado (Impersonation) no Painel do Cliente com Retorno Contextual:**
   - **Início da Supervisão:** O administrador pode acessar o painel de qualquer cliente ativo diretamente pela listagem de clientes (`/admin/clientes`) ou pelo modal de edição, com botão dedicado `<i class="fas fa-user-secret"></i>`.
-  - **Preservação de Contexto Exato:** Ao iniciar a supervisão, o sistema memoriza a URL exata em que o administrador estava navegando (incluindo parâmetros de busca, filtros de status ou paginação como `/admin/clientes?busca=João&status=ativo`).
-  - **Barra de Supervisão no Painel do Cliente:** Durante todo o período em que estiver navegando no painel do cliente, uma barra de alta visibilidade (`.banner-supervisao-admin`) fica afixada no topo com alerta sonoro visual ("MODO SUPERVISIONADO"), identificando o cliente e o administrador logado.
-  - **Função Voltar ao Administrador:** O administrador pode clicar a qualquer momento em **"Voltar ao Administrador"** (na barra superior, no menu dropdown do usuário ou no botão flutuante pulsante). A sessão do cliente é encerrada, o usuário administrador é autenticado novamente e redirecionado **exatamente para a mesma página anterior** de onde iniciou a supervisão.
+  - **Badge de Supervisão Integrado na Navbar:** Durante todo o período em que estiver navegando no painel do cliente, um badge translúcido de alta visibilidade (`.navbar-supervisao-badge`) fica integrado de forma centralizada e harmônica na barra superior de navegação com o alerta "MODO SUPERVISIONADO" e identificação do cliente, sem quebrar o layout nem cobrir o cabeçalho do AdminLTE 4.
+  - **Botão Flutuante Não-Intrusivo com Arraste Livre:** O botão flutuante **"Voltar ao Administrador"** (`.btn-flutuante-voltar-admin`) foi posicionado na lateral direita (`bottom: 74px; right: 24px`), perfeitamente empilhado acima do botão de WhatsApp e abaixo do botão de voltar ao topo, sem colidir com a sidebar esquerda nem cobrir menus. O botão possui suporte a arraste livre (drag & drop) com persistência de posição na sessão, além de acesso rápido via dropdown de perfil.
+  - **Função Voltar ao Administrador:** O administrador pode clicar a qualquer momento em **"Voltar ao Administrador"** para encerrar a supervisão; a sessão original é restaurada e o usuário é redirecionado **exatamente para a mesma página anterior** de onde iniciou a supervisão.
 
 ---
 
