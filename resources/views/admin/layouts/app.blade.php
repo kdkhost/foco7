@@ -506,10 +506,32 @@
         @php
             $footerSiteNome = \App\Models\CmsSetting::get('site_nome', 'Foco 7 Rastreamento & Segurança');
             $footerDevNome = \App\Models\CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad');
-            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5521981325441');
-            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441');
-            $footerDevWhatsClean = preg_replace('/\D/', '', $footerDevWhats);
-            $footerDevWhatsUrl = 'https://wa.me/' . ($footerDevWhatsClean ?: '5521981325441') . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');
+            $empresaWhatsClean = preg_replace('/\D/', '', (string) \App\Models\CmsSetting::get('contato_whatsapp', '559131970219'));
+
+            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5591980510736');
+            $footerDevWhatsClean = preg_replace('/\D/', '', (string) $footerDevWhats);
+
+            // Blindagem: se o whatsapp do desenvolvedor estiver apontando para o numero corporativo da Foco 7, força o numero real do desenvolvedor
+            if (empty($footerDevWhatsClean) || $footerDevWhatsClean === $empresaWhatsClean || str_contains($footerDevWhatsClean, '31970219')) {
+                $footerDevWhatsClean = '5591980510736';
+            }
+
+            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/' . $footerDevWhatsClean);
+            if (str_contains((string) $footerDevLink, '31970219')) {
+                $footerDevLink = 'https://wa.me/5591980510736';
+            }
+
+            $footerDevWhatsUrl = 'https://wa.me/' . $footerDevWhatsClean . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');
+
+            // Formatação legível com máscara de telefone brasileiro
+            $formattedDevWhats = '+' . substr($footerDevWhatsClean, 0, 2) . ' (' . substr($footerDevWhatsClean, 2, 2) . ') ';
+            if (strlen($footerDevWhatsClean) >= 13) {
+                $formattedDevWhats .= substr($footerDevWhatsClean, 4, 5) . '-' . substr($footerDevWhatsClean, 9);
+            } elseif (strlen($footerDevWhatsClean) === 12) {
+                $formattedDevWhats .= substr($footerDevWhatsClean, 4, 4) . '-' . substr($footerDevWhatsClean, 8);
+            } else {
+                $formattedDevWhats .= substr($footerDevWhatsClean, 4);
+            }
 
             $footerDevTelegram = \App\Models\CmsSetting::get('desenvolvedor_telegram', 'MARCELO_BRAD');
             $footerDevTelegramClean = ltrim(preg_replace('/^https?:\/\/t\.me\//i', '', trim($footerDevTelegram)), '@');
@@ -579,7 +601,7 @@
                         </div>
                         <div>
                             <strong class="d-block text-body">WhatsApp</strong>
-                            <span class="small text-secondary font-monospace">{{ $footerDevWhats ? ('+' . substr($footerDevWhatsClean, 0, 2) . ' (' . substr($footerDevWhatsClean, 2, 2) . ') ' . substr($footerDevWhatsClean, 4)) : 'Conversar agora' }}</span>
+                            <span class="small text-secondary font-monospace">{{ $formattedDevWhats }}</span>
                         </div>
                     </div>
                     <i class="fas fa-arrow-right text-success fs-5"></i>
