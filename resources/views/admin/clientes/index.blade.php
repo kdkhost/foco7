@@ -209,7 +209,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Nome Completo *</label>
-                            <input type="text" name="name" id="cli_name" class="form-control" required placeholder="Ex: Roberto Carlos">
+                            <input type="text" name="name" id="cli_name" class="form-control" required placeholder="Ex: Nome Completo do Cliente">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">E-mail de Acesso *</label>

@@ -8,58 +8,46 @@
 <!-- CARDS KPIS DO CMS & LANDING PAGE -->
 <div class="row g-3 mb-4">
     <!-- KPI 1: Banners & Slides -->
-    <div class="col-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid var(--admin-primary) !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-banners');">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-secondary small fw-semibold">Banners & Hero</span>
-                    <div class="bg-danger-subtle text-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                        <i class="fas fa-images"></i>
-                    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0 cursor-pointer" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-banners');">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-danger text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-images"></i>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bold mb-0 text-body">{{ $slides->count() }}</h3>
-                    <span class="badge bg-danger-subtle text-danger small">slides</span>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Banners &amp; Hero</h6>
+                    <h3 class="fw-bold mb-0 text-body">{{ $slides->count() }} <small class="text-secondary fs-6 fw-normal">slides</small></h3>
                 </div>
-                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Carrossel principal da home</p>
             </div>
         </div>
     </div>
 
     <!-- KPI 2: FAQs & Dúvidas -->
-    <div class="col-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #f59e0b !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-faq');">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-secondary small fw-semibold">FAQs & Dúvidas</span>
-                    <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0 cursor-pointer" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-faq');">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-warning text-dark rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-question-circle"></i>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bold mb-0 text-body">{{ $faqs->count() }}</h3>
-                    <span class="badge bg-warning-subtle text-warning small">perguntas</span>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">FAQs &amp; Dúvidas</h6>
+                    <h3 class="fw-bold mb-0 text-body">{{ $faqs->count() }} <small class="text-secondary fs-6 fw-normal">perguntas</small></h3>
                 </div>
-                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Perguntas frequentes ativas</p>
             </div>
         </div>
     </div>
 
     <!-- KPI 3: Depoimentos -->
-    <div class="col-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #8b5cf6 !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-depoimentos');">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-secondary small fw-semibold">Depoimentos</span>
-                    <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                        <i class="fas fa-star"></i>
-                    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0 cursor-pointer" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-depoimentos');">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-primary text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fas fa-star"></i>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bold mb-0 text-body">{{ $depoimentos->count() }}</h3>
-                    <span class="badge bg-primary-subtle text-primary small">avaliações</span>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">Depoimentos</h6>
+                    <h3 class="fw-bold mb-0 text-body">{{ $depoimentos->count() }} <small class="text-secondary fs-6 fw-normal">relatos</small></h3>
                 </div>
-                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Feedbacks de clientes</p>
             </div>
         </div>
     </div>
@@ -73,20 +61,16 @@
             }
         }
     @endphp
-    <div class="col-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-3 h-100 kpi-card" style="border-left: 4px solid #10b981 !important; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-whatsapp');">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-secondary small fw-semibold">WhatsApp Flutuante</span>
-                    <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                        <i class="fab fa-whatsapp"></i>
-                    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 shadow-sm border-0 cursor-pointer" onclick="if(window.ativarAbaCms) ativarAbaCms('tab-whatsapp');">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success text-white rounded-3 p-3 me-3 fs-3">
+                    <i class="fab fa-whatsapp"></i>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bold mb-0 text-body">{{ $whatsappCanaisAtivos }}</h3>
-                    <span class="badge bg-success-subtle text-success small">canais</span>
+                <div>
+                    <h6 class="text-secondary small text-uppercase mb-1">WhatsApp Flutuante</h6>
+                    <h3 class="fw-bold mb-0 text-body">{{ $whatsappCanaisAtivos }} <small class="text-secondary fs-6 fw-normal">canais</small></h3>
                 </div>
-                <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem;">Central multicanal ativa</p>
             </div>
         </div>
     </div>

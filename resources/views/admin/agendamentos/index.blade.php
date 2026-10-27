@@ -35,10 +35,10 @@
             </div>
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="small fw-bold text-secondary me-1">Status:</span>
-                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pendente</span>
-                <span class="badge bg-success"><i class="fas fa-check me-1"></i> Confirmado</span>
-                <span class="badge bg-primary"><i class="fas fa-check-double me-1"></i> Concluído</span>
-                <span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Cancelado</span>
+                <span class="status-badge-pill status-badge-pendente"><span class="status-dot"></span><i class="fas fa-clock"></i><span>Pendente</span></span>
+                <span class="status-badge-pill status-badge-pago"><span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Confirmado</span></span>
+                <span class="status-badge-pill status-badge-concluido"><span class="status-dot"></span><i class="fas fa-flag-checkered"></i><span>Concluído</span></span>
+                <span class="status-badge-pill status-badge-cancelado"><span class="status-dot"></span><i class="fas fa-ban"></i><span>Cancelado</span></span>
             </div>
         </div>
     </div>

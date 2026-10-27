@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\CmsSetting;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Mail;
+use App\Services\EmailTemplateService;
+use App\Services\GeoIpService;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
 
 class ConfiguracoesController extends Controller
 {
@@ -81,8 +83,8 @@ class ConfiguracoesController extends Controller
 
             // Desenvolvedor do Sistema & Suporte Técnico
             'desenvolvedor_nome' => CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad'),
-            'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736'),
-            'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5591980510736'),
+            'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441'),
+            'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5521981325441'),
             'desenvolvedor_telegram' => CmsSetting::get('desenvolvedor_telegram', 'marcelobrad'),
         ];
 
@@ -111,7 +113,7 @@ class ConfiguracoesController extends Controller
 
         foreach ($camposTexto as $campo) {
             if ($request->has($campo)) {
-                CmsSetting::set($campo, trim((string)$request->input($campo, '')), 'sistema');
+                CmsSetting::set($campo, trim((string) $request->input($campo, '')), 'sistema');
             }
         }
 
@@ -137,16 +139,16 @@ class ConfiguracoesController extends Controller
         }
 
         $uploadPath = public_path('uploads/branding');
-        if (!File::isDirectory($uploadPath)) {
+        if (! File::isDirectory($uploadPath)) {
             File::makeDirectory($uploadPath, 0755, true, true);
         }
 
         // 2. Upload de Logotipo Principal (Fundo Escuro / Preto) com Drag & Drop
         if ($request->hasFile('logo_upload')) {
             $file = $request->file('logo_upload');
-            $fileName = 'logo_dark_bg_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'logo_dark_bg_'.time().'.'.$file->getClientOriginalExtension();
             $file->move($uploadPath, $fileName);
-            $logoUrl = '/uploads/branding/' . $fileName;
+            $logoUrl = '/uploads/branding/'.$fileName;
             CmsSetting::set('site_logo', $logoUrl, 'branding');
             @copy(public_path(ltrim($logoUrl, '/\\')), public_path('img/logo-foco7.png'));
         } elseif ($request->boolean('remover_logo_upload') || $request->boolean('remover_logo') || $request->input('remover_logo_upload') == '1' || $request->input('remover_logo') == '1') {
@@ -156,9 +158,9 @@ class ConfiguracoesController extends Controller
         // 3. Upload de Logotipo Secundário (Fundo Claro / Branco) com Drag & Drop
         if ($request->hasFile('logo_light_upload')) {
             $file = $request->file('logo_light_upload');
-            $fileName = 'logo_light_bg_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'logo_light_bg_'.time().'.'.$file->getClientOriginalExtension();
             $file->move($uploadPath, $fileName);
-            $logoLightUrl = '/uploads/branding/' . $fileName;
+            $logoLightUrl = '/uploads/branding/'.$fileName;
             CmsSetting::set('site_logo_clara', $logoLightUrl, 'branding');
             CmsSetting::set('site_logo_light', $logoLightUrl, 'branding');
             @copy(public_path(ltrim($logoLightUrl, '/\\')), public_path('img/logo-foco7-dark.png'));
@@ -170,9 +172,9 @@ class ConfiguracoesController extends Controller
         // 4. Upload de Favicon com Drag & Drop
         if ($request->hasFile('favicon_upload')) {
             $file = $request->file('favicon_upload');
-            $fileName = 'favicon_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'favicon_'.time().'.'.$file->getClientOriginalExtension();
             $file->move($uploadPath, $fileName);
-            $favUrl = '/uploads/branding/' . $fileName;
+            $favUrl = '/uploads/branding/'.$fileName;
             CmsSetting::set('site_favicon', $favUrl, 'branding');
             @copy(public_path(ltrim($favUrl, '/\\')), public_path('img/favicon.png'));
             @copy(public_path(ltrim($favUrl, '/\\')), public_path('favicon.ico'));
@@ -248,14 +250,14 @@ class ConfiguracoesController extends Controller
                 <p>Todas as notificações do sistema (faturas, carnês, pagamentos e avisos de segurança) estão configuradas para utilizar este canal oficial com entrega em formato responsivo para todos os dispositivos.</p>
             ";
 
-            $htmlCompleto = \App\Services\EmailTemplateService::compilarHtml($corpoHtml, [
+            $htmlCompleto = EmailTemplateService::compilarHtml($corpoHtml, [
                 'assunto' => '✅ Teste de Conexão SMTP - Foco 7 Rastreamento',
             ]);
 
             Mail::mailer('smtp_teste')->html($htmlCompleto, function ($message) use ($destinatario, $fromAddress, $fromName) {
                 $message->to($destinatario)
-                        ->from($fromAddress, $fromName)
-                        ->subject('✅ Teste de Conexão SMTP - Foco 7 Rastreamento');
+                    ->from($fromAddress, $fromName)
+                    ->subject('✅ Teste de Conexão SMTP - Foco 7 Rastreamento');
             });
 
             return response()->json([
@@ -265,7 +267,7 @@ class ConfiguracoesController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Falha na conexão SMTP: ' . $e->getMessage(),
+                'message' => 'Falha na conexão SMTP: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -276,7 +278,7 @@ class ConfiguracoesController extends Controller
     public function testarGeoip(Request $request)
     {
         $termo = $request->input('ip') ?? $request->input('termo', 'BR');
-        $resultado = \App\Services\GeoIpService::simular($termo);
+        $resultado = GeoIpService::simular($termo);
 
         return response()->json([
             'success' => true,

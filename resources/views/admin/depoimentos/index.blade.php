@@ -263,7 +263,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Nome do Cliente *</label>
-                            <input type="text" name="nome_cliente" id="dep_nome_cliente" class="form-control" required placeholder="Ex: Roberto Carlos">
+                            <input type="text" name="nome_cliente" id="dep_nome_cliente" class="form-control" required placeholder="Ex: Nome do Cliente">
                         </div>
 
                         <div class="col-md-6">

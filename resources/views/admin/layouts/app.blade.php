@@ -508,17 +508,17 @@
             $footerDevNome = \App\Models\CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad');
             $empresaWhatsClean = preg_replace('/\D/', '', (string) \App\Models\CmsSetting::get('contato_whatsapp', '559131970219'));
 
-            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5591980510736');
+            $footerDevWhats = \App\Models\CmsSetting::get('desenvolvedor_whatsapp', '5521981325441');
             $footerDevWhatsClean = preg_replace('/\D/', '', (string) $footerDevWhats);
 
-            // Blindagem: se o whatsapp do desenvolvedor estiver apontando para o numero corporativo da Foco 7, força o numero real do desenvolvedor
-            if (empty($footerDevWhatsClean) || $footerDevWhatsClean === $empresaWhatsClean || str_contains($footerDevWhatsClean, '31970219')) {
-                $footerDevWhatsClean = '5591980510736';
+            // Blindagem: se o whatsapp do desenvolvedor estiver apontando para o numero corporativo da Foco 7 ou estiver vazio, força o numero real do desenvolvedor Marcelo Brad
+            if (empty($footerDevWhatsClean) || $footerDevWhatsClean === $empresaWhatsClean || str_contains($footerDevWhatsClean, '31970219') || str_contains($footerDevWhatsClean, '80510736')) {
+                $footerDevWhatsClean = '5521981325441';
             }
 
             $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/' . $footerDevWhatsClean);
-            if (str_contains((string) $footerDevLink, '31970219')) {
-                $footerDevLink = 'https://wa.me/5591980510736';
+            if (str_contains((string) $footerDevLink, '31970219') || str_contains((string) $footerDevLink, '80510736')) {
+                $footerDevLink = 'https://wa.me/5521981325441';
             }
 
             $footerDevWhatsUrl = 'https://wa.me/' . $footerDevWhatsClean . '?text=' . urlencode('Olá ' . $footerDevNome . ', preciso de suporte técnico referente ao painel administrativo da Foco 7.');

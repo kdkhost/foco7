@@ -27,16 +27,22 @@
                 <p class="text-secondary small mb-2">{{ $user->email }}</p>
                 
                 <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
-                    <span class="badge bg-danger text-uppercase px-3 py-2">
-                        <i class="fas fa-shield-alt me-1"></i> {{ ucfirst($user->role) }}
+                    <span class="status-badge-pill status-badge-vencida">
+                        <span class="status-dot"></span>
+                        <i class="fas fa-shield-alt"></i>
+                        <span>{{ strtoupper($user->role) }}</span>
                     </span>
                     @if($user->hasTwoFactor())
-                        <span class="badge bg-success px-3 py-2" title="Autenticação em Duas Etapas Ativa">
-                            <i class="fas fa-lock me-1"></i> 2FA ATIVO
+                        <span class="status-badge-pill status-badge-pago" title="Autenticação em Duas Etapas Ativa">
+                            <span class="status-dot"></span>
+                            <i class="fas fa-lock"></i>
+                            <span>2FA ATIVO</span>
                         </span>
                     @else
-                        <span class="badge bg-secondary px-3 py-2" title="2FA Não Configurado">
-                            <i class="fas fa-unlock me-1"></i> 2FA INATIVO
+                        <span class="status-badge-pill status-badge-cancelado" title="2FA Não Configurado">
+                            <span class="status-dot"></span>
+                            <i class="fas fa-unlock"></i>
+                            <span>2FA INATIVO</span>
                         </span>
                     @endif
                 </div>

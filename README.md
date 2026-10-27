@@ -616,10 +616,20 @@ public_html/
   - Conversão dos 4 `small-box` antigos em cards elegantes e interativos de métricas (`Não Lidas`, `Contatos`, `Agendamentos`, `Depoimentos`).
 - **Depoimentos & Avaliações (`/admin/depoimentos`):**
   - Cards de métricas padronizados, botão principal com estilo corporativo e status de moderação com `.status-badge-pill` e `.status-dot` (`Aprovado` / `Pendente`) sincronizados via AJAX.
-- **Clientes (`/admin/clientes`):**
-  - Status do cliente padronizado com `.status-badge-pill` e `.status-dot` (`Ativo` / `Bloqueado`).
 - **Dashboard Principal (`/admin`):**
   - Todos os 4 KPIs principais convertidos para o design system unificado preservando a animação de contadores numéricos (`kpi-counter`) e badges de agendamentos (`confirmado`, `concluido`, `cancelado`, `pendente`) unificados via Model `Agendamento`.
+- **CMS & Conteúdo da Landing Page (`/admin/cms`):**
+  - Conversão de todos os 4 cards de KPIs (`Banners`, `FAQs`, `Depoimentos`, `WhatsApp Flutuante`) para o padrão com boxes de ícones coloridos arredondados, tipografia uppercase e contadores numéricos em destaque.
+- **Central de Tarefas Cron (`/admin/cron`):**
+  - Coluna de status da listagem padronizada com `.status-badge-pill` e `.status-dot` (`Ativo` / `Pausado`) e atualização dinâmica do badge na alternância instantânea via switch AJAX.
+- **Templates de E-mails Transacionais (`/admin/emails`):**
+  - Status do servidor SMTP e tipos de template (`Sistema` / `Custom`) padronizados com pílulas luminosas e ações agrupadas em `.btn-group`.
+- **Agenda de Instalações (`/admin/agendamentos`):**
+  - Legenda e indicadores de status com `.status-badge-pill` e `.status-dot` (`Pendente`, `Confirmado`, `Concluído`, `Cancelado`).
+- **Meu Perfil (`/admin/perfil`):**
+  - Badges de perfil e 2FA padronizados no formato pílula com indicador luminoso.
+- **Créditos & Suporte Técnico do Desenvolvedor:**
+  - Contato oficial do desenvolvedor Marcelo Brad configurado com WhatsApp direto `+55 (21) 98132-5441` (`5521981325441`), Telegram `@marcelobrad` e blindagem no core impedindo sobrescrita acidental com dados da empresa cliente.
 
 ---
 

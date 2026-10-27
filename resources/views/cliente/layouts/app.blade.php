@@ -211,7 +211,7 @@
         @php
             $footerSiteNome = \App\Models\CmsSetting::get('site_nome', 'Foco 7 Rastreamento & Segurança');
             $footerDevNome = \App\Models\CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad');
-            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5591980510736');
+            $footerDevLink = \App\Models\CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441');
             
             $empresaWhats = \App\Models\CmsSetting::get('contato_whatsapp', '559180510736');
             $empresaWhatsClean = preg_replace('/\D/', '', $empresaWhats);

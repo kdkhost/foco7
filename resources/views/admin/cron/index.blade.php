@@ -288,11 +288,15 @@
                         </span>
                     </td>
                     <td>
-                        <div class="form-check form-switch m-0">
-                            <input class="form-check-input" type="checkbox" role="switch" id="toggle_job_{{ $job->id }}" {{ $job->ativo ? 'checked' : '' }} onchange="toggleJobStatus({{ $job->id }})">
-                            <label class="form-check-label small text-secondary" for="toggle_job_{{ $job->id }}" id="label_toggle_{{ $job->id }}">
-                                {{ $job->ativo ? 'Ativo' : 'Pausado' }}
-                            </label>
+                        <div class="d-inline-flex align-items-center gap-2">
+                            <span id="badge_job_{{ $job->id }}" class="status-badge-pill {{ $job->ativo ? 'status-badge-pago' : 'status-badge-cancelado' }}">
+                                <span class="status-dot"></span>
+                                <i class="fas {{ $job->ativo ? 'fa-check-circle' : 'fa-pause' }}"></i>
+                                <span>{{ $job->ativo ? 'Ativo' : 'Pausado' }}</span>
+                            </span>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input cursor-pointer" type="checkbox" role="switch" id="toggle_job_{{ $job->id }}" {{ $job->ativo ? 'checked' : '' }} onchange="toggleJobStatus({{ $job->id }})" title="{{ $job->ativo ? 'Pausar Rotina' : 'Ativar Rotina' }}">
+                            </div>
                         </div>
                     </td>
                     <td>
@@ -573,7 +577,16 @@
             dataType: 'json',
             success: function(res) {
                 if (res.success) {
-                    $('#label_toggle_' + id).text(res.ativo ? 'Ativo' : 'Pausado');
+                    var $badge = $('#badge_job_' + id);
+                    if (res.ativo) {
+                        $badge.removeClass('status-badge-cancelado').addClass('status-badge-pago');
+                        $badge.html('<span class="status-dot"></span><i class="fas fa-check-circle"></i><span>Ativo</span>');
+                        $('#toggle_job_' + id).attr('title', 'Pausar Rotina');
+                    } else {
+                        $badge.removeClass('status-badge-pago').addClass('status-badge-cancelado');
+                        $badge.html('<span class="status-dot"></span><i class="fas fa-pause"></i><span>Pausado</span>');
+                        $('#toggle_job_' + id).attr('title', 'Ativar Rotina');
+                    }
                     window.foco7Notify.success(res.message);
                 }
             },

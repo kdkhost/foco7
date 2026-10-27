@@ -139,7 +139,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp (DDI + DDD + Número)</label>
-                            <input type="text" name="desenvolvedor_whatsapp" class="form-control" value="{{ $configs['desenvolvedor_whatsapp'] ?? '5591980510736' }}" placeholder="Ex: 5591980510736">
+                            <input type="text" name="desenvolvedor_whatsapp" class="form-control" value="{{ $configs['desenvolvedor_whatsapp'] ?? '5521981325441' }}" placeholder="Ex: 5521981325441">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold"><i class="fab fa-telegram-plane text-info me-1"></i> Telegram (Usuário ou Link)</label>
@@ -147,7 +147,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">Link / Site do Desenvolvedor</label>
-                            <input type="text" name="desenvolvedor_link" class="form-control" value="{{ $configs['desenvolvedor_link'] ?? 'https://wa.me/5591980510736' }}" placeholder="Ex: https://wa.me/5591980510736">
+                            <input type="text" name="desenvolvedor_link" class="form-control" value="{{ $configs['desenvolvedor_link'] ?? 'https://wa.me/5521981325441' }}" placeholder="Ex: https://wa.me/5521981325441">
                         </div>
                     </div>
                 </div>

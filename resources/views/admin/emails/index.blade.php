@@ -33,7 +33,7 @@
                     <div>
                         <h6 class="fw-bold mb-1 text-body">Conta SMTP Exclusiva do Sistema</h6>
                         <p class="text-secondary small mb-0 font-monospace">
-                            <span class="badge bg-success-subtle text-success border border-success-subtle me-1">Ativo</span>
+                            <span class="status-badge-pill status-badge-pago me-2"><span class="status-dot"></span><span>SMTP Ativo</span></span>
                             Remetente Oficial: <strong>{{ $smtpConfig['from'] }}</strong> &bull; Servidor: {{ $smtpConfig['host'] }}:{{ $smtpConfig['port'] }}
                         </p>
                     </div>
@@ -89,21 +89,29 @@
                     </td>
                     <td class="text-center">
                         @if(!empty($tpl['sistema']))
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Sistema</span>
+                            <span class="status-badge-pill status-badge-cancelado">
+                                <span class="status-dot"></span>
+                                <i class="fas fa-lock"></i>
+                                <span>Sistema</span>
+                            </span>
                         @else
-                            <span class="badge bg-success-subtle text-success border border-success-subtle">Personalizado</span>
+                            <span class="status-badge-pill status-badge-concluido">
+                                <span class="status-dot"></span>
+                                <i class="fas fa-magic"></i>
+                                <span>Custom</span>
+                            </span>
                         @endif
                     </td>
                     <td class="text-end">
-                        <div class="d-inline-flex gap-1">
-                            <a href="{{ route('admin.emails.edit', $chave) }}" class="btn btn-outline-danger btn-sm fw-semibold" title="Abrir em Página Dedicada com Preview em Tempo Real">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ route('admin.emails.edit', $chave) }}" class="btn btn-outline-danger fw-semibold" title="Abrir em Página Dedicada com Preview em Tempo Real">
                                 <i class="fas fa-edit me-1"></i> Editar
                             </a>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" title="Disparar Teste Deste Template" onclick="dispararTesteIndividual('{{ $chave }}', '{{ addslashes($tpl['nome']) }}')">
+                            <button type="button" class="btn btn-outline-secondary" title="Disparar Teste Deste Template" onclick="dispararTesteIndividual('{{ $chave }}', '{{ addslashes($tpl['nome']) }}')">
                                 <i class="fas fa-vial"></i>
                             </button>
                             @if(empty($tpl['sistema']))
-                            <button type="button" class="btn btn-outline-danger btn-sm" title="Excluir Template" onclick="excluirTemplate('{{ $chave }}', '{{ addslashes($tpl['nome']) }}')">
+                            <button type="button" class="btn btn-outline-danger" title="Excluir Template" onclick="excluirTemplate('{{ $chave }}', '{{ addslashes($tpl['nome']) }}')">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                             @endif
