@@ -323,7 +323,7 @@ i.text-primary {
 .badge-circle,
 .badge.rounded-circle,
 span.badge.rounded-circle,
-span.rounded-circle {
+span.rounded-circle:not(.avatar-status-dot):not(.online-status-dot) {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -337,6 +337,32 @@ span.rounded-circle {
     font-size: 0.85rem !important;
     line-height: 1 !important;
     flex-shrink: 0 !important;
+}
+
+/* Indicador de status online em avatares (discreto, fixado no cantinho sem cobrir a imagem) */
+.avatar-status-dot {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 10px !important;
+    height: 10px !important;
+    min-width: 10px !important;
+    min-height: 10px !important;
+    max-width: 10px !important;
+    max-height: 10px !important;
+    border-radius: 50% !important;
+    background-color: #28a745 !important;
+    border: 2px solid #ffffff !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 5 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+    pointer-events: none !important;
+}
+
+[data-bs-theme="dark"] .avatar-status-dot {
+    border-color: #212529 !important;
 }
 
 /* Ícones circulares médios/grandes em cards de estatísticas */

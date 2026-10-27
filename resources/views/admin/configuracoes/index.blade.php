@@ -128,14 +128,13 @@
                             <div class="card card-dev-protegido {{ $configs['dev_desbloqueado'] ? 'desbloqueado' : 'bloqueado' }} shadow-sm rounded-3 overflow-hidden border">
                                 <div class="card-header bg-body-tertiary py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="position-relative flex-shrink-0">
+                                        <div class="position-relative flex-shrink-0" style="width: 44px; height: 44px;">
                                             <img src="{{ asset(ltrim($configs['desenvolvedor_avatar'], '/')) }}" 
                                                  alt="{{ $configs['desenvolvedor_nome'] }}" 
                                                  id="dev_avatar_header" 
-                                                 class="rounded-circle border border-2 border-danger object-fit-cover shadow-sm {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                                 style="width: 44px; height: 44px;" 
+                                                 class="rounded-circle border border-2 border-danger object-fit-cover shadow-sm w-100 h-100 {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
                                                  onerror="this.onerror=null; this.src='{{ asset('img/desenvolvedor-avatar.png') }}';">
-                                            <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width: 10px; height: 10px;" title="Online"></span>
+                                            <span class="avatar-status-dot" title="Online"></span>
                                         </div>
                                         <div>
                                             <h6 class="fw-bold mb-1 text-danger d-flex align-items-center gap-2">
@@ -163,14 +162,13 @@
                                     <div class="d-flex flex-column flex-lg-row align-items-center align-items-lg-start gap-4">
                                         <!-- AVATAR DO DESENVOLVEDOR -->
                                         <div class="text-center flex-shrink-0" style="min-width: 130px;">
-                                            <div class="position-relative d-inline-block">
+                                            <div class="position-relative d-inline-block" style="width: 86px; height: 86px;">
                                                 <img src="{{ asset(ltrim($configs['desenvolvedor_avatar'], '/')) }}" 
                                                      id="dev_avatar_preview" 
                                                      alt="{{ $configs['desenvolvedor_nome'] }}" 
-                                                     class="rounded-circle border border-3 border-danger shadow-sm object-fit-cover {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                                     style="width: 86px; height: 86px;" 
+                                                     class="rounded-circle border border-3 border-danger shadow-sm object-fit-cover w-100 h-100 {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
                                                      onerror="this.onerror=null; this.src='{{ asset('img/desenvolvedor-avatar.png') }}';">
-                                                <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 14px; height: 14px;" title="Online"></span>
+                                                <span class="avatar-status-dot" style="width: 14px !important; height: 14px !important; min-width: 14px !important; min-height: 14px !important;" title="Online"></span>
                                             </div>
                                             <div class="mt-2">
                                                 <label for="dev_avatar_upload" class="btn btn-xs btn-outline-danger fw-bold shadow-sm {{ $configs['dev_desbloqueado'] ? '' : 'disabled' }}" id="btnTrocarAvatarDev" style="font-size: 11px;">

@@ -574,13 +574,12 @@
         <div id="boxDevContato" class="box-dev-contato shadow-lg border" style="display: none;">
             <div class="box-dev-header d-flex align-items-center justify-content-between p-3 border-bottom">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="position-relative flex-shrink-0">
+                    <div class="position-relative flex-shrink-0" style="width: 42px; height: 42px;">
                         <img src="{{ $footerDevAvatarUrl }}" 
                              alt="{{ $footerDevNome }}" 
-                             class="rounded-circle border border-2 border-success object-fit-cover shadow-sm" 
-                             style="width: 38px; height: 38px;" 
+                             class="rounded-circle border border-2 border-success object-fit-cover shadow-sm w-100 h-100" 
                              onerror="this.onerror=null; this.src='{{ asset('img/desenvolvedor-avatar.png') }}';">
-                        <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width: 10px; height: 10px;" title="Online"></span>
+                        <span class="avatar-status-dot" title="Online"></span>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0 text-body fs-6">{{ $footerDevNome }}</h6>
