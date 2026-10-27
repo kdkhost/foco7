@@ -19,11 +19,19 @@ class WebhookController extends Controller
         Log::info('Webhook Mercado Pago recebido:', $request->all());
 
         $type = $request->input('type');
-        $dataId = $request->input('data.id');
+        $dataId = $request->input('data.id') ?: $request->input('id');
+        $faturaCodigo = $request->query('fatura_codigo') ?: $request->input('fatura_codigo');
 
-        if ($type === 'payment' && $dataId) {
-            // Localiza a fatura vinculada ao transaction id
-            $fatura = Fatura::where('gateway_transaction_id', $dataId)->first();
+        if (($type === 'payment' || $request->input('action') === 'payment.created' || $request->input('action') === 'payment.updated' || ! empty($dataId)) && ($dataId || $faturaCodigo)) {
+            // Localiza a fatura vinculada ao transaction id ou código dinâmico
+            $fatura = Fatura::where(function ($q) use ($dataId, $faturaCodigo) {
+                if (! empty($dataId)) {
+                    $q->where('gateway_transaction_id', (string) $dataId);
+                }
+                if (! empty($faturaCodigo)) {
+                    $q->orWhere('codigo_fatura', (string) $faturaCodigo);
+                }
+            })->first();
 
             if ($fatura && $fatura->status !== 'pago') {
                 $fatura->update([
@@ -32,7 +40,7 @@ class WebhookController extends Controller
                     'webhook_payload' => $request->all(),
                 ]);
 
-                Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Mercado Pago Webhook.");
+                Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Mercado Pago Webhook Dinâmico.");
 
                 // Dispara confirmação imediata por e-mail ao cliente
                 if ($fatura->user && ! empty($fatura->user->email)) {

@@ -607,6 +607,12 @@ class GatewaysController extends Controller
      */
     public function gerarCarne(Request $request)
     {
+        if (! $request->filled('data_primeiro_vencimento') && $request->filled('primeiro_vencimento')) {
+            $request->merge(['data_primeiro_vencimento' => $request->input('primeiro_vencimento')]);
+        } elseif (! $request->filled('data_primeiro_vencimento')) {
+            $request->merge(['data_primeiro_vencimento' => now()->addDays(5)->format('Y-m-d')]);
+        }
+
         $request->validate([
             'cliente_id' => 'required|exists:users,id',
             'plano_id' => 'nullable|exists:planos,id',

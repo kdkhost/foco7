@@ -645,6 +645,39 @@ public_html/
   - **Sincronização & Webhook Unificado de Carnês:**
     - Tratamento de notificações v1 (`/v1/notification/:token`) no webhook `/webhook/efi` para conciliação automática de carnês e boletos emitidos via Efí PRO.
     - Comando de sincronização diária (`php artisan gateways:sincronizar-pagamentos`) consultando faturas pendentes da Efí via endpoint `/v1/carnet/{id}` e baixando parcelas quitadas.
+---
+
+## ⚡ Módulo 37: Checkout 100% Transparente (Sem Venda Fora do Site), Webhooks Dinâmicos por Requisição & API RESTful v1 Escalável
+
+### 1. Checkout 100% Transparente & Experiência Nativa (Zero Redirecionamento Externo)
+- **Venda Exclusiva no Site Foco 7:** O sistema não utiliza soluções de redirecionamento (como Checkout Pro ou páginas externas de instituições financeiras).
+- **Processamento Inline Multigateway:**
+  - **PIX Instantâneo:** Geração em milissegundos com QR Code renderizado no modal do site e código Copia e Cola com botão de cópia com 1 clique.
+  - **Cartão de Crédito Transparente:** Entrada de dados e tokenização direta no navegador. Suporte integral tanto na Efí PRO quanto no Mercado Pago, retornando aprovação imediata ou status de processamento na própria tela.
+  - **Boleto Bancário:** Retorno imediato da linha digitável copiada e visualizador do boleto embutido.
+  - **Carnê em PDF:** Emissão sequencial de lâminas (Carnê Próprio Foco 7 ou Oficial Efí PRO) com visualizador e download direto em PDF.
+
+### 2. Webhooks Dinâmicos por Requisição
+- **Rastreamento Individualizado:** A cada emissão de cobrança (Pix, Boleto, Cartão ou Carnê), o sistema injeta dinamicamente o parâmetro `notification_url` com identificadores únicos da fatura (`fatura_codigo`, `carne_codigo`) e timestamp de requisição (`t=...`).
+- **Conciliação e Baixa Imediata:** Os controladores de webhook (`/webhook/mercadopago` e `/webhook/efi`) leem os parâmetros dinâmicos da URL para localizar a fatura instantaneamente e disparar os e-mails transacionais de confirmação e recibo ao cliente.
+
+### 3. API RESTful v1 Escalável para Integrações & Aplicativos Móveis
+- **Arquitetura Oficial de Rotas (`routes/api.php`):** Registrada oficialmente no ciclo de inicialização do Laravel 13 (`bootstrap/app.php`) sob o prefixo `/api/v1/`.
+- **Endpoints Públicos de Consulta:**
+  - `GET /api/v1/ping`: Health check e diagnóstico de serviços com timestamp, timezone e versão.
+  - `GET /api/v1/planos`: Catálogo de planos com preços, benefícios, taxas de adesão e destaques.
+  - `GET /api/v1/filiais`: Listagem de unidades e filiais para mapas com coordenadas GPS e WhatsApp.
+  - `GET /api/v1/faturas/{codigo}`: Consulta detalhada de fatura por código ou ID com QR Code Pix, linha digitável e link de carnê.
+- **Endpoints de Checkout Transparente na API:**
+  - `POST /api/v1/checkout/calcular-taxas`: Simulação de valores com repasse de taxas e descontos em tempo real.
+  - `POST /api/v1/checkout/gerar`: Processamento de checkout seguro via API REST com geração de faturas e retorno dos payloads para consumo nativo por aplicativos móveis ou plataformas parceiras.
+- **Endpoints Administrativos Protegidos (`ApiAuthKey`):**
+  - Autenticação via cabeçalhos `Authorization: Bearer <token>` ou `X-API-Key: <token>`.
+  - `GET /api/v1/admin/metricas`: KPIs de faturamento, faturas quitadas/pendentes e receita mensal.
+  - `GET /api/v1/admin/clientes`: Listagem paginada de clientes com busca e filtros.
+  - `POST /api/v1/admin/carnes/emitir`: Emissão programática de carnê escolhendo explicitamente entre `tipo_carne: "proprio"` ou `"efi"`.
+  - `POST /api/v1/admin/faturas/{id}/estornar`: Estorno auditado de fatura quitada com justificativa.
+
 - **Créditos & Suporte Técnico do Desenvolvedor:**
   - Contato oficial do desenvolvedor Marcelo Brad configurado com WhatsApp direto `+55 (21) 98132-5441` (`5521981325441`), Telegram `@marcelobrad` e blindagem no core impedindo sobrescrita acidental com dados da empresa cliente.
 
@@ -653,8 +686,8 @@ public_html/
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
-- **141 testes executados, 141 aprovados (100% de sucesso), 643 asserções**.
-- Cobertura completa: Gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks e isolamento ACL.
+- **149 testes executados, 149 aprovados (100% de sucesso), 680 asserções**.
+- Cobertura completa: API REST v1 versionada (ping, planos, filiais, checkout transparente, consulta de faturas, métricas administrativas e emissão de carnê dual), gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks dinâmicos e isolamento ACL.
 
 ---
 
