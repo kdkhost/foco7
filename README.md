@@ -678,11 +678,17 @@ public_html/
   - `POST /api/v1/admin/carnes/emitir`: Emissão programática de carnê escolhendo explicitamente entre `tipo_carne: "proprio"` ou `"efi"`.
   - `POST /api/v1/admin/faturas/{id}/estornar`: Estorno auditado de fatura quitada com justificativa.
 
-- **Créditos & Suporte Técnico do Desenvolvedor (Área Restrita com Tarja & Senha Master):**
+- **Créditos & Suporte Técnico do Desenvolvedor (Área Restrita com Tarja, Avatar Oficial & Criptografia no Banco):**
   - Contato oficial do desenvolvedor Marcelo Brad configurado com WhatsApp direto `+55 (21) 98132-5441` (`5521981325441`), Telegram `@marcelobrad` e blindagem no core impedindo sobrescrita acidental com dados da empresa cliente.
-  - **Proteção Visual & Blindagem por Senha:**
+  - **Criptografia AES-256 & Proteção Anti-Adulteração no Banco de Dados:**
+    - Todos os dados sensíveis de autoria e contato (`desenvolvedor_nome`, `desenvolvedor_whatsapp`, `desenvolvedor_telegram`, `desenvolvedor_link`, `desenvolvedor_avatar`, `dev_master_password`) são **criptografados no banco de dados** via AES-256 e assinados com HMAC de integridade.
+    - Caso alguém acesse o MySQL diretamente (phpMyAdmin, cPanel ou SQL injection) e tente forjar ou alterar os valores em texto puro ou com chaves inválidas, a descriptografia falha e o sistema **rejeita a adulteração**, restaurando e exibindo automaticamente os dados oficiais do desenvolvedor Marcelo Brad.
+  - **Avatar Oficial do Desenvolvedor:**
+    - Exibição da foto avatar de perfil no cabeçalho do box flutuante de atendimento direto (`#boxDevContato`) com indicador online verde de alta precisão.
+    - No painel administrativo (`/admin/configuracoes`), conta com pré-visualização circular, upload direto de imagem e efeito de tarja blur quando bloqueado.
+  - **Proteção Visual & Blindagem por Senha Master:**
     - No painel administrativo (`/admin/configuracoes`), os campos de autoria e contato do desenvolvedor ficam **tarjados por padrão** (`filter: blur(6px)` e máscara de caracteres `••••••••••••`), desabilitados para leitura e edição.
-    - Desbloqueio seguro e interativo via **SweetAlert2** solicitando a **Senha Master do Desenvolvedor**.
+    - Desbloqueio seguro e interativo via **SweetAlert2** solicitando a **Senha Master do Desenvolvedor** (`Brad@2026`, o próprio WhatsApp `21981325441` ou chave personalizada via `.env`).
     - O backend bloqueia categoricamente qualquer tentativa de salvar ou sobrescrever os dados de autoria caso a requisição não possua a autenticação válida do desenvolvedor.
 
 ---
@@ -690,8 +696,8 @@ public_html/
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):
-- **153 testes executados, 153 aprovados (100% de sucesso), 691 asserções**.
-- Cobertura completa: Blindagem por senha master e tarja dos dados do desenvolvedor, API REST v1 versionada (ping, planos, filiais, checkout transparente, consulta de faturas, métricas administrativas e emissão de carnê dual), gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks dinâmicos e isolamento ACL.
+- **156 testes executados, 156 aprovados (100% de sucesso), 700 asserções**.
+- Cobertura completa: Criptografia AES-256 no banco de dados e rejeição de adulteração direta via SQL, avatar do desenvolvedor e exibição no layout, blindagem por senha master e tarja dos dados do desenvolvedor, API REST v1 versionada (ping, planos, filiais, checkout transparente, consulta de faturas, métricas administrativas e emissão de carnê dual), gestão inteligente de carnê (cancelamento contextual de parcela única, sequência pendente, carnê completo e exclusão em lote de todas de uma única vez), segurança de sessão e auto-logout por inatividade, blindagem de cobrança para faturas quitadas na régua e cron jobs, usuários e permissões granulares, ciclo de vida do perfil pessoal e endereço ViaCEP, autenticação em duas etapas (2FA TOTP RFC 6238, QR code, desafio no login e códigos de emergência), unidades, filiais e mapa interativo OpenStreetMap com geocodificação e traçado de rotas, bloqueio geográfico de países fora das Américas, parceiros em carrossel infinito, depoimentos, checkout transparente Efí (Pix, Boleto, Cartão e Carnê em PDF), fullcalendar, webhooks dinâmicos e isolamento ACL.
 
 ---
 

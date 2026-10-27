@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\CmsSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -225,5 +227,56 @@ class AdminPerfilEConfiguracoesTest extends TestCase
         // Os dados do desenvolvedor Marcelo Brad permanecem 100% blindados
         $this->assertEquals('Marcelo Brad', CmsSetting::get('desenvolvedor_nome'));
         $this->assertEquals('5521981325441', CmsSetting::get('desenvolvedor_whatsapp'));
+    }
+
+    public function test_dados_do_desenvolvedor_sao_criptografados_no_banco_de_dados(): void
+    {
+        CmsSetting::set('desenvolvedor_nome', 'Marcelo Brad', 'desenvolvedor');
+        CmsSetting::set('desenvolvedor_whatsapp', '5521981325441', 'desenvolvedor');
+
+        // Verifica o valor bruto direto no banco de dados (tabela cms_settings)
+        $rawNome = DB::table('cms_settings')
+            ->where('chave', 'desenvolvedor_nome')
+            ->value('valor');
+
+        $rawWhats = DB::table('cms_settings')
+            ->where('chave', 'desenvolvedor_whatsapp')
+            ->value('valor');
+
+        // Não pode estar em texto puro no banco de dados
+        $this->assertStringNotContainsString('Marcelo Brad', (string) $rawNome);
+        $this->assertStringNotContainsString('5521981325441', (string) $rawWhats);
+
+        // O getter CmsSetting::get descriptografa de forma transparente
+        $this->assertEquals('Marcelo Brad', CmsSetting::get('desenvolvedor_nome'));
+        $this->assertEquals('5521981325441', CmsSetting::get('desenvolvedor_whatsapp'));
+    }
+
+    public function test_adulteracao_direta_no_banco_de_dados_e_rejeitada_e_mantem_marcelo_brad(): void
+    {
+        // Forja adulteração maliciosa direta via SQL / phpMyAdmin
+        DB::table('cms_settings')->updateOrInsert(
+            ['chave' => 'desenvolvedor_nome'],
+            ['valor' => 'Invasor phpMyAdmin', 'grupo' => 'desenvolvedor']
+        );
+        DB::table('cms_settings')->updateOrInsert(
+            ['chave' => 'desenvolvedor_whatsapp'],
+            ['valor' => '31999999999', 'grupo' => 'desenvolvedor']
+        );
+
+        Cache::forget('cms_settings_all');
+
+        // O sistema deve detectar adulteração/falha de criptografia e proteger Marcelo Brad
+        $this->assertEquals('Marcelo Brad', CmsSetting::get('desenvolvedor_nome'));
+        $this->assertEquals('5521981325441', CmsSetting::get('desenvolvedor_whatsapp'));
+    }
+
+    public function test_avatar_do_desenvolvedor_e_carregado_com_sucesso(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get('/admin/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertSee('desenvolvedor-avatar');
+        $response->assertSee('Marcelo Brad');
     }
 }

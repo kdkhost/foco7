@@ -536,6 +536,8 @@
             $footerDevTelegram = \App\Models\CmsSetting::get('desenvolvedor_telegram', 'MARCELO_BRAD');
             $footerDevTelegramClean = ltrim(preg_replace('/^https?:\/\/t\.me\//i', '', trim($footerDevTelegram)), '@');
             $footerDevTelegramUrl = 'https://t.me/' . ($footerDevTelegramClean ?: 'marcelobrad');
+            $footerDevAvatar = \App\Models\CmsSetting::get('desenvolvedor_avatar', '/img/desenvolvedor-avatar.png');
+            $footerDevAvatarUrl = asset(ltrim($footerDevAvatar, '/'));
         @endphp
         <footer class="app-footer foco7-admin-footer">
             <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 py-3 px-4">
@@ -572,10 +574,12 @@
         <div id="boxDevContato" class="box-dev-contato shadow-lg border" style="display: none;">
             <div class="box-dev-header d-flex align-items-center justify-content-between p-3 border-bottom">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="position-relative">
-                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 13px;">
-                            {{ strtoupper(substr($footerDevNome, 0, 2)) }}
-                        </div>
+                    <div class="position-relative flex-shrink-0">
+                        <img src="{{ $footerDevAvatarUrl }}" 
+                             alt="{{ $footerDevNome }}" 
+                             class="rounded-circle border border-2 border-success object-fit-cover shadow-sm" 
+                             style="width: 38px; height: 38px;" 
+                             onerror="this.onerror=null; this.src='{{ asset('img/desenvolvedor-avatar.png') }}';">
                         <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width: 10px; height: 10px;" title="Online"></span>
                     </div>
                     <div>

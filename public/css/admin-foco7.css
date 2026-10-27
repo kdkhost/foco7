@@ -2147,6 +2147,13 @@ nav[role="navigation"] svg,
     transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
 }
 
+img.tarja-dev-bloqueado {
+    filter: blur(8px) grayscale(60%) !important;
+    opacity: 0.6 !important;
+    color: inherit !important;
+    text-shadow: none !important;
+}
+
 [data-bs-theme="dark"] .tarja-dev-bloqueado {
     background-color: rgba(255, 255, 255, 0.06) !important;
     color: transparent !important;

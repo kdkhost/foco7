@@ -83,6 +83,7 @@ class ConfiguracoesController extends Controller
 
             // Desenvolvedor do Sistema & Suporte Técnico (Protegido e Tarjado)
             'dev_desbloqueado' => (bool) session('dev_unlocked', false),
+            'desenvolvedor_avatar' => CmsSetting::get('desenvolvedor_avatar', '/img/desenvolvedor-avatar.png'),
             'desenvolvedor_nome' => session('dev_unlocked', false)
                 ? CmsSetting::get('desenvolvedor_nome', 'Marcelo Brad')
                 : '••••••••••••',
@@ -127,7 +128,7 @@ class ConfiguracoesController extends Controller
 
         // 2. Proteção Estrita dos Dados do Desenvolvedor (Blindado por Senha Master)
         $camposDev = [
-            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp', 'desenvolvedor_telegram',
+            'desenvolvedor_nome', 'desenvolvedor_link', 'desenvolvedor_whatsapp', 'desenvolvedor_telegram', 'desenvolvedor_avatar',
         ];
         $devMasterPass = CmsSetting::get('dev_master_password', env('DEV_MASTER_PASSWORD', 'Brad@2026'));
         $senhaDevEnviada = (string) $request->input('dev_password', '');
@@ -144,6 +145,18 @@ class ConfiguracoesController extends Controller
                         CmsSetting::set($campo, $val, 'desenvolvedor');
                     }
                 }
+            }
+
+            // Upload de Novo Avatar do Desenvolvedor
+            if ($request->hasFile('desenvolvedor_avatar_upload') && $request->file('desenvolvedor_avatar_upload')->isValid()) {
+                $file = $request->file('desenvolvedor_avatar_upload');
+                $filename = 'dev_avatar_'.time().'.'.$file->getClientOriginalExtension();
+                $destination = public_path('uploads/dev');
+                if (! file_exists($destination)) {
+                    mkdir($destination, 0755, true);
+                }
+                $file->move($destination, $filename);
+                CmsSetting::set('desenvolvedor_avatar', '/uploads/dev/'.$filename, 'desenvolvedor');
             }
         }
 
@@ -340,6 +353,7 @@ class ConfiguracoesController extends Controller
                     'desenvolvedor_whatsapp' => CmsSetting::get('desenvolvedor_whatsapp', '5521981325441'),
                     'desenvolvedor_telegram' => CmsSetting::get('desenvolvedor_telegram', 'marcelobrad'),
                     'desenvolvedor_link' => CmsSetting::get('desenvolvedor_link', 'https://wa.me/5521981325441'),
+                    'desenvolvedor_avatar' => asset(ltrim(CmsSetting::get('desenvolvedor_avatar', '/img/desenvolvedor-avatar.png'), '/')),
                 ],
             ]);
         }
