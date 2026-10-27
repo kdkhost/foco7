@@ -129,7 +129,14 @@
                 <tbody>
                     @forelse($faturas as $fat)
                     <tr>
-                        <td><span class="fw-bold font-monospace">{{ $fat->codigo_fatura }}</span></td>
+                        <td>
+                            <span class="fw-bold font-monospace">{{ $fat->codigo_fatura }}</span>
+                            @if($fat->isCarne())
+                                <br><span class="badge bg-primary-subtle text-primary border border-primary-subtle small mt-1" title="Carnê: {{ $fat->codigo_carne ?? $fat->codigo_fatura }}">
+                                    <i class="fas fa-book me-1"></i> Parcela {{ $fat->numero_parcela ?? 1 }}/{{ $fat->total_parcelas ?? 1 }}
+                                </span>
+                            @endif
+                        </td>
                         <td>
                             <div class="fw-bold">{{ $fat->user->name ?? 'Cliente Removido' }}</div>
                             <small class="text-secondary">{{ $fat->user->telefone ?? '' }}</small>
@@ -175,7 +182,12 @@
                                         <li><h6 class="dropdown-header">Alterar Status</h6></li>
                                         <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pago')"><i class="fas fa-check-circle text-success me-2"></i> Marcar como Paga</a></li>
                                         <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'pendente')"><i class="fas fa-clock text-warning me-2"></i> Marcar como Pendente</a></li>
-                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'cancelado')"><i class="fas fa-ban text-danger me-2"></i> Marcar como Cancelada</a></li>
+                                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="alterarStatusFatura({{ $fat->id }}, 'cancelado')"><i class="fas fa-ban text-danger me-2"></i> Marcar como Cancelada</a></li>
+                                        @if($fat->isCarne())
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header"><i class="fas fa-book me-1"></i> Gestão do Carnê</h6></li>
+                                            <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="iniciarCancelamentoFatura({{ $fat->id }})"><i class="fas fa-ban text-danger me-2"></i> Opções de Cancelamento...</a></li>
+                                        @endif
                                     </ul>
                                 </div>
                             @endif
@@ -194,9 +206,31 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarFatura({{ $fat->id }})" title="Editar Fatura">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirFatura({{ $fat->id }})" title="Excluir">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                @if($fat->isCarne())
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirFatura({{ $fat->id }})" title="Excluir Parcela / Opções do Carnê">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" title="Opções de exclusão do carnê"></button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                            <li><h6 class="dropdown-header"><i class="fas fa-book text-danger me-1"></i> Exclusão do Carnê</h6></li>
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="excluirFatura({{ $fat->id }})">
+                                                    <i class="fas fa-trash text-secondary me-2"></i> Excluir somente esta parcela
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger fw-bold" href="javascript:void(0)" onclick="confirmarExclusaoDiretaTodasCarne({{ $fat->id }}, '{{ $fat->codigo_fatura }}')">
+                                                    <i class="fas fa-dumpster-fire text-danger me-2"></i> Deletar TODAS de uma única vez
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                @else
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="excluirFatura({{ $fat->id }})" title="Excluir">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -386,31 +420,331 @@
     }
 
     function alterarStatusFatura(id, status) {
-        $.post('/admin/faturas/status/' + id, {
-            _token: '{{ csrf_token() }}',
-            status: status
-        }, function(res) {
-            if (res.success) {
-                window.foco7Notify.success(res.message);
-                setTimeout(function() { location.reload(); }, 600);
-            }
-        });
-    }
+        if (status === 'cancelado') {
+            iniciarCancelamentoFatura(id);
+            return;
+        }
 
-    function excluirFatura(id) {
-        window.foco7Confirm('Excluir Fatura?', 'Tem certeza que deseja remover esta fatura do sistema financeiro?', function() {
-            $.ajax({
-                url: '/admin/faturas/' + id,
-                type: 'DELETE',
-                data: { _token: '{{ csrf_token() }}' },
-                success: function(res) {
+        const statusTexto = status === 'pago' ? 'como Paga (Quitada)' : 'como Pendente';
+        Swal.fire({
+            title: 'Alterar Status?',
+            text: `Deseja realmente marcar esta fatura ${statusTexto}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: status === 'pago' ? '#28a745' : '#ffc107',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, alterar',
+            cancelButtonText: 'Cancelar'
+        }).then((resConfirm) => {
+            if (resConfirm.isConfirmed) {
+                $.post('/admin/faturas/status/' + id, {
+                    _token: '{{ csrf_token() }}',
+                    status: status
+                }, function(res) {
                     if (res.success) {
                         window.foco7Notify.success(res.message);
                         setTimeout(function() { location.reload(); }, 600);
                     }
-                }
-            });
+                }).fail(function(xhr) {
+                    window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao alterar status da fatura.');
+                });
+            }
         });
+    }
+
+    /**
+     * Lógica de Cancelamento:
+     * - Fatura avulsa: confirmação padrão.
+     * - Carnê:
+     *   - Se houver alguma paga: pergunta se deseja cancelar somente essa ou a sequência ainda pendente.
+     *   - Se NÃO houver nenhuma paga: pergunta se quer cancelar somente essa ou o carnê / todas as parcelas.
+     */
+    function iniciarCancelamentoFatura(id) {
+        Swal.fire({
+            title: 'Consultando carnê...',
+            text: 'Verificando dados contábeis e status das parcelas...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.getJSON('/admin/faturas/carne-info/' + id, function(res) {
+            Swal.close();
+
+            if (!res.success) {
+                window.foco7Notify.error('Não foi possível obter dados da fatura.');
+                return;
+            }
+
+            const fat = res.fatura;
+            const carne = res.carne;
+
+            if (fat.is_paga) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fatura Já Quitada',
+                    text: 'Faturas quitadas não podem ser canceladas diretamente. Para anular a receita, utilize a função formal de "Estornar Fatura".',
+                    confirmButtonColor: '#d90000'
+                });
+                return;
+            }
+
+            // Fatura comum avulsa (não é carnê)
+            if (!carne || !carne.is_carne) {
+                Swal.fire({
+                    title: 'Cancelar Fatura?',
+                    html: `Deseja realmente cancelar a fatura <strong>${fat.codigo_fatura}</strong> (${fat.valor_formatado}) do cliente <strong>${fat.cliente_nome}</strong>?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d90000',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-ban me-1"></i> Sim, Cancelar Fatura',
+                    cancelButtonText: 'Manter Fatura'
+                }).then((r) => {
+                    if (r.isConfirmed) {
+                        executarCancelamentoFatura(id, 'somente_esta');
+                    }
+                });
+                return;
+            }
+
+            // É CARNÊ: avalia se há parcelas pagas
+            if (carne.tem_pagas) {
+                // HÁ parcelas já pagas -> Pergunta se cancela somente essa ou a sequência ainda pendente
+                Swal.fire({
+                    title: 'Cancelar Parcela do Carnê',
+                    html: `
+                        <div class="text-start mb-2">
+                            <div class="alert alert-info py-2 px-3 small mb-3">
+                                <i class="fas fa-info-circle me-1"></i> Parcela <strong>#${carne.numero_parcela}/${carne.total_parcelas}</strong> do carnê <code>${carne.codigo_carne}</code>.<br>
+                                <span class="badge bg-success text-white mt-1 me-1"><i class="fas fa-check-circle me-1"></i> ${carne.total_pagas} parcela(s) já paga(s)</span>
+                                <span class="badge bg-warning text-dark mt-1"><i class="fas fa-clock me-1"></i> ${carne.total_pendentes} pendente(s)</span>
+                            </div>
+                            <p class="mb-2 fw-semibold text-body">Existem parcelas já pagas neste carnê. Como você deseja cancelar?</p>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-danger text-start p-3 rounded-3 shadow-sm" onclick="executarCancelamentoFatura(${id}, 'somente_esta')">
+                                    <div class="fw-bold fs-6"><i class="fas fa-file-invoice me-2"></i> Cancelar SOMENTE esta parcela (#${carne.numero_parcela})</div>
+                                    <div class="small text-muted ms-4">Cancela apenas a parcela ${fat.codigo_fatura}. As demais parcelas continuam ativas normalmente.</div>
+                                </button>
+                                <button type="button" class="btn btn-danger text-start p-3 rounded-3 shadow-sm text-white" onclick="executarCancelamentoFatura(${id}, 'sequencia_pendente')">
+                                    <div class="fw-bold fs-6"><i class="fas fa-forward me-2"></i> Cancelar esta e a SEQUÊNCIA ainda pendente (${carne.total_sequencia} parcelas)</div>
+                                    <div class="small text-white-50 ms-4">Cancela a parcela atual (#${carne.numero_parcela}) e todas as seguintes pendentes até o final do carnê. As parcelas já quitadas permanecem salvas.</div>
+                                </button>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: '<i class="fas fa-times me-1"></i> Voltar / Fechar Sem Alterar',
+                    cancelButtonColor: '#6c757d',
+                    width: '620px'
+                });
+            } else {
+                // NÃO HÁ nenhuma paga -> Pergunta se quer cancelar somente esta ou o carnê / todas as parcelas
+                Swal.fire({
+                    title: 'Cancelar Fatura / Carnê Completo',
+                    html: `
+                        <div class="text-start mb-2">
+                            <div class="alert alert-warning py-2 px-3 small mb-3">
+                                <i class="fas fa-exclamation-triangle me-1"></i> Parcela <strong>#${carne.numero_parcela}/${carne.total_parcelas}</strong> do carnê <code>${carne.codigo_carne}</code>.<br>
+                                <span class="badge bg-secondary text-white mt-1"><i class="fas fa-info-circle me-1"></i> Nenhuma parcela deste carnê foi paga até o momento</span>
+                            </div>
+                            <p class="mb-2 fw-semibold text-body">Como nenhuma parcela foi paga ainda, você pode cancelar somente esta parcela ou cancelar o carnê inteiro:</p>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-danger text-start p-3 rounded-3 shadow-sm" onclick="executarCancelamentoFatura(${id}, 'somente_esta')">
+                                    <div class="fw-bold fs-6"><i class="fas fa-file-invoice me-2"></i> Cancelar SOMENTE esta parcela (#${carne.numero_parcela})</div>
+                                    <div class="small text-muted ms-4">Cancela apenas a parcela individual selecionada. As demais ${carne.total_geral - 1} parcelas continuam abertas.</div>
+                                </button>
+                                <button type="button" class="btn btn-danger text-start p-3 rounded-3 shadow-sm text-white" onclick="executarCancelamentoFatura(${id}, 'todas_parcelas')">
+                                    <div class="fw-bold fs-6"><i class="fas fa-ban me-2"></i> Cancelar o CARNÊ COMPLETO / TODAS as parcelas (${carne.total_geral} parcelas)</div>
+                                    <div class="small text-white-50 ms-4">Cancela integralmente todas as ${carne.total_geral} parcelas do carnê de uma única vez.</div>
+                                </button>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: '<i class="fas fa-times me-1"></i> Voltar / Fechar Sem Alterar',
+                    cancelButtonColor: '#6c757d',
+                    width: '620px'
+                });
+            }
+        }).fail(function() {
+            Swal.close();
+            window.foco7Notify.error('Falha ao comunicar com o servidor.');
+        });
+    }
+
+    function executarCancelamentoFatura(id, escopo) {
+        Swal.close();
+        $.ajax({
+            url: '/admin/faturas/cancelar-carne/' + id,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                escopo: escopo
+            },
+            success: function(res) {
+                if (res.success) {
+                    window.foco7Notify.success(res.message);
+                    setTimeout(function() { location.reload(); }, 600);
+                }
+            },
+            error: function(xhr) {
+                window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao cancelar fatura.');
+            }
+        });
+    }
+
+    /**
+     * Lógica de Exclusão de Faturas & Carnê:
+     * - Fatura avulsa: confirmação padrão.
+     * - Carnê: oferece opção de excluir somente esta parcela, a sequência pendente, ou DELETAR TODAS DE UMA ÚNICA VEZ.
+     */
+    function excluirFatura(id) {
+        Swal.fire({
+            title: 'Consultando fatura...',
+            text: 'Verificando vínculos do carnê...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.getJSON('/admin/faturas/carne-info/' + id, function(res) {
+            Swal.close();
+
+            if (!res.success) {
+                window.foco7Notify.error('Não foi possível obter dados da fatura.');
+                return;
+            }
+
+            const fat = res.fatura;
+            const carne = res.carne;
+
+            if (fat.is_paga) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fatura Quitada',
+                    text: 'Faturas quitadas não podem ser excluídas diretamente sem estorno prévio para segurança contábil.',
+                    confirmButtonColor: '#d90000'
+                });
+                return;
+            }
+
+            // Não é carnê
+            if (!carne || !carne.is_carne) {
+                Swal.fire({
+                    title: 'Excluir Fatura?',
+                    html: `Tem certeza que deseja remover permanentemente a fatura <strong>${fat.codigo_fatura}</strong> (${fat.valor_formatado})?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d90000',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sim, Excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((r) => {
+                    if (r.isConfirmed) {
+                        executarExclusaoFatura(id, 'somente_esta');
+                    }
+                });
+                return;
+            }
+
+            // É Carnê: apresenta opção para excluir esta, sequência, ou DELETAR TODAS DE UMA ÚNICA VEZ
+            let htmlOpcoes = `
+                <div class="text-start mb-2">
+                    <div class="alert alert-secondary py-2 px-3 small mb-3">
+                        <i class="fas fa-book me-1"></i> Parcela <strong>#${carne.numero_parcela}/${carne.total_parcelas}</strong> do carnê <code>${carne.codigo_carne}</code>.<br>
+                        Total de parcelas: <strong>${carne.total_geral}</strong> (${carne.total_pagas > 0 ? carne.total_pagas + ' quitada(s), ' : ''}${carne.total_pendentes} pendente(s)).
+                    </div>
+                    <p class="mb-2 fw-semibold text-body">Selecione o escopo da exclusão:</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-danger text-start p-3 rounded-3 shadow-sm" onclick="executarExclusaoFatura(${id}, 'somente_esta')">
+                            <div class="fw-bold fs-6"><i class="fas fa-trash me-2"></i> Excluir SOMENTE esta parcela (#${carne.numero_parcela})</div>
+                            <div class="small text-muted ms-4">Remove apenas o registro da fatura ${fat.codigo_fatura}. As demais parcelas continuam salvas.</div>
+                        </button>`;
+
+            if (carne.total_sequencia > 1) {
+                htmlOpcoes += `
+                        <button type="button" class="btn btn-outline-danger text-start p-3 rounded-3 shadow-sm" onclick="executarExclusaoFatura(${id}, 'sequencia_pendente')">
+                            <div class="fw-bold fs-6"><i class="fas fa-forward me-2"></i> Excluir esta e a SEQUÊNCIA pendente (${carne.total_sequencia} parcelas)</div>
+                            <div class="small text-muted ms-4">Exclui a parcela #${carne.numero_parcela} e todas as parcelas pendentes posteriores.</div>
+                        </button>`;
+            }
+
+            htmlOpcoes += `
+                        <button type="button" class="btn btn-danger text-start p-3 rounded-3 shadow-sm text-white" onclick="executarExclusaoFatura(${id}, 'todas_parcelas')">
+                            <div class="fw-bold fs-6"><i class="fas fa-dumpster-fire me-2"></i> DELETAR TODAS AS PARCELAS DE UMA ÚNICA VEZ (${carne.total_geral} parcelas)</div>
+                            <div class="small text-white-50 ms-4">Apaga permanentemente todas as parcelas vinculadas a este carnê de uma única vez.${carne.total_pagas > 0 ? ' (Parcelas já pagas são preservadas por segurança contábil)' : ''}</div>
+                        </button>
+                    </div>
+                </div>`;
+
+            Swal.fire({
+                title: 'Excluir Parcela / Carnê',
+                html: htmlOpcoes,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar Ação',
+                cancelButtonColor: '#6c757d',
+                width: '620px'
+            });
+        }).fail(function() {
+            Swal.close();
+            window.foco7Notify.error('Falha ao comunicar com o servidor.');
+        });
+    }
+
+    function executarExclusaoFatura(id, escopo) {
+        Swal.close();
+
+        let tituloConfirm = 'Confirmar Exclusão';
+        let textoConfirm = 'Tem certeza que deseja prosseguir com a exclusão?';
+
+        if (escopo === 'todas_parcelas') {
+            tituloConfirm = 'DELETAR TODAS AS PARCELAS?';
+            textoConfirm = 'ATENÇÃO: Todas as parcelas deste carnê serão removidas permanentemente do sistema financeiro de uma única vez!';
+        } else if (escopo === 'sequencia_pendente') {
+            tituloConfirm = 'Excluir Sequência Pendente?';
+            textoConfirm = 'A parcela selecionada e todas as seguintes que ainda não foram pagas serão removidas!';
+        }
+
+        Swal.fire({
+            title: tituloConfirm,
+            text: textoConfirm,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sim, Confirmar Exclusão',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/faturas/excluir-carne/' + id,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        escopo: escopo
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            window.foco7Notify.success(res.message);
+                            setTimeout(function() { location.reload(); }, 600);
+                        }
+                    },
+                    error: function(xhr) {
+                        window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao excluir faturas.');
+                    }
+                });
+            }
+        });
+    }
+
+    function confirmarExclusaoDiretaTodasCarne(id, codigo) {
+        executarExclusaoFatura(id, 'todas_parcelas');
+    }
+
+    function iniciarCancelamentoCarne(id) {
+        iniciarCancelamentoFatura(id);
     }
 
     // Funções de Antecipação de Parcela

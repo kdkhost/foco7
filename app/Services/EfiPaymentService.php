@@ -4,15 +4,15 @@ namespace App\Services;
 
 use App\Models\CmsSetting;
 use App\Models\Fatura;
-use App\Models\User;
 use App\Models\Plano;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
 
 class EfiPaymentService
 {
@@ -53,6 +53,7 @@ class EfiPaymentService
         if ($amb === 'producao') {
             return CmsSetting::get('efi_client_id_prod', CmsSetting::get('efi_client_id', ''));
         }
+
         return CmsSetting::get('efi_client_id_sandbox', CmsSetting::get('efi_client_id', ''));
     }
 
@@ -65,6 +66,7 @@ class EfiPaymentService
         if ($amb === 'producao') {
             return CmsSetting::get('efi_client_secret_prod', CmsSetting::get('efi_client_secret', ''));
         }
+
         return CmsSetting::get('efi_client_secret_sandbox', CmsSetting::get('efi_client_secret', ''));
     }
 
@@ -93,8 +95,8 @@ class EfiPaymentService
             ? CmsSetting::get('efi_certificado_pem_prod', CmsSetting::get('efi_certificado_pem', ''))
             : CmsSetting::get('efi_certificado_pem_sandbox', CmsSetting::get('efi_certificado_pem', ''));
 
-        if (!empty($certName)) {
-            $path = storage_path('certs/' . $certName);
+        if (! empty($certName)) {
+            $path = storage_path('certs/'.$certName);
             if (file_exists($path)) {
                 return $path;
             }
@@ -105,10 +107,10 @@ class EfiPaymentService
 
     /**
      * Calcula o repasse de taxas ao cliente conforme parametrização administrativa
-     * 
-     * @param float $valorBase Valor original do plano ou serviço
-     * @param string $metodo 'pix' | 'boleto' | 'cartao' | 'carne'
-     * @param int $parcelas Número de parcelas (para cartão ou carnê)
+     *
+     * @param  float  $valorBase  Valor original do plano ou serviço
+     * @param  string  $metodo  'pix' | 'boleto' | 'cartao' | 'carne'
+     * @param  int  $parcelas  Número de parcelas (para cartão ou carnê)
      * @return array Detalhamento do valor original, taxa repassada, desconto e valor final
      */
     public static function calcularTaxas(float $valorBase, string $metodo = 'pix', int $parcelas = 1): array
@@ -132,10 +134,10 @@ class EfiPaymentService
                 if ($pixValor > 0) {
                     if ($pixTipo === 'percentual') {
                         $taxaRepassada = round($valorBase * ($pixValor / 100), 2);
-                        $detalhe = "Taxa PIX ({$pixValor}%): + R$ " . number_format($taxaRepassada, 2, ',', '.');
+                        $detalhe = "Taxa PIX ({$pixValor}%): + R$ ".number_format($taxaRepassada, 2, ',', '.');
                     } else {
                         $taxaRepassada = $pixValor;
-                        $detalhe = "Taxa PIX (fixa): + R$ " . number_format($taxaRepassada, 2, ',', '.');
+                        $detalhe = 'Taxa PIX (fixa): + R$ '.number_format($taxaRepassada, 2, ',', '.');
                     }
                 }
             }
@@ -143,14 +145,14 @@ class EfiPaymentService
             if ($repasseAtivo) {
                 $taxaBoleto = (float) CmsSetting::get('taxa_boleto_fixo', '2.99');
                 $taxaRepassada = $taxaBoleto;
-                $detalhe = "Taxa de emissão bancária: + R$ " . number_format($taxaRepassada, 2, ',', '.');
+                $detalhe = 'Taxa de emissão bancária: + R$ '.number_format($taxaRepassada, 2, ',', '.');
             }
         } elseif ($metodo === 'carne') {
             if ($repasseAtivo) {
                 $taxaPorParcela = (float) CmsSetting::get('taxa_carne_parcela_fixo', '2.99');
                 // Para o carnê, a taxa é aplicada por parcela
                 $taxaRepassada = $taxaPorParcela;
-                $detalhe = "Taxa de emissão do carnê por parcela: + R$ " . number_format($taxaRepassada, 2, ',', '.');
+                $detalhe = 'Taxa de emissão do carnê por parcela: + R$ '.number_format($taxaRepassada, 2, ',', '.');
             }
         } elseif ($metodo === 'cartao') {
             if ($repasseAtivo) {
@@ -158,7 +160,7 @@ class EfiPaymentService
                 $cartaoFixo = (float) CmsSetting::get('taxa_cartao_fixo', '0.49');
 
                 $taxaRepassada = round(($valorBase * ($cartaoPerc / 100)) + $cartaoFixo, 2);
-                $detalhe = "Taxa de processamento de cartão ({$cartaoPerc}% + R$ " . number_format($cartaoFixo, 2, ',', '.') . "): + R$ " . number_format($taxaRepassada, 2, ',', '.');
+                $detalhe = "Taxa de processamento de cartão ({$cartaoPerc}% + R$ ".number_format($cartaoFixo, 2, ',', '.').'): + R$ '.number_format($taxaRepassada, 2, ',', '.');
             }
         }
 
@@ -172,7 +174,7 @@ class EfiPaymentService
             'taxa_repassada' => $taxaRepassada,
             'desconto' => $desconto,
             'valor_final' => $valorFinal,
-            'valor_formatado' => 'R$ ' . number_format($valorFinal, 2, ',', '.'),
+            'valor_formatado' => 'R$ '.number_format($valorFinal, 2, ',', '.'),
             'detalhe' => $detalhe,
             'repasse_ativo' => $repasseAtivo,
         ];
@@ -190,10 +192,11 @@ class EfiPaymentService
             return null;
         }
 
-        $cacheKey = 'efi_token_v1_' . md5($clientId . self::getAmbiente());
+        $cacheKey = 'efi_token_v1_'.md5($clientId.self::getAmbiente());
+
         return Cache::remember($cacheKey, 3300, function () use ($clientId, $clientSecret) {
             try {
-                $url = self::getApiUrl() . '/authorize';
+                $url = self::getApiUrl().'/authorize';
                 $response = Http::withBasicAuth($clientId, $clientSecret)
                     ->timeout(10)
                     ->post($url, ['grant_type' => 'client_credentials']);
@@ -202,10 +205,12 @@ class EfiPaymentService
                     return $response->json()['access_token'];
                 }
 
-                Log::warning('Falha na autenticação Efí v1: ' . $response->body());
+                Log::warning('Falha na autenticação Efí v1: '.$response->body());
+
                 return null;
             } catch (Exception $e) {
-                Log::error('Erro ao conectar com Efí v1 OAuth: ' . $e->getMessage());
+                Log::error('Erro ao conectar com Efí v1 OAuth: '.$e->getMessage());
+
                 return null;
             }
         });
@@ -225,14 +230,14 @@ class EfiPaymentService
         $clientSecret = self::getClientSecret();
 
         // Se temos certificado mTLS e credenciais, tenta chamar a API Pix da Efí
-        if ($certPath && !empty($clientId) && !empty($clientSecret)) {
+        if ($certPath && ! empty($clientId) && ! empty($clientSecret)) {
             try {
                 $pixUrl = self::getPixUrl();
                 // 1. Token OAuth Pix com mTLS
                 $tokenResp = Http::withOptions(['ssl_key' => $certPath, 'cert' => $certPath])
                     ->withBasicAuth($clientId, $clientSecret)
                     ->timeout(10)
-                    ->post($pixUrl . '/oauth/token', ['grant_type' => 'client_credentials']);
+                    ->post($pixUrl.'/oauth/token', ['grant_type' => 'client_credentials']);
 
                 if ($tokenResp->successful() && isset($tokenResp->json()['access_token'])) {
                     $token = $tokenResp->json()['access_token'];
@@ -256,7 +261,7 @@ class EfiPaymentService
                     $cobResp = Http::withOptions(['ssl_key' => $certPath, 'cert' => $certPath])
                         ->withToken($token)
                         ->timeout(12)
-                        ->put($pixUrl . "/v2/cob/{$txid}", $payloadCob);
+                        ->put($pixUrl."/v2/cob/{$txid}", $payloadCob);
 
                     if ($cobResp->successful()) {
                         $cobData = $cobResp->json();
@@ -267,7 +272,7 @@ class EfiPaymentService
                             $qrResp = Http::withOptions(['ssl_key' => $certPath, 'cert' => $certPath])
                                 ->withToken($token)
                                 ->timeout(10)
-                                ->get($pixUrl . "/v2/loc/{$locId}/qrcode");
+                                ->get($pixUrl."/v2/loc/{$locId}/qrcode");
 
                             if ($qrResp->successful()) {
                                 $qrData = $qrResp->json();
@@ -295,13 +300,13 @@ class EfiPaymentService
                     }
                 }
             } catch (Exception $e) {
-                Log::warning('Erro ao gerar Pix via API Efí mTLS, acionando gerador dinâmico: ' . $e->getMessage());
+                Log::warning('Erro ao gerar Pix via API Efí mTLS, acionando gerador dinâmico: '.$e->getMessage());
             }
         }
 
         // Fallback Seguro Padrão BACEN Oficial (EMVCo com CRC16 válido)
         $copiaCola = self::gerarPayloadPixBacen($chavePix, $valor, "Foco 7 - {$fatura->codigo_fatura}", $txid);
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($copiaCola);
+        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='.urlencode($copiaCola);
 
         $fatura->update([
             'gateway' => 'efi',
@@ -337,7 +342,7 @@ class EfiPaymentService
         // Se temos token v1 da Efí, tenta gerar via API Cobrança
         if ($token) {
             try {
-                $urlCharge = self::getApiUrl() . '/charge';
+                $urlCharge = self::getApiUrl().'/charge';
                 $respCharge = Http::withToken($token)
                     ->timeout(12)
                     ->post($urlCharge, [
@@ -353,7 +358,7 @@ class EfiPaymentService
                 if ($respCharge->successful() && isset($respCharge->json()['data']['charge_id'])) {
                     $chargeId = $respCharge->json()['data']['charge_id'];
 
-                    $urlPay = self::getApiUrl() . "/charge/{$chargeId}/pay";
+                    $urlPay = self::getApiUrl()."/charge/{$chargeId}/pay";
                     $respPay = Http::withToken($token)
                         ->timeout(12)
                         ->post($urlPay, [
@@ -399,7 +404,7 @@ class EfiPaymentService
                     }
                 }
             } catch (Exception $e) {
-                Log::warning('Erro ao emitir boleto via API Efí v1: ' . $e->getMessage());
+                Log::warning('Erro ao emitir boleto via API Efí v1: '.$e->getMessage());
             }
         }
 
@@ -410,7 +415,7 @@ class EfiPaymentService
         $fatura->update([
             'gateway' => 'efi',
             'metodo_pagamento' => 'boleto',
-            'gateway_transaction_id' => 'BOL-' . strtoupper(Str::random(12)),
+            'gateway_transaction_id' => 'BOL-'.strtoupper(Str::random(12)),
             'linha_digitavel_boleto' => $linhaDigitavel,
             'url_boleto' => $urlVisualizar,
         ]);
@@ -426,14 +431,6 @@ class EfiPaymentService
 
     /**
      * Emite um Carnê de Pagamento Completo (com geração de PDF e parcelas)
-     * 
-     * @param User $cliente
-     * @param float $valorParcelaBase
-     * @param int $totalParcelas
-     * @param Carbon $primeiroVencimento
-     * @param string $descricao
-     * @param Plano|null $plano
-     * @return array
      */
     public static function criarCarne(
         User $cliente,
@@ -448,7 +445,7 @@ class EfiPaymentService
         $valorParcelaFinal = $taxas['valor_final'];
         $taxaPorParcela = $taxas['taxa_repassada'];
 
-        $codigoCarne = 'CARNE-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        $codigoCarne = 'CARNE-'.date('Ymd').'-'.strtoupper(Str::random(6));
         $token = self::getAccessTokenV1();
         $efiCarnetId = null;
         $linkPdfEfi = null;
@@ -459,7 +456,7 @@ class EfiPaymentService
         // Se temos token v1 da Efí, tenta criar o Carnê Oficial via API POST /v1/carnet
         if ($token) {
             try {
-                $urlCarnet = self::getApiUrl() . '/carnet';
+                $urlCarnet = self::getApiUrl().'/carnet';
                 $respCarnet = Http::withToken($token)
                     ->timeout(15)
                     ->post($urlCarnet, [
@@ -492,7 +489,7 @@ class EfiPaymentService
                     Log::info("Carnê Efí criado com sucesso na API. ID: {$efiCarnetId}");
                 }
             } catch (Exception $e) {
-                Log::warning('Erro ao criar Carnê via API Efí: ' . $e->getMessage());
+                Log::warning('Erro ao criar Carnê via API Efí: '.$e->getMessage());
             }
         }
 
@@ -501,12 +498,12 @@ class EfiPaymentService
         // Geração das parcelas no banco de dados Foco 7
         for ($i = 1; $i <= $totalParcelas; $i++) {
             $dataVenc = (clone $primeiroVencimento)->addMonths($i - 1);
-            $codFatura = "{$codigoCarne}-" . str_pad($i, 2, '0', STR_PAD_LEFT);
+            $codFatura = "{$codigoCarne}-".str_pad($i, 2, '0', STR_PAD_LEFT);
 
             // Gera Pix individual para a lâmina da parcela
             $chavePix = self::getChavePix();
             $pixPayload = self::gerarPayloadPixBacen($chavePix, $valorParcelaFinal, "Foco 7 - Parcela {$i}/{$totalParcelas}", $codFatura);
-            $pixQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($pixPayload);
+            $pixQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='.urlencode($pixPayload);
 
             $linhaDig = self::gerarLinhaDigitavelBoleto($valorParcelaFinal, $dataVenc, $codFatura);
 
@@ -539,13 +536,13 @@ class EfiPaymentService
         $pdfDownloadUrl = route('faturas.carne.pdf', $codigoCarne);
 
         // Disparo de notificação por e-mail se ativado
-        if (CmsSetting::get('carne_envio_email', '1') == '1' && !empty($cliente->email)) {
+        if (CmsSetting::get('carne_envio_email', '1') == '1' && ! empty($cliente->email)) {
             EmailTemplateService::enviar($cliente->email, 'carne_gerado', [
                 'cliente_nome' => $cliente->name,
                 'cliente_email' => $cliente->email,
                 'fatura_id' => $codigoCarne,
                 'plano_nome' => $descricao,
-                'valor' => 'R$ ' . number_format($valorParcelaFinal, 2, ',', '.') . ' (x' . $totalParcelas . ' parcelas)',
+                'valor' => 'R$ '.number_format($valorParcelaFinal, 2, ',', '.').' (x'.$totalParcelas.' parcelas)',
                 'data_vencimento' => $primeiroVencimento->format('d/m/Y'),
                 'link_carne' => $pdfDownloadUrl,
             ]);
@@ -556,7 +553,7 @@ class EfiPaymentService
             'codigo_carne' => $codigoCarne,
             'total_parcelas' => $totalParcelas,
             'valor_parcela' => $valorParcelaFinal,
-            'valor_parcela_formatado' => 'R$ ' . number_format($valorParcelaFinal, 2, ',', '.'),
+            'valor_parcela_formatado' => 'R$ '.number_format($valorParcelaFinal, 2, ',', '.'),
             'taxa_repassada_por_parcela' => $taxaPorParcela,
             'repasse_ativo' => $taxas['repasse_ativo'],
             'efi_carnet_id' => $efiCarnetId,
@@ -577,9 +574,9 @@ class EfiPaymentService
 
         // Tenta processar com Token v1 na Efí se credenciais estiverem preenchidas
         $token = self::getAccessTokenV1();
-        if ($token && !empty($dadosCartao['payment_token'])) {
+        if ($token && ! empty($dadosCartao['payment_token'])) {
             try {
-                $urlCharge = self::getApiUrl() . '/charge';
+                $urlCharge = self::getApiUrl().'/charge';
                 $respCharge = Http::withToken($token)
                     ->timeout(12)
                     ->post($urlCharge, [
@@ -595,7 +592,7 @@ class EfiPaymentService
                 if ($respCharge->successful() && isset($respCharge->json()['data']['charge_id'])) {
                     $chargeId = $respCharge->json()['data']['charge_id'];
 
-                    $urlPay = self::getApiUrl() . "/charge/{$chargeId}/pay";
+                    $urlPay = self::getApiUrl()."/charge/{$chargeId}/pay";
                     $respPay = Http::withToken($token)
                         ->timeout(15)
                         ->post($urlPay, [
@@ -635,12 +632,12 @@ class EfiPaymentService
                     }
                 }
             } catch (Exception $e) {
-                Log::warning('Erro ao processar cartão na Efí: ' . $e->getMessage());
+                Log::warning('Erro ao processar cartão na Efí: '.$e->getMessage());
             }
         }
 
         // Simulação / Homologação Transparente quando payment_token não é fornecido ou em sandbox
-        $transId = 'CC-EFI-' . strtoupper(Str::random(10));
+        $transId = 'CC-EFI-'.strtoupper(Str::random(10));
         $fatura->update([
             'gateway' => 'efi',
             'metodo_pagamento' => 'cartao',
@@ -722,25 +719,25 @@ class EfiPaymentService
         $carteira = '17';
 
         // Bloco 1 (5 digitos + 5 digitos com DV)
-        $campo1 = $banco . $moeda . substr($carteira, 0, 1) . substr($nossoNumero, 0, 4);
+        $campo1 = $banco.$moeda.substr($carteira, 0, 1).substr($nossoNumero, 0, 4);
         $dv1 = self::modulo10($campo1);
-        $campo1Formatado = substr($campo1, 0, 5) . '.' . substr($campo1, 5) . $dv1;
+        $campo1Formatado = substr($campo1, 0, 5).'.'.substr($campo1, 5).$dv1;
 
         // Bloco 2 (10 digitos com DV)
-        $campo2 = substr($nossoNumero, 4, 7) . $agencia;
+        $campo2 = substr($nossoNumero, 4, 7).$agencia;
         $dv2 = self::modulo10($campo2);
-        $campo2Formatado = substr($campo2, 0, 5) . '.' . substr($campo2, 5) . $dv2;
+        $campo2Formatado = substr($campo2, 0, 5).'.'.substr($campo2, 5).$dv2;
 
         // Bloco 3 (10 digitos com DV)
-        $campo3 = '100' . str_pad(substr($nossoNumero, -7), 7, '0', STR_PAD_LEFT);
+        $campo3 = '100'.str_pad(substr($nossoNumero, -7), 7, '0', STR_PAD_LEFT);
         $dv3 = self::modulo10($campo3);
-        $campo3Formatado = substr($campo3, 0, 5) . '.' . substr($campo3, 5) . $dv3;
+        $campo3Formatado = substr($campo3, 0, 5).'.'.substr($campo3, 5).$dv3;
 
         // Bloco 4 (DV Geral)
         $dvGeral = '7';
 
         // Bloco 5 (Fator Vencimento + Valor)
-        $campo5 = $fatorVenc . $valorFmt;
+        $campo5 = $fatorVenc.$valorFmt;
 
         return "{$campo1Formatado} {$campo2Formatado} {$campo3Formatado} {$dvGeral} {$campo5}";
     }
@@ -761,6 +758,7 @@ class EfiPaymentService
             $peso = ($peso === 2) ? 1 : 2;
         }
         $resto = $soma % 10;
+
         return ($resto === 0) ? 0 : 10 - $resto;
     }
 
@@ -781,29 +779,31 @@ class EfiPaymentService
         // GUI
         $gui = self::emvFormat('00', 'br.gov.bcb.pix');
         $key = self::emvFormat('01', $chave);
-        $desc = !empty($descricao) ? self::emvFormat('02', substr($descricao, 0, 40)) : '';
-        $merchantAccount = self::emvFormat('26', $gui . $key . $desc);
+        $desc = ! empty($descricao) ? self::emvFormat('02', substr($descricao, 0, 40)) : '';
+        $merchantAccount = self::emvFormat('26', $gui.$key.$desc);
 
         $payload = self::emvFormat('00', '01')                           // Payload Format Indicator
-            . self::emvFormat('01', '12')                                 // Ponto de iniciação dinâmico/recorrente
-            . $merchantAccount                                            // Merchant Account Information
-            . self::emvFormat('52', '0000')                               // Merchant Category Code
-            . self::emvFormat('53', '986')                                // Moeda BRL
-            . self::emvFormat('54', $valorFormatado)                      // Valor
-            . self::emvFormat('58', 'BR')                                 // Código do País
-            . self::emvFormat('59', substr($nomeBeneficiario, 0, 25))     // Nome do Beneficiário
-            . self::emvFormat('60', substr($cidade, 0, 15))               // Cidade
-            . self::emvFormat('62', self::emvFormat('05', $txid))         // Additional Data Field (txid)
-            . '6304';                                                     // CRC16 Checksum Tag
+            .self::emvFormat('01', '12')                                 // Ponto de iniciação dinâmico/recorrente
+            .$merchantAccount                                            // Merchant Account Information
+            .self::emvFormat('52', '0000')                               // Merchant Category Code
+            .self::emvFormat('53', '986')                                // Moeda BRL
+            .self::emvFormat('54', $valorFormatado)                      // Valor
+            .self::emvFormat('58', 'BR')                                 // Código do País
+            .self::emvFormat('59', substr($nomeBeneficiario, 0, 25))     // Nome do Beneficiário
+            .self::emvFormat('60', substr($cidade, 0, 15))               // Cidade
+            .self::emvFormat('62', self::emvFormat('05', $txid))         // Additional Data Field (txid)
+            .'6304';                                                     // CRC16 Checksum Tag
 
         $crc16 = self::calcularCrc16($payload);
-        return $payload . $crc16;
+
+        return $payload.$crc16;
     }
 
     private static function emvFormat(string $id, string $valor): string
     {
         $len = str_pad((string) strlen($valor), 2, '0', STR_PAD_LEFT);
-        return $id . $len . $valor;
+
+        return $id.$len.$valor;
     }
 
     private static function calcularCrc16(string $dados): string
@@ -823,5 +823,69 @@ class EfiPaymentService
         }
 
         return strtoupper(str_pad(dechex($resultado), 4, '0', STR_PAD_LEFT));
+    }
+
+    /**
+     * Cancela um carnê completo diretamente na API oficial da Efí (v1)
+     */
+    public static function cancelarCarneEfi(?string $efiCarnetId): bool
+    {
+        if (empty($efiCarnetId)) {
+            return false;
+        }
+
+        $token = self::getAccessTokenV1();
+        if (! $token) {
+            return false;
+        }
+
+        try {
+            $url = self::getApiUrl()."/carnet/{$efiCarnetId}/cancel";
+            $resp = Http::withToken($token)->timeout(10)->put($url);
+            if ($resp->successful()) {
+                Log::info("Carnê Efí {$efiCarnetId} cancelado com sucesso via API.");
+
+                return true;
+            }
+            Log::warning("Falha ao cancelar Carnê Efí {$efiCarnetId}: ".$resp->body());
+
+            return false;
+        } catch (\Throwable $e) {
+            Log::warning("Exceção ao cancelar Carnê Efí {$efiCarnetId}: ".$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Cancela uma parcela específica do carnê diretamente na API oficial da Efí (v1)
+     */
+    public static function cancelarParcelaCarneEfi(?string $efiCarnetId, int $parcelNum): bool
+    {
+        if (empty($efiCarnetId) || $parcelNum <= 0) {
+            return false;
+        }
+
+        $token = self::getAccessTokenV1();
+        if (! $token) {
+            return false;
+        }
+
+        try {
+            $url = self::getApiUrl()."/carnet/{$efiCarnetId}/parcel/{$parcelNum}/cancel";
+            $resp = Http::withToken($token)->timeout(10)->put($url);
+            if ($resp->successful()) {
+                Log::info("Parcela {$parcelNum} do carnê Efí {$efiCarnetId} cancelada com sucesso via API.");
+
+                return true;
+            }
+            Log::warning("Falha ao cancelar parcela {$parcelNum} do carnê Efí {$efiCarnetId}: ".$resp->body());
+
+            return false;
+        } catch (\Throwable $e) {
+            Log::warning("Exceção ao cancelar parcela {$parcelNum} do carnê Efí {$efiCarnetId}: ".$e->getMessage());
+
+            return false;
+        }
     }
 }

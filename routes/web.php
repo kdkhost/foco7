@@ -1,32 +1,33 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Site\SiteController;
+use App\Http\Controllers\Admin\AgendamentosController;
+use App\Http\Controllers\Admin\ClientesController;
+use App\Http\Controllers\Admin\CmsController;
+use App\Http\Controllers\Admin\ConfiguracoesController;
+use App\Http\Controllers\Admin\CronController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DepoimentosController;
+use App\Http\Controllers\Admin\EmailTemplatesController;
+use App\Http\Controllers\Admin\FaturasController;
+use App\Http\Controllers\Admin\FiliaisController;
+use App\Http\Controllers\Admin\GatewaysController;
+use App\Http\Controllers\Admin\ManutencaoController;
+use App\Http\Controllers\Admin\NotificacoesController;
+use App\Http\Controllers\Admin\ParceirosController;
+use App\Http\Controllers\Admin\PerfilController;
+use App\Http\Controllers\Admin\PlanosController;
+use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\ServicosEsteticaController;
+use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Cliente\ClienteDashboardController;
+use App\Http\Controllers\Cliente\ClienteFaturasController;
 use App\Http\Controllers\Instalador\InstaladorController;
 use App\Http\Controllers\Pagamento\CheckoutController;
 use App\Http\Controllers\Pagamento\WebhookController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\CmsController;
-use App\Http\Controllers\Admin\PlanosController;
-use App\Http\Controllers\Admin\AgendamentosController;
-use App\Http\Controllers\Admin\SeoController;
-use App\Http\Controllers\Admin\ManutencaoController;
-use App\Http\Controllers\Admin\GatewaysController;
-use App\Http\Controllers\Admin\PerfilController;
-use App\Http\Controllers\Admin\UsuarioController;
-use App\Http\Controllers\Admin\ConfiguracoesController;
-use App\Http\Controllers\Admin\ServicosEsteticaController;
-use App\Http\Controllers\Admin\ClientesController;
-use App\Http\Controllers\Admin\FaturasController;
-use App\Http\Controllers\Admin\EmailTemplatesController;
-use App\Http\Controllers\Admin\CronController;
-use App\Http\Controllers\Admin\NotificacoesController;
-use App\Http\Controllers\Admin\DepoimentosController;
-use App\Http\Controllers\Cliente\ClienteDashboardController;
-use App\Http\Controllers\Cliente\ClienteFaturasController;
-
-use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Site\SiteController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,20 +125,20 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     // Parceiros & Marcas Homologadas (Carrossel Infinito CMS)
     Route::prefix('parceiros')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\ParceirosController::class, 'index'])->name('admin.parceiros.index');
-        Route::get('/obter/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'obter'])->name('admin.parceiros.obter');
-        Route::post('/salvar', [\App\Http\Controllers\Admin\ParceirosController::class, 'salvar'])->name('admin.parceiros.salvar');
-        Route::post('/toggle/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'toggle'])->name('admin.parceiros.toggle');
-        Route::delete('/{id}', [\App\Http\Controllers\Admin\ParceirosController::class, 'excluir'])->name('admin.parceiros.excluir');
+        Route::get('/', [ParceirosController::class, 'index'])->name('admin.parceiros.index');
+        Route::get('/obter/{id}', [ParceirosController::class, 'obter'])->name('admin.parceiros.obter');
+        Route::post('/salvar', [ParceirosController::class, 'salvar'])->name('admin.parceiros.salvar');
+        Route::post('/toggle/{id}', [ParceirosController::class, 'toggle'])->name('admin.parceiros.toggle');
+        Route::delete('/{id}', [ParceirosController::class, 'excluir'])->name('admin.parceiros.excluir');
     });
 
     // Filiais & Localidades de Atendimento (Mapa Interativo do Brasil)
     Route::prefix('filiais')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\FiliaisController::class, 'index'])->name('admin.filiais.index');
-        Route::get('/obter/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'obter'])->name('admin.filiais.obter');
-        Route::post('/salvar', [\App\Http\Controllers\Admin\FiliaisController::class, 'salvar'])->name('admin.filiais.salvar');
-        Route::post('/toggle/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'toggle'])->name('admin.filiais.toggle');
-        Route::delete('/{id}', [\App\Http\Controllers\Admin\FiliaisController::class, 'excluir'])->name('admin.filiais.excluir');
+        Route::get('/', [FiliaisController::class, 'index'])->name('admin.filiais.index');
+        Route::get('/obter/{id}', [FiliaisController::class, 'obter'])->name('admin.filiais.obter');
+        Route::post('/salvar', [FiliaisController::class, 'salvar'])->name('admin.filiais.salvar');
+        Route::post('/toggle/{id}', [FiliaisController::class, 'toggle'])->name('admin.filiais.toggle');
+        Route::delete('/{id}', [FiliaisController::class, 'excluir'])->name('admin.filiais.excluir');
     });
 
     // Estética Automotiva (Serviços & Pacotes)
@@ -162,8 +163,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('faturas')->group(function () {
         Route::get('/', [FaturasController::class, 'index'])->name('admin.faturas.index');
         Route::get('/obter/{id}', [FaturasController::class, 'obter'])->name('admin.faturas.obter');
+        Route::get('/carne-info/{id}', [FaturasController::class, 'obterInfoCarne'])->name('admin.faturas.carne_info');
         Route::post('/', [FaturasController::class, 'salvar'])->name('admin.faturas.salvar');
         Route::post('/status/{id}', [FaturasController::class, 'alterarStatus'])->name('admin.faturas.status');
+        Route::post('/cancelar-carne/{id}', [FaturasController::class, 'cancelarCarne'])->name('admin.faturas.cancelar_carne');
+        Route::post('/excluir-carne/{id}', [FaturasController::class, 'excluirCarne'])->name('admin.faturas.excluir_carne');
         Route::post('/estornar/{id}', [FaturasController::class, 'estornar'])->name('admin.faturas.estornar');
         Route::post('/antecipar/{id}', [FaturasController::class, 'anteciparParcela'])->name('admin.faturas.antecipar');
         Route::post('/antecipar-lote', [FaturasController::class, 'anteciparLote'])->name('admin.faturas.antecipar_lote');

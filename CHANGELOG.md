@@ -3,6 +3,27 @@
 Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), mantendo sempre **o registro mais recente no topo** (ordem cronológica inversa).
 
+## [1.8.0] - 2026-10-27
+
+### 💳 Gestão Financeira: Cancelamento Inteligente de Carnê/Parcelas e Exclusão em Lote de Todas de uma Única Vez
+- **Lógica Inteligente e Contextual de Cancelamento de Carnê:**
+  - Ao solicitar o cancelamento de uma parcela vinculada a carnê, o sistema consulta em tempo real o histórico financeiro contábil e abre diálogo modal com SweetAlert2 contendo opções adaptadas:
+    - **Se houver parcelas já pagas:** O sistema pergunta se o usuário deseja cancelar **somente esta parcela** ou **esta e toda a sequência ainda pendente** (da parcela selecionada em diante), preservando intactas as parcelas já quitadas para conformidade contábil.
+    - **Se não houver nenhuma parcela paga:** O sistema pergunta se o usuário deseja cancelar **somente esta parcela** ou **o carnê completo / todas as parcelas** de uma só vez.
+- **Opção de Deletar Todas as Parcelas de uma Única Vez:**
+  - Implementação de funcionalidade para **deletar todas as parcelas do carnê de uma única vez**, disponível tanto no diálogo de confirmação de exclusão quanto no menu rápido de ações em cascata (botão split na listagem).
+  - Proteção contábil ativa: caso existam parcelas pagas, apenas as pendentes são deletadas e as quitadas permanecem salvas para auditoria. Caso não haja parcelas pagas, todas as parcelas vinculadas ao carnê são removidas e o carnê é cancelado na API da Efí.
+- **Integração com a API Efí (v1):**
+  - Métodos `cancelarCarneEfi` e `cancelarParcelaCarneEfi` integrados ao `EfiPaymentService` para sincronização automática com o gateway de pagamento.
+- **Interface e Experiência do Usuário (UI/UX):**
+  - Badges informativos de carnê na listagem de faturas (`Parcela X/Y`).
+  - Menu de ações rápido em cascata no botão de exclusão de parcelas de carnê.
+  - Conformidade estrita com SweetAlert2, Toastr e AJAX sem recarregar a tela desnecessariamente.
+- **Suíte de Testes Automatizados:**
+  - Novo arquivo de testes `tests/Feature/CancelamentoEExclusaoCarneTest.php` com 8 testes cobrindo todos os cenários de cancelamento individual, sequência pendente, cancelamento integral e deleção em lote de todas de uma única vez. Totalizando 141 testes e 643 asserções com 100% de sucesso.
+
+---
+
 ## [1.7.1] - 2026-10-12
 
 ### 🛠️ Modo de Manutenção: Persistência de Dados via AJAX (.keep-data), Wallpaper Drag & Drop (FocoDropzone) e Barra de Alerta Administrativa

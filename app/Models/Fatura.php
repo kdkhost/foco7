@@ -72,7 +72,7 @@ class Fatura extends Model
 
     public function getValorFormatadoAttribute(): string
     {
-        return 'R$ ' . number_format($this->valor, 2, ',', '.');
+        return 'R$ '.number_format($this->valor, 2, ',', '.');
     }
 
     /**
@@ -83,22 +83,23 @@ class Fatura extends Model
         $base = (float) $this->valor;
         $multa = (float) ($this->valor_multa ?? 0);
         $juros = (float) ($this->valor_juros ?? 0);
+
         return round($base + $multa + $juros, 2);
     }
 
     public function getValorTotalComEncargosFormatadoAttribute(): string
     {
-        return 'R$ ' . number_format($this->valor_total_com_encargos, 2, ',', '.');
+        return 'R$ '.number_format($this->valor_total_com_encargos, 2, ',', '.');
     }
 
     public function getMultaFormatadaAttribute(): string
     {
-        return 'R$ ' . number_format($this->valor_multa ?? 0, 2, ',', '.');
+        return 'R$ '.number_format($this->valor_multa ?? 0, 2, ',', '.');
     }
 
     public function getJurosFormatadoAttribute(): string
     {
-        return 'R$ ' . number_format($this->valor_juros ?? 0, 2, ',', '.');
+        return 'R$ '.number_format($this->valor_juros ?? 0, 2, ',', '.');
     }
 
     /**
@@ -106,7 +107,7 @@ class Fatura extends Model
      */
     public function getDiasAtrasoAttribute(): int
     {
-        if (!$this->data_vencimento) {
+        if (! $this->data_vencimento) {
             return 0;
         }
 
@@ -126,7 +127,8 @@ class Fatura extends Model
     public function isPaga(): bool
     {
         $st = strtolower((string) $this->status);
-        return in_array($st, ['pago', 'paga', 'quitada', 'liquidada']) || !empty($this->data_pagamento);
+
+        return in_array($st, ['pago', 'paga', 'quitada', 'liquidada']) || ! empty($this->data_pagamento);
     }
 
     /**
@@ -143,6 +145,7 @@ class Fatura extends Model
     public function isLiquidadaOuCancelada(): bool
     {
         $st = strtolower((string) $this->status);
+
         return $this->isPaga() || in_array($st, ['cancelado', 'cancelada', 'estornado', 'estornada']);
     }
 
@@ -158,7 +161,7 @@ class Fatura extends Model
     public function getStatusBadgeAttribute(): string
     {
         if ($this->isVencida() && $this->status !== 'cancelado') {
-            return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Vencida (' . $this->dias_atraso . 'd)</span>';
+            return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Vencida ('.$this->dias_atraso.'d)</span>';
         }
 
         return match ($this->status) {
@@ -171,17 +174,109 @@ class Fatura extends Model
 
     public function isCarne(): bool
     {
-        return !empty($this->codigo_carne) || $this->metodo_pagamento === 'carne' || str_starts_with($this->codigo_fatura, 'CARNE-');
+        return ! empty($this->codigo_carne)
+            || $this->metodo_pagamento === 'carne'
+            || str_starts_with($this->codigo_fatura, 'CARNE-')
+            || ($this->total_parcelas !== null && $this->total_parcelas > 1);
+    }
+
+    /**
+     * Retorna a query de todas as parcelas pertencentes ao mesmo carnê
+     */
+    public function getParcelasCarneQuery()
+    {
+        if (! empty($this->codigo_carne)) {
+            return self::where('codigo_carne', $this->codigo_carne);
+        }
+
+        if (! empty($this->efi_carnet_id)) {
+            return self::where('efi_carnet_id', $this->efi_carnet_id);
+        }
+
+        if ($this->total_parcelas > 1 && str_contains($this->codigo_fatura, '-')) {
+            $prefixo = substr($this->codigo_fatura, 0, (int) strrpos($this->codigo_fatura, '-'));
+
+            return self::where('user_id', $this->user_id)
+                ->where('codigo_fatura', 'like', $prefixo.'-%');
+        }
+
+        return self::where('id', $this->id);
+    }
+
+    /**
+     * Retorna informações completas do carnê (pagas, pendentes, sequência a partir desta parcela)
+     */
+    public function getInfoCarne(): array
+    {
+        if (! $this->isCarne()) {
+            return [
+                'is_carne' => false,
+                'codigo_carne' => null,
+                'numero_parcela' => 1,
+                'total_parcelas' => 1,
+                'total_geral' => 1,
+                'tem_pagas' => false,
+                'total_pagas' => 0,
+                'total_canceladas' => 0,
+                'total_pendentes' => $this->status === 'pendente' ? 1 : 0,
+                'total_sequencia' => 1,
+            ];
+        }
+
+        $parcelas = $this->getParcelasCarneQuery()->orderBy('numero_parcela')->orderBy('id')->get();
+        $totalGeral = $parcelas->count();
+
+        if ($totalGeral <= 1 && ($this->total_parcelas ?? 1) <= 1) {
+            return [
+                'is_carne' => false,
+                'codigo_carne' => $this->codigo_carne,
+                'numero_parcela' => $this->numero_parcela ?? 1,
+                'total_parcelas' => 1,
+                'total_geral' => 1,
+                'tem_pagas' => $this->isPaga(),
+                'total_pagas' => $this->isPaga() ? 1 : 0,
+                'total_canceladas' => $this->status === 'cancelado' ? 1 : 0,
+                'total_pendentes' => $this->status === 'pendente' ? 1 : 0,
+                'total_sequencia' => 1,
+            ];
+        }
+
+        $pagas = $parcelas->filter(fn ($p) => $p->isPaga());
+        $temPagas = $pagas->isNotEmpty();
+        $totalPagas = $pagas->count();
+
+        $canceladas = $parcelas->filter(fn ($p) => $p->status === 'cancelado');
+        $pendentes = $parcelas->filter(fn ($p) => ! $p->isPaga() && $p->status !== 'cancelado');
+
+        $numAtual = $this->numero_parcela ?: 1;
+        $sequenciaPendente = $parcelas->filter(fn ($p) => ($p->numero_parcela >= $numAtual) && ! $p->isPaga() && $p->status !== 'cancelado'
+        );
+
+        return [
+            'is_carne' => true,
+            'codigo_carne' => $this->codigo_carne ?: ($this->codigo_fatura ? preg_replace('/-\\d+$/', '', $this->codigo_fatura) : 'CARNE'),
+            'numero_parcela' => $numAtual,
+            'total_parcelas' => $this->total_parcelas ?: $totalGeral,
+            'total_geral' => $totalGeral,
+            'tem_pagas' => $temPagas,
+            'total_pagas' => $totalPagas,
+            'total_canceladas' => $canceladas->count(),
+            'total_pendentes' => $pendentes->count(),
+            'total_sequencia' => $sequenciaPendente->count(),
+            'sequencia_numeros' => $sequenciaPendente->pluck('numero_parcela')->values()->all(),
+            'pagas_numeros' => $pagas->pluck('numero_parcela')->values()->all(),
+        ];
     }
 
     public function getTaxaRepassadaFormatadaAttribute(): string
     {
-        return 'R$ ' . number_format($this->taxa_repassada ?? 0, 2, ',', '.');
+        return 'R$ '.number_format($this->taxa_repassada ?? 0, 2, ',', '.');
     }
 
     public function getValorOriginalFormatadoAttribute(): string
     {
         $val = $this->valor_original ?? ($this->valor - ($this->taxa_repassada ?? 0));
-        return 'R$ ' . number_format($val, 2, ',', '.');
+
+        return 'R$ '.number_format($val, 2, ',', '.');
     }
 }
