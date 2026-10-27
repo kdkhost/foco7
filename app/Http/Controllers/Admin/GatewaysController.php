@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\CmsSetting;
-use App\Models\User;
 use App\Models\Plano;
-use App\Models\Fatura;
-use App\Services\EmailTemplateService;
+use App\Models\User;
 use App\Services\EfiPaymentService;
+use App\Services\EmailTemplateService;
 use App\Services\ReguaCobrancaService;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class GatewaysController extends Controller
 {
@@ -33,19 +32,19 @@ class GatewaysController extends Controller
             // ==========================================
             'mp_ativo' => CmsSetting::get('mercadopago_ativo', '1') == '1',
             'mp_ambiente' => CmsSetting::get('mercadopago_ambiente', 'sandbox'), // 'sandbox' ou 'producao'
-            
+
             // Credenciais de Sandbox (Homologação)
             'mp_public_key_sandbox' => CmsSetting::get('mercadopago_public_key_sandbox', CmsSetting::get('mercadopago_public_key', '')),
             'mp_access_token_sandbox' => CmsSetting::get('mercadopago_access_token_sandbox', CmsSetting::get('mercadopago_access_token', '')),
             'mp_client_id_sandbox' => CmsSetting::get('mercadopago_client_id_sandbox', CmsSetting::get('mercadopago_client_id', '')),
             'mp_client_secret_sandbox' => CmsSetting::get('mercadopago_client_secret_sandbox', CmsSetting::get('mercadopago_client_secret', '')),
-            
+
             // Credenciais de Produção Real
             'mp_public_key_prod' => CmsSetting::get('mercadopago_public_key_prod', ''),
             'mp_access_token_prod' => CmsSetting::get('mercadopago_access_token_prod', ''),
             'mp_client_id_prod' => CmsSetting::get('mercadopago_client_id_prod', ''),
             'mp_client_secret_prod' => CmsSetting::get('mercadopago_client_secret_prod', ''),
-            
+
             'mp_webhook_secret' => CmsSetting::get('mercadopago_webhook_secret', ''),
             'mp_aceita_pix' => CmsSetting::get('mp_aceita_pix', '1') == '1',
             'mp_aceita_cartao' => CmsSetting::get('mp_aceita_cartao', '1') == '1',
@@ -56,19 +55,19 @@ class GatewaysController extends Controller
             // ==========================================
             'efi_ativo' => CmsSetting::get('efi_ativo', '1') == '1',
             'efi_ambiente' => CmsSetting::get('efi_ambiente', 'sandbox'), // 'sandbox' ou 'producao'
-            
+
             // Credenciais de Sandbox (Homologação)
             'efi_client_id_sandbox' => CmsSetting::get('efi_client_id_sandbox', CmsSetting::get('efi_client_id', '')),
             'efi_client_secret_sandbox' => CmsSetting::get('efi_client_secret_sandbox', CmsSetting::get('efi_client_secret', '')),
             'efi_chave_pix_sandbox' => CmsSetting::get('efi_chave_pix_sandbox', CmsSetting::get('efi_chave_pix', '')),
             'efi_certificado_pem_sandbox' => CmsSetting::get('efi_certificado_pem_sandbox', CmsSetting::get('efi_certificado_pem', '')),
-            
+
             // Credenciais de Produção Real
             'efi_client_id_prod' => CmsSetting::get('efi_client_id_prod', ''),
             'efi_client_secret_prod' => CmsSetting::get('efi_client_secret_prod', ''),
             'efi_chave_pix_prod' => CmsSetting::get('efi_chave_pix_prod', ''),
             'efi_certificado_pem_prod' => CmsSetting::get('efi_certificado_pem_prod', ''),
-            
+
             'efi_aceita_pix' => CmsSetting::get('efi_aceita_pix', '1') == '1',
             'efi_aceita_boleto' => CmsSetting::get('efi_aceita_boleto', '1') == '1',
             'efi_aceita_cartao' => CmsSetting::get('efi_aceita_cartao', '1') == '1',
@@ -148,7 +147,7 @@ class GatewaysController extends Controller
 
         // Histórico de Execução de Tarefas Cron
         $cronStatus = [
-            'comando_cpanel' => '* * * * * cd ' . base_path() . ' && php artisan schedule:run >> /dev/null 2>&1',
+            'comando_cpanel' => '* * * * * cd '.base_path().' && php artisan schedule:run >> /dev/null 2>&1',
             'rotinas' => [
                 'regua_cobranca' => [
                     'nome' => 'Régua de Cobrança & Mensalidades Recorrentes',
@@ -185,7 +184,7 @@ class GatewaysController extends Controller
                     'descricao' => 'Descarrega views e caches para manter o painel e site rápidos em cPanel/LiteSpeed.',
                     'ultima_execucao' => CmsSetting::get('cron_last_run_limpar_cache', 'Aguardando agendador'),
                 ],
-            ]
+            ],
         ];
 
         return view('admin.gateways.index', compact(
@@ -215,16 +214,32 @@ class GatewaysController extends Controller
         $mpSecretProd = $request->input('mp_client_secret_prod', '');
 
         // Salva Sandbox Mercado Pago
-        if ($mpPubSandbox !== '') CmsSetting::set('mercadopago_public_key_sandbox', $mpPubSandbox, 'gateways');
-        if ($mpTokenSandbox !== '') CmsSetting::set('mercadopago_access_token_sandbox', $mpTokenSandbox, 'gateways');
-        if ($mpClientSandbox !== '') CmsSetting::set('mercadopago_client_id_sandbox', $mpClientSandbox, 'gateways');
-        if ($mpSecretSandbox !== '') CmsSetting::set('mercadopago_client_secret_sandbox', $mpSecretSandbox, 'gateways');
+        if ($mpPubSandbox !== '') {
+            CmsSetting::set('mercadopago_public_key_sandbox', $mpPubSandbox, 'gateways');
+        }
+        if ($mpTokenSandbox !== '') {
+            CmsSetting::set('mercadopago_access_token_sandbox', $mpTokenSandbox, 'gateways');
+        }
+        if ($mpClientSandbox !== '') {
+            CmsSetting::set('mercadopago_client_id_sandbox', $mpClientSandbox, 'gateways');
+        }
+        if ($mpSecretSandbox !== '') {
+            CmsSetting::set('mercadopago_client_secret_sandbox', $mpSecretSandbox, 'gateways');
+        }
 
         // Salva Produção Mercado Pago
-        if ($mpPubProd !== '') CmsSetting::set('mercadopago_public_key_prod', $mpPubProd, 'gateways');
-        if ($mpTokenProd !== '') CmsSetting::set('mercadopago_access_token_prod', $mpTokenProd, 'gateways');
-        if ($mpClientProd !== '') CmsSetting::set('mercadopago_client_id_prod', $mpClientProd, 'gateways');
-        if ($mpSecretProd !== '') CmsSetting::set('mercadopago_client_secret_prod', $mpSecretProd, 'gateways');
+        if ($mpPubProd !== '') {
+            CmsSetting::set('mercadopago_public_key_prod', $mpPubProd, 'gateways');
+        }
+        if ($mpTokenProd !== '') {
+            CmsSetting::set('mercadopago_access_token_prod', $mpTokenProd, 'gateways');
+        }
+        if ($mpClientProd !== '') {
+            CmsSetting::set('mercadopago_client_id_prod', $mpClientProd, 'gateways');
+        }
+        if ($mpSecretProd !== '') {
+            CmsSetting::set('mercadopago_client_secret_prod', $mpSecretProd, 'gateways');
+        }
 
         // Mantém retrocompatibilidade com chaves legadas baseando-se no ambiente ativo
         if ($mpAmbiente === 'sandbox') {
@@ -273,14 +288,26 @@ class GatewaysController extends Controller
         $efiPixProd = $request->input('efi_chave_pix_prod', '');
 
         // Sandbox Efí
-        if ($efiClientSandbox !== '') CmsSetting::set('efi_client_id_sandbox', $efiClientSandbox, 'gateways');
-        if ($efiSecretSandbox !== '') CmsSetting::set('efi_client_secret_sandbox', $efiSecretSandbox, 'gateways');
-        if ($efiPixSandbox !== '') CmsSetting::set('efi_chave_pix_sandbox', $efiPixSandbox, 'gateways');
+        if ($efiClientSandbox !== '') {
+            CmsSetting::set('efi_client_id_sandbox', $efiClientSandbox, 'gateways');
+        }
+        if ($efiSecretSandbox !== '') {
+            CmsSetting::set('efi_client_secret_sandbox', $efiSecretSandbox, 'gateways');
+        }
+        if ($efiPixSandbox !== '') {
+            CmsSetting::set('efi_chave_pix_sandbox', $efiPixSandbox, 'gateways');
+        }
 
         // Produção Efí
-        if ($efiClientProd !== '') CmsSetting::set('efi_client_id_prod', $efiClientProd, 'gateways');
-        if ($efiSecretProd !== '') CmsSetting::set('efi_client_secret_prod', $efiSecretProd, 'gateways');
-        if ($efiPixProd !== '') CmsSetting::set('efi_chave_pix_prod', $efiPixProd, 'gateways');
+        if ($efiClientProd !== '') {
+            CmsSetting::set('efi_client_id_prod', $efiClientProd, 'gateways');
+        }
+        if ($efiSecretProd !== '') {
+            CmsSetting::set('efi_client_secret_prod', $efiSecretProd, 'gateways');
+        }
+        if ($efiPixProd !== '') {
+            CmsSetting::set('efi_chave_pix_prod', $efiPixProd, 'gateways');
+        }
 
         // Retrocompatibilidade Efí
         if ($efiAmbiente === 'sandbox') {
@@ -299,7 +326,7 @@ class GatewaysController extends Controller
 
         // Upload Certificados .PEM Sandbox e Produção
         $certsPath = storage_path('certs');
-        if (!File::isDirectory($certsPath)) {
+        if (! File::isDirectory($certsPath)) {
             File::makeDirectory($certsPath, 0700, true, true);
         }
 
@@ -313,7 +340,7 @@ class GatewaysController extends Controller
         if ($request->hasFile('efi_certificado_sandbox')) {
             $file = $request->file('efi_certificado_sandbox');
             if (strtolower($file->getClientOriginalExtension()) === 'pem') {
-                $nome = 'efi_cert_sandbox_' . time() . '.pem';
+                $nome = 'efi_cert_sandbox_'.time().'.pem';
                 $file->move($certsPath, $nome);
                 CmsSetting::set('efi_certificado_pem_sandbox', $nome, 'gateways');
                 if ($efiAmbiente === 'sandbox') {
@@ -332,7 +359,7 @@ class GatewaysController extends Controller
         if ($request->hasFile('efi_certificado_prod')) {
             $file = $request->file('efi_certificado_prod');
             if (strtolower($file->getClientOriginalExtension()) === 'pem') {
-                $nome = 'efi_cert_prod_' . time() . '.pem';
+                $nome = 'efi_cert_prod_'.time().'.pem';
                 $file->move($certsPath, $nome);
                 CmsSetting::set('efi_certificado_pem_prod', $nome, 'gateways');
                 if ($efiAmbiente === 'producao') {
@@ -431,7 +458,7 @@ class GatewaysController extends Controller
             CmsSetting::set('cobranca_bloquear_rastreador_apos_dias', $request->input('cobranca_bloquear_rastreador_apos_dias'), 'gateways');
         }
 
-        CmsSetting::set('regua_juros_diario_percentual', $request->input('regua_juros_diario_percentual', round(((float)$juros) / 30, 4) ?: '0.033'), 'financeiro');
+        CmsSetting::set('regua_juros_diario_percentual', $request->input('regua_juros_diario_percentual', round(((float) $juros) / 30, 4) ?: '0.033'), 'financeiro');
         CmsSetting::set('regua_dias_tolerancia', $request->input('regua_dias_tolerancia', '0'), 'financeiro');
         CmsSetting::set('regua_enviar_email', $request->boolean('regua_enviar_email', true) ? '1' : '0', 'financeiro');
         CmsSetting::set('regua_enviar_whatsapp', $request->boolean('regua_enviar_whatsapp') ? '1' : '0', 'financeiro');
@@ -504,7 +531,7 @@ class GatewaysController extends Controller
         ]);
 
         $nome = $request->input('nome');
-        $chave = $request->input('chave') ?: \Illuminate\Support\Str::slug($nome, '_');
+        $chave = $request->input('chave') ?: Str::slug($nome, '_');
         $descricao = $request->input('descricao') ?: 'Template de e-mail personalizado';
         $assunto = $request->input('assunto');
         $corpo = $request->input('corpo');
@@ -587,6 +614,7 @@ class GatewaysController extends Controller
             'valor_parcela' => 'required',
             'total_parcelas' => 'required|integer|min:2|max:24',
             'data_primeiro_vencimento' => 'required|date',
+            'tipo_carne' => 'nullable|in:proprio,efi',
         ]);
 
         $cliente = User::findOrFail($request->input('cliente_id'));
@@ -594,6 +622,7 @@ class GatewaysController extends Controller
         $descricao = $request->input('descricao');
         $numParcelas = (int) $request->input('total_parcelas');
         $primeiroVenc = Carbon::parse($request->input('data_primeiro_vencimento'));
+        $tipoCarne = $request->input('tipo_carne', 'proprio');
 
         // Normalização do valor (aceita tanto formato BR '89,90' / '1.250,50' quanto float '89.90')
         $valorInput = trim((string) $request->input('valor_parcela'));
@@ -621,17 +650,21 @@ class GatewaysController extends Controller
             totalParcelas: $numParcelas,
             primeiroVencimento: $primeiroVenc,
             descricao: $descricao,
-            plano: $plano
+            plano: $plano,
+            tipoCarne: $tipoCarne
         );
 
-        $msg = "Carnê ({$resultadoCarne['codigo_carne']}) com {$numParcelas} parcelas de {$resultadoCarne['valor_parcela_formatado']} gerado com sucesso para {$cliente->name}!";
+        $tipoRotulo = $resultadoCarne['tipo_carne_rotulo'];
+        $msg = "{$tipoRotulo} ({$resultadoCarne['codigo_carne']}) com {$numParcelas} parcelas de {$resultadoCarne['valor_parcela_formatado']} gerado com sucesso para {$cliente->name}!";
         if ($resultadoCarne['repasse_ativo'] && $resultadoCarne['taxa_repassada_por_parcela'] > 0) {
-            $msg .= " (Taxa de emissão bancária de R$ " . number_format($resultadoCarne['taxa_repassada_por_parcela'], 2, ',', '.') . " repassada por parcela).";
+            $msg .= ' (Taxa bancária de R$ '.number_format($resultadoCarne['taxa_repassada_por_parcela'], 2, ',', '.').' repassada por parcela).';
         }
 
         return response()->json([
             'success' => true,
             'message' => $msg,
+            'tipo_carne' => $resultadoCarne['tipo_carne'],
+            'tipo_carne_rotulo' => $tipoRotulo,
             'codigo_carne' => $resultadoCarne['codigo_carne'],
             'total_parcelas' => $numParcelas,
             'valor_parcela' => $resultadoCarne['valor_parcela_formatado'],
@@ -674,7 +707,7 @@ class GatewaysController extends Controller
                 case 'limpar_cache':
                     Artisan::call('cache:clear');
                     Artisan::call('view:clear');
-                    $output = "Cache da aplicação e views compiladas limpos com sucesso.";
+                    $output = 'Cache da aplicação e views compiladas limpos com sucesso.';
                     CmsSetting::set('cron_last_run_limpar_cache', now()->format('d/m/Y H:i:s'), 'cron');
                     $msg = 'Otimização e limpeza de cache executadas!';
                     break;
@@ -695,7 +728,7 @@ class GatewaysController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao executar tarefa: ' . $e->getMessage(),
+                'message' => 'Erro ao executar tarefa: '.$e->getMessage(),
             ], 500);
         }
     }

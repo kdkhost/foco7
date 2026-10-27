@@ -633,7 +633,18 @@ public_html/
   - Ações primárias e de persistência (Salvar, Gravar, Criar, Cadastrar, Liquidar, Filtrar) consolidadas no padrão corporativo `btn btn-danger fw-bold shadow-sm` com vermelho corporativo `#d90000`, hover suave e transição calibrada.
   - Ações de cancelamento, fechamento e retorno unificadas em `btn btn-outline-secondary` com suporte otimizado a light mode e dark mode.
   - Grupos de botões em tabelas (`.btn-group.btn-group-sm`) padronizados com altura unificada de 32px, eliminando quebras de raio de borda interno e mantendo acabamento de contorno (*outline*) homogêneo para ações de executar, editar e excluir.
-  - Módulos auditados e padronizados: CMS (slides, FAQs, depoimentos, WhatsApp), Gateways (Mercado Pago, Efí, Carnê, Régua de Cobrança), Cron Jobs, Notificações, Faturas, Clientes, Usuários, Planos, Parceiros, Agendamentos e Dashboard.
+- **36.6. Fluxo Completo dos 3 Gateways & Emissão Dual de Carnês (Próprio vs Efí PRO):**
+  - **Três Provedores/Módulos Integrados:**
+    1. *Mercado Pago (`mercadopago`):* PIX dinâmico com QR Code / Copia e Cola, Cartão de Crédito e Boleto Bancário. Webhook dedicado (`/webhook/mercadopago`) com assinatura criptográfica HMAC SHA-256 e sincronizador em segundo plano.
+    2. *Efí PRO / Gerencianet (`efi`):* PIX Open Finance com autenticação mTLS via certificado `.p12`, Boleto Bancário com código de barras FEBRABAN e Carnês bancários oficiais registrados diretamente na API `/v1/carnet` da Efí Bank.
+    3. *Carnê Próprio Foco 7 (`proprio`):* Emissão interna de carnês de mensalidades vinculados ao cliente sem taxas bancárias por boleto da Efí, gerando parcelas automáticas com QR Code Pix direto, linha digitável e PDF próprio para impressão e envio ao cliente via WhatsApp ou e-mail.
+  - **Decisão Interativa de Emissão (Carnê Próprio vs Efí PRO):**
+    - Disponível tanto na aba de Gateways (`/admin/gateways#tab-carne`) quanto na Gestão Financeira de Faturas (`/admin/faturas`).
+    - Formulário com seletor visual e rádio buttons com descrições detalhadas entre "Carnê Próprio Foco 7" (sem tarifas bancárias) e "Carnê Bancário via Efí PRO" (registrado na API Efí com boletos bancários).
+    - Confirmação inteligente via SweetAlert2 perguntando ao administrador qual modalidade deseja emitir, com opção de alternar instantaneamente com um clique antes do disparo da requisição AJAX.
+  - **Sincronização & Webhook Unificado de Carnês:**
+    - Tratamento de notificações v1 (`/v1/notification/:token`) no webhook `/webhook/efi` para conciliação automática de carnês e boletos emitidos via Efí PRO.
+    - Comando de sincronização diária (`php artisan gateways:sincronizar-pagamentos`) consultando faturas pendentes da Efí via endpoint `/v1/carnet/{id}` e baixando parcelas quitadas.
 - **Créditos & Suporte Técnico do Desenvolvedor:**
   - Contato oficial do desenvolvedor Marcelo Brad configurado com WhatsApp direto `+55 (21) 98132-5441` (`5521981325441`), Telegram `@marcelobrad` e blindagem no core impedindo sobrescrita acidental com dados da empresa cliente.
 

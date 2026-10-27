@@ -430,7 +430,7 @@ class EfiPaymentService
     }
 
     /**
-     * Emite um Carnê de Pagamento Completo (com geração de PDF e parcelas)
+     * Emite um Carnê de Pagamento Completo (com opção de Carnê Próprio Foco 7 ou via Efí PRO)
      */
     public static function criarCarne(
         User $cliente,
@@ -438,58 +438,74 @@ class EfiPaymentService
         int $totalParcelas,
         Carbon $primeiroVencimento,
         string $descricao,
-        ?Plano $plano = null
+        ?Plano $plano = null,
+        string $tipoCarne = 'proprio'
     ): array {
-        // Cálculo de repasse de taxas por parcela (se ativo)
-        $taxas = self::calcularTaxas($valorParcelaBase, 'carne', $totalParcelas);
-        $valorParcelaFinal = $taxas['valor_final'];
-        $taxaPorParcela = $taxas['taxa_repassada'];
+        $tipoCarne = in_array($tipoCarne, ['proprio', 'efi']) ? $tipoCarne : 'proprio';
+
+        // Para Carnê Efí calcula taxas de repasse bancário se ativas; para Carnê Próprio Foco 7 usa o valor base
+        if ($tipoCarne === 'efi') {
+            $taxas = self::calcularTaxas($valorParcelaBase, 'carne', $totalParcelas);
+            $valorParcelaFinal = $taxas['valor_final'];
+            $taxaPorParcela = $taxas['taxa_repassada'];
+            $repasseAtivo = $taxas['repasse_ativo'];
+        } else {
+            $valorParcelaFinal = $valorParcelaBase;
+            $taxaPorParcela = 0.00;
+            $repasseAtivo = false;
+        }
 
         $codigoCarne = 'CARNE-'.date('Ymd').'-'.strtoupper(Str::random(6));
-        $token = self::getAccessTokenV1();
         $efiCarnetId = null;
         $linkPdfEfi = null;
 
-        $cpfCnpjLimpo = preg_replace('/\\D/', '', $cliente->cpf_cnpj ?? '00000000000');
-        $telefoneLimpo = preg_replace('/\\D/', '', $cliente->telefone ?? '11999998888');
+        // SE FOR VIA EFÍ: Conecta na API oficial da Efí POST /v1/carnet
+        if ($tipoCarne === 'efi') {
+            $token = self::getAccessTokenV1();
+            if ($token) {
+                try {
+                    $cpfCnpjLimpo = preg_replace('/\\D/', '', $cliente->cpf_cnpj ?? '00000000000');
+                    $telefoneLimpo = preg_replace('/\\D/', '', $cliente->telefone ?? '11999998888');
 
-        // Se temos token v1 da Efí, tenta criar o Carnê Oficial via API POST /v1/carnet
-        if ($token) {
-            try {
-                $urlCarnet = self::getApiUrl().'/carnet';
-                $respCarnet = Http::withToken($token)
-                    ->timeout(15)
-                    ->post($urlCarnet, [
-                        'items' => [
-                            [
-                                'name' => substr($descricao, 0, 100),
-                                'value' => (int) round($valorParcelaFinal * 100),
-                                'amount' => 1,
+                    $urlCarnet = self::getApiUrl().'/carnet';
+                    $respCarnet = Http::withToken($token)
+                        ->timeout(15)
+                        ->post($urlCarnet, [
+                            'items' => [
+                                [
+                                    'name' => substr($descricao, 0, 100),
+                                    'value' => (int) round($valorParcelaFinal * 100),
+                                    'amount' => 1,
+                                ],
                             ],
-                        ],
-                        'customer' => [
-                            'name' => $cliente->name,
-                            'cpf' => strlen($cpfCnpjLimpo) <= 11 ? $cpfCnpjLimpo : null,
-                            'cnpj' => strlen($cpfCnpjLimpo) > 11 ? $cpfCnpjLimpo : null,
-                            'email' => $cliente->email,
-                            'phone_number' => $telefoneLimpo,
-                        ],
-                        'repeats' => $totalParcelas,
-                        'split_items' => false,
-                        'expire_at' => $primeiroVencimento->format('Y-m-d'),
-                        'instructions' => [
-                            substr(CmsSetting::get('carne_instrucoes', 'Não receber após 30 dias de atraso.'), 0, 90),
-                        ],
-                    ]);
+                            'customer' => [
+                                'name' => $cliente->name,
+                                'cpf' => strlen($cpfCnpjLimpo) <= 11 ? $cpfCnpjLimpo : null,
+                                'cnpj' => strlen($cpfCnpjLimpo) > 11 ? $cpfCnpjLimpo : null,
+                                'email' => $cliente->email,
+                                'phone_number' => $telefoneLimpo,
+                            ],
+                            'repeats' => $totalParcelas,
+                            'split_items' => false,
+                            'expire_at' => $primeiroVencimento->format('Y-m-d'),
+                            'instructions' => [
+                                substr(CmsSetting::get('carne_instrucoes', 'Não receber após 30 dias de atraso.'), 0, 90),
+                            ],
+                        ]);
 
-                if ($respCarnet->successful() && isset($respCarnet->json()['data']['carnet_id'])) {
-                    $carnetData = $respCarnet->json()['data'];
-                    $efiCarnetId = (string) $carnetData['carnet_id'];
-                    $linkPdfEfi = $carnetData['pdf']['charge'] ?? ($carnetData['link'] ?? null);
-                    Log::info("Carnê Efí criado com sucesso na API. ID: {$efiCarnetId}");
+                    if ($respCarnet->successful() && isset($respCarnet->json()['data']['carnet_id'])) {
+                        $carnetData = $respCarnet->json()['data'];
+                        $efiCarnetId = (string) $carnetData['carnet_id'];
+                        $linkPdfEfi = $carnetData['pdf']['charge'] ?? ($carnetData['link'] ?? null);
+                        Log::info("Carnê Efí criado com sucesso na API. ID: {$efiCarnetId}");
+                    } else {
+                        Log::warning('Efí API recusou criação de Carnê: '.$respCarnet->body());
+                    }
+                } catch (Exception $e) {
+                    Log::warning('Erro ao criar Carnê via API Efí: '.$e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::warning('Erro ao criar Carnê via API Efí: '.$e->getMessage());
+            } else {
+                Log::warning('Credenciais da Efí v1 ausentes ou inválidas ao solicitar Carnê via Efí.');
             }
         }
 
@@ -518,14 +534,14 @@ class EfiPaymentService
                 'valor' => $valorParcelaFinal,
                 'taxa_repassada' => $taxaPorParcela,
                 'valor_original' => $valorParcelaBase,
-                'gateway' => 'efi',
+                'gateway' => $tipoCarne === 'efi' ? 'efi' : 'proprio',
                 'metodo_pagamento' => 'carne',
                 'gateway_transaction_id' => $codFatura,
                 'efi_carnet_id' => $efiCarnetId,
                 'qr_code_pix' => $pixPayload,
                 'qr_code_pix_url' => $pixQrUrl,
                 'linha_digitavel_boleto' => $linhaDig,
-                'link_pdf_carne' => route('faturas.carne.pdf', $codigoCarne),
+                'link_pdf_carne' => ($tipoCarne === 'efi' && $linkPdfEfi) ? $linkPdfEfi : route('faturas.carne.pdf', $codigoCarne),
                 'status' => 'pendente',
                 'data_vencimento' => $dataVenc,
             ]);
@@ -544,23 +560,73 @@ class EfiPaymentService
                 'plano_nome' => $descricao,
                 'valor' => 'R$ '.number_format($valorParcelaFinal, 2, ',', '.').' (x'.$totalParcelas.' parcelas)',
                 'data_vencimento' => $primeiroVencimento->format('d/m/Y'),
-                'link_carne' => $pdfDownloadUrl,
+                'link_carne' => ($tipoCarne === 'efi' && $linkPdfEfi) ? $linkPdfEfi : $pdfDownloadUrl,
             ]);
         }
 
         return [
             'success' => true,
+            'tipo_carne' => $tipoCarne,
+            'tipo_carne_rotulo' => $tipoCarne === 'efi' ? 'Carnê Bancário Efí PRO' : 'Carnê Próprio Foco 7',
             'codigo_carne' => $codigoCarne,
             'total_parcelas' => $totalParcelas,
             'valor_parcela' => $valorParcelaFinal,
             'valor_parcela_formatado' => 'R$ '.number_format($valorParcelaFinal, 2, ',', '.'),
             'taxa_repassada_por_parcela' => $taxaPorParcela,
-            'repasse_ativo' => $taxas['repasse_ativo'],
+            'repasse_ativo' => $repasseAtivo,
             'efi_carnet_id' => $efiCarnetId,
             'pdf_url' => $pdfDownloadUrl,
             'pdf_efi_url' => $linkPdfEfi,
             'faturas' => $faturas,
         ];
+    }
+
+    /**
+     * Consulta os detalhes de uma notificação de cobrança v1 (Boleto ou Carnê da Efí)
+     */
+    public static function consultarNotificacaoV1(string $notificationToken): ?array
+    {
+        $token = self::getAccessTokenV1();
+        if (! $token) {
+            return null;
+        }
+
+        try {
+            $url = self::getApiUrl().'/notification/'.$notificationToken;
+            $response = Http::withToken($token)->timeout(12)->get($url);
+
+            if ($response->successful()) {
+                return $response->json()['data'] ?? null;
+            }
+        } catch (Exception $e) {
+            Log::warning('Erro ao consultar notificação Efí v1: '.$e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Consulta o status de um Carnê diretamente na API v1 da Efí
+     */
+    public static function consultarCarneV1(string $carnetId): ?array
+    {
+        $token = self::getAccessTokenV1();
+        if (! $token) {
+            return null;
+        }
+
+        try {
+            $url = self::getApiUrl().'/carnet/'.$carnetId;
+            $response = Http::withToken($token)->timeout(12)->get($url);
+
+            if ($response->successful()) {
+                return $response->json()['data'] ?? null;
+            }
+        } catch (Exception $e) {
+            Log::warning("Erro ao consultar Carnê #{$carnetId} na Efí: ".$e->getMessage());
+        }
+
+        return null;
     }
 
     /**

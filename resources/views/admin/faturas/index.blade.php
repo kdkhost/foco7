@@ -8,6 +8,9 @@
 <button type="button" class="btn btn-danger fw-bold shadow-sm" onclick="abrirModalFatura()">
     <i class="fas fa-file-invoice-dollar me-1"></i> Lançar Nova Fatura
 </button>
+<button type="button" class="btn btn-outline-danger fw-bold shadow-sm ms-2" onclick="abrirModalEmitirCarneFaturas()">
+    <i class="fas fa-book me-1"></i> Emitir Carnê de Mensalidades
+</button>
 @endsection
 
 @section('content')
@@ -398,6 +401,104 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL DE EMISSÃO DE CARNÊ (PRÓPRIO VS EFÍ PRO) -->
+<div class="modal fade" id="modalEmitirCarneFaturas" tabindex="-1" aria-labelledby="modalEmitirCarneFaturasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white py-3">
+                <h5 class="modal-title fw-bold" id="modalEmitirCarneFaturasLabel">
+                    <i class="fas fa-book me-2"></i> Emitir Carnê de Mensalidades
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form action="{{ route('admin.gateways.gerar_carne') }}" method="POST" id="formGerarCarneFaturas">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="alert alert-light border d-flex align-items-center mb-4">
+                        <i class="fas fa-info-circle text-primary fs-3 me-3"></i>
+                        <div class="small">
+                            Gere um carnê completo de parcelas sequenciais vinculadas a um cliente. O sistema permite escolher entre <strong>Carnê Próprio Foco 7</strong> (interno, sem taxas bancárias da Efí) ou <strong>Carnê Bancário via Efí PRO</strong> (registrado na Efí Bank com conciliação automática).
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Cliente Vinculado *</label>
+                            <select name="cliente_id" id="carne_fat_cliente_id" class="form-select" required>
+                                <option value="">Selecione um cliente...</option>
+                                @foreach($clientes as $cli)
+                                    <option value="{{ $cli->id }}">{{ $cli->name }} ({{ $cli->email }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Plano ou Serviço Vinculado (Opcional)</label>
+                            <select name="plano_id" id="carne_fat_plano_id" class="form-select">
+                                <option value="">Nenhum plano específico (Cobrança avulsa)</option>
+                                @foreach($planos as $pln)
+                                    <option value="{{ $pln->id }}" data-preco="{{ $pln->preco }}">{{ $pln->nome }} ({{ $pln->preco_formatado }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Descrição da Cobrança *</label>
+                            <input type="text" name="descricao" id="carne_fat_descricao" class="form-control" required placeholder="Ex: Mensalidade Rastreamento Veicular 2026">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Valor de Cada Parcela *</label>
+                            <input type="text" name="valor_parcela" id="carne_fat_valor" class="form-control mask-dinheiro" required placeholder="R$ 69,90">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Número de Parcelas *</label>
+                            <select name="total_parcelas" class="form-select" required>
+                                <option value="2">2x parcelas (Bimestral)</option>
+                                <option value="3">3x parcelas (Trimestral)</option>
+                                <option value="6">6x parcelas (Semestral)</option>
+                                <option value="12" selected>12x parcelas (Anual - Recomendado)</option>
+                                <option value="24">24x parcelas (Bienal)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">1º Vencimento</label>
+                            <input type="date" name="primeiro_vencimento" class="form-control" value="{{ date('Y-m-d', strtotime('+5 days')) }}">
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <label class="form-label small fw-bold">Modalidade de Emissão do Carnê *</label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 border rounded-3 h-100 bg-body-tertiary">
+                                        <input class="form-check-input" type="radio" name="tipo_carne" id="carneFatTipoProprio" value="proprio" checked>
+                                        <label class="form-check-label fw-bold cursor-pointer" for="carneFatTipoProprio">
+                                            <i class="fas fa-file-invoice text-danger me-1"></i> Carnê Próprio Foco 7
+                                            <div class="small text-secondary fw-normal mt-1">Gerado internamente. Sem tarifas bancárias da Efí. Ideal para envio de PDF ou pagamento com Pix direto.</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 border rounded-3 h-100 bg-body-tertiary">
+                                        <input class="form-check-input" type="radio" name="tipo_carne" id="carneFatTipoEfi" value="efi">
+                                        <label class="form-check-label fw-bold cursor-pointer" for="carneFatTipoEfi">
+                                            <i class="fas fa-university text-primary me-1"></i> Carnê Bancário via Efí PRO
+                                            <div class="small text-secondary fw-normal mt-1">Registrado na API Efí Bank. Lâminas bancárias oficiais com conciliação automática via webhook.</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2 px-4">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold shadow-sm" id="btnEmitirCarneFaturas">
+                        <i class="fas fa-print me-1"></i> Gerar Carnê de Cobrança
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -418,6 +519,109 @@
             var planoNome = $(this).find(':selected').text().split('(')[0].trim();
             $('#fat_descricao').val('Mensalidade Foco 7 - ' + planoNome);
         }
+    });
+
+    function abrirModalEmitirCarneFaturas() {
+        $('#formGerarCarneFaturas')[0].reset();
+        $('#carneFatTipoProprio').prop('checked', true);
+        new bootstrap.Modal(document.getElementById('modalEmitirCarneFaturas')).show();
+    }
+
+    $('#carne_fat_plano_id').on('change', function() {
+        var preco = $(this).find(':selected').data('preco');
+        if (preco) {
+            $('#carne_fat_valor').val('R$ ' + parseFloat(preco).toFixed(2).replace('.', ','));
+            var planoNome = $(this).find(':selected').text().split('(')[0].trim();
+            if (!$('#carne_fat_descricao').val()) {
+                $('#carne_fat_descricao').val('Mensalidade Foco 7 - ' + planoNome);
+            }
+        }
+    });
+
+    $('#formGerarCarneFaturas').on('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        var tipoCarne = $('input[name="tipo_carne"]:checked', form).val();
+        var tipoTexto = tipoCarne === 'efi' ? 'Carnê Bancário Oficial via Efí PRO' : 'Carnê Próprio do Sistema Foco 7';
+        var tipoDesc = tipoCarne === 'efi' 
+            ? 'As lâminas serão registradas diretamente na API Efí Bank com código de barras e boletos bancários oficiais.' 
+            : 'As parcelas serão geradas internamente no sistema sem custos bancários externos da Efí, com QR Code Pix direto e link de impressão.';
+
+        Swal.fire({
+            title: 'Confirmar Emissão do Carnê?',
+            html: `
+                <div class="text-start">
+                    <p class="mb-2">Você selecionou a modalidade: <strong class="text-danger">${tipoTexto}</strong>.</p>
+                    <div class="alert alert-info py-2 px-3 small mb-3">
+                        <i class="fas fa-info-circle me-1"></i> ${tipoDesc}
+                    </div>
+                    <p class="mb-0 small text-secondary">Deseja prosseguir com o tipo selecionado ou alternar antes de emitir?</p>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '<i class="fas fa-check me-1"></i> Confirmar ' + (tipoCarne === 'efi' ? 'Efí PRO' : 'Carnê Próprio'),
+            confirmButtonColor: '#28a745',
+            denyButtonText: '<i class="fas fa-exchange-alt me-1"></i> Alternar para ' + (tipoCarne === 'efi' ? 'Carnê Próprio' : 'Efí PRO'),
+            denyButtonColor: '#0d6efd',
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isDenied) {
+                if (tipoCarne === 'efi') {
+                    $('#carneFatTipoProprio', form).prop('checked', true);
+                } else {
+                    $('#carneFatTipoEfi', form).prop('checked', true);
+                }
+                $(form).trigger('submit');
+                return;
+            }
+
+            if (result.isConfirmed) {
+                var $btn = $('#btnEmitirCarneFaturas');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Emitindo Carnê...');
+
+                $.ajax({
+                    url: form.action,
+                    type: 'POST',
+                    data: $(form).serialize(),
+                    success: function(res) {
+                        $btn.prop('disabled', false).html('<i class="fas fa-print me-1"></i> Gerar Carnê de Cobrança');
+                        if (res.success) {
+                            var modalEl = document.getElementById('modalEmitirCarneFaturas');
+                            var modalInst = bootstrap.Modal.getInstance(modalEl);
+                            if (modalInst) modalInst.hide();
+                            
+                            var htmlMsg = `<p class="mb-2">${res.message}</p>`;
+                            if (res.link_pdf) {
+                                htmlMsg += `<div class="mt-3"><a href="${res.link_pdf}" target="_blank" class="btn btn-danger btn-sm fw-bold"><i class="fas fa-file-pdf me-1"></i> Abrir / Imprimir Carnê PDF</a></div>`;
+                            }
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Carnê Emitido com Sucesso!',
+                                html: htmlMsg,
+                                confirmButtonColor: '#28a745'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            window.foco7Notify.error(res.message || 'Erro ao gerar carnê.');
+                        }
+                    },
+                    error: function(xhr) {
+                        $btn.prop('disabled', false).html('<i class="fas fa-print me-1"></i> Gerar Carnê de Cobrança');
+                        var erro = xhr.responseJSON ? xhr.responseJSON.message : 'Erro ao processar a emissão do carnê.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro na Emissão',
+                            text: erro,
+                            confirmButtonColor: '#d90000'
+                        });
+                    }
+                });
+            }
+        });
     });
 
     function editarFatura(id) {

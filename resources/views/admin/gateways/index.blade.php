@@ -566,8 +566,27 @@
                                             </select>
                                         </div>
                                         <div class="col-12">
-                                            <label class="form-label small fw-bold">Data do 1º Vencimento *</label>
-                                            <input type="date" name="data_primeiro_vencimento" class="form-control" required value="{{ date('Y-m-d', strtotime('+10 days')) }}">
+                                            <label class="form-label small fw-bold">Tipo de Emissão do Carnê *</label>
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <div class="form-check p-3 border rounded-3 h-100 bg-body-tertiary">
+                                                        <input class="form-check-input" type="radio" name="tipo_carne" id="tipoCarneProprio" value="proprio" checked>
+                                                        <label class="form-check-label fw-bold cursor-pointer" for="tipoCarneProprio">
+                                                            <i class="fas fa-file-invoice text-danger me-1"></i> Carnê Próprio Foco 7
+                                                            <div class="small text-secondary fw-normal mt-1">Gerado internamente. Sem tarifas bancárias da Efí. Ideal para impressão ou envio com Pix direto.</div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-check p-3 border rounded-3 h-100 bg-body-tertiary">
+                                                        <input class="form-check-input" type="radio" name="tipo_carne" id="tipoCarneEfi" value="efi">
+                                                        <label class="form-check-label fw-bold cursor-pointer" for="tipoCarneEfi">
+                                                            <i class="fas fa-university text-primary me-1"></i> Carnê Bancário via Efí PRO
+                                                            <div class="small text-secondary fw-normal mt-1">Registrado na API Efí Bank. Boletos bancários oficiais com conciliação automática via webhook.</div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-12 text-end mt-4">
                                             <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm">
@@ -1047,37 +1066,79 @@
         }
     }
 
-    // Emissão de Carnê via AJAX com SweetAlert2 e Botão de Download PDF
+    // Emissão de Carnê via AJAX com Pergunta Interativa SweetAlert2 (Próprio vs Efí PRO)
     $(document).on('submit', '#formGerarCarne', function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
         var $form = $(this);
+        var clienteNome = $form.find('select[name="cliente_id"] option:selected').text();
+        var parcelas = $form.find('select[name="total_parcelas"]').val();
+        var valor = $form.find('input[name="valor_parcela"]').val();
+        var tipoPreSelecionado = $form.find('input[name="tipo_carne"]:checked').val() || 'proprio';
+
+        Swal.fire({
+            title: 'Qual tipo de Carnê deseja emitir?',
+            html: '<p class="text-secondary mb-3">Você está gerando um carnê de <strong>' + parcelas + 'x de ' + valor + '</strong> para <strong>' + clienteNome + '</strong>.</p>' +
+                  '<div class="text-start p-3 bg-body-tertiary rounded border mb-3 small">' +
+                  '<div class="mb-2"><strong><i class="fas fa-file-invoice text-danger me-1"></i> Carnê Próprio Foco 7:</strong> Gera as lâminas no sistema com Pix direto e PDF próprio para impressão, sem taxas bancárias da Efí.</div>' +
+                  '<div><strong><i class="fas fa-university text-primary me-1"></i> Via Efí PRO Oficial:</strong> Registra as parcelas na API da Efí com carnê bancário oficial homologado na rede bancária.</div>' +
+                  '</div>' +
+                  '<p class="mb-0 fw-bold">Selecione o modo de emissão desejado:</p>',
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonColor: '#d90000',
+            denyButtonColor: '#0284c7',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-file-invoice me-1"></i> Carnê Próprio Foco 7',
+            denyButtonText: '<i class="fas fa-university me-1"></i> Via Efí PRO Oficial',
+            cancelButtonText: 'Cancelar'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                $form.find('input[name="tipo_carne"][value="proprio"]').prop('checked', true);
+                enviarEmissaoCarneAjax($form, 'proprio');
+            } else if (result.isDenied) {
+                $form.find('input[name="tipo_carne"][value="efi"]').prop('checked', true);
+                enviarEmissaoCarneAjax($form, 'efi');
+            }
+        });
+    });
+
+    function enviarEmissaoCarneAjax($form, tipoEscolhido) {
         var $btn = $form.find('button[type="submit"]');
         var originalText = $btn.html();
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Gerando Carnê...');
+        var labelTipo = tipoEscolhido === 'efi' ? 'via Efí PRO' : 'Próprio Foco 7';
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Emitindo Carnê (' + labelTipo + ')...');
+
+        var formData = $form.serializeArray();
+        formData = formData.filter(function(item) { return item.name !== 'tipo_carne'; });
+        formData.push({ name: 'tipo_carne', value: tipoEscolhido });
 
         $.ajax({
             url: $form.attr('action'),
             type: 'POST',
-            data: $form.serialize(),
+            data: $.param(formData),
             dataType: 'json',
             success: function(res) {
                 $btn.prop('disabled', false).html(originalText);
                 if (res.success) {
+                    var htmlResumo = '<p class="text-muted mb-3">' + res.message + '</p>' +
+                                     '<div class="p-3 bg-body-secondary rounded text-start small mb-3 border">' +
+                                     '<strong>Modalidade:</strong> <span class="badge ' + (res.tipo_carne === 'efi' ? 'bg-primary' : 'bg-danger') + '">' + res.tipo_carne_rotulo + '</span><br>' +
+                                     '<strong>Código do Carnê:</strong> ' + res.codigo_carne + '<br>' +
+                                     '<strong>Parcelamento:</strong> ' + res.total_parcelas + ' parcelas de ' + res.valor_parcela + '<br>' +
+                                     (res.pdf_efi_url ? '<strong>Carnê Efí Oficial:</strong> Disponível via API<br>' : '') +
+                                     '</div>';
+
                     Swal.fire({
                         title: 'Carnê Emitido com Sucesso!',
-                        html: '<p class="text-muted mb-3">' + res.message + '</p>' +
-                              '<div class="p-3 bg-body-secondary rounded text-start small mb-3 border">' +
-                              '<strong>Código do Carnê:</strong> ' + res.codigo_carne + '<br>' +
-                              '<strong>Parcelamento:</strong> ' + res.total_parcelas + ' parcelas de ' + res.valor_parcela + '<br>' +
-                              '<strong>Plataforma:</strong> Efí PRO (Gerencianet)' +
-                              '</div>',
+                        html: htmlResumo,
                         icon: 'success',
                         showCancelButton: true,
                         confirmButtonText: '<i class="fas fa-file-pdf me-1"></i> Baixar Carnê em PDF',
                         cancelButtonText: 'Fechar',
-                        confirmButtonColor: '#198754'
-                    }).then((result) => {
+                        confirmButtonColor: '#d90000'
+                    }).then(function(result) {
                         if (result.isConfirmed && res.pdf_url) {
                             window.open(res.pdf_url, '_blank');
                         }
@@ -1093,7 +1154,7 @@
                 Swal.fire('Atenção', msg, 'warning');
             }
         });
-    });
+    }
 
     // ========================================================
     // DISPARO MANUAL DA RÉGUA DE COBRANÇA VIA AJAX COM SWEETALERT2
