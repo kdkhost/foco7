@@ -252,12 +252,26 @@ class WhatsappCobrancaController extends Controller
         $estado = 'desconectado';
 
         if ($statusRes['success']) {
-            $data = $statusRes['data'];
-            // Variações de resposta da Evolution API Go
-            $statusRaw = $data['status'] ?? ($data['instance']['status'] ?? ($data['state'] ?? ''));
+            $data = $statusRes['data'] ?? [];
+
+            // Variações de resposta da Evolution API Go (v1, v2 e v3)
+            $statusRaw = $data['instance']['state']
+                ?? ($data['state']
+                ?? ($data['status']
+                ?? ($data['instance']['status']
+                ?? ($data['connectionStatus']
+                ?? ($data['instance']['connectionStatus']
+                ?? ($data['connectionState'] ?? ''))))));
+
             $estado = strtolower((string) $statusRaw);
 
-            if (in_array($estado, ['open', 'connected', 'conectado'])) {
+            // Verificação abrangente: se state é open, connected ou se connected booleano é verdadeiro
+            $isConnected = in_array($estado, ['open', 'connected', 'conectado'])
+                || ($data['connected'] ?? false) === true
+                || ($data['instance']['connected'] ?? false) === true
+                || (($data['instance']['state'] ?? '') === 'open');
+
+            if ($isConnected) {
                 $conectado = true;
                 $estado = 'conectado';
                 CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');

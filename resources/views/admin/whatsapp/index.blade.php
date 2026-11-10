@@ -214,7 +214,7 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
-                                        Global API Key (Chave Mestra Admin)
+                                        Global API Key (Chave Mestra Admin) <span class="badge bg-secondary-subtle text-secondary small ms-1">Opcional</span>
                                         <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span>
                                     </label>
                                     <div class="input-group">
@@ -225,12 +225,14 @@
                                                class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
                                                value="{{ $configs['global_apikey'] }}" 
                                                {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
-                                               placeholder="Chave mestra do servidor Evolution">
+                                               placeholder="Chave mestra (opcional se já conectada)">
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputGlobalApiKey', this)">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text small">Necessária para criar, listar ou deletar instâncias automaticamente pelo painel.</div>
+                                    <div class="form-text small">
+                                        <strong>Não é necessária se a instância já estiver conectada</strong> no outro sistema. Preencha apenas para criar/listar instâncias globais.
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">

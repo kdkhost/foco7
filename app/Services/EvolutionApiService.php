@@ -226,6 +226,7 @@ class EvolutionApiService
 
         $headers = [
             'apikey' => $key,
+            'Authorization' => 'Bearer '.$key,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];
@@ -236,7 +237,6 @@ class EvolutionApiService
             $headers['Global-Api-Key'] = $key;
             $headers['globalapikey'] = $key;
             $headers['adminkey'] = $key;
-            $headers['Authorization'] = 'Bearer '.$key;
             // ATENÇÃO CRÍTICA: NUNCA injetar 'instance' ou 'Instance-Name' em chamadas globais,
             // pois o middleware de roteamento do servidor intercepta e rejeita a chave mestra com 401 not authorized!
         } else {
@@ -270,9 +270,8 @@ class EvolutionApiService
         $headers = self::getHeaders($isGlobal, $overrideKey);
         $key = $overrideKey ?: ($isGlobal ? self::getGlobalApiKey() : self::getInstanceApiKey());
 
-        // Se for chamada global administrativa, também anexa apikey na query string
-        // para garantir passagem mesmo se proxies reversos (Nginx/Traefik) sanitizarem headers customizados
-        if ($isGlobal && ! empty($key)) {
+        // Anexa apikey na query string para garantir passagem mesmo se proxies reversos (Nginx/Traefik) sanitizarem headers customizados
+        if (! empty($key)) {
             $separator = str_contains($url, '?') ? '&' : '?';
             $url .= $separator.'apikey='.urlencode($key);
         }
@@ -659,29 +658,68 @@ class EvolutionApiService
 
     /**
      * Desconecta a instância temporariamente
-     * Endpoint: POST /instance/disconnect
+     * Suporta DELETE /instance/logout/{instance}, GET /instance/disconnect/{instance} e fallback
      */
-    public static function desconectar(): array
+    public static function desconectar(?string $instance = null): array
     {
-        return self::request('POST', 'instance/disconnect', [], false);
+        $inst = $instance ?: self::getInstanceName();
+
+        // 1. Tenta DELETE /instance/logout/{instance}
+        $res = self::request('DELETE', "instance/logout/{$inst}", [], false);
+        if ($res['success']) {
+            return $res;
+        }
+
+        // 2. Tenta GET /instance/disconnect/{instance} (método suportado pelo servidor Evolution Go)
+        $res2 = self::request('GET', "instance/disconnect/{$inst}", [], false);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        // 3. Tenta GET /instance/disconnect
+        $res3 = self::request('GET', 'instance/disconnect', [], false);
+        if ($res3['success']) {
+            return $res3;
+        }
+
+        // 4. Fallback POST /instance/logout/{instance}
+        return self::request('POST', "instance/logout/{$inst}", [], false);
     }
 
     /**
      * Reconecta a instância ao WhatsApp
-     * Endpoint: POST /instance/reconnect
+     * Endpoint: POST /instance/reconnect/{instance} com fallback para POST /instance/reconnect
      */
-    public static function reconectar(): array
+    public static function reconectar(?string $instance = null): array
     {
+        $inst = $instance ?: self::getInstanceName();
+        $res = self::request('POST', "instance/reconnect/{$inst}", [], false);
+        if ($res['success']) {
+            return $res;
+        }
+
         return self::request('POST', 'instance/reconnect', [], false);
     }
 
     /**
      * Faz logout da instância (remove a sessão do WhatsApp)
-     * Endpoint: DELETE /instance/logout
+     * Endpoint: DELETE /instance/logout/{instance} com fallback para GET disconnect
      */
-    public static function logout(): array
+    public static function logout(?string $instance = null): array
     {
-        return self::request('DELETE', 'instance/logout', [], false);
+        $inst = $instance ?: self::getInstanceName();
+
+        $res = self::request('DELETE', "instance/logout/{$inst}", [], false);
+        if ($res['success']) {
+            return $res;
+        }
+
+        $res2 = self::request('GET', "instance/disconnect/{$inst}", [], false);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        return self::request('POST', "instance/logout/{$inst}", [], false);
     }
 
     // =========================================================================
