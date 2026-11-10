@@ -1,5 +1,13 @@
 test.bat
+test_*.bat
+test_*.php
+deploy-auto.bat
 deploy.bat
+deploy.ps1
+deploy_remote.php
+deploy.php
+deploy_executor.bat
+EXECUTAR_DEPLOY_PRODUCAO.bat
 *.log
 .DS_Store
 .env

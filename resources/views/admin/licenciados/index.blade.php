@@ -247,12 +247,12 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('admin.licenciados.download-zip', $licenca->id) }}">
+                                            <a class="dropdown-item" href="{{ route('admin.licenciados.download_pacote', $licenca->id) }}">
                                                 <i class="fas fa-file-archive me-2 text-success"></i> Baixar Pacote (.ZIP)
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('admin.licenciados.download-vps', $licenca->id) }}">
+                                            <a class="dropdown-item" href="{{ route('admin.licenciados.download_vps', $licenca->id) }}">
                                                 <i class="fas fa-terminal me-2 text-dark"></i> Baixar Script VPS (.sh)
                                             </a>
                                         </li>

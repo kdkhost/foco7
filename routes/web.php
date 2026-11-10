@@ -254,7 +254,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/regenerar-chave/{id}', [LicenciadosController::class, 'regenerarChave'])->name('admin.licenciados.regenerar_chave');
         Route::post('/configuracoes', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.salvar_configs');
         Route::get('/download-pacote/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download_pacote');
+        Route::get('/download-zip/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download-zip');
         Route::get('/download-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download_vps');
+        Route::get('/download-script-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download-vps');
         Route::delete('/excluir/{id}', [LicenciadosController::class, 'excluir'])->name('admin.licenciados.excluir');
     });
 
