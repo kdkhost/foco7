@@ -1,4 +1,4 @@
-# Script de deploy direto para o servidor remoto de producao via SSH/SCP
+﻿# Script de deploy direto para o servidor remoto de producao via SSH/SCP
 $ErrorActionPreference = "Stop"
 
 $SSH_KEY = "$env:USERPROFILE\.ssh\foco7_cpanel_ed25519"
@@ -21,7 +21,7 @@ git add -A
 Write-Host "[2/5] Realizando commit humanizado em portugues..." -ForegroundColor Yellow
 $status = git status --porcelain
 if ($status) {
-    git commit -m "fix(licenciamento): resolucao de erro 500 em admin/licenciados, nomes de rotas e auto-migracao da tabela de licencas"
+    git commit -m "feat(whatsapp): protecao por senha particular dos dados da evolution api e correcao de salvamento ajax no painel"
 }
 
 Write-Host "[3/5] Publicando no repositorio remoto (GitHub origin/master)..." -ForegroundColor Yellow

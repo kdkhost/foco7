@@ -821,6 +821,18 @@ public_html/
 
 ---
 
+### Módulo 14: WhatsApp Cobranças & Evolution API Go (v3.0) com Blindagem por Senha Master
+- **Integração Completa com Evolution API Go v3.0:** Suporte nativo à API Go de alta velocidade com gerenciamento de instâncias, geração e leitura dinâmica de QR Code em modal visual com polling automático, desconexão segura, callbacks via Webhook (`/webhook/evolution`) e disparador de teste em tempo real com retorno JSON.
+- **Régua Automatizada de Cobranças:** Cobranças automatizadas por etapas (Lembretes prévios 5, 3 e 1 dia antes; Aviso no dia do vencimento; 1º, 2º e 3º avisos de atraso com juros, multa e risco de suspensão; nova fatura gerada e confirmação de pagamento).
+- **Formato PIX & Botões Interativos:** Suporte a botões interativos nativos (URL e Copiar Chave PIX) e formato `/send/pix` com geração de QR Code Copia e Cola na mensagem do WhatsApp.
+- **Blindagem Estrita dos Parâmetros do Servidor por Senha Particular Master:**
+  - URL da API, Nome da Instância, Token e Chave Global do servidor são criptografados com AES-256 no banco de dados (`cms_settings`).
+  - Interface administrativa protegida: campos tarjados (`••••••••••••`) e com bloqueio de leitura (`readonly` e classe `.tarja-dev-bloqueado`).
+  - Desbloqueio e bloqueio dinâmico com **SweetAlert2** mediante validação da Senha Master Particular (`Brad@2026`).
+  - Salvamento 100% via **AJAX com preservação de dados (`.keep-data`)**, notificações via Toastr e modais de confirmação SweetAlert2 (zero `alert()` nativo).
+
+---
+
 ## 🧪 Testes Automatizados e Garantia de Qualidade
 
 A aplicação conta com uma suíte de testes de integração automatizados (`tests/Feature/` e `tests/Unit/`):

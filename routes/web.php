@@ -234,6 +234,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('whatsapp')->group(function () {
         Route::get('/', [WhatsappCobrancaController::class, 'index'])->name('admin.whatsapp.index');
         Route::post('/salvar', [WhatsappCobrancaController::class, 'salvar'])->name('admin.whatsapp.salvar');
+        Route::post('/desbloquear-seguranca', [WhatsappCobrancaController::class, 'desbloquearSeguranca'])->name('admin.whatsapp.desbloquear_seguranca');
+        Route::post('/bloquear-seguranca', [WhatsappCobrancaController::class, 'bloquearSeguranca'])->name('admin.whatsapp.bloquear_seguranca');
         Route::get('/status', [WhatsappCobrancaController::class, 'status'])->name('admin.whatsapp.status');
         Route::post('/conectar', [WhatsappCobrancaController::class, 'conectar'])->name('admin.whatsapp.conectar');
         Route::get('/qr', [WhatsappCobrancaController::class, 'obterQrCode'])->name('admin.whatsapp.qr');

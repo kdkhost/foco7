@@ -4,6 +4,18 @@
 @section('page_title', 'WhatsApp Cobranças & Evolution API Go (v3.0)')
 @section('page_description', 'Gerencie instâncias do WhatsApp, conexões via QR Code e automação de cobranças com PIX nativo e botões interativos.')
 
+@section('styles')
+<style>
+    .tarja-dev-bloqueado {
+        letter-spacing: 2px !important;
+        font-weight: 700 !important;
+        background-color: rgba(108, 117, 125, 0.08) !important;
+        color: var(--bs-secondary-color) !important;
+        cursor: not-allowed;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="row g-4">
 
@@ -94,7 +106,7 @@
             </div>
 
             <div class="card-body p-4">
-                <form action="{{ route('admin.whatsapp.salvar') }}" method="POST" id="formWhatsappConfig" class="ajax-form">
+                <form action="{{ route('admin.whatsapp.salvar') }}" method="POST" id="formWhatsappConfig" class="ajax-form keep-data">
                     @csrf
 
                     <div class="tab-content" id="whatsappTabsContent">
@@ -103,14 +115,35 @@
                              GUIA 1: CONEXÃO & CREDENCIAIS (CRIPTOGRAFIA TOTAL NO BANCO)
                              =================================================================== -->
                         <div class="tab-pane fade show active" id="tab-conexao" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
                                 <div>
-                                    <h5 class="fw-bold text-body mb-1"><i class="fas fa-key text-primary me-2"></i> Parâmetros da Evolution API Go (v3.0)</h5>
+                                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                        <h5 class="fw-bold text-body mb-0"><i class="fas fa-key text-primary me-2"></i> Parâmetros da Evolution API Go (v3.0)</h5>
+                                        <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} px-3 py-1 fs-6" id="badgeStatusSegurancaWpp">
+                                            <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }} me-1"></i>
+                                            <span id="badgeTextoSegurancaWpp">{{ $configs['dev_desbloqueado'] ? 'Acesso Liberado' : 'Protegido por Senha Master' }}</span>
+                                        </span>
+                                    </div>
                                     <p class="text-secondary small mb-0">Todas as chaves e tokens são gravados criptografados com AES-256 no banco de dados.</p>
                                 </div>
-                                <div class="form-check form-switch fs-5">
-                                    <input class="form-check-input" type="checkbox" name="ativo" id="wpp_ativo" value="1" {{ $configs['ativo'] ? 'checked' : '' }}>
-                                    <label class="form-check-label fs-6 fw-bold" for="wpp_ativo">WhatsApp Ativo no Sistema</label>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    <button type="button" class="btn btn-sm {{ $configs['dev_desbloqueado'] ? 'btn-outline-secondary' : 'btn-danger' }} fw-bold shadow-sm" id="btnAcaoSegurancaWpp" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}">
+                                        <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }} me-1"></i>
+                                        <span id="btnTextoSegurancaWpp">{{ $configs['dev_desbloqueado'] ? 'Bloquear Acesso' : 'Desbloquear com Senha' }}</span>
+                                    </button>
+                                    <div class="form-check form-switch fs-5 mb-0">
+                                        <input class="form-check-input" type="checkbox" name="ativo" id="wpp_ativo" value="1" {{ $configs['ativo'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fs-6 fw-bold" for="wpp_ativo">WhatsApp Ativo no Sistema</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="dev_password" id="wpp_dev_password_hidden" value="">
+
+                            <div class="alert alert-warning py-2 px-3 mb-3 small d-flex align-items-center gap-2 {{ $configs['dev_desbloqueado'] ? 'd-none' : '' }}" id="alertaTarjaWpp">
+                                <i class="fas fa-shield-alt text-warning fa-lg"></i>
+                                <div>
+                                    <strong>Dados do Servidor Protegidos por Senha Particular:</strong> A URL da API, Nome da Instância, Token e Chave Mestra estão bloqueados contra acesso de administradores comuns. Para visualizar ou alterar, utilize a Senha Master Particular.
                                 </div>
                             </div>
 
@@ -119,7 +152,14 @@
                                     <label class="form-label fw-semibold">URL Base do Servidor Evolution API <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-link"></i></span>
-                                        <input type="url" name="api_url" class="form-control font-monospace" value="{{ $configs['api_url'] }}" required placeholder="https://api.seuservidor.com ou http://localhost:8080">
+                                        <input type="{{ $configs['dev_desbloqueado'] ? 'url' : 'password' }}" 
+                                               name="api_url" 
+                                               id="inputApiUrl" 
+                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                               value="{{ $configs['api_url'] }}" 
+                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                               required 
+                                               placeholder="https://api.seuservidor.com ou http://localhost:8080">
                                     </div>
                                     <div class="form-text small">Sem barra no final. Exemplo: <code>http://localhost:8080</code> ou <code>https://whatsapp.meudominio.com</code></div>
                                 </div>
@@ -128,7 +168,14 @@
                                     <label class="form-label fw-semibold">Nome da Instância (Instance Name) <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-robot"></i></span>
-                                        <input type="text" name="instance" class="form-control font-monospace" value="{{ $configs['instance'] }}" required placeholder="foco7">
+                                        <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
+                                               name="instance" 
+                                               id="inputInstance" 
+                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                               value="{{ $configs['instance'] }}" 
+                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                               required 
+                                               placeholder="foco7">
                                     </div>
                                     <div class="form-text small">Identificador único da instância na Evolution API. Ex: <code>foco7</code>, <code>foco7-cobrancas</code></div>
                                 </div>
@@ -140,7 +187,13 @@
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-fingerprint"></i></span>
-                                        <input type="password" name="apikey" id="inputApiKey" class="form-control font-monospace" value="{{ $configs['apikey'] }}" placeholder="Token de autenticação da instância">
+                                        <input type="password" 
+                                               name="apikey" 
+                                               id="inputApiKey" 
+                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                               value="{{ $configs['apikey'] }}" 
+                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                               placeholder="Token de autenticação da instância">
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputApiKey', this)">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -155,7 +208,13 @@
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
-                                        <input type="password" name="global_apikey" id="inputGlobalApiKey" class="form-control font-monospace" value="{{ $configs['global_apikey'] }}" placeholder="Chave mestra do servidor Evolution">
+                                        <input type="password" 
+                                               name="global_apikey" 
+                                               id="inputGlobalApiKey" 
+                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
+                                               value="{{ $configs['global_apikey'] }}" 
+                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
+                                               placeholder="Chave mestra do servidor Evolution">
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputGlobalApiKey', this)">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -737,6 +796,10 @@
     // Alternador de visualização de senha
     function toggleVisibilidadeSenha(inputId, btn) {
         var input = document.getElementById(inputId);
+        if (input.classList.contains('tarja-dev-bloqueado')) {
+            solicitarSenhaSegurancaWpp();
+            return;
+        }
         var icon = btn.querySelector('i');
         if (input.type === 'password') {
             input.type = 'text';
@@ -747,6 +810,104 @@
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
+    }
+
+    function solicitarSenhaSegurancaWpp() {
+        Swal.fire({
+            title: 'Parâmetros Restritos do Servidor',
+            html: `
+                <div class="text-start mb-2">
+                    <p class="small text-secondary mb-3">
+                        Informe a <strong>Senha Master Particular</strong> para liberar a visualização e edição das credenciais e URL do servidor Evolution API Go.
+                    </p>
+                </div>
+            `,
+            input: 'password',
+            inputLabel: 'Senha Master Particular',
+            inputPlaceholder: 'Digite sua senha master...',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+                autocomplete: 'current-password'
+            },
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-unlock me-1"></i> Desbloquear Acesso',
+            confirmButtonColor: '#d90000',
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#6c757d',
+            showLoaderOnConfirm: true,
+            preConfirm: (senha) => {
+                if (!senha || senha.trim().length === 0) {
+                    Swal.showValidationMessage('Informe a senha master!');
+                    return false;
+                }
+                return $.ajax({
+                    url: '{{ route("admin.whatsapp.desbloquear_seguranca") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { senha: senha }
+                }).then(response => {
+                    if (!response.success) {
+                        throw new Error(response.message || 'Falha ao autenticar.');
+                    }
+                    return { response: response, senha: senha };
+                }).catch(error => {
+                    var msg = error.responseJSON?.message || error.message || 'Senha incorreta!';
+                    Swal.showValidationMessage(msg);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                var dados = result.value.response.dados;
+                var senha = result.value.senha;
+
+                $('#wpp_dev_password_hidden').val(senha);
+
+                // Preenche os campos reais e remove a tarja
+                $('#inputApiUrl').val(dados.api_url).attr('type', 'url').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputInstance').val(dados.instance).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputApiKey').val(dados.apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputGlobalApiKey').val(dados.global_apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
+
+                $('#txtInstanciaNome').text(dados.instance);
+                $('#txtApiUrl').text(dados.api_url);
+
+                // Atualiza badges e botões
+                $('#badgeStatusSegurancaWpp').removeClass('bg-danger').addClass('bg-success');
+                $('#badgeStatusSegurancaWpp i').removeClass('fa-lock').addClass('fa-unlock');
+                $('#badgeTextoSegurancaWpp').text('Acesso Liberado');
+                $('#btnAcaoSegurancaWpp').attr('onclick', 'bloquearSegurancaWpp()').removeClass('btn-danger').addClass('btn-outline-secondary');
+                $('#btnTextoSegurancaWpp').text('Bloquear Acesso');
+                $('#btnAcaoSegurancaWpp i').removeClass('fa-key').addClass('fa-lock');
+                $('#alertaTarjaWpp').addClass('d-none');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Acesso Liberado!',
+                    text: 'As credenciais do servidor foram liberadas para visualização e edição nesta sessão.',
+                    confirmButtonColor: '#28a745'
+                });
+            }
+        });
+    }
+
+    function bloquearSegurancaWpp() {
+        $.ajax({
+            url: '{{ route("admin.whatsapp.bloquear_seguranca") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            success: function(res) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Servidor Bloqueado!',
+                    text: res.message || 'As credenciais do servidor foram bloqueadas novamente.',
+                    confirmButtonColor: '#d90000'
+                }).then(() => {
+                    location.reload();
+                });
+            }
+        });
     }
 
     // Seleção de cards de formato
@@ -1053,9 +1214,73 @@
         });
     }
 
-    // Auto-checagem suave de status no carregamento da página
+    // Auto-checagem suave de status no carregamento da página e interceptação AJAX do formulário
     $(function () {
         verificarStatusApi(false);
+
+        // Ao clicar em qualquer campo protegido por tarja, solicita a senha master
+        $(document).on('click', '.tarja-dev-bloqueado', function () {
+            solicitarSenhaSegurancaWpp();
+        });
+
+        // Submissão do formulário de configurações via AJAX com SweetAlert2 e Toastr
+        $('#formWhatsappConfig').on('submit', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            var $btn = $('#btnSalvarConfigs');
+            var origHtml = $btn.html();
+
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando e Criptografando...');
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                dataType: 'json',
+                success: function (res) {
+                    $btn.prop('disabled', false).html(origHtml);
+                    if (res.success) {
+                        window.foco7Notify.success(res.message);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Configurações Salvas!',
+                            text: res.message,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Entendido'
+                        });
+
+                        if (res.instance && !$('#inputInstance').hasClass('tarja-dev-bloqueado')) {
+                            $('#txtInstanciaNome').text(res.instance);
+                        }
+                        if (res.api_url && !$('#inputApiUrl').hasClass('tarja-dev-bloqueado')) {
+                            $('#txtApiUrl').text(res.api_url);
+                        }
+                    } else {
+                        window.foco7Notify.error(res.message || 'Erro ao salvar configurações.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro ao Salvar',
+                            text: res.message || 'Ocorreu um erro ao gravar as alterações.',
+                            confirmButtonColor: '#d90000'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    $btn.prop('disabled', false).html(origHtml);
+                    var msg = 'Erro ao processar o salvamento das configurações.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    window.foco7Notify.error(msg);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Falha no Salvamento',
+                        text: msg,
+                        confirmButtonColor: '#d90000'
+                    });
+                }
+            });
+        });
     });
 </script>
 @endsection
