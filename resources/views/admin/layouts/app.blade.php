@@ -330,7 +330,13 @@
                                     <i class="nav-icon fas fa-certificate text-warning"></i>
                                     <p>
                                         Licenciados FOCO 7
-                                        @php $licencasAtivasMenuCount = \App\Models\Licenca::where('status', 'ativa')->count(); @endphp
+                                        @php
+                                            try {
+                                                $licencasAtivasMenuCount = \Illuminate\Support\Facades\Schema::hasTable('licencas') ? \App\Models\Licenca::where('status', 'ativa')->count() : 0;
+                                            } catch (\Throwable $e) {
+                                                $licencasAtivasMenuCount = 0;
+                                            }
+                                        @endphp
                                         @if($licencasAtivasMenuCount > 0)
                                             <span class="badge bg-warning text-dark ms-auto" style="font-size: 0.65rem;">{{ $licencasAtivasMenuCount }}</span>
                                         @endif

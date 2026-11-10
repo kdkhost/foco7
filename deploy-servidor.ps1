@@ -21,7 +21,7 @@ git add -A
 Write-Host "[2/5] Realizando commit humanizado em portugues..." -ForegroundColor Yellow
 $status = git status --porcelain
 if ($status) {
-    git commit -m "feat(licenciamento): modulo Seja um Licenciado FOCO 7 White Label para servidor proprio cPanel e VPS, gerador de pacote ZIP e painel administrativo"
+    git commit -m "fix(licenciamento): resolucao de erro 500 em admin/licenciados, nomes de rotas e auto-migracao da tabela de licencas"
 }
 
 Write-Host "[3/5] Publicando no repositorio remoto (GitHub origin/master)..." -ForegroundColor Yellow

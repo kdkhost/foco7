@@ -219,12 +219,13 @@
                                 {!! $licenca->status_badge !!}
                             </td>
                             <td>
-                                @if(!empty($licenca->ultimo_checkin_em))
+                                @if(!empty($licenca->ultimo_check_in) || !empty($licenca->ultimo_checkin_em))
+                                    @php $dtCheckin = $licenca->ultimo_check_in ?? $licenca->ultimo_checkin_em; @endphp
                                     <div class="small fw-semibold text-success">
-                                        <i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> {{ $licenca->ultimo_checkin_em->diffForHumans() }}
+                                        <i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> {{ $dtCheckin->diffForHumans() }}
                                     </div>
                                     <div class="small text-muted font-monospace" style="font-size: 0.75rem;">
-                                        IP: {{ $licenca->ultimo_checkin_ip ?? 'N/D' }}
+                                        IP: {{ $licenca->ip_autorizado ?? 'N/D' }}
                                     </div>
                                 @else
                                     <span class="small text-muted"><i class="far fa-clock me-1"></i> Nunca validou</span>

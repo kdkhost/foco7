@@ -249,15 +249,20 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('licenciados')->group(function () {
         Route::get('/', [LicenciadosController::class, 'index'])->name('admin.licenciados.index');
         Route::get('/obter/{id}', [LicenciadosController::class, 'obter'])->name('admin.licenciados.obter');
+        Route::get('/{id}/detalhes', [LicenciadosController::class, 'obter'])->name('admin.licenciados.detalhes');
         Route::post('/salvar', [LicenciadosController::class, 'salvar'])->name('admin.licenciados.salvar');
         Route::post('/status/{id}', [LicenciadosController::class, 'alterarStatus'])->name('admin.licenciados.status');
+        Route::post('/{id}/status', [LicenciadosController::class, 'alterarStatus']);
         Route::post('/regenerar-chave/{id}', [LicenciadosController::class, 'regenerarChave'])->name('admin.licenciados.regenerar_chave');
-        Route::post('/configuracoes', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.salvar_configs');
+        Route::post('/{id}/regenerar-chave', [LicenciadosController::class, 'regenerarChave']);
+        Route::post('/configuracoes', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.configuracoes');
+        Route::post('/salvar-configs', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.salvar_configs');
         Route::get('/download-pacote/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download_pacote');
         Route::get('/download-zip/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download-zip');
         Route::get('/download-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download_vps');
-        Route::get('/download-script-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download-vps');
+        Route::get('/download-script-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download-script-vps');
         Route::delete('/excluir/{id}', [LicenciadosController::class, 'excluir'])->name('admin.licenciados.excluir');
+        Route::delete('/{id}', [LicenciadosController::class, 'excluir']);
     });
 
     // Templates de E-mails Próprios (Páginas Dedicadas)

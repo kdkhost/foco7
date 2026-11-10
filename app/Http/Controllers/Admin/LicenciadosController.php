@@ -9,7 +9,11 @@ use App\Models\User;
 use App\Services\LicenciamentoService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class LicenciadosController extends Controller
@@ -19,39 +23,60 @@ class LicenciadosController extends Controller
      */
     public function index(Request $request)
     {
+        // Auto-criação da tabela se ainda não tiver sido criada no banco de dados remoto
+        if (! Schema::hasTable('licencas')) {
+            try {
+                Artisan::call('migrate', ['--force' => true]);
+            } catch (\Throwable $e) {
+                Log::warning('Auto-migração de licenças: ' . $e->getMessage());
+            }
+        }
+
         $busca = $request->input('busca');
         $status = $request->input('status');
 
-        $query = Licenca::with(['user', 'fatura'])->latest();
+        try {
+            $query = Licenca::with(['user', 'fatura'])->latest();
 
-        if (! empty($busca)) {
-            $query->where(function ($q) use ($busca) {
-                $q->where('chave_licenca', 'like', "%{$busca}%")
-                    ->orWhere('nome_empresa', 'like', "%{$busca}%")
-                    ->orWhere('dominio_autorizado', 'like', "%{$busca}%")
-                    ->orWhere('ip_autorizado', 'like', "%{$busca}%")
-                    ->orWhereHas('user', function ($uq) use ($busca) {
-                        $uq->where('name', 'like', "%{$busca}%")
-                            ->orWhere('email', 'like', "%{$busca}%")
-                            ->orWhere('cpf_cnpj', 'like', "%{$busca}%");
-                    });
-            });
+            if (! empty($busca)) {
+                $query->where(function ($q) use ($busca) {
+                    $q->where('chave_licenca', 'like', "%{$busca}%")
+                        ->orWhere('nome_empresa', 'like', "%{$busca}%")
+                        ->orWhere('dominio_autorizado', 'like', "%{$busca}%")
+                        ->orWhere('ip_autorizado', 'like', "%{$busca}%")
+                        ->orWhereHas('user', function ($uq) use ($busca) {
+                            $uq->where('name', 'like', "%{$busca}%")
+                                ->orWhere('email', 'like', "%{$busca}%")
+                                ->orWhere('cpf_cnpj', 'like', "%{$busca}%");
+                        });
+                });
+            }
+
+            if (! empty($status)) {
+                $query->where('status', $status);
+            }
+
+            $licencas = $query->paginate(15)->withQueryString();
+
+            // KPIs em tempo real
+            $kpis = [
+                'total' => Licenca::count(),
+                'ativas' => Licenca::where('status', 'ativa')->count(),
+                'pendentes' => Licenca::where('status', 'pendente')->count(),
+                'suspensas' => Licenca::whereIn('status', ['suspensa', 'bloqueada'])->count(),
+                'downloads' => (int) Licenca::sum('total_downloads'),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Erro ao consultar licenças: ' . $e->getMessage());
+            $licencas = new LengthAwarePaginator([], 0, 15);
+            $kpis = [
+                'total' => 0,
+                'ativas' => 0,
+                'pendentes' => 0,
+                'suspensas' => 0,
+                'downloads' => 0,
+            ];
         }
-
-        if (! empty($status)) {
-            $query->where('status', $status);
-        }
-
-        $licencas = $query->paginate(15)->withQueryString();
-
-        // KPIs em tempo real
-        $kpis = [
-            'total' => Licenca::count(),
-            'ativas' => Licenca::where('status', 'ativa')->count(),
-            'pendentes' => Licenca::where('status', 'pendente')->count(),
-            'suspensas' => Licenca::whereIn('status', ['suspensa', 'bloqueada'])->count(),
-            'downloads' => (int) Licenca::sum('total_downloads'),
-        ];
 
         $parametros = LicenciamentoService::obterParametrosPrograma();
         $usuarios = User::orderBy('name')->get();
