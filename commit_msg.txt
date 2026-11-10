@@ -1,6 +1,7 @@
-fix(whatsapp): deteccao de status conectado via instance.state, desconexao sem erro 405 e api key global opcional
+fix(whatsapp): prefixo api/ automatico para endpoints evolution go, deteccao de conexao e correcao do erro 405
 
-- Correcao da deteccao de conexao no WhatsappCobrancaController para suportar node instance.state da Evolution API Go (identifica instantaneamente conexao existente sem necessidade de novo pareamento)
-- Correcao dos metodos de desconexao e logout na EvolutionApiService para DELETE e GET em conformidade com as rotas suportadas pelo servidor Evolution Go (elimina erro 'POST method is not supported for route instance/disconnect')
-- Global API Key tornada explicitamente opcional: dispensavel quando a instancia ja esta conectada em outro sistema
-- Inclusao automatica de apikey na query string e Authorization Bearer nos headers para compatibilidade universal com proxies reversos
+- Resolucao automatica de prefixo /api/ nas rotas da Evolution API Go (corrige erro 'The POST method is not supported for route instance/create')
+- Suporte a endpoints REST sob /api/instance/create, /api/instance/connect, /api/instance/disconnect e /api/message/sendText
+- Tratamento gracioso quando a instancia ja existe no servidor
+- Deteccao de conexao ativa via instance.state com confirmacao imediata no modal e no badge
+- Métodos de desconexao e logout com DELETE e GET para total conformidade

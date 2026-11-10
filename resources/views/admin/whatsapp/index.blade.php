@@ -873,13 +873,16 @@
                         <i class="fas fa-triangle-exclamation fs-2"></i>
                     </div>
                     <h6 class="fw-bold text-danger mb-1">Não foi possível obter o QR Code</h6>
-                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">Verifique se o servidor Evolution API está online e se as credenciais estão corretas.</p>
+                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">Nenhum QR Code retornado. A instância pode já estar conectada ou precisando de reinicialização.</p>
                     <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <button type="button" class="btn btn-success btn-sm fw-bold" onclick="verificarSeConectou()">
+                            <i class="fas fa-check-circle me-1"></i> Verificar se já Conectou
+                        </button>
                         <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" onclick="conectarEabrirQr()">
                             <i class="fas fa-rotate me-1"></i> Tentar Novamente
                         </button>
                         <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="autoCriarOuSincronizarInstanciaModal()">
-                            <i class="fas fa-wand-magic-sparkles me-1"></i> Criar / Sincronizar no Servidor
+                            <i class="fas fa-wand-magic-sparkles me-1"></i> Sincronizar Instância
                         </button>
                     </div>
                 </div>
@@ -1171,6 +1174,15 @@
                 if (res.instancia) {
                     $('#txtInstanciaNome').text(res.instancia);
                 }
+                if (res.conectado) {
+                    $('#qrLoadingBox').hide();
+                    $('#qrCodeContentBox').hide();
+                    $('#qrErroBox').hide();
+                    $('#qrConectadoBox').show();
+                    verificarStatusApi(false);
+                    window.foco7Notify.success(res.message || 'Esta instância já está conectada!');
+                    return;
+                }
                 if (res.qrcode) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
@@ -1192,35 +1204,53 @@
     function autoCriarOuSincronizarInstanciaModal() {
         $('#qrErroBox').hide();
         $('#qrLoadingBox').show();
-        $('#qrLoadingBox h6').text('Sincronizando / Criando Instância no Servidor...');
-
-        var nome = $('#inputInstance').val() || 'carlos_americo_cavalcante_silva_8_1';
+        $('#qrLoadingBox h6').text('Sincronizando com o Servidor Evolution API...');
 
         $.ajax({
-            url: '{{ route("admin.whatsapp.criar_instancia") }}',
+            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
             type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                nome: nome
-            },
+            data: { _token: '{{ csrf_token() }}' },
             dataType: 'json',
             success: function (res) {
-                window.foco7Notify.success(res.message);
-                if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
-                    $('#inputApiKey').val(res.token);
-                }
-                if (res.qrcode) {
-                    exibirQrCode(res.qrcode);
-                    iniciarPollingStatusQr();
+                $('#qrLoadingBox').hide();
+                if (res.conectado) {
+                    $('#qrConectadoBox').show();
+                    verificarStatusApi(false);
+                    window.foco7Notify.success(res.message || 'Instância sincronizada e já conectada!');
                 } else {
-                    conectarEabrirQr();
+                    window.foco7Notify.info(res.message);
+                    verificarStatusApi(true);
                 }
             },
-            error: function (xhr) {
-                $('#qrLoadingBox').hide();
-                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao sincronizar/criar instância.';
-                $('#txtMensagemErroQr').text(msg);
-                $('#qrErroBox').show();
+            error: function () {
+                var nome = $('#inputInstance').val() || 'carlos_americo_cavalcante_silva_8_1';
+                var token = $('#inputApiKey').val() || '';
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.criar_instancia") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        nome: nome,
+                        token: token
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        $('#qrLoadingBox').hide();
+                        window.foco7Notify.success(res.message);
+                        if (res.qrcode) {
+                            exibirQrCode(res.qrcode);
+                            iniciarPollingStatusQr();
+                        } else {
+                            verificarSeConectou();
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#qrLoadingBox').hide();
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao sincronizar/criar instância.';
+                        $('#txtMensagemErroQr').text(msg);
+                        $('#qrErroBox').show();
+                    }
+                });
             }
         });
     }

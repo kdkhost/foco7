@@ -311,7 +311,33 @@ class WhatsappCobrancaController extends Controller
 
         $qrcode = null;
         if ($res['success']) {
-            $data = $res['data'];
+            $data = $res['data'] ?? [];
+
+            // Verifica se a instância já está conectada no servidor
+            $stateRaw = $data['instance']['state']
+                ?? ($data['state']
+                ?? ($data['status']
+                ?? ($data['instance']['status'] ?? '')));
+
+            $alreadyConnected = in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
+                || ($data['connected'] ?? false) === true
+                || ($data['instance']['connected'] ?? false) === true
+                || (($data['instance']['state'] ?? '') === 'open');
+
+            if ($alreadyConnected) {
+                CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
+
+                return response()->json([
+                    'success' => true,
+                    'conectado' => true,
+                    'message' => 'Esta instância já está conectada e autenticada no WhatsApp!',
+                    'qrcode' => null,
+                    'data' => $data,
+                    'instancia' => EvolutionApiService::getInstanceName(),
+                    'token' => CmsSetting::get('evolution_apikey'),
+                ]);
+            }
+
             $qrcode = $data['qrcode']['base64'] ?? ($data['base64'] ?? null);
 
             // Se não veio no body do connect, busca via /instance/qr
@@ -324,6 +350,7 @@ class WhatsappCobrancaController extends Controller
 
             return response()->json([
                 'success' => true,
+                'conectado' => false,
                 'message' => 'Instância iniciada com sucesso. Escaneie o QR Code abaixo.',
                 'qrcode' => $qrcode,
                 'data' => $data,
@@ -334,6 +361,7 @@ class WhatsappCobrancaController extends Controller
 
         return response()->json([
             'success' => false,
+            'conectado' => false,
             'message' => 'Falha ao conectar instância: '.($res['error'] ?? 'Verifique credenciais.'),
             'detalhes' => $res,
             'instancia' => EvolutionApiService::getInstanceName(),
@@ -342,6 +370,7 @@ class WhatsappCobrancaController extends Controller
 
     /**
      * Sincroniza e lista todas as instâncias existentes no servidor Evolution API
+     * Possui fallback inteligente para a instância ativa usando o token da própria instância
      */
     public function sincronizarInstancias()
     {
@@ -378,9 +407,48 @@ class WhatsappCobrancaController extends Controller
             ]);
         }
 
+        // Fallback: se listarInstancias falhar (ex: por falta da Global API Key),
+        // consulta diretamente a instância ativa usando a chave da própria instância
+        $statusRes = EvolutionApiService::obterStatus();
+        if ($statusRes['success']) {
+            $data = $statusRes['data'] ?? [];
+            $stateRaw = $data['instance']['state']
+                ?? ($data['state']
+                ?? ($data['status']
+                ?? ($data['instance']['status'] ?? '')));
+
+            $conectado = in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
+                || ($data['connected'] ?? false) === true
+                || ($data['instance']['connected'] ?? false) === true
+                || (($data['instance']['state'] ?? '') === 'open');
+
+            if ($conectado) {
+                CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
+            }
+
+            $instName = EvolutionApiService::getInstanceName();
+
+            return response()->json([
+                'success' => true,
+                'conectado' => $conectado,
+                'message' => $conectado
+                    ? 'Instância ativa sincronizada com sucesso! O WhatsApp já está conectado e pronto para envios.'
+                    : 'Instância sincronizada com sucesso no servidor.',
+                'instancia_ativa' => $instName,
+                'token_ativo' => CmsSetting::get('evolution_apikey'),
+                'instancias' => [
+                    [
+                        'name' => $instName,
+                        'state' => $stateRaw ?: ($conectado ? 'open' : 'close'),
+                        'status' => $conectado ? 'connected' : 'disconnected',
+                    ],
+                ],
+            ]);
+        }
+
         return response()->json([
             'success' => false,
-            'message' => 'Falha ao consultar servidor Evolution API: '.($res['error'] ?? 'Verifique a Global API Key.'),
+            'message' => 'Falha ao consultar servidor Evolution API: '.($res['error'] ?? ($statusRes['error'] ?? 'Verifique a URL e o Token da Instância.')),
         ], 400);
     }
 

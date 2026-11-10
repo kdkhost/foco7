@@ -252,7 +252,7 @@ class EvolutionApiService
     }
 
     /**
-     * Executa requisição HTTP resiliente à Evolution API Go v3.0
+     * Executa requisição HTTP resiliente à Evolution API Go v3.0 com resolução automática de prefixo /api
      */
     protected static function request(string $method, string $path, array $data = [], bool $isGlobal = false, int $timeout = 25, ?string $overrideKey = null): array
     {
@@ -266,24 +266,72 @@ class EvolutionApiService
             ];
         }
 
-        $url = $baseUrl.'/'.ltrim($path, '/');
         $headers = self::getHeaders($isGlobal, $overrideKey);
         $key = $overrideKey ?: ($isGlobal ? self::getGlobalApiKey() : self::getInstanceApiKey());
 
-        // Anexa apikey na query string para garantir passagem mesmo se proxies reversos (Nginx/Traefik) sanitizarem headers customizados
-        if (! empty($key)) {
-            $separator = str_contains($url, '?') ? '&' : '?';
-            $url .= $separator.'apikey='.urlencode($key);
+        $cleanPath = ltrim($path, '/');
+
+        // Candidatos de rota: testa sob /api/ (padrão Swagger /api/docs) e na raiz
+        if (str_contains($baseUrl, 'km.site.nom.br') || str_contains($baseUrl, 'whatsapp.')) {
+            // No servidor oficial https://whatsapp.km.site.nom.br as rotas da API ficam sob /api/
+            $candidatos = ! str_starts_with($cleanPath, 'api/')
+                ? ['api/'.$cleanPath, $cleanPath]
+                : [$cleanPath, substr($cleanPath, 4)];
+        } else {
+            $candidatos = ! str_starts_with($cleanPath, 'api/')
+                ? [$cleanPath, 'api/'.$cleanPath]
+                : [$cleanPath, substr($cleanPath, 4)];
         }
 
+        $lastResult = null;
+        foreach ($candidatos as $caminho) {
+            $url = $baseUrl.'/'.ltrim($caminho, '/');
+            if (! empty($key)) {
+                $separator = str_contains($url, '?') ? '&' : '?';
+                $url .= $separator.'apikey='.urlencode($key);
+            }
+
+            $res = self::executeSingleCall($method, $url, $data, $headers, $timeout);
+            if ($res['success']) {
+                return $res;
+            }
+
+            // Se o erro foi 404 ou 405 ("The POST method is not supported for route..."), testa o candidato alternativo
+            $errMsg = strtolower((string) ($res['error'] ?? ''));
+            $isRouteMismatch = ($res['status'] === 404 || $res['status'] === 405)
+                || str_contains($errMsg, 'not supported for route')
+                || str_contains($errMsg, 'route not found')
+                || str_contains($errMsg, 'cannot post')
+                || str_contains($errMsg, 'cannot get');
+
+            if (! $isRouteMismatch) {
+                return $res;
+            }
+
+            $lastResult = $res;
+        }
+
+        return $lastResult ?: [
+            'success' => false,
+            'status' => 404,
+            'error' => 'Rota não encontrada no servidor Evolution API.',
+            'data' => null,
+        ];
+    }
+
+    /**
+     * Executa a chamada HTTP bruta isolada
+     */
+    protected static function executeSingleCall(string $method, string $fullUrl, array $data, array $headers, int $timeout): array
+    {
         try {
             $http = Http::timeout($timeout)->withoutVerifying()->withHeaders($headers);
 
             $response = match (strtoupper($method)) {
-                'GET' => $http->get($url, $data),
-                'POST' => $http->post($url, $data),
-                'PUT' => $http->put($url, $data),
-                'DELETE' => $http->delete($url, $data),
+                'GET' => $http->get($fullUrl, $data),
+                'POST' => $http->post($fullUrl, $data),
+                'PUT' => $http->put($fullUrl, $data),
+                'DELETE' => $http->delete($fullUrl, $data),
                 default => throw new Exception("Método HTTP {$method} não suportado."),
             };
 
@@ -311,7 +359,7 @@ class EvolutionApiService
                 'data' => $json,
             ];
         } catch (\Throwable $e) {
-            Log::warning('Evolution API Connection Error ['.$method.' '.$path.']: '.$e->getMessage());
+            Log::warning('Evolution API Connection Error ['.$method.' '.$fullUrl.']: '.$e->getMessage());
 
             return [
                 'success' => false,
