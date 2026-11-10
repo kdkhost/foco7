@@ -32,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'webhook/*',
             'api/*',
+            'manutencao/bypass*',
+        ]);
+
+        $middleware->encryptCookies(except: [
+            'foco7_maintenance_bypass',
         ]);
 
         $middleware->alias([

@@ -821,8 +821,17 @@ public_html/
 
 ---
 
-### Módulo 14: WhatsApp Cobranças & Evolution API Go (v3.0) com Blindagem por Senha Master
-- **Integração Completa com Evolution API Go v3.0:** Suporte nativo à API Go de alta velocidade com gerenciamento de instâncias, geração e leitura dinâmica de QR Code em modal visual com polling automático, desconexão segura, callbacks via Webhook (`/webhook/evolution`) e disparador de teste em tempo real com retorno JSON.
+### Módulo 14: WhatsApp Cobranças & Evolution API Go (v3.0) Centralizado com Tarifação Recorrente
+- **Integração Completa com Cluster Central Evolution API Go (v3.0):** Centralização oficial da comunicação e mensageria no cluster oficial `https://whatsapp.km.site.nom.br` com conformidade estrita à documentação Swagger Go OpenAPI (`/api/docs`).
+- **Suporte a Múltiplas Instâncias & Tarifação Recorrente:**
+  - Instância primária (`foco7`) inclusa para a empresa.
+  - Instâncias adicionais para a empresa ou licenciados provisionadas no cluster central a **R$ 60,00 / mês (recorrente)** por instância, garantindo total governança, controle de spam e alta entregabilidade.
+  - Tabela administrativa de instâncias extras com KPIs de receita recorrente mensal (MRR).
+  - Modal de criação de instâncias com aviso de cobrança de R$ 60,00/mês, checkbox de conformidade e isolamento de chave mestra.
+- **WhatsApp Dedicado no Portal do Licenciado (`/cliente/licenca`):**
+  - Seção integrada para o franqueado/licenciado ativar e parear sua própria instância de WhatsApp com apenas 1 clique via AJAX.
+  - Geração automática de credenciais `.env` (`EVOLUTION_API_URL`, `EVOLUTION_INSTANCE`, `EVOLUTION_APIKEY`) para colar no servidor próprio (cPanel/VPS).
+  - Consulta de status de conexão em tempo real e leitor de QR Code integrado via SweetAlert2.
 - **Régua Automatizada de Cobranças:** Cobranças automatizadas por etapas (Lembretes prévios 5, 3 e 1 dia antes; Aviso no dia do vencimento; 1º, 2º e 3º avisos de atraso com juros, multa e risco de suspensão; nova fatura gerada e confirmação de pagamento).
 - **Formato PIX & Botões Interativos:** Suporte a botões interativos nativos (URL e Copiar Chave PIX) e formato `/send/pix` com geração de QR Code Copia e Cola na mensagem do WhatsApp.
 - **Blindagem Estrita dos Parâmetros do Servidor por Senha Particular Master:**
@@ -830,6 +839,9 @@ public_html/
   - Interface administrativa protegida: campos tarjados (`••••••••••••`) e com bloqueio de leitura (`readonly` e classe `.tarja-dev-bloqueado`).
   - Desbloqueio e bloqueio dinâmico com **SweetAlert2** mediante validação da Senha Master Particular (`Brad@2026`).
   - Salvamento 100% via **AJAX com preservação de dados (`.keep-data`)**, notificações via Toastr e modais de confirmação SweetAlert2 (zero `alert()` nativo).
+- **Modo de Manutenção com Bypass Universal e Multi-Dispositivo:**
+  - Validação estrita por Senha Master (`Brad@2026`), Telefone Master (`21981325441`), Token Técnico (`foco7_vip_bypass_2026`), IP Autorizado (`177.192.4.34`) ou parâmetro de URL (`?bypass=Brad@2026`).
+  - Exclusão do cookie `foco7_maintenance_bypass` da criptografia do Laravel para permitir leitura transparente e interoperabilidade perfeita entre JavaScript e o middleware backend.
 
 ---
 

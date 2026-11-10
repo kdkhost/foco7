@@ -42,27 +42,77 @@ class ModoManutencao
             return $this->renderManutencaoView($request, 200);
         }
 
-        // 4. Verificar liberação por Cookie / Identificação de Dispositivo
-        $bypassToken = CmsSetting::get('manutencao_token', 'foco7_vip_bypass_2026');
-        if ($request->cookie('foco7_maintenance_bypass') === $bypassToken) {
+        // 4. Parâmetros de bypass direto via Query String (?bypass=Brad@2026 ou ?token=Brad@2026 ou ?senha=Brad@2026)
+        $bypassToken = (string) CmsSetting::get('manutencao_token', 'foco7_vip_bypass_2026');
+        $devMaster = (string) CmsSetting::get('dev_master_password', 'Brad@2026');
+        $queryToken = (string) ($request->query('bypass') ?: $request->query('token') ?: $request->query('senha') ?: '');
+
+        if (! empty($queryToken)) {
+            $isQueryValid = (
+                $queryToken === 'Brad@2026'
+                || strcasecmp($queryToken, 'Brad@2026') === 0
+                || $queryToken === '21981325441'
+                || $queryToken === 'foco7_vip_bypass_2026'
+                || $queryToken === $bypassToken
+                || $queryToken === $devMaster
+            );
+            if ($isQueryValid) {
+                session(['foco7_maintenance_bypass' => true]);
+                $response = $next($request);
+                $cookie = cookie('foco7_maintenance_bypass', 'foco7_vip_bypass_2026', 60 * 24 * 30, '/', null, false, false);
+                return $response->withCookie($cookie);
+            }
+        }
+
+        // 5. Verificar liberação por Sessão
+        if (session('foco7_maintenance_bypass') === true) {
             return $next($request);
         }
 
-        // 5. Verificar liberação por IP
+        // 6. Verificar liberação por Cookie / Identificação de Dispositivo
+        $cookieValue = (string) ($request->cookie('foco7_maintenance_bypass') ?: ($_COOKIE['foco7_maintenance_bypass'] ?? ''));
+
+        if (! empty($cookieValue) && (
+            $cookieValue === $bypassToken
+            || $cookieValue === 'foco7_vip_bypass_2026'
+            || $cookieValue === $devMaster
+            || $cookieValue === 'Brad@2026'
+            || $cookieValue === '21981325441'
+            || strcasecmp($cookieValue, 'Brad@2026') === 0
+            || strcasecmp($cookieValue, 'foco7_vip_bypass_2026') === 0
+        )) {
+            return $next($request);
+        }
+
+        // 7. Verificar liberação por IP (incluindo IP master de desenvolvimento e cabeçalhos de proxy/Cloudflare)
         $ipsLiberadosStr = CmsSetting::get('manutencao_ips_liberados', '');
         $ipsLiberados = array_filter(array_map('trim', explode(',', $ipsLiberadosStr)));
-        $clientIp = $request->ip();
+        $ipsLiberados[] = '177.192.4.34'; // IP Master Foco 7
+        $ipsLiberados[] = '127.0.0.1';
+        $ipsLiberados[] = '::1';
 
-        if (in_array($clientIp, $ipsLiberados, true)) {
-            return $next($request);
+        $candidatosIp = array_filter([
+            $request->ip(),
+            $request->server('HTTP_CF_CONNECTING_IP'),
+            $request->server('HTTP_X_FORWARDED_FOR'),
+            $request->server('REMOTE_ADDR'),
+        ]);
+
+        foreach ($candidatosIp as $rawIp) {
+            $partes = array_map('trim', explode(',', $rawIp));
+            foreach ($partes as $ipVerificar) {
+                if (in_array($ipVerificar, $ipsLiberados, true)) {
+                    return $next($request);
+                }
+            }
         }
 
-        // 6. Se o usuário estiver autenticado como administrador, permitir acesso
+        // 8. Se o usuário estiver autenticado como administrador, permitir acesso
         if (auth()->check() && auth()->user()->isAdmin()) {
             return $next($request);
         }
 
-        // 7. Exibir página de manutenção com HTTP 503 Service Unavailable
+        // 9. Exibir página de manutenção com HTTP 503 Service Unavailable
         return $this->renderManutencaoView($request, 503);
     }
 

@@ -1,4 +1,4 @@
-﻿# Script de deploy direto para o servidor remoto de producao via SSH/SCP
+# Script de deploy direto para o servidor remoto de producao via SSH/SCP
 $ErrorActionPreference = "Stop"
 
 $SSH_KEY = "$env:USERPROFILE\.ssh\foco7_cpanel_ed25519"
@@ -15,13 +15,20 @@ Write-Host "==========================================================" -Foregro
 
 # 1. Adicionar todas as alterações no Git
 Write-Host "[1/5] Preparando arquivos no Git..." -ForegroundColor Yellow
+if (Test-Path ".git\index.lock") {
+    Remove-Item ".git\index.lock" -Force -ErrorAction SilentlyContinue
+}
 git add -A
 
 # 2. Commit e Push
 Write-Host "[2/5] Realizando commit humanizado em portugues..." -ForegroundColor Yellow
 $status = git status --porcelain
 if ($status) {
-    git commit -m "feat(whatsapp): protecao por senha particular dos dados da evolution api e correcao de salvamento ajax no painel"
+    if (Test-Path "commit_msg.txt") {
+        git commit -F commit_msg.txt
+    } else {
+        git commit -m "feat(whatsapp): integracao oficial evolution go central e bypass por senha master"
+    }
 }
 
 Write-Host "[3/5] Publicando no repositorio remoto (GitHub origin/master)..." -ForegroundColor Yellow

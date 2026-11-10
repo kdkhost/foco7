@@ -380,6 +380,134 @@
         </div>
     </div>
 
+    <!-- SEÇÃO DEDICADA: WHATSAPP CENTRALIZADO & INSTÂNCIA PRÓPRIA (EVOLUTION API GO) -->
+    <div class="card shadow-sm border-0 mb-4 bg-body overflow-hidden">
+        <div class="card-header bg-transparent py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+            <div>
+                <h5 class="fw-bold mb-0 text-body d-flex align-items-center gap-2">
+                    <i class="fab fa-whatsapp text-success fs-4"></i>
+                    <span>Instância de WhatsApp Dedicada (Evolution Go)</span>
+                </h5>
+                <p class="text-secondary small mb-0 mt-1">
+                    Central de disparos de cobrança PIX e alertas automáticos hospedada no cluster oficial FOCO 7.
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ $evolutionDocsUrl ?? 'https://whatsapp.km.site.nom.br/api/docs' }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-book me-1"></i> Documentação Swagger API
+                </a>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                    <i class="fas fa-server me-1"></i> {{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}
+                </span>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <!-- Box de Custo Recorrente e Transparência -->
+            <div class="alert alert-light border border-success-subtle rounded-3 p-3 mb-4 shadow-xs">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-danger text-uppercase fw-bold">Tarifação de Instância Dedicada</span>
+                            <span class="text-secondary small">• Cobrança Mensal Recorrente</span>
+                        </div>
+                        <h6 class="fw-bold mt-2 mb-1 text-body">Centralização e Controle da Mensageria da Sua Franquia</h6>
+                        <p class="text-secondary small mb-0">
+                            Para garantir alta entregabilidade e conformidade, a API de WhatsApp é provisionada diretamente no nosso cluster oficial. Cada instância dedicada adicional possui o custo de <strong>R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }} / mês</strong> com recorrência automática.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="p-3 bg-white border rounded-3 text-center shadow-xs">
+                            <span class="text-secondary small text-uppercase fw-bold">Valor por Instância</span>
+                            <div class="display-6 fw-extrabold text-danger my-1">
+                                R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }}
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger small">por mês / recorrência</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if(!empty($whatsappDados['instancia']))
+                <!-- Cenário: Instância Já Provisionada -->
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="p-3 bg-light-subtle border rounded-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0 text-body">
+                                    <i class="fas fa-key text-primary me-1"></i> Credenciais para o seu Arquivo .env
+                                </h6>
+                                <span class="badge bg-success" id="badgeStatusInstancia">
+                                    <i class="fas fa-check-circle me-1"></i> Provisionada
+                                </span>
+                            </div>
+                            <p class="text-secondary small mb-2">
+                                Copie estas chaves e cole no arquivo <code>.env</code> do sistema no seu servidor cPanel/VPS:
+                            </p>
+                            <div class="code-box-server position-relative mb-3">
+                                <button type="button" class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2" onclick="copiarCredenciaisEnv()">
+                                    <i class="fas fa-copy me-1"></i> Copiar .env
+                                </button>
+                                <pre class="mb-0 text-white" id="blocoEnvWhatsapp" style="white-space: pre-wrap; font-family: monospace;">EVOLUTION_API_URL={{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}
+EVOLUTION_INSTANCE={{ $whatsappDados['instancia'] }}
+EVOLUTION_APIKEY={{ $whatsappDados['token'] ?? '' }}
+EVOLUTION_ATENDE_COBRANCAS=true</pre>
+                            </div>
+                            <div class="small text-secondary">
+                                <i class="fas fa-shield-alt text-success me-1"></i> Instância vinculada e autenticada com Global API Key no servidor oficial.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="p-3 bg-light-subtle border rounded-3 h-100 text-center d-flex flex-column justify-content-between">
+                            <div>
+                                <h6 class="fw-bold mb-2 text-body">Ações da Instância WhatsApp</h6>
+                                <p class="text-secondary small mb-3">
+                                    Instância: <code class="fw-bold text-danger">{{ $whatsappDados['instancia'] }}</code>
+                                </p>
+                            </div>
+
+                            <div class="d-grid gap-2 my-auto">
+                                <button type="button" class="btn btn-outline-primary" onclick="verificarStatusWhatsappLicenciado()">
+                                    <i class="fas fa-sync-alt me-1"></i> Verificar Conexão em Tempo Real
+                                </button>
+                                <button type="button" class="btn btn-success fw-bold shadow-sm" onclick="conectarQrCodeLicenciado()">
+                                    <i class="fas fa-qrcode me-1"></i> Conectar Aparelho / QR Code
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="desconectarWhatsappLicenciado()">
+                                    <i class="fas fa-power-off me-1"></i> Desconectar Sessão
+                                </button>
+                            </div>
+
+                            <div class="text-secondary small mt-3">
+                                <i class="fas fa-info-circle me-1"></i> Escaneie o QR Code com o aplicativo WhatsApp no seu celular.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- Cenário: Instância Ainda Não Provisionada -->
+                <div class="text-center py-4 bg-light-subtle rounded-3 border p-4">
+                    <div class="rounded-circle bg-success-subtle text-success p-3 d-inline-flex mb-3 fs-3">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h5 class="fw-bold text-body">Ative Sua Instância Dedicada do WhatsApp</h5>
+                    <p class="text-secondary small mb-4" style="max-width: 580px; margin: 0 auto;">
+                        Dispare cobranças PIX com botão "Copiar Código", réguas de vencimento automáticas e notificações aos seus clientes a partir do seu próprio número de WhatsApp através da nossa infraestrutura central.
+                    </p>
+
+                    <button type="button" class="btn btn-danger btn-lg fw-bold px-4 shadow-sm" onclick="ativarWhatsappLicenciado()" id="btnAtivarWhatsapp">
+                        <i class="fas fa-plug me-2"></i> Ativar Minha Instância (R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }}/mês)
+                    </button>
+
+                    <div class="mt-3 text-secondary small">
+                        <i class="fas fa-lock me-1"></i> Instância criada instantaneamente via API Swagger Go e protegida por token criptografado.
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
 @else
     <!-- ============================================== -->
     <!-- CENÁRIO B: CLIENTE AINDA NÃO É LICENCIADO      -->
@@ -536,6 +664,224 @@
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-save me-1"></i> Atualizar Vínculo';
             Swal.fire('Erro', 'Não foi possível se comunicar com o servidor.', 'error');
+        });
+    }
+
+    function copiarCredenciaisEnv() {
+        const pre = document.getElementById('blocoEnvWhatsapp');
+        if (!pre) return;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Credenciais copiadas!',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        });
+    }
+
+    function ativarWhatsappLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        Swal.fire({
+            title: 'Ativar Instância de WhatsApp?',
+            html: `
+                <div class="text-start small">
+                    <p>Ao ativar sua instância dedicada de WhatsApp, você terá:</p>
+                    <ul class="mb-3">
+                        <li>Conexão direta no cluster oficial <strong>{{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}</strong></li>
+                        <li>Disparos automáticos de cobranças PIX com botão e réguas</li>
+                        <li>Isolamento e controle centralizado pela FOCO 7</li>
+                    </ul>
+                    <div class="alert alert-warning py-2 px-3 small border-0 mb-0">
+                        <i class="fas fa-info-circle me-1"></i> <strong>Custo Recorrente:</strong> R$ 60,00 / mês por instância adicional.
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-check me-1"></i> Confirmar e Ativar (R$ 60/mês)',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Provisionando Instância...',
+                    text: 'Conectando ao cluster oficial Evolution API Go...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(`/cliente/licenca/whatsapp/ativar/${licencaId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Instância Provisionada com Sucesso!',
+                            text: data.message,
+                            confirmButtonColor: '#d90000'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Atenção', data.message || 'Falha ao criar instância.', 'warning');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Erro', 'Erro ao se comunicar com o servidor de cobrança WhatsApp.', 'error');
+                });
+            }
+        });
+    }
+
+    function conectarQrCodeLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        Swal.fire({
+            title: 'Carregando QR Code...',
+            text: 'Buscando código no servidor central Evolution API...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`/cliente/licenca/whatsapp/qr/${licencaId}`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.qrcode) {
+                let imgSrc = data.qrcode.startsWith('data:') ? data.qrcode : `data:image/png;base64,${data.qrcode}`;
+                Swal.fire({
+                    title: 'Escanear QR Code WhatsApp',
+                    html: `
+                        <div class="text-center py-2">
+                            <p class="small text-secondary mb-3">Abra o WhatsApp no seu celular > <strong>Aparelhos Conectados</strong> > <strong>Conectar Aparelho</strong>:</p>
+                            <img src="${imgSrc}" class="img-fluid rounded border shadow-sm mb-3" style="max-width: 250px;">
+                            <div class="small text-muted"><i class="fas fa-server me-1"></i> Servidor: {{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}</div>
+                        </div>
+                    `,
+                    confirmButtonText: '<i class="fas fa-check me-1"></i> Já Escaneei',
+                    confirmButtonColor: '#28a745'
+                }).then(() => {
+                    verificarStatusWhatsappLicenciado();
+                });
+            } else {
+                Swal.fire('QR Code Indisponível', data.message || 'A instância já pode estar conectada ou em processamento. Verifique o status.', 'info');
+            }
+        })
+        .catch(() => {
+            Swal.fire('Erro', 'Não foi possível buscar o QR Code.', 'error');
+        });
+    }
+
+    function verificarStatusWhatsappLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        Swal.fire({
+            title: 'Verificando Conexão...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`/cliente/licenca/whatsapp/status/${licencaId}`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.conectado) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'WhatsApp Conectado!',
+                    text: `Instância [${data.instancia}] está online e pronta para disparos automáticos no servidor oficial.`,
+                    confirmButtonColor: '#28a745'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'WhatsApp Desconectado',
+                    text: `Estado atual: ${data.estado || 'Desconectado'}. Clique em Conectar / QR Code para parear seu aparelho.`,
+                    confirmButtonColor: '#d90000'
+                });
+            }
+        })
+        .catch(() => {
+            Swal.fire('Erro', 'Erro ao verificar status.', 'error');
+        });
+    }
+
+    function desconectarWhatsappLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        Swal.fire({
+            title: 'Desconectar WhatsApp?',
+            text: 'Sua instância será desvinculada deste aparelho até um novo pareamento.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d90000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, desconectar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/cliente/licenca/whatsapp/desconectar/${licencaId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire('Sucesso', data.message, 'success');
+                })
+                .catch(() => {
+                    Swal.fire('Erro', 'Erro ao desconectar.', 'error');
+                });
+            }
         });
     }
 </script>

@@ -43,7 +43,7 @@ Route::get('/privacidade', [SiteController::class, 'privacidade'])->name('site.p
 Route::post('/contato', [SiteController::class, 'contato'])->name('site.contato');
 Route::post('/agendar', [SiteController::class, 'agendar'])->name('site.agendar');
 Route::post('/depoimento/enviar', [SiteController::class, 'enviarDepoimento'])->name('site.depoimento.enviar');
-Route::get('/manutencao/bypass/{token}', [SiteController::class, 'bypassManutencao'])->name('site.manutencao.bypass');
+Route::match(['get', 'post'], '/manutencao/bypass/{token?}', [SiteController::class, 'bypassManutencao'])->name('site.manutencao.bypass');
 Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
 Route::get('/checkout/calcular-taxas', [CheckoutController::class, 'calcularTaxas'])->name('checkout.calcular_taxas');
 Route::get('/faturas/carne/{codigo}/pdf', [CheckoutController::class, 'downloadCarnePdf'])->name('faturas.carne.pdf');
@@ -243,6 +243,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/reconectar', [WhatsappCobrancaController::class, 'reconectar'])->name('admin.whatsapp.reconectar');
         Route::post('/logout', [WhatsappCobrancaController::class, 'logout'])->name('admin.whatsapp.logout');
         Route::post('/criar-instancia', [WhatsappCobrancaController::class, 'criarInstancia'])->name('admin.whatsapp.criar_instancia');
+        Route::post('/sincronizar-instancias', [WhatsappCobrancaController::class, 'sincronizarInstancias'])->name('admin.whatsapp.sincronizar_instancias');
         Route::post('/teste', [WhatsappCobrancaController::class, 'enviarTeste'])->name('admin.whatsapp.teste');
         Route::post('/cobrar/{id}', [WhatsappCobrancaController::class, 'cobrarFatura'])->name('admin.whatsapp.cobrar_fatura');
     });
@@ -384,5 +385,11 @@ Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function (
         Route::get('/download-pacote/{id}', [LicenciadoPortalController::class, 'downloadPacote'])->name('cliente.licenca.download_pacote');
         Route::get('/download-vps/{id}', [LicenciadoPortalController::class, 'downloadScriptVps'])->name('cliente.licenca.download_vps');
         Route::get('/download-manual/{id}', [LicenciadoPortalController::class, 'downloadManual'])->name('cliente.licenca.download_manual');
+
+        // Central de WhatsApp Dedicada do Licenciado (Evolution Go Central - R$ 60/mês)
+        Route::post('/whatsapp/ativar/{id}', [LicenciadoPortalController::class, 'ativarWhatsapp'])->name('cliente.licenca.whatsapp.ativar');
+        Route::get('/whatsapp/qr/{id}', [LicenciadoPortalController::class, 'qrWhatsapp'])->name('cliente.licenca.whatsapp.qr');
+        Route::get('/whatsapp/status/{id}', [LicenciadoPortalController::class, 'statusWhatsapp'])->name('cliente.licenca.whatsapp.status');
+        Route::post('/whatsapp/desconectar/{id}', [LicenciadoPortalController::class, 'desconectarWhatsapp'])->name('cliente.licenca.whatsapp.desconectar');
     });
 });

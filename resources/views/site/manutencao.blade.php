@@ -228,23 +228,56 @@
         function abrirBypassModal() {
             Swal.fire({
                 title: 'Acesso Técnico de Desenvolvimento',
-                text: 'Insira o token de bypass para liberar a visualização prévia neste dispositivo:',
+                text: 'Insira o token de bypass ou sua Senha Master para liberar a visualização prévia neste dispositivo:',
                 input: 'password',
                 inputAttributes: {
                     autocapitalize: 'off',
-                    placeholder: 'Token de liberação'
+                    placeholder: 'Token de liberação ou Senha Master'
                 },
                 showCancelButton: true,
-                confirmButtonText: 'Autorizar Dispositivo',
+                confirmButtonText: '<i class="fas fa-check me-1"></i> Autorizar Dispositivo',
                 cancelButtonText: 'Cancelar',
                 confirmButtonColor: '#d90000',
+                cancelButtonColor: '#6c757d',
                 showLoaderOnConfirm: true,
                 preConfirm: (token) => {
-                    if (!token) {
-                        Swal.showValidationMessage('Por favor, informe o token.');
+                    if (!token || !token.trim()) {
+                        Swal.showValidationMessage('Por favor, informe o token ou senha.');
                         return false;
                     }
-                    window.location.href = '/manutencao/bypass/' + encodeURIComponent(token);
+                    return fetch('{{ route("site.manutencao.bypass") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ token: token.trim() })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw new Error(err.message || 'Token inválido'); });
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(error.message || 'Falha ao autorizar dispositivo.');
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value && result.value.success) {
+                    try {
+                        document.cookie = "foco7_maintenance_bypass=foco7_vip_bypass_2026; path=/; max-age=2592000; SameSite=Lax";
+                    } catch(e) {}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Dispositivo Autorizado!',
+                        text: 'Acesso prévio liberado. Redirecionando para a Landing Page...',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = result.value.redirect || '{{ url("/") }}';
+                    });
                 }
             });
         }

@@ -1,0 +1,9 @@
+feat(whatsapp): integracao oficial evolution go central, tarifacao recorrente r$ 60 por instancia extra e bypass por senha master
+
+- Atualizacao da URL base oficial da Evolution API Go para https://whatsapp.km.site.nom.br (Swagger Docs /api/docs)
+- Suporte a multiplas instancias com tarifacao de R$ 60,00/mes recorrente por instancia extra
+- Area de ativacao e conexao de WhatsApp dedicada para Licenciados no portal do cliente com geracao de credenciais .env
+- Liberacao do modo de manutencao atraves de senha master 'Brad@2026', token tecnico 'foco7_vip_bypass_2026', IP '177.192.4.34' e query parameters
+- Exclusao de foco7_maintenance_bypass da criptografia de cookies do Laravel para integracao transparente entre JavaScript e backend
+- Protecao de seguranca com senha master particular nos campos de credenciais da Evolution API
+

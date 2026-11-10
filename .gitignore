@@ -1,6 +1,8 @@
 test.bat
 test_*.bat
 test_*.php
+runner.php
+commit_msg.txt
 deploy-auto.bat
 deploy.bat
 deploy.ps1

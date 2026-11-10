@@ -13,12 +13,129 @@ class EvolutionApiService
 {
     /**
      * Retorna a URL base limpa da Evolution API Go (v3.0)
+     * Documentação Swagger: https://whatsapp.km.site.nom.br/api/docs
      */
     public static function getBaseUrl(): string
     {
-        $url = (string) CmsSetting::get('evolution_api_url', 'http://localhost:8080');
+        $url = trim((string) CmsSetting::get('evolution_api_url', ''));
+        if (empty($url) || $url === 'http://localhost:8080' || str_contains($url, 'kdkhost') || str_contains($url, '•')) {
+            return 'https://whatsapp.km.site.nom.br';
+        }
 
-        return rtrim(trim($url), '/');
+        return rtrim($url, '/');
+    }
+
+    /**
+     * Custo mensal recorrente de cada instância adicional do WhatsApp (R$ 60,00/mês)
+     */
+    public static function getCustoInstanciaExtra(): float
+    {
+        return 60.00;
+    }
+
+    /**
+     * Retorna a lista de instâncias extras cadastradas com cobrança recorrente (R$ 60,00/mês)
+     */
+    public static function getInstanciasExtras(): array
+    {
+        $data = CmsSetting::get('evolution_instancias_extras', []);
+        if (is_string($data)) {
+            $decoded = json_decode($data, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Registra ou atualiza uma instância com tarifação recorrente de R$ 60,00/mês
+     */
+    public static function registrarInstanciaExtra(string $nome, ?string $token = null, string $tipo = 'empresa', ?int $licenciadoId = null): array
+    {
+        $extras = self::getInstanciasExtras();
+        $custo = self::getCustoInstanciaExtra();
+
+        $nova = [
+            'nome' => $nome,
+            'token' => $token,
+            'tipo' => $tipo, // 'empresa' ou 'licenciado'
+            'licenciado_id' => $licenciadoId,
+            'valor_recorrente' => $custo,
+            'criado_em' => now()->format('Y-m-d H:i:s'),
+            'status' => 'ativa',
+        ];
+
+        $encontrou = false;
+        foreach ($extras as &$item) {
+            if (($item['nome'] ?? '') === $nome) {
+                $item = array_merge($item, $nova);
+                $encontrou = true;
+                break;
+            }
+        }
+        if (! $encontrou) {
+            $extras[] = $nova;
+        }
+
+        CmsSetting::set('evolution_instancias_extras', $extras, 'whatsapp', 'json');
+
+        return $nova;
+    }
+
+    /**
+     * Remove uma instância extra do registro de cobrança
+     */
+    public static function removerInstanciaExtra(string $nome): bool
+    {
+        $extras = self::getInstanciasExtras();
+        $filtradas = array_values(array_filter($extras, fn ($i) => ($i['nome'] ?? '') !== $nome));
+        CmsSetting::set('evolution_instancias_extras', $filtradas, 'whatsapp', 'json');
+
+        return true;
+    }
+
+    /**
+     * Obtém o QR Code para uma instância específica (ex: do licenciado)
+     */
+    public static function obterQrCodeParaInstancia(string $instName, ?string $token = null): array
+    {
+        // 1. Tenta GET /instance/connect/{instance} (padrão v3 Go no endpoint https://whatsapp.km.site.nom.br/api/docs)
+        $res = self::request('GET', "instance/connect/{$instName}", [], false, 15, $token);
+        if ($res['success'] && (! empty($res['data']['qrcode']['base64']) || ! empty($res['data']['base64']))) {
+            return $res;
+        }
+
+        // 2. Tenta GET /instance/qr/{instance}
+        return self::request('GET', "instance/qr/{$instName}", [], false, 15, $token);
+    }
+
+    /**
+     * Obtém o status de conexão de uma instância específica
+     */
+    public static function obterStatusInstancia(string $instName, ?string $token = null): array
+    {
+        // 1. Tenta GET /instance/connectionState/{instance} (Swagger /api/docs)
+        $res = self::request('GET', "instance/connectionState/{$instName}", [], false, 10, $token);
+        if ($res['success']) {
+            return $res;
+        }
+
+        // 2. Tenta GET /instance/status/{instance}
+        return self::request('GET', "instance/status/{$instName}", [], false, 10, $token);
+    }
+
+    /**
+     * Desconecta uma instância específica
+     */
+    public static function desconectarInstanciaEspecifica(string $instName, ?string $token = null): array
+    {
+        $res = self::request('POST', "instance/disconnect/{$instName}", [], false, 10, $token);
+        if (! $res['success']) {
+            return self::request('POST', 'instance/disconnect', ['instance' => $instName], false, 10, $token);
+        }
+
+        return $res;
     }
 
     /**
@@ -26,7 +143,12 @@ class EvolutionApiService
      */
     public static function getGlobalApiKey(): string
     {
-        return trim((string) CmsSetting::get('evolution_global_apikey', ''));
+        $key = trim((string) CmsSetting::get('evolution_global_apikey', ''));
+        if (empty($key) || str_contains($key, '•')) {
+            return 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
+        }
+
+        return $key;
     }
 
     /**
@@ -34,7 +156,12 @@ class EvolutionApiService
      */
     public static function getInstanceName(): string
     {
-        return trim((string) CmsSetting::get('evolution_instance', 'foco7'));
+        $name = trim((string) CmsSetting::get('evolution_instance', ''));
+        if (empty($name) || str_contains($name, '•')) {
+            return 'foco7';
+        }
+
+        return $name;
     }
 
     /**
@@ -42,7 +169,12 @@ class EvolutionApiService
      */
     public static function getInstanceApiKey(): string
     {
-        return trim((string) CmsSetting::get('evolution_apikey', ''));
+        $key = trim((string) CmsSetting::get('evolution_apikey', ''));
+        if (empty($key) || str_contains($key, '•')) {
+            return 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+        }
+
+        return $key;
     }
 
     /**
@@ -86,23 +218,43 @@ class EvolutionApiService
     }
 
     /**
-     * Monta os headers da requisição HTTP
+     * Monta os headers da requisição HTTP com isolamento estrito entre chamadas globais e de instância
      */
-    protected static function getHeaders(bool $isGlobal = false): array
+    protected static function getHeaders(bool $isGlobal = false, ?string $overrideKey = null): array
     {
-        $key = $isGlobal ? self::getGlobalApiKey() : self::getInstanceApiKey();
+        $key = $overrideKey ?: ($isGlobal ? self::getGlobalApiKey() : self::getInstanceApiKey());
 
-        return [
+        $headers = [
             'apikey' => $key,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];
+
+        if ($isGlobal) {
+            // Em chamadas administrativas globais (ex: /instance/create, /instance/all):
+            // Envia todos os cabeçalhos reconhecidos pelas variações da Evolution API Go e Node.js
+            $headers['Global-Api-Key'] = $key;
+            $headers['globalapikey'] = $key;
+            $headers['adminkey'] = $key;
+            $headers['Authorization'] = 'Bearer '.$key;
+            // ATENÇÃO CRÍTICA: NUNCA injetar 'instance' ou 'Instance-Name' em chamadas globais,
+            // pois o middleware de roteamento do servidor intercepta e rejeita a chave mestra com 401 not authorized!
+        } else {
+            // Em chamadas direcionadas a uma instância específica (ex: envio de mensagens, status):
+            $instName = self::getInstanceName();
+            if (! empty($instName)) {
+                $headers['instance'] = $instName;
+                $headers['Instance-Name'] = $instName;
+            }
+        }
+
+        return $headers;
     }
 
     /**
      * Executa requisição HTTP resiliente à Evolution API Go v3.0
      */
-    protected static function request(string $method, string $path, array $data = [], bool $isGlobal = false, int $timeout = 25): array
+    protected static function request(string $method, string $path, array $data = [], bool $isGlobal = false, int $timeout = 25, ?string $overrideKey = null): array
     {
         $baseUrl = self::getBaseUrl();
         if (empty($baseUrl)) {
@@ -115,7 +267,15 @@ class EvolutionApiService
         }
 
         $url = $baseUrl.'/'.ltrim($path, '/');
-        $headers = self::getHeaders($isGlobal);
+        $headers = self::getHeaders($isGlobal, $overrideKey);
+        $key = $overrideKey ?: ($isGlobal ? self::getGlobalApiKey() : self::getInstanceApiKey());
+
+        // Se for chamada global administrativa, também anexa apikey na query string
+        // para garantir passagem mesmo se proxies reversos (Nginx/Traefik) sanitizarem headers customizados
+        if ($isGlobal && ! empty($key)) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url .= $separator.'apikey='.urlencode($key);
+        }
 
         try {
             $http = Http::timeout($timeout)->withoutVerifying()->withHeaders($headers);
@@ -187,9 +347,11 @@ class EvolutionApiService
 
         $payload = [
             'name' => $instance,
+            'instanceName' => $instance,
             'token' => $apiKey,
             'number' => '',
             'qrcode' => true,
+            'integration' => 'WHATSAPP-BAILEYS',
             'advancedSettings' => array_merge($defaultAdvanced, $advancedSettings),
             'proxy' => [
                 'enabled' => false,
@@ -200,27 +362,64 @@ class EvolutionApiService
             ],
         ];
 
-        return self::request('POST', 'instance/create', $payload, true);
+        $res = self::request('POST', 'instance/create', $payload, true);
+
+        // Se a instância já existir no servidor, trata graciosamente como sucesso
+        if (! $res['success']) {
+            $err = strtolower($res['error'] ?? '');
+            if (str_contains($err, 'already exists') || str_contains($err, 'já existe') || str_contains($err, 'in use')) {
+                Log::info("Evolution API: Instância '{$instance}' já existia no servidor.");
+
+                return [
+                    'success' => true,
+                    'status' => 200,
+                    'data' => [
+                        'name' => $instance,
+                        'instance' => ['name' => $instance],
+                        'already_existed' => true,
+                    ],
+                    'error' => null,
+                ];
+            }
+        }
+
+        return $res;
     }
 
     /**
      * Busca todas as instâncias existentes no servidor
-     * Endpoint: GET /instance/all
+     * Endpoint: GET /instance/all com fallback para GET /instance/fetchInstances
      */
     public static function listarInstancias(): array
     {
-        return self::request('GET', 'instance/all', [], true);
+        $res = self::request('GET', 'instance/all', [], true);
+        if (! $res['success'] && ($res['status'] === 404 || $res['status'] === 405)) {
+            $alt = self::request('GET', 'instance/fetchInstances', [], true);
+            if ($alt['success']) {
+                return $alt;
+            }
+        }
+
+        return $res;
     }
 
     /**
      * Obtém informações detalhadas de uma instância
-     * Endpoint: GET /instance/info/{instance}
+     * Endpoint: GET /instance/info/{instance} com fallback para GET /instance/fetchInstances?instanceName={instance}
      */
     public static function obterInfoInstancia(?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
 
-        return self::request('GET', "instance/info/{$inst}", [], true);
+        $res = self::request('GET', "instance/info/{$inst}", [], true);
+        if (! $res['success'] && ($res['status'] === 404 || $res['status'] === 405)) {
+            $alt = self::request('GET', "instance/fetchInstances?instanceName={$inst}", [], true);
+            if ($alt['success']) {
+                return $alt;
+            }
+        }
+
+        return $res;
     }
 
     /**
@@ -253,13 +452,64 @@ class EvolutionApiService
     // =========================================================================
 
     /**
-     * Inicia a conexão da instância e configura o webhook se fornecido
-     * Endpoint: POST /instance/connect
+     * Sincroniza e recupera automaticamente o token correto da instância diretamente do servidor Evolution API via Global API Key
+     */
+    public static function sincronizarTokenInstancia(?string $instanceName = null): ?string
+    {
+        $instName = $instanceName ?: self::getInstanceName();
+        $globalKey = self::getGlobalApiKey();
+
+        if (empty($globalKey) || empty($instName)) {
+            return null;
+        }
+
+        // 1. Tenta obter info da instância específica via GET /instance/info/{instance}
+        $infoRes = self::obterInfoInstancia($instName);
+        if ($infoRes['success'] && is_array($infoRes['data'])) {
+            $d = $infoRes['data'];
+            $token = $d['token'] ?? ($d['instance']['token'] ?? ($d['apikey'] ?? null));
+            if (! empty($token)) {
+                CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                Log::info("Evolution API: Token sincronizado via /instance/info para '{$instName}'.");
+
+                return $token;
+            }
+        }
+
+        // 2. Tenta listar todas as instâncias via GET /instance/all
+        $allRes = self::listarInstancias();
+        if ($allRes['success'] && is_array($allRes['data'])) {
+            $list = $allRes['data'];
+            $itens = isset($list['instances']) ? $list['instances'] : $list;
+            if (is_array($itens)) {
+                foreach ($itens as $item) {
+                    $nome = $item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? null));
+                    if ($nome === $instName) {
+                        $token = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
+                        if (! empty($token)) {
+                            CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                            Log::info("Evolution API: Token sincronizado via /instance/all para '{$instName}'.");
+
+                            return $token;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Inicia a conexão da instância e configura o webhook se fornecido (com Auto-Recuperação e Criação Inteligente)
+     * Endpoint padrão: GET /instance/connect/{instance} ou POST /instance/connect
      */
     public static function conectar(?string $webhookUrl = null, array $subscribe = ['ALL']): array
     {
+        $instName = self::getInstanceName();
         $payload = [
             'number' => '',
+            'instance' => $instName,
         ];
 
         $webhook = $webhookUrl ?: url('/webhook/evolution');
@@ -268,25 +518,143 @@ class EvolutionApiService
             $payload['subscribe'] = ! empty($subscribe) ? $subscribe : ['MESSAGE', 'SEND_MESSAGE', 'CONNECTION'];
         }
 
-        return self::request('POST', 'instance/connect', $payload, false);
+        // 1. Tenta endpoint padrão Evolution API Go / v2: GET /instance/connect/{instance}
+        $res = self::request('GET', "instance/connect/{$instName}", [], false, 25);
+        if ($res['success']) {
+            return $res;
+        }
+
+        // 2. Tenta POST /instance/connect/{instance}
+        $res2 = self::request('POST', "instance/connect/{$instName}", $payload, false, 25);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        // 3. Tenta POST /instance/connect com payload
+        $res3 = self::request('POST', 'instance/connect', $payload, false, 25);
+        if ($res3['success']) {
+            return $res3;
+        }
+
+        // 4. Se falhou por autorização (401 / "not authorized") ou token incorreto
+        $isAuthError = ($res['status'] === 401 || $res2['status'] === 401 || $res3['status'] === 401)
+            || str_contains(strtolower($res['error'] ?? ''), 'authorized')
+            || str_contains(strtolower($res['error'] ?? ''), 'unauthorized')
+            || str_contains(strtolower($res['error'] ?? ''), 'token');
+
+        if ($isAuthError && ! empty(self::getGlobalApiKey())) {
+            Log::info("Evolution API: Conexão não autorizada para '{$instName}'. Recuperando com Global API Key...");
+
+            // 4.1 Tenta recuperar o token real da instância no servidor Evolution
+            $tokenReal = self::sincronizarTokenInstancia($instName);
+            if (! empty($tokenReal)) {
+                $retryRes = self::request('GET', "instance/connect/{$instName}", [], false, 25, $tokenReal);
+                if ($retryRes['success']) {
+                    return $retryRes;
+                }
+                $retryResPost = self::request('POST', "instance/connect/{$instName}", $payload, false, 25, $tokenReal);
+                if ($retryResPost['success']) {
+                    return $retryResPost;
+                }
+            }
+
+            // 4.2 Se a instância não existe no servidor, cria-a via POST /instance/create
+            Log::info("Evolution API: Tentando criar/recriar instância '{$instName}' no servidor...");
+            $createRes = self::criarInstancia($instName, self::getInstanceApiKey());
+
+            if ($createRes['success']) {
+                $createData = $createRes['data'];
+                $novoToken = $createData['token'] ?? ($createData['instance']['token'] ?? null);
+                if (! empty($novoToken)) {
+                    CmsSetting::set('evolution_apikey', $novoToken, 'whatsapp');
+                }
+
+                // Se a criação já devolveu o QR Code direto, retorna imediatamente
+                if (! empty($createData['qrcode']['base64']) || ! empty($createData['base64'])) {
+                    return $createRes;
+                }
+
+                // Tenta conectar agora que a instância foi criada
+                $retryAfterCreate = self::request('GET', "instance/connect/{$instName}", [], false, 25, $novoToken ?: self::getInstanceApiKey());
+                if ($retryAfterCreate['success']) {
+                    return $retryAfterCreate;
+                }
+            }
+
+            // 4.3 Tenta conectar usando a Global API Key diretamente (suportado por várias distribuições Evolution API)
+            $globalRes = self::request('GET', "instance/connect/{$instName}", [], true, 25);
+            if ($globalRes['success']) {
+                return $globalRes;
+            }
+        }
+
+        return $res;
     }
 
     /**
-     * Retorna o status de conexão da instância (open, connecting, close, etc.)
-     * Endpoint: GET /instance/status
+     * Retorna o status de conexão da instância (open, connected, connecting, close, etc.)
+     * Endpoint: GET /instance/connectionState/{instance} ou GET /instance/status
      */
     public static function obterStatus(): array
     {
-        return self::request('GET', 'instance/status', [], false, 10);
+        $instName = self::getInstanceName();
+
+        // 1. Tenta GET /instance/connectionState/{instance} (padrão v2 / v3)
+        $res = self::request('GET', "instance/connectionState/{$instName}", [], false, 10);
+        if ($res['success']) {
+            return $res;
+        }
+
+        // 2. Tenta GET /instance/status
+        $res2 = self::request('GET', 'instance/status', [], false, 10);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        // 3. Tenta GET /instance/status/{instance}
+        $res3 = self::request('GET', "instance/status/{$instName}", [], false, 10);
+        if ($res3['success']) {
+            return $res3;
+        }
+
+        // Se falhou por autenticação, tenta sincronizar token com a chave global
+        if ($res['status'] === 401 || str_contains(strtolower($res['error'] ?? ''), 'authorized')) {
+            $tokenReal = self::sincronizarTokenInstancia($instName);
+            if ($tokenReal) {
+                return self::request('GET', "instance/connectionState/{$instName}", [], false, 10, $tokenReal);
+            }
+        }
+
+        return $res;
     }
 
     /**
      * Retorna o QR Code atual para autenticação
-     * Endpoint: GET /instance/qr
+     * Endpoint: GET /instance/connect/{instance} ou GET /instance/qr
      */
     public static function obterQrCode(): array
     {
-        return self::request('GET', 'instance/qr', [], false, 15);
+        $instName = self::getInstanceName();
+
+        // 1. Tenta GET /instance/connect/{instance}
+        $res = self::request('GET', "instance/connect/{$instName}", [], false, 15);
+        if ($res['success'] && (! empty($res['data']['qrcode']['base64']) || ! empty($res['data']['base64']))) {
+            return $res;
+        }
+
+        // 2. Tenta GET /instance/qr
+        $res2 = self::request('GET', 'instance/qr', [], false, 15);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        // 3. Tenta GET /instance/qr/{instance}
+        $res3 = self::request('GET', "instance/qr/{$instName}", [], false, 15);
+        if ($res3['success']) {
+            return $res3;
+        }
+
+        return $res;
     }
 
     /**
@@ -322,7 +690,7 @@ class EvolutionApiService
 
     /**
      * Envia mensagem de texto simples
-     * Endpoint: POST /send/text
+     * Endpoint padrão Swagger (https://whatsapp.km.site.nom.br/api/docs): POST /message/sendText/{instance} com fallback para POST /send/text
      */
     public static function enviarTexto(string $numero, string $texto, int $delay = 0): array
     {
@@ -331,16 +699,41 @@ class EvolutionApiService
             return ['success' => false, 'error' => 'Número de WhatsApp inválido para envio.'];
         }
 
-        $payload = [
+        $inst = self::getInstanceName();
+
+        // 1. Tenta endpoint padrão Evolution API Go v3 (Swagger /api/docs): POST /message/sendText/{instance}
+        $payloadV3 = [
+            'number' => $num,
+            'text' => $texto,
+            'textMessage' => [
+                'text' => $texto,
+            ],
+        ];
+        if ($delay > 0) {
+            $payloadV3['options'] = ['delay' => $delay];
+            $payloadV3['delay'] = $delay;
+        }
+
+        $res = self::request('POST', "message/sendText/{$inst}", $payloadV3, false);
+        if ($res['success']) {
+            return $res;
+        }
+
+        // 2. Fallback para rota compacta POST /send/text
+        $payloadCompact = [
             'number' => $num,
             'text' => $texto,
         ];
-
         if ($delay > 0) {
-            $payload['delay'] = $delay;
+            $payloadCompact['delay'] = $delay;
         }
 
-        return self::request('POST', 'send/text', $payload, false);
+        $res2 = self::request('POST', 'send/text', $payloadCompact, false);
+        if ($res2['success']) {
+            return $res2;
+        }
+
+        return $res;
     }
 
     /**

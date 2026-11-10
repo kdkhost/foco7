@@ -41,7 +41,8 @@
                             </div>
                             <p class="text-secondary small mb-0">
                                 Instância ativa: <strong class="text-body font-monospace" id="txtInstanciaNome">{{ $configs['instance'] }}</strong> | 
-                                Servidor: <span class="text-muted font-monospace" id="txtApiUrl">{{ $configs['api_url'] }}</span> | 
+                                Servidor: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="text-primary font-monospace fw-semibold" id="txtApiUrl">{{ $configs['api_url'] }}</a> | 
+                                Instâncias Extras: <strong class="text-danger">{{ $totalInstanciasExtras ?? 0 }} (R$ {{ number_format($custoTotalRecorrente ?? 0, 2, ',', '.') }}/mês)</strong> | 
                                 Cobranças Disparadas: <strong class="text-primary">{{ $totalCobrancasWpp }}</strong>
                             </p>
                         </div>
@@ -100,6 +101,11 @@
                     <li class="nav-item">
                         <button class="nav-link fw-semibold" id="tab-webhook-btn" data-bs-toggle="tab" data-bs-target="#tab-webhook" type="button" role="tab">
                             <i class="fas fa-satellite-dish text-secondary me-2"></i> Webhook & Callbacks
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-semibold" id="tab-instancias-btn" data-bs-toggle="tab" data-bs-target="#tab-instancias" type="button" role="tab">
+                            <i class="fas fa-layer-group text-warning me-2"></i> Instâncias & Licenciados <span class="badge bg-danger ms-1">R$ 60/mês</span>
                         </button>
                     </li>
                 </ul>
@@ -165,7 +171,12 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Nome da Instância (Instance Name) <span class="text-danger">*</span></label>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label fw-semibold mb-0">Nome da Instância (Instance Name) <span class="text-danger">*</span></label>
+                                        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="listarInstanciasServidor()" style="font-size: 0.75rem;" title="Consultar instâncias no servidor Evolution">
+                                            <i class="fas fa-cloud-arrow-down me-1"></i> Ver no Servidor
+                                        </button>
+                                    </div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-robot"></i></span>
                                         <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
@@ -665,6 +676,128 @@
                             </div>
                         </div>
 
+                        <!-- ===================================================================
+                             GUIA 7: GESTÃO DE INSTÂNCIAS (EMPRESA & LICENCIADOS - R$ 60/MÊS)
+                             =================================================================== -->
+                        <div class="tab-pane fade" id="tab-instancias" role="tabpanel">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+                                <div>
+                                    <h5 class="fw-bold text-body mb-1"><i class="fas fa-network-wired text-warning me-2"></i> Controle Central de Instâncias WhatsApp Evolution Go</h5>
+                                    <p class="text-secondary small mb-0">Servidor oficial: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-primary font-monospace">https://whatsapp.km.site.nom.br</a> | Documentação: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-info">/api/docs</a></p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="listarInstanciasServidor()">
+                                        <i class="fas fa-rotate me-1"></i> Sincronizar Servidor
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
+                                        <i class="fas fa-plus-circle me-1"></i> Nova Instância (+ R$ 60,00/mês)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CARDS DE RESUMO DE TARIFAS -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-success bg-opacity-10 h-100">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small fw-semibold text-success text-uppercase">1ª Instância (Principal)</span>
+                                                <i class="fas fa-shield-halved text-success fs-5"></i>
+                                            </div>
+                                            <h4 class="fw-bold text-success mb-1">INCLUSA</h4>
+                                            <small class="text-secondary">Instância padrão <strong class="font-monospace text-body">{{ $configs['instance'] }}</strong> da empresa Foco 7.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-warning bg-opacity-10 h-100">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small fw-semibold text-warning text-uppercase">Instâncias Extras / Licenciados</span>
+                                                <i class="fas fa-layer-group text-warning fs-5"></i>
+                                            </div>
+                                            <h4 class="fw-bold text-body mb-1">{{ $totalInstanciasExtras ?? 0 }} <small class="fs-6 text-muted">instâncias extras</small></h4>
+                                            <small class="text-secondary">Custo fixo por instância extra: <strong>R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }} / mês</strong>.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-danger bg-opacity-10 h-100">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small fw-semibold text-danger text-uppercase">Recorrência Mensal Extra</span>
+                                                <i class="fas fa-receipt text-danger fs-5"></i>
+                                            </div>
+                                            <h4 class="fw-bold text-danger mb-1">R$ {{ number_format($custoTotalRecorrente ?? 0, 2, ',', '.') }} <small class="fs-6 text-muted">/mês</small></h4>
+                                            <small class="text-secondary">Faturamento total gerado pelas instâncias extras contratadas.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TABELA DE INSTÂNCIAS REGISTRADAS -->
+                            <div class="card border">
+                                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold mb-0 text-body"><i class="fas fa-list me-2 text-primary"></i> Instâncias Provisionadas no Servidor Central</h6>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light small">
+                                            <tr>
+                                                <th>Identificador / Nome</th>
+                                                <th>Tipo / Proprietário</th>
+                                                <th>Custo Recorrente</th>
+                                                <th>Criado em</th>
+                                                <th>Status</th>
+                                                <th class="text-end">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="table-success table-opacity-25">
+                                                <td>
+                                                    <strong class="font-monospace text-primary">{{ $configs['instance'] }}</strong>
+                                                    <span class="badge bg-success ms-1">Principal Foco 7</span>
+                                                </td>
+                                                <td><span class="badge bg-dark">Empresa Master</span></td>
+                                                <td><strong class="text-success">Inclusa no Plano</strong></td>
+                                                <td>-</td>
+                                                <td><span class="badge {{ $statusCache === 'conectado' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($statusCache) }}</span></td>
+                                                <td class="text-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="conectarEabrirQr()">
+                                                        <i class="fas fa-qrcode me-1"></i> Conectar / QR Code
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            @if(!empty($instanciasExtras) && is_array($instanciasExtras))
+                                                @foreach($instanciasExtras as $extra)
+                                                <tr>
+                                                    <td>
+                                                        <strong class="font-monospace text-body">{{ $extra['nome'] ?? 'N/D' }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        @if(($extra['tipo'] ?? '') === 'licenciado')
+                                                            <span class="badge bg-primary">Licenciado FOCO 7</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">Instância Extra Empresa</span>
+                                                        @endif
+                                                    </td>
+                                                    <td><strong class="text-danger">R$ {{ number_format($extra['valor_recorrente'] ?? 60.00, 2, ',', '.') }} / mês</strong></td>
+                                                    <td><small class="text-muted">{{ !empty($extra['criado_em']) ? date('d/m/Y H:i', strtotime($extra['criado_em'])) : '-' }}</small></td>
+                                                    <td><span class="badge bg-success">Ativa</span></td>
+                                                    <td class="text-end">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selecionarInstanciaServidor('{{ $extra['nome'] }}', '{{ $extra['token'] ?? '' }}')">
+                                                            <i class="fas fa-arrow-right me-1"></i> Selecionar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <!-- BOTÃO FIXO DE SALVAR CONFIGURAÇÕES -->
@@ -739,9 +872,14 @@
                     </div>
                     <h6 class="fw-bold text-danger mb-1">Não foi possível obter o QR Code</h6>
                     <p class="text-secondary small mb-3" id="txtMensagemErroQr">Verifique se o servidor Evolution API está online e se as credenciais estão corretas.</p>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="conectarEabrirQr()">
-                        <i class="fas fa-rotate me-1"></i> Tentar Novamente
-                    </button>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" onclick="conectarEabrirQr()">
+                            <i class="fas fa-rotate me-1"></i> Tentar Novamente
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="autoCriarOuSincronizarInstanciaModal()">
+                            <i class="fas fa-wand-magic-sparkles me-1"></i> Criar / Sincronizar no Servidor
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -750,7 +888,7 @@
 </div>
 
 <!-- ===================================================================
-     MODAL DE CRIAÇÃO ADMINISTRATIVA DA INSTÂNCIA
+     MODAL DE CRIAÇÃO ADMINISTRATIVA DA INSTÂNCIA (RECORRÊNCIA R$ 60/MÊS)
      =================================================================== -->
 <div class="modal fade" id="modalCriarInstancia" tabindex="-1" aria-labelledby="modalCriarInstanciaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -760,28 +898,46 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="text-secondary small mb-3">
-                    Cria a instância no servidor Evolution API Go via endpoint administrativo <code>POST /instance/create</code> usando sua Global API Key.
-                </p>
+                <!-- CARD DE PRECIFICAÇÃO E RECORRÊNCIA DA INSTÂNCIA -->
+                <div class="card border-warning bg-warning bg-opacity-10 mb-3 shadow-none">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                            <span class="badge bg-danger text-white px-2 py-1 fs-6">
+                                <i class="fas fa-tag me-1"></i> R$ 60,00 / mês por Instância Adicional
+                            </span>
+                            <span class="badge bg-success text-white">Evolution Go Dedicado</span>
+                        </div>
+                        <p class="small text-secondary mb-2">
+                            A primeira instância (<code class="fw-bold text-dark">foco7</code>) está inclusa no plano. A criação de instâncias extras para a empresa ou licenciados possui cobrança recorrente de <strong>R$ 60,00 cada</strong> provisionada diretamente no cluster oficial central (<a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-primary font-monospace">whatsapp.km.site.nom.br</a>).
+                        </p>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="checkConcordoValorExtra" checked>
+                            <label class="form-check-label small fw-semibold text-body" for="checkConcordoValorExtra">
+                                Estou ciente do custo recorrente de <strong>R$ 60,00/mês</strong> para instâncias extras criadas.
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nome da Instância</label>
-                    <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="{{ $configs['instance'] }}" placeholder="foco7">
+                    <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="{{ (!empty($configs['instance']) && !str_contains($configs['instance'], '•')) ? $configs['instance'] : 'foco7' }}" placeholder="Ex: foco7_cobranca ou foco7_vendas">
+                    <div class="form-text small">Identificador único no servidor <code>https://whatsapp.km.site.nom.br</code></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Token da Instância (API Key)</label>
-                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" value="{{ $configs['apikey'] }}" placeholder="Chave de segurança da instância">
+                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" value="{{ (!empty($configs['apikey']) && !str_contains($configs['apikey'], '•')) ? $configs['apikey'] : 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d' }}" placeholder="Chave de segurança da instância">
                 </div>
 
-                <div class="alert alert-warning border-warning small mb-0">
-                    <i class="fas fa-shield-alt text-warning me-1"></i> Requer que a <strong>Global API Key</strong> esteja configurada corretamente.
+                <div class="alert alert-info border-info small mb-0">
+                    <i class="fas fa-info-circle text-info me-1"></i> Servidor Central Evolution Go: <strong>https://whatsapp.km.site.nom.br</strong> (<a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="text-primary fw-bold">Swagger Docs /api/docs</a>).
                 </div>
             </div>
             <div class="modal-footer bg-body-tertiary">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary fw-bold" id="btnConfirmarCriarInstancia" onclick="executarCriacaoInstancia()">
-                    <i class="fas fa-check me-1"></i> Criar Instância Agora
+                    <i class="fas fa-check me-1"></i> Confirmar &amp; Criar Instância (R$ 60,00/mês se extra)
                 </button>
             </div>
         </div>
@@ -869,6 +1025,9 @@
                 $('#inputInstance').val(dados.instance).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
                 $('#inputApiKey').val(dados.apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
                 $('#inputGlobalApiKey').val(dados.global_apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
+
+                $('#modalInstanciaNome').val(dados.instance);
+                $('#modalInstanciaToken').val(dados.apikey);
 
                 $('#txtInstanciaNome').text(dados.instance);
                 $('#txtApiUrl').text(dados.api_url);
@@ -1004,6 +1163,12 @@
             data: { _token: '{{ csrf_token() }}' },
             dataType: 'json',
             success: function (res) {
+                if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
+                    $('#inputApiKey').val(res.token);
+                }
+                if (res.instancia) {
+                    $('#txtInstanciaNome').text(res.instancia);
+                }
                 if (res.qrcode) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
@@ -1019,6 +1184,141 @@
                 $('#qrErroBox').show();
             }
         });
+    }
+
+    // Auto-criação ou sincronização inteligente a partir do modal de QR Code
+    function autoCriarOuSincronizarInstanciaModal() {
+        $('#qrErroBox').hide();
+        $('#qrLoadingBox').show();
+        $('#qrLoadingBox h6').text('Sincronizando / Criando Instância no Servidor...');
+
+        var nome = $('#inputInstance').val() || 'carlos_americo_cavalcante_silva_8_1';
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.criar_instancia") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                nome: nome
+            },
+            dataType: 'json',
+            success: function (res) {
+                window.foco7Notify.success(res.message);
+                if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
+                    $('#inputApiKey').val(res.token);
+                }
+                if (res.qrcode) {
+                    exibirQrCode(res.qrcode);
+                    iniciarPollingStatusQr();
+                } else {
+                    conectarEabrirQr();
+                }
+            },
+            error: function (xhr) {
+                $('#qrLoadingBox').hide();
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao sincronizar/criar instância.';
+                $('#txtMensagemErroQr').text(msg);
+                $('#qrErroBox').show();
+            }
+        });
+    }
+
+    // Consulta e exibe as instâncias diretamente do servidor Evolution API
+    function listarInstanciasServidor() {
+        Swal.fire({
+            title: 'Consultando Servidor...',
+            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i><p class="text-secondary small mb-0">Buscando instâncias cadastradas na Evolution API...</p></div>',
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            dataType: 'json',
+            success: function (res) {
+                if (!res.success || !res.instancias) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nenhuma Instância',
+                        text: res.message || 'Nenhuma instância retornada pelo servidor.',
+                        confirmButtonColor: '#d90000'
+                    });
+                    return;
+                }
+
+                var lista = res.instancias;
+                if (!Array.isArray(lista) && typeof lista === 'object') {
+                    lista = Object.values(lista);
+                }
+
+                if (lista.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Nenhuma Instância Encontrada',
+                        html: `
+                            <p class="small text-secondary mb-3">O servidor Evolution API está online, mas nenhuma instância foi criada ainda.</p>
+                            <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="Swal.close(); abrirModalCriarInstancia();">
+                                <i class="fas fa-plus me-1"></i> Criar Instância Agora
+                            </button>
+                        `,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                var htmlInst = '<div class="list-group text-start my-2" style="max-height: 280px; overflow-y: auto;">';
+                lista.forEach(function (inst) {
+                    var nome = inst.name || (inst.instance && inst.instance.name) || (inst.instanceName) || 'Sem Nome';
+                    var status = inst.status || (inst.instance && inst.instance.status) || (inst.state) || 'desconectado';
+                    var token = inst.token || (inst.instance && inst.instance.token) || (inst.apikey) || '';
+                    var isConnected = (status === 'open' || status === 'connected' || status === 'conectado');
+                    var statusBadge = isConnected 
+                        ? '<span class="badge bg-success">Conectado</span>' 
+                        : '<span class="badge bg-secondary">' + status + '</span>';
+
+                    htmlInst += `
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2 mb-1 border rounded">
+                            <div>
+                                <strong class="d-block text-body font-monospace">${nome}</strong>
+                                <small class="text-secondary">${statusBadge}</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="selecionarInstanciaServidor('${nome}', '${token}')">
+                                <i class="fas fa-check me-1"></i> Selecionar
+                            </button>
+                        </div>
+                    `;
+                });
+                htmlInst += '</div>';
+
+                Swal.fire({
+                    title: 'Instâncias no Servidor Evolution',
+                    html: htmlInst,
+                    showCloseButton: true,
+                    showConfirmButton: false
+                });
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao consultar servidor.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro de Comunicação',
+                    text: msg,
+                    confirmButtonColor: '#d90000'
+                });
+            }
+        });
+    }
+
+    function selecionarInstanciaServidor(nome, token) {
+        Swal.close();
+        $('#inputInstance').val(nome);
+        $('#txtInstanciaNome').text(nome);
+        if (token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
+            $('#inputApiKey').val(token);
+        }
+        window.foco7Notify.success('Instância "' + nome + '" selecionada! Salve as configurações ou clique em Conectar / QR Code.');
     }
 
     // Exibe imagem do QR Code
@@ -1156,12 +1456,21 @@
             success: function (res) {
                 $('#modalCriarInstancia').modal('hide');
                 window.foco7Notify.success(res.message);
+                if (res.instancia) {
+                    $('#txtInstanciaNome').text(res.instancia);
+                    $('#inputInstance').val(res.instancia);
+                }
+                if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
+                    $('#inputApiKey').val(res.token);
+                }
                 verificarStatusApi(false);
                 if (res.qrcode) {
                     var modalQr = new bootstrap.Modal(document.getElementById('modalQrCode'));
                     modalQr.show();
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
+                } else {
+                    conectarEabrirQr();
                 }
             },
             error: function (xhr) {

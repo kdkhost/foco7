@@ -17,22 +17,27 @@ class WhatsappCobrancaController extends Controller
     {
         $devUnlocked = (bool) (session('whatsapp_dev_unlocked', false) || session('dev_unlocked', false));
 
-        $realApiUrl = CmsSetting::get('evolution_api_url') ?: 'https://api.kdkhost.com.br';
-        $realGlobalKey = CmsSetting::get('evolution_global_apikey') ?: 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
-        $realInstance = CmsSetting::get('evolution_instance') ?: 'foco7';
-        $realApiKey = CmsSetting::get('evolution_apikey') ?: 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+        $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
+        $rawGlobalKey = (string) CmsSetting::get('evolution_global_apikey');
+        $rawInstance = (string) CmsSetting::get('evolution_instance');
+        $rawApiKey = (string) CmsSetting::get('evolution_apikey');
 
-        // Garante que se ainda não foram persistidos no banco, sejam salvos com criptografia AES-256
-        if (empty(CmsSetting::get('evolution_api_url')) || CmsSetting::get('evolution_api_url') === 'http://localhost:8080') {
+        $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, 'kdkhost') && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://whatsapp.km.site.nom.br';
+        $realGlobalKey = (! empty($rawGlobalKey) && ! str_contains($rawGlobalKey, '•')) ? $rawGlobalKey : 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
+        $realInstance = (! empty($rawInstance) && ! str_contains($rawInstance, '•')) ? $rawInstance : 'foco7';
+        $realApiKey = (! empty($rawApiKey) && ! str_contains($rawApiKey, '•')) ? $rawApiKey : 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+
+        // Garante que se ainda não foram persistidos no banco ou estavam com tarjas/kdkhost, sejam gravados com a URL oficial da Evolution Go
+        if (empty($rawApiUrl) || $rawApiUrl === 'http://localhost:8080' || str_contains($rawApiUrl, 'kdkhost') || str_contains($rawApiUrl, '•')) {
             CmsSetting::set('evolution_api_url', $realApiUrl, 'whatsapp');
         }
-        if (empty(CmsSetting::get('evolution_global_apikey'))) {
+        if (empty($rawGlobalKey) || str_contains($rawGlobalKey, '•')) {
             CmsSetting::set('evolution_global_apikey', $realGlobalKey, 'whatsapp');
         }
-        if (empty(CmsSetting::get('evolution_instance'))) {
+        if (empty($rawInstance) || str_contains($rawInstance, '•')) {
             CmsSetting::set('evolution_instance', $realInstance, 'whatsapp');
         }
-        if (empty(CmsSetting::get('evolution_apikey'))) {
+        if (empty($rawApiKey) || str_contains($rawApiKey, '•')) {
             CmsSetting::set('evolution_apikey', $realApiKey, 'whatsapp');
         }
 
@@ -87,7 +92,23 @@ class WhatsappCobrancaController extends Controller
             }
         }
 
-        return view('admin.whatsapp.index', compact('configs', 'statusCache', 'ultimoEvento', 'webhookUrl', 'totalCobrancasWpp'));
+        // Gestão de Tarifação de Instâncias Extras (R$ 60,00/mês cada)
+        $custoInstanciaExtra = EvolutionApiService::getCustoInstanciaExtra(); // 60.00
+        $instanciasExtras = EvolutionApiService::getInstanciasExtras();
+        $totalInstanciasExtras = count($instanciasExtras);
+        $custoTotalRecorrente = $totalInstanciasExtras * $custoInstanciaExtra;
+
+        return view('admin.whatsapp.index', compact(
+            'configs',
+            'statusCache',
+            'ultimoEvento',
+            'webhookUrl',
+            'totalCobrancasWpp',
+            'custoInstanciaExtra',
+            'instanciasExtras',
+            'totalInstanciasExtras',
+            'custoTotalRecorrente'
+        ));
     }
 
     /**
@@ -105,7 +126,8 @@ class WhatsappCobrancaController extends Controller
         ) {
             session(['whatsapp_dev_unlocked' => true]);
 
-            $realApiUrl = CmsSetting::get('evolution_api_url') ?: 'https://api.kdkhost.com.br';
+            $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
+            $realApiUrl = (! empty($rawApiUrl) && ! str_contains($rawApiUrl, 'kdkhost') && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://whatsapp.km.site.nom.br';
             $realGlobalKey = CmsSetting::get('evolution_global_apikey') ?: 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
             $realInstance = CmsSetting::get('evolution_instance') ?: 'foco7';
             $realApiKey = CmsSetting::get('evolution_apikey') ?: 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
@@ -291,6 +313,8 @@ class WhatsappCobrancaController extends Controller
                 'message' => 'Instância iniciada com sucesso. Escaneie o QR Code abaixo.',
                 'qrcode' => $qrcode,
                 'data' => $data,
+                'instancia' => EvolutionApiService::getInstanceName(),
+                'token' => CmsSetting::get('evolution_apikey'),
             ]);
         }
 
@@ -298,6 +322,51 @@ class WhatsappCobrancaController extends Controller
             'success' => false,
             'message' => 'Falha ao conectar instância: '.($res['error'] ?? 'Verifique credenciais.'),
             'detalhes' => $res,
+            'instancia' => EvolutionApiService::getInstanceName(),
+        ], 400);
+    }
+
+    /**
+     * Sincroniza e lista todas as instâncias existentes no servidor Evolution API
+     */
+    public function sincronizarInstancias()
+    {
+        $res = EvolutionApiService::listarInstancias();
+
+        if ($res['success']) {
+            $data = $res['data'];
+            $instancias = isset($data['instances']) ? $data['instances'] : $data;
+
+            // Tenta encontrar a instância ativa e atualizar o token
+            $instName = EvolutionApiService::getInstanceName();
+            $tokenAtualizado = false;
+
+            if (is_array($instancias)) {
+                foreach ($instancias as $item) {
+                    $nome = $item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? null));
+                    if ($nome === $instName) {
+                        $token = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
+                        if (! empty($token)) {
+                            CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                            $tokenAtualizado = true;
+                        }
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Instâncias consultadas diretamente do servidor Evolution API com sucesso!',
+                'instancias' => $instancias,
+                'token_atualizado' => $tokenAtualizado,
+                'instancia_ativa' => $instName,
+                'token_ativo' => CmsSetting::get('evolution_apikey'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Falha ao consultar servidor Evolution API: '.($res['error'] ?? 'Verifique a Global API Key.'),
         ], 400);
     }
 
@@ -369,19 +438,55 @@ class WhatsappCobrancaController extends Controller
      */
     public function criarInstancia(Request $request)
     {
-        $nome = $request->input('nome') ?: EvolutionApiService::getInstanceName();
-        $token = $request->input('token') ?: EvolutionApiService::getInstanceApiKey();
+        $nome = trim((string) $request->input('nome', ''));
+        if (empty($nome) || str_contains($nome, '•')) {
+            $nome = EvolutionApiService::getInstanceName();
+        }
+
+        $token = trim((string) $request->input('token', ''));
+        if (empty($token) || str_contains($token, '•')) {
+            $token = EvolutionApiService::getInstanceApiKey();
+        }
+
+        $instanciaPrincipal = (string) CmsSetting::get('evolution_instance', 'foco7');
+        $isExtra = ($nome !== $instanciaPrincipal && ! empty($instanciaPrincipal));
 
         $res = EvolutionApiService::criarInstancia($nome, $token);
 
         if ($res['success']) {
+            // Se for a primeira instância / principal, define como ativa no sistema
+            if (! $isExtra) {
+                CmsSetting::set('evolution_instance', $nome, 'whatsapp');
+                if (! empty($token)) {
+                    CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                }
+            } else {
+                // Registra a instância extra com recorrência de R$ 60,00/mês
+                EvolutionApiService::registrarInstanciaExtra($nome, $token, 'empresa');
+            }
+
+            // Tenta obter o QR Code diretamente ou dispara conexão
             $qrcode = $res['data']['qrcode']['base64'] ?? ($res['data']['base64'] ?? null);
+            if (! $qrcode) {
+                $connectRes = EvolutionApiService::conectar();
+                if ($connectRes['success']) {
+                    $qrcode = $connectRes['data']['qrcode']['base64'] ?? ($connectRes['data']['base64'] ?? null);
+                }
+            }
+
+            $msg = $isExtra
+                ? "Instância adicional '{$nome}' criada com sucesso! Custo recorrente de R$ 60,00/mês registrado."
+                : "Instância '{$nome}' configurada com sucesso na Evolution API!";
 
             return response()->json([
                 'success' => true,
-                'message' => "Instância '{$nome}' criada com sucesso na Evolution API!",
+                'message' => $msg,
                 'qrcode' => $qrcode,
                 'data' => $res['data'],
+                'instancia' => $nome,
+                'token' => $token,
+                'is_extra' => $isExtra,
+                'custo_recorrente' => $isExtra ? 60.00 : 0.00,
             ]);
         }
 

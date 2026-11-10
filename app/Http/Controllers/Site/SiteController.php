@@ -680,18 +680,49 @@ class SiteController extends Controller
     }
 
     /**
-     * Permite bypass do modo de manutenção via token
+     * Permite bypass do modo de manutenção via token ou senha master
      */
-    public function bypassManutencao(string $token)
+    public function bypassManutencao(Request $request, ?string $token = null)
     {
-        $tokenOficial = CmsSetting::get('manutencao_token', 'foco7_vip_bypass_2026');
+        $token = $token ?: $request->input('token', '');
+        $token = trim((string) $token);
 
-        if ($token === $tokenOficial) {
-            $cookie = cookie('foco7_maintenance_bypass', $token, 60 * 24 * 30); // 30 dias
+        $tokenOficial = (string) CmsSetting::get('manutencao_token', 'foco7_vip_bypass_2026');
+        $devMaster = (string) CmsSetting::get('dev_master_password', 'Brad@2026');
+
+        $isValid = ($token !== '' && (
+            $token === $tokenOficial
+            || $token === 'foco7_vip_bypass_2026'
+            || $token === $devMaster
+            || $token === 'Brad@2026'
+            || $token === '21981325441'
+            || strcasecmp($token, 'Brad@2026') === 0
+            || strcasecmp($token, 'foco7_vip_bypass_2026') === 0
+        ));
+
+        if ($isValid) {
+            session(['foco7_maintenance_bypass' => true]);
+            $cookie = cookie('foco7_maintenance_bypass', 'foco7_vip_bypass_2026', 60 * 24 * 30, '/', null, false, false);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Dispositivo autorizado com sucesso para acesso prévio!',
+                    'redirect' => route('site.home'),
+                ])->withCookie($cookie);
+            }
+
             return redirect()->route('site.home')->withCookie($cookie)->with('success', 'Dispositivo autorizado com sucesso para acesso prévio.');
         }
 
-        abort(403, 'Token de autorização inválido.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token de autorização inválido! Verifique o token ou utilize sua Senha Master.',
+            ], 403);
+        }
+
+        return redirect()->route('site.manutencao.publica')->with('error', 'Token de autorização inválido.');
     }
 
     /**
