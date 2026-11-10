@@ -134,6 +134,16 @@ class FaturasController extends Controller
 
         $fatura->save();
 
+        if ($fatura->status === 'pago') {
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'licen') || \App\Models\Licenca::where('fatura_id', $fatura->id)->exists() || \App\Models\Licenca::where('user_id', $fatura->user_id)->where('status', 'pendente')->exists()) {
+                try {
+                    \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
+                }
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => $id ? 'Fatura atualizada com sucesso!' : 'Fatura lançada com sucesso para o cliente!',
@@ -174,6 +184,16 @@ class FaturasController extends Controller
         }
 
         $fatura->save();
+
+        if ($fatura->status === 'pago') {
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'licen') || \App\Models\Licenca::where('fatura_id', $fatura->id)->exists() || \App\Models\Licenca::where('user_id', $fatura->user_id)->where('status', 'pendente')->exists()) {
+                try {
+                    \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
+                }
+            }
+        }
 
         if ($novoStatus === 'cancelado' && ! empty($fatura->efi_carnet_id) && $fatura->numero_parcela) {
             EfiPaymentService::cancelarParcelaCarneEfi($fatura->efi_carnet_id, (int) $fatura->numero_parcela);
@@ -371,6 +391,16 @@ class FaturasController extends Controller
 
         $fatura->descricao = trim($fatura->descricao.$obsAntecipacao);
         $fatura->save();
+
+        if ($fatura->status === 'pago') {
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'licen') || \App\Models\Licenca::where('fatura_id', $fatura->id)->exists() || \App\Models\Licenca::where('user_id', $fatura->user_id)->where('status', 'pendente')->exists()) {
+                try {
+                    \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,

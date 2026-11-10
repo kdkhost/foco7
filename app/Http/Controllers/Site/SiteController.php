@@ -218,10 +218,21 @@ class SiteController extends Controller
             'secao_app_link_appstore' => CmsSetting::get('secao_app_link_appstore', 'https://www.apple.com/app-store/'),
             'secao_app_mockup_imagem' => CmsSetting::get('secao_app_mockup_imagem', '/img/app-mockup-foco7.jpg'),
 
-            // Seção Estética Automotiva e Diferenciais Técnicos
-            'secao_estetica_titulo' => CmsSetting::get('secao_estetica_titulo', 'Estética Automotiva de Alta Performance'),
-            'secao_estetica_subtitulo' => CmsSetting::get('secao_estetica_subtitulo', 'Além de proteger com tecnologia, cuidamos do visual, valorização e conservação do seu veículo com padrão premium.'),
+            // Seção Estética Automotiva, Diferenciais Técnicos e Modo Em Breve
+            'secao_estetica_badge' => CmsSetting::get('secao_estetica_badge', 'Cuidado & Valorização Automotiva'),
+            'secao_estetica_titulo' => CmsSetting::get('secao_estetica_titulo', 'Estética Automotiva Premium FOCO7'),
+            'secao_estetica_subtitulo' => CmsSetting::get('secao_estetica_subtitulo', 'Cuidado minucioso, para proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.'),
             'secao_estetica_descricao' => CmsSetting::get('secao_estetica_descricao', 'Serviços especializados com produtos nobres, vitrificação técnica, polimento com brilho espelhado e higienização profunda.'),
+            'estetica_em_breve_ativo' => CmsSetting::get('estetica_em_breve_ativo', '1'),
+            'estetica_navbar_badge' => CmsSetting::get('estetica_navbar_badge', 'Em Breve'),
+            'estetica_navbar_badge_ativo' => CmsSetting::get('estetica_navbar_badge_ativo', '1'),
+            'estetica_em_breve_badge' => CmsSetting::get('estetica_em_breve_badge', 'EM BREVE • LANÇAMENTO OFICIAL'),
+            'estetica_em_breve_titulo' => CmsSetting::get('estetica_em_breve_titulo', 'Novos Pacotes de Estética Automotiva Sendo Preparados!'),
+            'estetica_em_breve_mensagem' => CmsSetting::get('estetica_em_breve_mensagem', 'Novos pacotes de estética automotiva sendo adicionados pela equipe. Em breve você poderá agendar vitrificação técnica, polimento espelhado, higienização profunda e proteção de pintura direto pelo site!'),
+            'estetica_em_breve_previsao' => CmsSetting::get('estetica_em_breve_previsao', 'Inauguração em Breve'),
+            'estetica_btn_whatsapp_ativo' => CmsSetting::get('estetica_btn_whatsapp_ativo', '1'),
+            'estetica_btn_whatsapp_texto' => CmsSetting::get('estetica_btn_whatsapp_texto', 'Entrar na Lista VIP de Espera via WhatsApp'),
+            'estetica_whatsapp_mensagem' => CmsSetting::get('estetica_whatsapp_mensagem', 'Olá! Gostaria de receber novidades e entrar na lista VIP para os serviços de Estética Automotiva da Foco 7.'),
             'secao_estetica_dif1_icone' => CmsSetting::get('secao_estetica_dif1_icone', 'fa-award'),
             'secao_estetica_dif1_titulo' => CmsSetting::get('secao_estetica_dif1_titulo', 'Produtos Nobres'),
             'secao_estetica_dif1_desc' => CmsSetting::get('secao_estetica_dif1_desc', 'Vonixx, CarPro e Menzerna'),
@@ -310,6 +321,16 @@ class SiteController extends Controller
             'secao_filiais_badge' => CmsSetting::get('secao_filiais_badge', 'Presença & Atendimento'),
             'secao_filiais_titulo' => CmsSetting::get('secao_filiais_titulo', 'Nossas Filiais & Localidades de Atendimento'),
             'secao_filiais_subtitulo' => CmsSetting::get('secao_filiais_subtitulo', 'Localize a unidade Foco 7 mais próxima, trace a rota e converse diretamente com nossa equipe local.'),
+
+            // Seção Licenciamento FOCO 7 (White Label & Servidor Próprio)
+            'licenciamento_ativo' => CmsSetting::get('licenciamento_ativo', '1') == '1',
+            'licenciamento_badge' => CmsSetting::get('licenciamento_badge', 'OPORTUNIDADE DE NEGÓCIO • WHITE LABEL'),
+            'licenciamento_titulo' => CmsSetting::get('licenciamento_titulo', 'Tenha Sua Própria Empresa de Rastreamento Veicular'),
+            'licenciamento_subtitulo' => CmsSetting::get('licenciamento_subtitulo', 'Instale o sistema FOCO 7 completo em seu próprio servidor (VPS, cPanel ou Cloud). Faturamento 100% seu, sua própria marca, logo e domínio próprio.'),
+            'licenciamento_preco_adesao' => (float) CmsSetting::get('licenciamento_preco_adesao', '1497.00'),
+            'licenciamento_preco_mensal' => (float) CmsSetting::get('licenciamento_preco_mensal', '0.00'),
+            'licenciamento_versao_atual' => CmsSetting::get('licenciamento_versao_atual', 'v3.8.0'),
+            'licenciamento_whatsapp_suporte' => CmsSetting::get('licenciamento_whatsapp_suporte', '559180510736'),
         ];
 
         return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'parceiros', 'filiais', 'seo', 'configs'));

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Pagamento;
 
 use App\Http\Controllers\Controller;
+use App\Models\CmsSetting;
 use App\Models\Fatura;
 use App\Services\EfiPaymentService;
 use App\Services\EmailTemplateService;
+use App\Services\EvolutionApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -42,17 +44,7 @@ class WebhookController extends Controller
 
                 Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Mercado Pago Webhook Dinâmico.");
 
-                // Dispara confirmação imediata por e-mail ao cliente
-                if ($fatura->user && ! empty($fatura->user->email)) {
-                    EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
-                        'cliente_nome' => $fatura->user->name,
-                        'cliente_email' => $fatura->user->email,
-                        'fatura_id' => $fatura->codigo_fatura,
-                        'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
-                        'valor' => $fatura->valor_formatado,
-                        'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
-                    ]);
-                }
+                $this->processarPosPagamentoFatura($fatura);
             }
         }
 
@@ -84,16 +76,7 @@ class WebhookController extends Controller
 
                     Log::info("Fatura {$fatura->codigo_fatura} baixada automaticamente via Efí PRO Pix Webhook.");
 
-                    if ($fatura->user && ! empty($fatura->user->email)) {
-                        EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
-                            'cliente_nome' => $fatura->user->name,
-                            'cliente_email' => $fatura->user->email,
-                            'fatura_id' => $fatura->codigo_fatura,
-                            'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
-                            'valor' => $fatura->valor_formatado,
-                            'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
-                        ]);
-                    }
+                    $this->processarPosPagamentoFatura($fatura);
                 }
             }
         }
@@ -121,16 +104,7 @@ class WebhookController extends Controller
 
                             Log::info("Fatura {$fatura->codigo_fatura} (Carnê/Boleto Efí) baixada automaticamente via Notificação v1.");
 
-                            if ($fatura->user && ! empty($fatura->user->email)) {
-                                EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
-                                    'cliente_nome' => $fatura->user->name,
-                                    'cliente_email' => $fatura->user->email,
-                                    'fatura_id' => $fatura->codigo_fatura,
-                                    'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
-                                    'valor' => $fatura->valor_formatado,
-                                    'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
-                                ]);
-                            }
+                            $this->processarPosPagamentoFatura($fatura);
                         }
                     }
                 }
@@ -138,5 +112,83 @@ class WebhookController extends Controller
         }
 
         return response()->json(['status' => 'received'], 200);
+    }
+
+    /**
+     * Webhook de retorno da Evolution API Go (v3.0)
+     * Recebe eventos de status de conexão, mensagens, QR code, etc.
+     */
+    public function evolution(Request $request)
+    {
+        $payload = $request->all();
+        $event = $request->input('event') ?? $request->input('type') ?? 'UNKNOWN';
+
+        Log::info("Webhook Evolution API Go [{$event}]:", $payload);
+
+        // Tratamento de evento de CONEXÃO (CONNECTION_UPDATE)
+        if (str_contains(strtoupper($event), 'CONNECTION') || isset($payload['state'])) {
+            $state = $payload['state'] ?? ($payload['data']['state'] ?? null);
+            if ($state) {
+                $statusMapeado = match (strtolower((string) $state)) {
+                    'open', 'connected' => 'conectado',
+                    'connecting' => 'conectando',
+                    'close', 'disconnected' => 'desconectado',
+                    'refused' => 'recusado',
+                    default => strtolower((string) $state),
+                };
+
+                CmsSetting::set('evolution_status_cache', $statusMapeado, 'whatsapp');
+                CmsSetting::set('evolution_last_connection_event', now()->format('Y-m-d H:i:s'), 'whatsapp');
+                Log::info("Status da Evolution API Go atualizado para: {$statusMapeado}");
+            }
+        }
+
+        // Tratamento de evento de QRCODE
+        if (str_contains(strtoupper($event), 'QRCODE') || isset($payload['qrcode'])) {
+            $qrCode = $payload['qrcode']['base64'] ?? ($payload['data']['qrcode']['base64'] ?? null);
+            if ($qrCode) {
+                CmsSetting::set('evolution_last_qrcode', $qrCode, 'whatsapp');
+            }
+        }
+
+        return response()->json(['status' => 'success', 'event' => $event], 200);
+    }
+
+    /**
+     * Processa notificações e ativação pós-pagamento de fatura
+     */
+    protected function processarPosPagamentoFatura(Fatura $fatura): void
+    {
+        // 1. Dispara confirmação imediata por e-mail ao cliente
+        if ($fatura->user && ! empty($fatura->user->email)) {
+            EmailTemplateService::enviar($fatura->user->email, 'pagamento_confirmado', [
+                'cliente_nome' => $fatura->user->name,
+                'cliente_email' => $fatura->user->email,
+                'fatura_id' => $fatura->codigo_fatura,
+                'plano_nome' => $fatura->plano->nome ?? $fatura->descricao,
+                'valor' => $fatura->valor_formatado,
+                'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
+            ]);
+        }
+
+        // 2. Dispara confirmação imediata via WhatsApp
+        if ($fatura->user && ! empty($fatura->user->telefone) && EvolutionApiService::isAtivo()) {
+            try {
+                EvolutionApiService::enviarConfirmacaoPagamento($fatura);
+            } catch (\Throwable $e) {
+                Log::warning("Falha ao enviar confirmação WhatsApp: " . $e->getMessage());
+            }
+        }
+
+        // 3. Ativação automática de Licença de Software FOCO 7
+        if (str_contains(strtolower($fatura->descricao ?? ''), 'licen') 
+            || \App\Models\Licenca::where('fatura_id', $fatura->id)->exists() 
+            || \App\Models\Licenca::where('user_id', $fatura->user_id)->where('status', 'pendente')->exists()) {
+            try {
+                \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
+            } catch (\Throwable $e) {
+                Log::warning("Falha ao ativar licença no webhook: " . $e->getMessage());
+            }
+        }
     }
 }

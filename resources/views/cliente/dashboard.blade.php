@@ -82,6 +82,36 @@
     </div>
 </div>
 
+<!-- BANNER DO PROGRAMA DE LICENCIAMENTO FOCO 7 -->
+@php $minhaLicenca = auth()->user()->licencaAtiva(); @endphp
+<div class="card shadow-sm border-0 mb-4 bg-body overflow-hidden border-start border-4 border-warning">
+    <div class="card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-3 p-3 bg-warning text-dark fs-3">
+                <i class="fas fa-server"></i>
+            </div>
+            <div>
+                @if($minhaLicenca)
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="fw-bold mb-0">Licença de Servidor: {{ $minhaLicenca->nome_empresa }}</h6>
+                        <span class="badge bg-success small">ATIVA</span>
+                    </div>
+                    <p class="text-secondary small mb-0">Chave: <code class="fw-bold text-danger">{{ $minhaLicenca->chave_licenca }}</code> &bull; Domínio: {{ $minhaLicenca->dominio_autorizado ?: 'Aguardando vinculação' }}</p>
+                @else
+                    <h6 class="fw-bold mb-0">Programa de Licenciados FOCO 7 (White Label)</h6>
+                    <p class="text-secondary small mb-0">Tenha sua própria empresa de rastreamento com sistema completo no seu servidor (VPS, cPanel, Cloud).</p>
+                @endif
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('cliente.licenca.index') }}" class="btn btn-outline-danger fw-bold text-nowrap">
+                <i class="fas {{ $minhaLicenca ? 'fa-download' : 'fa-certificate' }} me-1"></i>
+                {{ $minhaLicenca ? 'Acessar Downloads & Servidor' : 'Conhecer Programa de Licenciados' }}
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
     <!-- Mensalidades / Faturas -->
     <div class="col-lg-6">

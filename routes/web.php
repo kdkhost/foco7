@@ -17,12 +17,15 @@ use App\Http\Controllers\Admin\ParceirosController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\PlanosController;
 use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\LicenciadosController;
 use App\Http\Controllers\Admin\ServicosEsteticaController;
 use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Admin\WhatsappCobrancaController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Cliente\ClienteDashboardController;
 use App\Http\Controllers\Cliente\ClienteFaturasController;
+use App\Http\Controllers\Cliente\LicenciadoPortalController;
 use App\Http\Controllers\Instalador\InstaladorController;
 use App\Http\Controllers\Pagamento\CheckoutController;
 use App\Http\Controllers\Pagamento\WebhookController;
@@ -84,11 +87,12 @@ Route::prefix('instalar')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Webhooks de Gateways de Pagamento (Isentos de CSRF)
+| Webhooks de Gateways de Pagamento & WhatsApp (Isentos de CSRF)
 |--------------------------------------------------------------------------
 */
 Route::post('/webhook/mercadopago', [WebhookController::class, 'mercadopago'])->name('webhook.mercadopago');
 Route::post('/webhook/efi', [WebhookController::class, 'efi'])->name('webhook.efi');
+Route::post('/webhook/evolution', [WebhookController::class, 'evolution'])->name('webhook.evolution');
 
 /*
 |--------------------------------------------------------------------------
@@ -172,6 +176,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/estornar/{id}', [FaturasController::class, 'estornar'])->name('admin.faturas.estornar');
         Route::post('/antecipar/{id}', [FaturasController::class, 'anteciparParcela'])->name('admin.faturas.antecipar');
         Route::post('/antecipar-lote', [FaturasController::class, 'anteciparLote'])->name('admin.faturas.antecipar_lote');
+        Route::post('/cobrar-whatsapp/{id}', [WhatsappCobrancaController::class, 'cobrarFatura'])->name('admin.faturas.cobrar_whatsapp');
         Route::delete('/{id}', [FaturasController::class, 'excluir'])->name('admin.faturas.excluir');
     });
 
@@ -223,6 +228,34 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/preview-email', [GatewaysController::class, 'previewEmail'])->name('admin.gateways.preview_email');
         Route::post('/executar-cron', [GatewaysController::class, 'executarCron'])->name('admin.gateways.executar_cron');
         Route::post('/executar-regua', [GatewaysController::class, 'executarRegua'])->name('admin.gateways.executar_regua');
+    });
+
+    // WhatsApp Cobranças & Evolution API Go (v3.0)
+    Route::prefix('whatsapp')->group(function () {
+        Route::get('/', [WhatsappCobrancaController::class, 'index'])->name('admin.whatsapp.index');
+        Route::post('/salvar', [WhatsappCobrancaController::class, 'salvar'])->name('admin.whatsapp.salvar');
+        Route::get('/status', [WhatsappCobrancaController::class, 'status'])->name('admin.whatsapp.status');
+        Route::post('/conectar', [WhatsappCobrancaController::class, 'conectar'])->name('admin.whatsapp.conectar');
+        Route::get('/qr', [WhatsappCobrancaController::class, 'obterQrCode'])->name('admin.whatsapp.qr');
+        Route::post('/desconectar', [WhatsappCobrancaController::class, 'desconectar'])->name('admin.whatsapp.desconectar');
+        Route::post('/reconectar', [WhatsappCobrancaController::class, 'reconectar'])->name('admin.whatsapp.reconectar');
+        Route::post('/logout', [WhatsappCobrancaController::class, 'logout'])->name('admin.whatsapp.logout');
+        Route::post('/criar-instancia', [WhatsappCobrancaController::class, 'criarInstancia'])->name('admin.whatsapp.criar_instancia');
+        Route::post('/teste', [WhatsappCobrancaController::class, 'enviarTeste'])->name('admin.whatsapp.teste');
+        Route::post('/cobrar/{id}', [WhatsappCobrancaController::class, 'cobrarFatura'])->name('admin.whatsapp.cobrar_fatura');
+    });
+
+    // Licenciados FOCO 7 & Gestão de Servidores / White Label
+    Route::prefix('licenciados')->group(function () {
+        Route::get('/', [LicenciadosController::class, 'index'])->name('admin.licenciados.index');
+        Route::get('/obter/{id}', [LicenciadosController::class, 'obter'])->name('admin.licenciados.obter');
+        Route::post('/salvar', [LicenciadosController::class, 'salvar'])->name('admin.licenciados.salvar');
+        Route::post('/status/{id}', [LicenciadosController::class, 'alterarStatus'])->name('admin.licenciados.status');
+        Route::post('/regenerar-chave/{id}', [LicenciadosController::class, 'regenerarChave'])->name('admin.licenciados.regenerar_chave');
+        Route::post('/configuracoes', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.salvar_configs');
+        Route::get('/download-pacote/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download_pacote');
+        Route::get('/download-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download_vps');
+        Route::delete('/excluir/{id}', [LicenciadosController::class, 'excluir'])->name('admin.licenciados.excluir');
     });
 
     // Templates de E-mails Próprios (Páginas Dedicadas)
@@ -334,4 +367,13 @@ Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function (
     Route::post('/perfil/dados', [ClienteDashboardController::class, 'salvarDados'])->name('cliente.perfil.dados');
     Route::post('/perfil/senha', [ClienteDashboardController::class, 'alterarSenha'])->name('cliente.perfil.senha');
     Route::post('/perfil/avatar', [ClienteDashboardController::class, 'salvarAvatar'])->name('cliente.perfil.avatar');
+
+    // Portal do Licenciado (Downloads, Chave e Guias de Servidor)
+    Route::prefix('licenca')->group(function () {
+        Route::get('/', [LicenciadoPortalController::class, 'index'])->name('cliente.licenca.index');
+        Route::post('/vincular-servidor/{id}', [LicenciadoPortalController::class, 'vincularServidor'])->name('cliente.licenca.vincular_servidor');
+        Route::get('/download-pacote/{id}', [LicenciadoPortalController::class, 'downloadPacote'])->name('cliente.licenca.download_pacote');
+        Route::get('/download-vps/{id}', [LicenciadoPortalController::class, 'downloadScriptVps'])->name('cliente.licenca.download_vps');
+        Route::get('/download-manual/{id}', [LicenciadoPortalController::class, 'downloadManual'])->name('cliente.licenca.download_manual');
+    });
 });

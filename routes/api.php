@@ -21,6 +21,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/planos', [ApiController::class, 'planos'])->name('api.v1.planos');
     Route::get('/filiais', [ApiController::class, 'filiais'])->name('api.v1.filiais');
     Route::get('/faturas/{codigo}', [ApiController::class, 'consultarFatura'])->name('api.v1.faturas.consultar');
+    Route::post('/licenca/validar', [ApiController::class, 'validarLicenca'])->name('api.v1.licenca.validar');
 
     // Checkout Transparente Unificado (Mercado Pago e Efí PRO - Sem Redirecionamento)
     Route::post('/checkout/calcular-taxas', [ApiCheckoutController::class, 'calcularTaxas'])->name('api.v1.checkout.calcular_taxas');

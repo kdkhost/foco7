@@ -22,8 +22,20 @@ class CmsSetting extends Model
     ];
 
     /**
-     * Chaves protegidas que DEVEM ser criptografadas no banco de dados
-     * para impedir qualquer alteração direta via phpMyAdmin / SQL.
+     * Chaves exclusivas do desenvolvedor com assinatura criptográfica anti-adulteração
+     */
+    protected static array $devProtectedKeys = [
+        'desenvolvedor_nome',
+        'desenvolvedor_whatsapp',
+        'desenvolvedor_telegram',
+        'desenvolvedor_link',
+        'desenvolvedor_avatar',
+        'dev_master_password',
+    ];
+
+    /**
+     * Chaves protegidas que DEVEM ser criptografadas no banco de dados (AES-256)
+     * para impedir qualquer alteração direta ou vazamento via phpMyAdmin / dump SQL.
      */
     protected static array $encryptedKeys = [
         'desenvolvedor_nome',
@@ -32,6 +44,13 @@ class CmsSetting extends Model
         'desenvolvedor_link',
         'desenvolvedor_avatar',
         'dev_master_password',
+        // Credenciais Evolution API Go v3.0 (Criptografia total no banco de dados)
+        'evolution_api_url',
+        'evolution_global_apikey',
+        'evolution_apikey',
+        'evolution_instance',
+        'evolution_pix_key',
+        'evolution_webhook_secret',
     ];
 
     /**
@@ -52,6 +71,14 @@ class CmsSetting extends Model
     public static function isEncryptedKey(string $chave): bool
     {
         return in_array($chave, self::$encryptedKeys, true);
+    }
+
+    /**
+     * Verifica se uma chave é estritamente protegida com assinatura do desenvolvedor
+     */
+    public static function isDevProtectedKey(string $chave): bool
+    {
+        return in_array($chave, self::$devProtectedKeys, true);
     }
 
     /**
@@ -125,13 +152,25 @@ class CmsSetting extends Model
 
             $valor = $settings[$chave] ?? null;
 
-            if (self::isEncryptedKey($chave)) {
+            if (self::isDevProtectedKey($chave)) {
                 return self::decryptDevValue($chave, $valor, $default);
+            }
+
+            if (self::isEncryptedKey($chave)) {
+                if ($valor === null || $valor === '') {
+                    return $default;
+                }
+                try {
+                    return Crypt::decryptString((string) $valor);
+                } catch (\Throwable $e) {
+                    // Fallback se o valor estiver em texto puro (ex: recém migrado ou configuração padrão)
+                    return $valor;
+                }
             }
 
             return ($valor === null || $valor === '') ? $default : $valor;
         } catch (\Throwable $e) {
-            if (self::isEncryptedKey($chave)) {
+            if (self::isDevProtectedKey($chave)) {
                 return self::$devDefaults[$chave] ?? $default;
             }
 
@@ -146,9 +185,13 @@ class CmsSetting extends Model
     {
         $valorFinal = is_array($valor) ? json_encode($valor) : (string) $valor;
 
-        if (self::isEncryptedKey($chave)) {
+        if (self::isDevProtectedKey($chave)) {
             $valorFinal = self::encryptDevValue($chave, $valorFinal);
             $grupo = 'desenvolvedor';
+        } elseif (self::isEncryptedKey($chave)) {
+            if ($valorFinal !== '') {
+                $valorFinal = Crypt::encryptString($valorFinal);
+            }
         }
 
         $setting = self::updateOrCreate(
@@ -175,8 +218,18 @@ class CmsSetting extends Model
             $itens = self::where('grupo', $grupo)->pluck('valor', 'chave')->toArray();
             $resultado = [];
             foreach ($itens as $chave => $valor) {
-                if (self::isEncryptedKey($chave)) {
+                if (self::isDevProtectedKey($chave)) {
                     $resultado[$chave] = self::decryptDevValue($chave, $valor);
+                } elseif (self::isEncryptedKey($chave)) {
+                    if ($valor === null || $valor === '') {
+                        $resultado[$chave] = '';
+                    } else {
+                        try {
+                            $resultado[$chave] = Crypt::decryptString((string) $valor);
+                        } catch (\Throwable $e) {
+                            $resultado[$chave] = $valor;
+                        }
+                    }
                 } else {
                     $resultado[$chave] = $valor;
                 }

@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Fatura;
-use App\Models\User;
-use App\Models\Plano;
 use App\Models\CmsSetting;
+use App\Models\Fatura;
 use App\Models\Notificacao;
+use App\Models\Plano;
+use App\Models\User;
+use App\Services\EvolutionApiService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -76,7 +77,14 @@ class ReguaCobrancaService
 
             // Canais de Notificação
             'enviar_email' => CmsSetting::get('regua_enviar_email', '1') == '1',
-            'enviar_whatsapp' => CmsSetting::get('regua_enviar_whatsapp', '0') == '1',
+            'enviar_whatsapp' => CmsSetting::get('regua_enviar_whatsapp', '1') == '1' || CmsSetting::get('evolution_ativo', '0') == '1',
+            'whatsapp_lembrete_1' => CmsSetting::get('evolution_regua_lembrete_1', '1') == '1',
+            'whatsapp_lembrete_2' => CmsSetting::get('evolution_regua_lembrete_2', '1') == '1',
+            'whatsapp_lembrete_3' => CmsSetting::get('evolution_regua_lembrete_3', '1') == '1',
+            'whatsapp_vencimento_hoje' => CmsSetting::get('evolution_regua_vencimento_hoje', '1') == '1',
+            'whatsapp_atraso_1' => CmsSetting::get('evolution_regua_atraso_1', '1') == '1',
+            'whatsapp_atraso_2' => CmsSetting::get('evolution_regua_atraso_2', '1') == '1',
+            'whatsapp_atraso_3' => CmsSetting::get('evolution_regua_atraso_3', '1') == '1',
         ];
     }
 
@@ -476,6 +484,20 @@ class ReguaCobrancaService
         // Disparo por e-mail
         if ($params['enviar_email']) {
             $enviado = EmailTemplateService::enviar($cliente->email, $etapa, $dadosPayload);
+        }
+
+        // Disparo por WhatsApp (Evolution API Go v3.0)
+        $etapaSlug = str_replace('cobranca_', '', $etapa);
+        $deveEnviarWhatsapp = !empty($params['enviar_whatsapp'])
+            && ($params["whatsapp_{$etapaSlug}"] ?? true)
+            && EvolutionApiService::isAtivo();
+
+        if ($deveEnviarWhatsapp && !empty($cliente->telefone)) {
+            try {
+                EvolutionApiService::enviarCobrancaFatura($fatura, $etapa, $encargos);
+            } catch (\Throwable $e) {
+                Log::warning("Falha ao enviar cobrança via WhatsApp para {$fatura->codigo_fatura}: " . $e->getMessage());
+            }
         }
 
         // Notificação Interna do Sistema (Sininho de Notificações do Cliente)

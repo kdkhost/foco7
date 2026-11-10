@@ -140,4 +140,34 @@ class ApiController extends Controller
             ],
         ], 200);
     }
+
+    /**
+     * Validação remota de Licença de Software FOCO 7 para instalações externas
+     */
+    public function validarLicenca(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $chave = $request->input('chave') ?? $request->input('license_key') ?? $request->input('key');
+        if (empty($chave)) {
+            return response()->json([
+                'valida' => false,
+                'status' => 'chave_ausente',
+                'mensagem' => 'Chave de licença não informada na requisição.',
+            ], 400);
+        }
+
+        $dominio = $request->input('dominio') ?? $request->header('Host') ?? $request->getHost();
+        $ip = $request->input('ip') ?? $request->ip();
+        $dadosServidor = $request->input('servidor', []);
+
+        $res = \App\Services\LicenciamentoService::validarLicencaRemota(
+            $chave,
+            $dominio,
+            $ip,
+            is_array($dadosServidor) ? $dadosServidor : []
+        );
+
+        $httpStatus = $res['valida'] ? 200 : 403;
+
+        return response()->json($res, $httpStatus);
+    }
 }

@@ -222,6 +222,11 @@
                                     <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirModalAnteciparFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', {{ $fat->valor }}, {{ $fat->numero_parcela ?? 1 }})" title="Antecipar / Quitar com Desconto">
                                         <i class="fas fa-hand-holding-usd"></i>
                                     </button>
+                                    @if($fat->status !== 'cancelado')
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="cobrarWhatsAppFatura({{ $fat->id }}, '{{ $fat->codigo_fatura }}', '{{ addslashes($fat->user->name ?? 'Cliente') }}', '{{ $fat->user->telefone ?? '' }}')" title="Cobrar via WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </button>
+                                    @endif
                                 @endif
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarFatura({{ $fat->id }})" title="Editar Fatura">
                                     <i class="fas fa-edit"></i>
@@ -1067,6 +1072,66 @@
                     },
                     error: function (xhr) {
                         window.foco7Notify.error(xhr.responseJSON?.message || 'Falha ao processar estorno da fatura.');
+                    }
+                });
+            }
+        });
+    }
+
+    // Cobrança manual avulsa via WhatsApp (Evolution API Go v3.0)
+    function cobrarWhatsAppFatura(id, codigo, cliente, telefone) {
+        if (!telefone) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Telefone Ausente',
+                text: `O cliente ${cliente} não possui número de telefone cadastrado para envio via WhatsApp.`,
+                confirmButtonColor: '#d90000'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Cobrar via WhatsApp?',
+            html: `Deseja disparar a notificação de cobrança da fatura <strong>${codigo}</strong> para <strong>${cliente}</strong> no WhatsApp <strong>${telefone}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#25D366',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fab fa-whatsapp me-1"></i> Sim, Enviar Cobrança',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Disparando WhatsApp...',
+                    text: 'Aguarde a resposta da Evolution API...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/admin/faturas/cobrar-whatsapp/${id}`,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: {
+                        etapa: 'manual'
+                    },
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cobrança Enviada!',
+                            text: res.message,
+                            confirmButtonColor: '#28a745'
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Falha no Envio',
+                            text: xhr.responseJSON?.message || 'Erro ao conectar à Evolution API.',
+                            confirmButtonColor: '#d90000'
+                        });
                     }
                 });
             }

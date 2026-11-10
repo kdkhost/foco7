@@ -157,7 +157,13 @@ public_html/
 - **Webhooks Oficiais:** Retorno automático de compensação e atualização instantânea de faturas.
 
 ### Módulo 9: Estética Automotiva & Detalhamento Premium
-- **Landing Page Pública:** Nova seção elegante e de alta conversão apresentando os serviços de estética (Polimento Técnico, Vitrificação Cerâmica 9H, Higienização Interna, Lavagem Detalhada, Cristalização e PPF).
+- **Landing Page Pública & Modo "Em Breve":** Seção elegante e de alta conversão apresentando os serviços de estética (Polimento Técnico, Vitrificação Cerâmica 9H, Higienização Interna, Lavagem Detalhada, Cristalização e PPF), com suporte a modo "Em Breve" ativo quando a empresa ainda está organizando o espaço ou pacotes.
+- **Controle 100% Editável via Painel Admin (`/admin/estetica` e `/admin/cms`):**
+  - Interruptor mestre liga/desliga para o modo "Em Breve".
+  - Badge personalizável no Menu Superior (Navbar) e na Gaveta Móvel Android (ex: "Em Breve", "Novidade").
+  - Showcase visual de lançamento com badges, ícones nobres, destaques dos serviços futuros e previsão de inauguração.
+  - Botão de ação integrado para Lista VIP de Espera no WhatsApp com mensagem pré-formatada editável.
+  - Edição dos títulos, subtítulos, descrições e dos 4 cards de diferenciais técnicos e selos de garantia.
 - **Agendamento Online no Site:** Modal inteligente multi-categoria permitindo aos clientes agendarem tanto serviços de estética quanto instalações de rastreamento.
 - **Painel Administrativo (`/admin/estetica`):** CRUD completo com gerenciamento de preços, tempos de aplicação, ícones, descrições detalhadas, itens inclusos e ativação/desativação instantânea via AJAX.
 - **FullCalendar 6 Integrado:** Identificação visual automática por cores (Grafite Nobre `#1e293b` para estética, Verde `#28a745` para rastreamento) com edição e reagendamento via arrastar e soltar (drag & drop).
@@ -696,6 +702,122 @@ public_html/
   - **Badge de Supervisão Integrado na Navbar:** Durante todo o período em que estiver navegando no painel do cliente, um badge translúcido de alta visibilidade (`.navbar-supervisao-badge`) fica integrado de forma centralizada e harmônica na barra superior de navegação com o alerta "MODO SUPERVISIONADO" e identificação do cliente, sem quebrar o layout nem cobrir o cabeçalho do AdminLTE 4.
   - **Botão Flutuante Não-Intrusivo com Arraste Livre:** O botão flutuante **"Voltar ao Administrador"** (`.btn-flutuante-voltar-admin`) foi posicionado na lateral direita (`bottom: 74px; right: 24px`), perfeitamente empilhado acima do botão de WhatsApp e abaixo do botão de voltar ao topo, sem colidir com a sidebar esquerda nem cobrir menus. O botão possui suporte a arraste livre (drag & drop) com persistência de posição na sessão, além de acesso rápido via dropdown de perfil.
   - **Função Voltar ao Administrador:** O administrador pode clicar a qualquer momento em **"Voltar ao Administrador"** para encerrar a supervisão; a sessão original é restaurada e o usuário é redirecionado **exatamente para a mesma página anterior** de onde iniciou a supervisão.
+
+---
+
+## 📱 Módulo 38: Cobranças Automatizadas via WhatsApp & Evolution API Go (v3.0) com Criptografia AES-256 no Banco
+
+### 1. Painel de Controle Dedicado (`/admin/whatsapp`)
+- **Gestão de Conexão em Tempo Real:**
+  - Status em tempo real com badges visuais (Conectado, Desconectado, Conectando, QR Code Pendente).
+  - Indicador de segurança com selo **Criptografia AES-256 Ativa** no banco de dados.
+  - Ações de 1 clique: Conectar, Obter QR Code, Desconectar, Forçar Reconexão e Logout formal da sessão do WhatsApp.
+  - **Modal de Pareamento com QR Code Dinâmico:** Exibição do QR Code gerado pela Evolution API com atualização automática a cada 5 segundos e auto-fechamento com SweetAlert2 assim que a conexão for confirmada.
+  - **Criação de Instâncias via Admin:** Modal para criação de novas instâncias do WhatsApp diretamente pela `globalApikey`, permitindo definir nome, token e opções avançadas (rejeição de chamadas, ignorar mensagens de grupos, always online, sincronização de histórico e leitura automática de status).
+
+### 2. Criptografia AES-256 no Banco de Dados MySQL
+- **Blindagem Contra Vazamento de Servidor ou SQL Dump:**
+  - Todas as credenciais sensíveis da Evolution API (`evolution_api_url`, `evolution_global_apikey`, `evolution_apikey`, `evolution_instance`, `evolution_pix_key`, `evolution_webhook_secret`) são encriptadas automaticamente no banco de dados através da classe `CmsSetting` utilizando o algoritmo `AES-256-CBC` do Laravel (`Crypt::encryptString`).
+  - Nenhum token, chave mestra ou credencial do WhatsApp fica armazenado em texto puro. Mesmo em caso de dump do MySQL, acesso indevido ao phpMyAdmin ou backup interceptado, os dados permanecem cifrados (`eyJpdiI6...`).
+
+### 3. Suporte Integral a Todos os Formatos da Evolution API Go (v3.0)
+- **Botões Interativos (`send/interactive` com tipo `button`):**
+  - Botão de URL segura para pagamento online no checkout transparente do site.
+  - Botão de ação nativa de cópia do código PIX (`cta_copy`), permitindo ao cliente copiar a chave PIX com 1 único toque.
+- **Botão Nativo PIX (`send/pix`):**
+  - Payload específico da versão Go v3.0 com `keyType`, `pixKey` e valor formatado para transferência instantânea.
+- **Botão Review and Pay (`send/button` com `review_and_pay`):**
+  - Fluxo nativo do WhatsApp com cabeçalho, corpo explicativo e rodapé institucional.
+- **Texto Puro Formatado (`send/text`):**
+  - Mensagens ricas com tipografia WhatsApp (`*negrito*`, `_itálico_`), emojis temáticos e quebra de linha.
+- **Anexo de Mídia / Carnê em PDF (`send/media`):**
+  - Envio automático de faturas e carnês em PDF gerados no servidor com legenda informativa.
+
+### 4. Integração Nativa com a Régua de Cobrança (`ReguaCobrancaService`)
+- **Automação Completa nas 7 Etapas:**
+  - Disparos preventivos pré-vencimento: 1º Lembrete (ex: 5 dias antes), 2º Lembrete (ex: 3 dias antes) e 3º Lembrete (ex: 1 dia antes).
+  - Cobrança no dia do vencimento (D-0).
+  - Avisos pós-vencimento: 1º Aviso (D+1), 2º Aviso com juros e multa (D+5) e 3º Aviso com alerta de suspensão (D+10).
+- **Controle Granular por Canal:** Opção de habilitar/desabilitar disparos por WhatsApp de forma global ou individual para cada etapa da régua, independente do e-mail.
+- **Blindagem de Faturas Quitadas:** Nenhuma mensagem é enviada para faturas pagas, canceladas ou liquidadas.
+
+### 5. Cobrança Manual de Faturas com 1 Clique (`/admin/faturas`)
+- Botão "Cobrar via WhatsApp" presente na listagem de faturas pendentes e vencidas.
+- Modal de confirmação inteligente com SweetAlert2 exibindo o nome do cliente, código da fatura e telefone de destino.
+- Processamento assíncrono via AJAX com retorno imediato via Toastr e SweetAlert2 (**zero `alert()` nativo**).
+
+### 6. Notificação Instantânea de Pagamento & Webhook Oficial
+- Envio automático de mensagem de confirmação e agradecimento assim que a fatura é compensada via Mercado Pago ou Efí PRO.
+- Endpoint seguro `/webhook/evolution` para recepção de eventos da Evolution API Go (conexão, QR Code e status de mensagens).
+
+---
+
+## 🚀 Módulo 39: Programa de Licenciados FOCO 7 & Distribuição de Software (White Label, Servidor Próprio cPanel/VPS/Cloud & Validação Remota)
+
+### 1. Visão Geral do Modelo de Negócio White Label
+- **Empreendedorismo e Franquia de Software:** Concessão de licenças independentes para empresários e parceiros montarem sua própria empresa de rastreamento veicular utilizando o ecossistema completo da FOCO 7.
+- **Liberdade de Infraestrutura (Servidor Próprio):** O licenciado pode hospedar o sistema no servidor de sua preferência: VPS Linux (Ubuntu 22.04 LTS / 24.04 LTS), Hospedagem Compartilhada cPanel, Cloud (AWS, DigitalOcean, Hetzner, Linode, Contabo), Servidor Dedicado ou containers Docker.
+- **Marca 100% Personalizada (White Label):** Logotipo, nome fantasia, CNPJ, paleta de cores e domínio/subdomínio próprios. Seus clientes utilizam o sistema sem qualquer menção à Foco 7.
+- **Faturamento Direto e Sem Royalties:** Recebimento de mensalidades e taxas de adesão via Pix, Boleto e Cartão de Crédito direto na conta bancária do licenciado (Mercado Pago ou Efí Bank), sem taxas ocultas ou cobrança por veículo rastreado.
+
+### 2. Ciclo de Vida da Licença & Ativação Automática Pós-Pagamento
+- **Chave de Licença Criptográfica Única:** Formato padronizado `FOCO7-XXXX-XXXX-XXXX-XXXX` com verificação de entropia e integridade.
+- **Ativação Instantânea via Webhook de Pagamento:**
+  - O processamento pós-pagamento em `WebhookController` (Mercado Pago, Efí Pix e Carnê) e a quitação manual em `FaturasController` ativam a licença imediatamente ao identificar a compensação da fatura.
+  - O perfil do usuário é automaticamente promovido para o papel `licenciado`.
+  - Disparo automático de e-mail transacional e mensagem no WhatsApp oficial via Evolution API Go informando a liberação da licença, chave de ativação e link direto para download do pacote.
+
+### 3. Mecanismo de Validação Remota & Auto-Binding de Domínio (API REST v1)
+- **Endpoint Público Seguro (`POST /api/v1/licenca/validar`):**
+  - Recebe a chave de licença, domínio do servidor chamador e IP remoto.
+  - Valida rigorosamente a existência da chave, status (`ativa`), limite de expiração e correspondência do domínio e IP autorizados.
+- **Auto-Binding no Primeiro Acesso:**
+  - Se a licença for emitida com o domínio autorizado em branco e o parâmetro `licenciamento_permitir_auto_binding` estiver ativo no CMS, o primeiro check-in realizado pelo servidor do parceiro vincula o domínio chamador de forma automática e segura, eliminando etapas manuais de configuração.
+- **Telemetria e Auditoria:**
+  - Armazenamento em tempo real do timestamp da última validação (`ultimo_checkin_em`), IP do servidor chamador (`ultimo_checkin_ip`) e metadados técnicos do servidor remoto.
+
+### 4. Instalador Web Gráfico Integrado (`/instalar`)
+- **Assistente Interativo de Configuração de Servidor:** O código distribuído no arquivo `.zip` já possui um instalador web gráfico completo (`InstaladorController` e views em `resources/views/instalador/`).
+- **Verificações Automatizadas:**
+  - Teste de extensões essenciais do PHP (BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PCRE, PDO MySQL, Tokenizer, XML).
+  - Teste e validação de permissões de escrita nos diretórios `storage/`, `bootstrap/cache/` e `.env`.
+  - Teste de conexão ativa com o banco de dados MySQL fornecido pelo usuário.
+  - Execução automatizada de migrações e seeders do sistema.
+  - Criação do primeiro usuário Administrador Master com os dados personalizados da empresa do parceiro.
+
+### 5. Empacotamento Dinâmico (.ZIP), Script VPS e Guia Markdown
+- **Serviço Centralizado (`LicenciamentoService`):**
+  - `gerarPacoteZipParaDownload(Licenca $licenca)`: Empacota dinamicamente todo o código-fonte limpo da aplicação, excluindo arquivos sensíveis do ambiente de desenvolvimento/produção (`.env`, `.git`, `.idea`, caches, logs e arquivos de lock), injetando automaticamente o arquivo `license.key` com a chave do licenciado, o script `install-vps.sh` e o guia `GUIA_INSTALACAO_SERVIDOR.md`. Incrementa automaticamente o contador de downloads da licença.
+  - `gerarScriptInstalacaoVps(Licenca $licenca)`: Gera sob demanda um script em Shell Bash (`install-vps.sh`) sob medida para Ubuntu 22.04/24.04 LTS, automatizando a instalação de Nginx, PHP 8.3/8.5 FPM, Composer, MariaDB, criação de vhost e configuração de permissões.
+  - `gerarGuiaInstalacaoMarkdown(Licenca $licenca)`: Documentação técnica completa em Markdown para instalação em cPanel e VPS.
+
+### 6. Painel de Controle Administrativo (`/admin/licenciados`)
+- **Gestão Completa de Licenças:** Listagem paginada com busca por chave, nome da empresa, cliente, e-mail ou domínio, e filtro por status (Ativa, Pendente, Suspensa, Bloqueada e Expirada).
+- **Métricas em Tempo Real (AdminLTE 4):** Total de Licenças, Licenças Ativas, Pendentes de Setup e Total de Downloads Realizados.
+- **Operações Administrativas Avançadas:**
+  - Modal de Criação / Edição de Licença (vinculação com cliente existente ou cadastro rápido de novo titular, definição de versão, limites de veículos/clientes e validade).
+  - Modal de Configurações do Programa (visibilidade no site, badge, títulos, taxa de adesão, mensalidade, versão de distribuição, WhatsApp de atendimento e auto-binding).
+  - Download direto do pacote `.zip` e do script `install-vps.sh`.
+  - Regeneração instantânea de chave de licença em caso de comprometimento da anterior.
+  - Alternância rápida de status (Ativar, Suspender e Bloquear) e exclusão segura com SweetAlert2.
+  - **100% de conformidade com AJAX, SweetAlert2 e Toastr globais (zero `alert()` nativo)**.
+
+### 7. Portal do Licenciado na Central do Assinante (`/cliente/licenca`)
+- **Interface Exclusiva do Licenciado:**
+  - Card da Chave de Licença com tipografia monospace de alta visibilidade e botão de cópia rápida para o clipboard com feedback Toastr.
+  - Formulário AJAX para o próprio licenciado vincular ou atualizar o domínio e IP de seu servidor.
+  - Botões de alta conversão para download imediato do Pacote Completo do Sistema (.ZIP), do script de instalação VPS (`install-vps.sh`) e do manual técnico em Markdown.
+  - Central de Guias Passo a Passo em abas interativas do Bootstrap 5:
+    - *Aba 1: Hospedagem Compartilhada / cPanel* (Criação de MySQL, upload do ZIP, extração e execução do instalador gráfico em `/instalar`).
+    - *Aba 2: VPS Linux Ubuntu 22.04 / 24.04* (Execução via SSH, permissões do Nginx e configuração do Cron Job do agendador de tarefas).
+    - *Aba 3: Configuração de Apontamento DNS* (Registros do tipo A para subdomínio e domínio raiz).
+    - *Aba 4: Suporte Técnico ao Licenciado* (Canal direto no WhatsApp exclusivo com mensagem personalizada).
+- **Showcase Comercial para Clientes Não-Licenciados:** Apresentação de alto padrão visual destacando os benefícios do modelo White Label, precificação de adesão e botão direto para contratação imediata via WhatsApp.
+
+### 8. Landing Page Oficial (Seção `#licenciado`)
+- Seção institucional `#licenciado` configurável via CMS com os 4 pilares de valor da franquia de software (Servidor Próprio, 100% White Label, Lucro 100% Seu e Instalador Web Fácil).
+- Card de oferta com exibição dinâmica do valor da adesão, benefícios inclusos e botões de ação integrados ao WhatsApp comercial e ao portal do licenciado.
+- Links dedicados adicionados na Navbar principal do desktop e no Drawer Android deslizante com selo comemorativo.
 
 ---
 

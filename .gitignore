@@ -1,3 +1,5 @@
+test.bat
+deploy.bat
 *.log
 .DS_Store
 .env

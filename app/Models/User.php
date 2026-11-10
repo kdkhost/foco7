@@ -116,6 +116,11 @@ class User extends Authenticatable
         return $this->role === 'cliente';
     }
 
+    public function isLicenciado(): bool
+    {
+        return $this->role === 'licenciado' || $this->licencas()->where('status', 'ativa')->exists();
+    }
+
     public function plano(): BelongsTo
     {
         return $this->belongsTo(Plano::class);
@@ -129,5 +134,15 @@ class User extends Authenticatable
     public function agendamentos(): HasMany
     {
         return $this->hasMany(Agendamento::class);
+    }
+
+    public function licencas(): HasMany
+    {
+        return $this->hasMany(Licenca::class);
+    }
+
+    public function licencaAtiva(): ?Licenca
+    {
+        return $this->licencas()->where('status', 'ativa')->latest()->first();
     }
 }

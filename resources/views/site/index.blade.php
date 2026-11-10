@@ -211,12 +211,26 @@
                         <li class="nav-item"><a class="nav-link" href="#riscos">Benefícios</a></li>
                         <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
                         <li class="nav-item"><a class="nav-link" href="#planos">Planos</a></li>
-                        <li class="nav-item"><a class="nav-link text-nowrap fw-semibold" href="#estetica"><i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-nowrap fw-semibold d-inline-flex align-items-center" href="#estetica">
+                                <i class="fas fa-spray-can-sparkles text-danger me-1"></i>Estética
+                                @if(($configs['estetica_navbar_badge_ativo'] ?? '1') == '1' && !empty($configs['estetica_navbar_badge']))
+                                    <span class="badge bg-danger rounded-pill px-2 py-1 ms-1 text-uppercase fw-bold shadow-sm badge-estetica-em-breve-pulse" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $configs['estetica_navbar_badge'] }}</span>
+                                @endif
+                            </a>
+                        </li>
                         @if(isset($parceiros) && $parceiros->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#parceiros">Parceiros</a></li>
                         @endif
                         @if(isset($filiais) && $filiais->count() > 0)
                         <li class="nav-item"><a class="nav-link" href="#unidades">Onde Estamos</a></li>
+                        @endif
+                        @if(($configs['licenciamento_ativo'] ?? true))
+                        <li class="nav-item">
+                            <a class="nav-link text-nowrap fw-semibold d-inline-flex align-items-center" href="#licenciado">
+                                <i class="fas fa-certificate text-danger me-1"></i>Licenciamento
+                            </a>
+                        </li>
                         @endif
                         <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                     </ul>
@@ -286,7 +300,9 @@
                 <a href="#estetica" class="android-nav-item">
                     <div class="android-item-icon text-danger"><i class="fas fa-spray-can-sparkles"></i></div>
                     <span class="android-item-text">Estética Automotiva</span>
-                    <span class="badge bg-danger rounded-pill px-2 me-1" style="font-size: 0.65rem;">Novo</span>
+                    @if(($configs['estetica_navbar_badge_ativo'] ?? '1') == '1' && !empty($configs['estetica_navbar_badge']))
+                        <span class="badge bg-danger rounded-pill px-2 me-1" style="font-size: 0.65rem;">{{ $configs['estetica_navbar_badge'] }}</span>
+                    @endif
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 @if(isset($parceiros) && $parceiros->count() > 0)
@@ -300,6 +316,14 @@
                 <a href="#unidades" class="android-nav-item">
                     <div class="android-item-icon"><i class="fas fa-map-location-dot"></i></div>
                     <span class="android-item-text">Nossas Unidades</span>
+                    <i class="fas fa-chevron-right android-item-arrow"></i>
+                </a>
+                @endif
+                @if(($configs['licenciamento_ativo'] ?? true))
+                <a href="#licenciado" class="android-nav-item">
+                    <div class="android-item-icon text-danger"><i class="fas fa-certificate"></i></div>
+                    <span class="android-item-text">Seja um Licenciado</span>
+                    <span class="badge bg-danger text-white rounded-pill px-2 me-1" style="font-size: 0.65rem;">White Label</span>
                     <i class="fas fa-chevron-right android-item-arrow"></i>
                 </a>
                 @endif
@@ -731,15 +755,43 @@
     <section id="estetica" class="section-estetica">
         <div class="container" style="max-width: 1280px;">
             <div class="text-center max-w-700 mx-auto mb-5">
-                <span class="badge-estetica-topo text-uppercase small fw-bold px-3 py-1 rounded-pill">
-                    <i class="fas fa-sparkles text-danger me-1"></i> Cuidado & Valorização Automotiva
+                <span class="badge-estetica-topo text-uppercase small fw-bold px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1">
+                    @if(($configs['estetica_em_breve_ativo'] ?? '1') == '1')
+                        <span class="badge bg-danger text-white rounded-pill px-2 py-1 me-1 shadow-sm" style="font-size: 0.72rem;">
+                            <i class="fas fa-clock me-1"></i> {{ $configs['estetica_navbar_badge'] ?? 'EM BREVE' }}
+                        </span>
+                    @else
+                        <i class="fas fa-sparkles text-danger me-1"></i>
+                    @endif
+                    {{ $configs['secao_estetica_badge'] ?? 'Cuidado & Valorização Automotiva' }}
                 </span>
-                <h2 class="display-6 fw-black mt-3" style="color: var(--foco-title);">{{ $configs['secao_estetica_titulo'] }}</h2>
-                <p class="text-secondary fs-5 mt-2">{{ $configs['secao_estetica_subtitulo'] }}</p>
+                <h2 class="display-6 fw-black mt-3" style="color: var(--foco-title);">{{ $configs['secao_estetica_titulo'] ?? 'Estética Automotiva Premium FOCO7' }}</h2>
+                <p class="text-secondary fs-5 mt-2">{{ $configs['secao_estetica_subtitulo'] ?? 'Cuidado minucioso, para proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.' }}</p>
                 @if(!empty($configs['secao_estetica_descricao']))
                     <p class="small text-muted">{{ $configs['secao_estetica_descricao'] }}</p>
                 @endif
             </div>
+
+            @if(($configs['estetica_em_breve_ativo'] ?? '1') == '1' && $servicosEstetica->count() > 0)
+            <!-- BANNER DE AVISO "EM BREVE" QUANDO HÁ SERVIÇOS CADASTRADOS -->
+            <div class="card-estetica-em-breve mb-5 p-4 rounded-4 shadow-sm border border-danger border-opacity-25 text-center position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(217, 0, 0, 0.05) 0%, rgba(15, 23, 42, 0.03) 100%);">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-danger-subtle text-danger rounded-pill fw-bold small mb-2 border border-danger-subtle">
+                    <i class="fas fa-clock"></i> {{ $configs['estetica_em_breve_badge'] ?? 'EM BREVE • LANÇAMENTO OFICIAL' }}
+                </div>
+                <h4 class="fw-bold mb-2" style="color: var(--foco-title);">{{ $configs['estetica_em_breve_titulo'] ?? 'Novos Pacotes de Estética Automotiva Sendo Preparados!' }}</h4>
+                <p class="text-secondary max-w-700 mx-auto mb-3 leading-relaxed">
+                    {{ $configs['estetica_em_breve_mensagem'] ?? 'Confira a prévia dos nossos pacotes exclusivos abaixo. Em breve você poderá agendar horários diretamente pelo site ou entrar na nossa lista de espera.' }}
+                </p>
+                @if(($configs['estetica_btn_whatsapp_ativo'] ?? '1') == '1')
+                <a href="https://wa.me/{{ $configs['whatsapp'] }}?text={{ urlencode($configs['estetica_whatsapp_mensagem'] ?? 'Olá! Gostaria de receber novidades e entrar na lista VIP para os serviços de Estética Automotiva da Foco 7.') }}" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn btn-sm btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="fab fa-whatsapp"></i> {{ $configs['estetica_btn_whatsapp_texto'] ?? 'Entrar na Lista VIP de Espera via WhatsApp' }}
+                </a>
+                @endif
+            </div>
+            @endif
 
             <!-- Grid de Serviços de Estética Automotiva -->
             <div class="row g-4 justify-content-center">
@@ -771,18 +823,78 @@
                                 </div>
                             </div>
 
+                            @if(($configs['estetica_em_breve_ativo'] ?? '1') == '1')
+                            <a href="https://wa.me/{{ $configs['whatsapp'] }}?text={{ urlencode('Olá! Tenho interesse no serviço de ' . $servico->nome . ' da Estética Automotiva Foco 7.') }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn-agendar-estetica text-decoration-none d-flex align-items-center justify-content-center">
+                                <i class="fab fa-whatsapp me-2"></i> Lista de Espera • WhatsApp
+                            </a>
+                            @else
                             <button type="button" 
                                     class="btn-agendar-estetica"
                                     onclick="abrirModalAgendamentoSite('estetica', '{{ $servico->id }}', '{{ addslashes($servico->nome) }}')">
                                 <i class="fas fa-calendar-check me-2"></i> Agendar Este Serviço
                             </button>
+                            @endif
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="col-12 text-center py-4">
-                    <div class="alert alert-light border">
-                        <i class="fas fa-info-circle text-danger me-2"></i> Novos pacotes de estética automotiva sendo adicionados pela equipe.
+                <!-- CASO SEM SERVIÇOS (CONFORME FOTO DO CLIENTE): SHOWCASE PREMIUM DE EM BREVE -->
+                <div class="col-12 text-center py-2">
+                    <div class="card-estetica-em-breve p-4 p-md-5 rounded-4 shadow-sm border border-danger border-opacity-25 position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(217, 0, 0, 0.04) 0%, rgba(15, 23, 42, 0.03) 100%);">
+                        <div class="position-relative" style="z-index: 2;">
+                            <div class="mb-3">
+                                <span class="badge bg-danger text-white rounded-pill px-3 py-2 text-uppercase fw-bold shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-clock me-1"></i> {{ $configs['estetica_em_breve_badge'] ?? 'EM BREVE • LANÇAMENTO OFICIAL' }}
+                                </span>
+                            </div>
+
+                            <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle mb-3 shadow-sm" style="width: 72px; height: 72px;">
+                                <i class="fas fa-spray-can-sparkles fs-1"></i>
+                            </div>
+
+                            <h3 class="fw-bold mb-2" style="color: var(--foco-title);">
+                                {{ $configs['estetica_em_breve_titulo'] ?? 'Novos Pacotes de Estética Automotiva Sendo Preparados!' }}
+                            </h3>
+
+                            <p class="text-secondary max-w-700 mx-auto fs-5 mb-4 leading-relaxed">
+                                {!! nl2br(e($configs['estetica_em_breve_mensagem'] ?? 'Novos pacotes de estética automotiva sendo adicionados pela equipe. Em breve você poderá agendar vitrificação técnica, polimento espelhado, higienização profunda e proteção de pintura direto pelo site!')) !!}
+                            </p>
+
+                            <!-- Destaques dos Serviços Futuros -->
+                            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                                <span class="badge bg-body text-body border px-3 py-2 rounded-pill fw-semibold shadow-2xs">
+                                    <i class="fas fa-gem text-danger me-1"></i> Vitrificação Cerâmica 9H
+                                </span>
+                                <span class="badge bg-body text-body border px-3 py-2 rounded-pill fw-semibold shadow-2xs">
+                                    <i class="fas fa-wand-magic-sparkles text-danger me-1"></i> Polimento Técnico Espelhado
+                                </span>
+                                <span class="badge bg-body text-body border px-3 py-2 rounded-pill fw-semibold shadow-2xs">
+                                    <i class="fas fa-soap text-danger me-1"></i> Higienização Interna & Oxi-Sanitização
+                                </span>
+                                <span class="badge bg-body text-body border px-3 py-2 rounded-pill fw-semibold shadow-2xs">
+                                    <i class="fas fa-shield-halved text-danger me-1"></i> Proteção de Pintura & PPF
+                                </span>
+                            </div>
+
+                            @if(($configs['estetica_btn_whatsapp_ativo'] ?? '1') == '1')
+                            <div class="mt-3">
+                                <a href="https://wa.me/{{ $configs['whatsapp'] }}?text={{ urlencode($configs['estetica_whatsapp_mensagem'] ?? 'Olá! Gostaria de receber novidades e entrar na lista VIP para os serviços de Estética Automotiva da Foco 7.') }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="btn btn-danger btn-lg rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                                    <i class="fab fa-whatsapp fs-5"></i> {{ $configs['estetica_btn_whatsapp_texto'] ?? 'Entrar na Lista VIP de Espera via WhatsApp' }}
+                                </a>
+                                @if(!empty($configs['estetica_em_breve_previsao']))
+                                    <div class="small text-muted mt-2">
+                                        <i class="fas fa-calendar-alt me-1 text-danger"></i> {{ $configs['estetica_em_breve_previsao'] }}
+                                    </div>
+                                @endif
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 @endforelse
@@ -1168,7 +1280,136 @@
     </section>
     @endif
 
-    <!-- 11. PERGUNTAS FREQUENTES (FAQ) -->
+    <!-- ==============================================================================
+         11. SEÇÃO SEJA UM LICENCIADO FOCO 7 (WHITE LABEL & SERVIDOR PRÓPRIO)
+         ============================================================================== -->
+    @if(($configs['licenciamento_ativo'] ?? true))
+    <section id="licenciado" class="section-licenciado">
+        <div class="container">
+            <!-- Header da Seção -->
+            <div class="text-center max-w-800 mx-auto mb-5">
+                <span class="badge bg-danger text-white rounded-pill px-3 py-2 text-uppercase fw-bold shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                    <i class="fas fa-certificate me-1"></i> {{ $configs['licenciamento_badge'] ?? 'OPORTUNIDADE DE NEGÓCIO • WHITE LABEL' }}
+                </span>
+                <h2 class="display-6 fw-black mt-3" style="color: var(--foco-title);">
+                    {{ $configs['licenciamento_titulo'] ?? 'Tenha Sua Própria Empresa de Rastreamento Veicular' }}
+                </h2>
+                <p class="text-secondary fs-5 mt-2 leading-relaxed">
+                    {{ $configs['licenciamento_subtitulo'] ?? 'Instale o sistema FOCO 7 completo em seu próprio servidor (VPS, cPanel ou Cloud). Faturamento 100% seu, sua própria marca, logo e domínio próprio.' }}
+                </p>
+            </div>
+
+            <!-- 4 Pilares de Benefícios -->
+            <div class="row g-4 mb-5">
+                <!-- Pilar 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-licenciado-pilar">
+                        <div class="licenciado-icon-box">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">Servidor Próprio</h5>
+                        <p class="small text-secondary mb-0 leading-relaxed">
+                            Instale no seu próprio cPanel, VPS Linux (Ubuntu/Debian), Dedicated ou Cloud (AWS, DigitalOcean). O código e os dados são 100% seus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pilar 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-licenciado-pilar">
+                        <div class="licenciado-icon-box">
+                            <i class="fas fa-paint-roller"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">100% White Label</h5>
+                        <p class="small text-secondary mb-0 leading-relaxed">
+                            Sua própria marca, domínio, logotipo, cores e CNPJ. Seus clientes utilizam o sistema com a sua identidade, sem nenhuma menção à Foco 7.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pilar 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-licenciado-pilar">
+                        <div class="licenciado-icon-box">
+                            <i class="fas fa-hand-holding-dollar"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">Lucro 100% Seu</h5>
+                        <p class="small text-secondary mb-0 leading-relaxed">
+                            Receba mensalidades via Pix, Boleto e Cartão direto na sua conta (Mercado Pago ou Efí Bank). Sem cobrança por veículo rastreado.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pilar 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-licenciado-pilar">
+                        <div class="licenciado-icon-box">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">Instalador Web Fácil</h5>
+                        <p class="small text-secondary mb-0 leading-relaxed">
+                            Assistente web gráfico integrado (<code>/instalar</code>). Criação automática de banco de dados, migrações e administrador em poucos cliques.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Oferta & Ação de Conversão -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    <div class="card-oferta-licenciado shadow-lg">
+                        <div class="row align-items-center g-4">
+                            <div class="col-md-7">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 fw-bold small rounded-pill mb-2">
+                                    PACOTE COMPLETO DE DISTRIBUIÇÃO
+                                </span>
+                                <h3 class="fw-bold mb-2 text-dark">Software Foco 7 para Seu Servidor</h3>
+                                <p class="text-secondary small mb-3 leading-relaxed">
+                                    Receba o pacote completo <code>.ZIP</code> pronto para descompactar, script de instalação automatizada VPS (<code>install-vps.sh</code>) e sua chave de licença criptografada com ativação imediata.
+                                </p>
+                                <ul class="list-unstyled small text-secondary mb-0 d-flex flex-column gap-2">
+                                    <li class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Painel Administrativo Completo + Painel do Cliente</span>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>WhatsApp Automático (Evolution API Go) + Gateways de Pagamento</span>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Validação Remota &amp; Suporte Técnico Especializado</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-5 text-center text-md-end border-start-md ps-md-4">
+                                <div class="text-secondary small text-uppercase fw-semibold mb-1">Taxa de Adesão / Licença</div>
+                                <div class="display-5 fw-black text-danger mb-1">
+                                    R$ {{ number_format($configs['licenciamento_preco_adesao'] ?? 1497.00, 2, ',', '.') }}
+                                </div>
+                                <div class="badge bg-light text-dark border small mb-3">Pagamento Único • Sem Royalties</div>
+
+                                <div class="d-grid gap-2">
+                                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['licenciamento_whatsapp_suporte'] ?? $configs['whatsapp']) }}?text={{ urlencode('Olá! Gostaria de mais detalhes e adquirir a licença White Label do sistema FOCO 7 para instalar no meu próprio servidor.') }}" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer" 
+                                       class="btn btn-danger btn-lg fw-bold shadow-sm py-3 d-flex align-items-center justify-content-center gap-2">
+                                        <i class="fab fa-whatsapp fs-5"></i> Quero Ser Licenciado
+                                    </a>
+                                    <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-sm py-2 fw-semibold">
+                                        <i class="fas fa-user-lock me-1"></i> Já sou Licenciado / Acessar Downloads
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- 12. PERGUNTAS FREQUENTES (FAQ) -->
     <section id="faq" class="section-faq">
         <div class="container">
             <div class="text-center max-w-700 mx-auto mb-5">

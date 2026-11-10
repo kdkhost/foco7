@@ -134,6 +134,11 @@
                     <i class="fab fa-whatsapp text-success me-1"></i> WhatsApp Flutuante
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link fw-semibold" id="estetica-tab" data-bs-toggle="tab" data-bs-target="#tab-estetica" type="button">
+                    <i class="fas fa-spray-can-sparkles text-danger me-1"></i> Estética Automotiva (Em Breve)
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -1675,6 +1680,179 @@
                         <div class="card-footer bg-body-tertiary p-3 text-end">
                             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
                                 <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DO WHATSAPP & CANAIS
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA 12: ESTÉTICA AUTOMOTIVA & MODO "EM BREVE" -->
+            <div class="tab-pane fade" id="tab-estetica" role="tabpanel">
+                <form action="{{ route('admin.cms.salvar_configs') }}" method="POST" class="ajax-form keep-data">
+                    @csrf
+                    <div class="card border mb-4">
+                        <div class="card-header bg-body-tertiary d-flex flex-wrap justify-content-between align-items-center py-3 gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-danger-subtle text-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                    <i class="fas fa-spray-can-sparkles"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-body">Estética Automotiva &amp; Modo "Em Breve" na Landing Page</h5>
+                                    <small class="text-secondary">Defina o selo no menu superior, títulos e o box de lançamento da seção #estetica no site.</small>
+                                </div>
+                            </div>
+                            <div class="ms-auto d-flex align-items-center gap-2">
+                                @if(($settings['estetica_em_breve_ativo'] ?? '1') == '1')
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill shadow-xs">
+                                        <i class="fas fa-clock me-1"></i> Modo "Em Breve" ATIVO
+                                    </span>
+                                @else
+                                    <span class="badge bg-success px-3 py-2 rounded-pill shadow-xs">
+                                        <i class="fas fa-check-circle me-1"></i> Serviços Abertos no Site
+                                    </span>
+                                @endif
+                                <a href="{{ route('admin.estetica.index') }}" class="btn btn-sm btn-outline-danger fw-bold">
+                                    <i class="fas fa-car-side me-1"></i> Gerenciar Pacotes
+                                </a>
+                                <a href="{{ url('/#estetica') }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <!-- 1. CONTROLES MESTRE: STATUS "EM BREVE" E BADGE DA NAVBAR -->
+                            <div class="row g-3 p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25 mb-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center justify-content-between h-100 p-2">
+                                        <div>
+                                            <label class="form-check-label fw-bold text-danger d-block mb-1" for="cms_estetica_em_breve_ativo">
+                                                <i class="fas fa-toggle-on me-1"></i> Ativar Modo "Em Breve" na Estética Automotiva
+                                            </label>
+                                            <small class="text-secondary d-block">
+                                                Exibe o showcase de lançamento com lista de espera no lugar do alerta simples quando não houver serviços ou como prévia oficial.
+                                            </small>
+                                        </div>
+                                        <div class="form-check form-switch fs-4 ms-3">
+                                            <input type="hidden" name="estetica_em_breve_ativo" value="0">
+                                            <input class="form-check-input" type="checkbox" name="estetica_em_breve_ativo" value="1" id="cms_estetica_em_breve_ativo" {{ ($settings['estetica_em_breve_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 border-start-md">
+                                    <div class="d-flex align-items-center justify-content-between h-100 p-2">
+                                        <div>
+                                            <label class="form-check-label fw-bold text-dark d-block mb-1" for="cms_estetica_navbar_badge_ativo">
+                                                <i class="fas fa-tag me-1 text-danger"></i> Exibir Selo / Badge no Menu (Navbar &amp; Gaveta)
+                                            </label>
+                                            <small class="text-secondary d-block">
+                                                Mostra uma etiqueta chamativa ao lado do link "Estética" no menu de navegação.
+                                            </small>
+                                        </div>
+                                        <div class="form-check form-switch fs-4 ms-3">
+                                            <input type="hidden" name="estetica_navbar_badge_ativo" value="0">
+                                            <input class="form-check-input" type="checkbox" name="estetica_navbar_badge_ativo" value="1" id="cms_estetica_navbar_badge_ativo" {{ ($settings['estetica_navbar_badge_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. IDENTIFICAÇÃO E TEXTOS DA SEÇÃO NO SITE -->
+                            <h6 class="fw-bold text-danger border-bottom pb-2 mb-3">
+                                <i class="fas fa-heading me-1"></i> Textos Principais do Cabeçalho da Seção (#estetica)
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Texto do Selo no Menu (Navbar)</label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-danger text-white"><i class="fas fa-tag"></i></span>
+                                        <input type="text" name="estetica_navbar_badge" class="form-control" value="{{ $settings['estetica_navbar_badge'] ?? 'Em Breve' }}" placeholder="ex: Em Breve, Novidade">
+                                    </div>
+                                    <small class="text-secondary" style="font-size: 0.73rem;">Aparece ao lado de "🧴 Estética" no topo do site.</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge Superior da Seção</label>
+                                    <input type="text" name="secao_estetica_badge" class="form-control form-control-sm" value="{{ $settings['secao_estetica_badge'] ?? 'Cuidado & Valorização Automotiva' }}" placeholder="ex: Cuidado & Valorização Automotiva">
+                                    <small class="text-secondary" style="font-size: 0.73rem;">Pílula em destaque acima do título da seção.</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Título Principal da Seção</label>
+                                    <input type="text" name="secao_estetica_titulo" class="form-control form-control-sm" value="{{ $settings['secao_estetica_titulo'] ?? 'Estética Automotiva Premium FOCO7' }}" placeholder="ex: Estética Automotiva Premium FOCO7">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Subtítulo da Seção</label>
+                                    <textarea name="secao_estetica_subtitulo" class="form-control form-control-sm" rows="2" placeholder="Subtítulo chamativo">{{ $settings['secao_estetica_subtitulo'] ?? 'Cuidado minucioso, para proteção de pintura e detalhamento automotivo de alta precisão para o seu veículo.' }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Descrição Complementar da Seção</label>
+                                    <textarea name="secao_estetica_descricao" class="form-control form-control-sm" rows="2" placeholder="Descrição dos produtos e serviços">{{ $settings['secao_estetica_descricao'] ?? 'Serviços especializados com produtos nobres, vitrificação técnica, polimento com brilho espelhado e higienização profunda.' }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- 3. BOX DE LANÇAMENTO "EM BREVE" (CARD DE DESTAQUE NO SITE) -->
+                            <h6 class="fw-bold text-danger border-bottom pb-2 mb-3">
+                                <i class="fas fa-bullhorn me-1"></i> Conteúdo do Box de Lançamento "Em Breve" (Exibido aos Visitantes)
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Badge / Tag do Box</label>
+                                    <input type="text" name="estetica_em_breve_badge" class="form-control form-control-sm" value="{{ $settings['estetica_em_breve_badge'] ?? 'EM BREVE • LANÇAMENTO OFICIAL' }}" placeholder="ex: EM BREVE • LANÇAMENTO OFICIAL">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Título do Box de Lançamento</label>
+                                    <input type="text" name="estetica_em_breve_titulo" class="form-control form-control-sm" value="{{ $settings['estetica_em_breve_titulo'] ?? 'Novos Pacotes de Estética Automotiva Sendo Preparados!' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Previsão de Lançamento / Inauguração</label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text"><i class="fas fa-calendar-alt text-danger"></i></span>
+                                        <input type="text" name="estetica_em_breve_previsao" class="form-control" value="{{ $settings['estetica_em_breve_previsao'] ?? 'Inauguração em Breve' }}" placeholder="ex: Inauguração em Breve, Dezembro/2026">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Mensagem Explicativa / Descrição do Lançamento</label>
+                                    <textarea name="estetica_em_breve_mensagem" class="form-control form-control-sm" rows="3">{{ $settings['estetica_em_breve_mensagem'] ?? 'Novos pacotes de estética automotiva sendo adicionados pela equipe. Em breve você poderá agendar vitrificação técnica, polimento espelhado, higienização profunda e proteção de pintura direto pelo site!' }}</textarea>
+                                    <small class="text-secondary" style="font-size: 0.73rem;">Este é o texto que substitui o alerta simples que aparecia na tela quando ainda não há pacotes publicados.</small>
+                                </div>
+                            </div>
+
+                            <!-- 4. BOTÃO WHATSAPP / LISTA VIP DE ESPERA -->
+                            <div class="p-3 bg-body-secondary rounded-3 border border-secondary border-opacity-25">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-success">
+                                            <i class="fab fa-whatsapp me-1"></i> Botão de Ação: Lista VIP de Espera via WhatsApp
+                                        </h6>
+                                        <small class="text-secondary">Permite que interessados cliquem no botão para entrar na lista de espera ou solicitar novidades no WhatsApp.</small>
+                                    </div>
+                                    <div class="form-check form-switch fs-5 ms-3">
+                                        <input type="hidden" name="estetica_btn_whatsapp_ativo" value="0">
+                                        <input class="form-check-input" type="checkbox" name="estetica_btn_whatsapp_ativo" value="1" id="cms_estetica_btn_whatsapp_ativo" {{ ($settings['estetica_btn_whatsapp_ativo'] ?? '1') == '1' ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Texto do Botão no Site</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-success text-white"><i class="fab fa-whatsapp"></i></span>
+                                            <input type="text" name="estetica_btn_whatsapp_texto" class="form-control" value="{{ $settings['estetica_btn_whatsapp_texto'] ?? 'Entrar na Lista VIP de Espera via WhatsApp' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label class="form-label small fw-bold">Mensagem Pré-configurada ao Iniciar Conversa</label>
+                                        <input type="text" name="estetica_whatsapp_mensagem" class="form-control form-control-sm" value="{{ $settings['estetica_whatsapp_mensagem'] ?? 'Olá! Gostaria de receber novidades e entrar na lista VIP para os serviços de Estética Automotiva da Foco 7.' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-body-tertiary p-3 d-flex justify-content-between align-items-center">
+                            <a href="{{ url('/#estetica') }}" target="_blank" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye me-1"></i> Visualizar no Site
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
+                                <i class="fas fa-save me-1"></i> SALVAR CONFIGURAÇÕES DA ESTÉTICA &amp; MODO EM BREVE
                             </button>
                         </div>
                     </div>

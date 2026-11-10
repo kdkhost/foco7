@@ -29,6 +29,11 @@
                     <i class="fas fa-clock-rotate-left text-danger me-2"></i> Régua de Cobrança & Mensalidades
                 </button>
             </li>
+            <li class="nav-item">
+                <a class="nav-link fw-semibold text-success" href="{{ route('admin.whatsapp.index') }}">
+                    <i class="fab fa-whatsapp me-2"></i> WhatsApp Cobranças (Evolution API Go)
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -797,6 +802,9 @@
                                         <input class="form-check-input" type="checkbox" name="regua_enviar_whatsapp" value="1" id="regua_enviar_whatsapp" {{ $configs['regua_enviar_whatsapp'] ? 'checked' : '' }}>
                                         <label class="form-check-label small" for="regua_enviar_whatsapp">Habilitar WhatsApp</label>
                                     </div>
+                                    <a href="{{ route('admin.whatsapp.index') }}" class="btn btn-outline-success btn-xs mt-1" style="font-size: 0.72rem;">
+                                        <i class="fab fa-whatsapp me-1"></i> Ajustar Evolution API
+                                    </a>
                                 </div>
                             </div>
                         </div>

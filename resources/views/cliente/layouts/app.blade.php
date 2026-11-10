@@ -133,6 +133,11 @@
                                     <i class="fas fa-file-invoice-dollar me-2 text-danger"></i> Minhas Faturas
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('cliente.licenca.*') ? 'active' : '' }}" href="{{ route('cliente.licenca.index') }}">
+                                    <i class="fas fa-server me-2 text-warning"></i> Minha Licença (Servidor)
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="document.getElementById('formLogout').submit();">
@@ -182,6 +187,20 @@
                             <a href="{{ route('cliente.faturas.index') }}" class="nav-link {{ request()->routeIs('cliente.faturas.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                 <p>Minhas Faturas</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header text-uppercase small text-secondary mt-3">Licenciamento &amp; Servidor</li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('cliente.licenca.index') }}" class="nav-link {{ request()->routeIs('cliente.licenca.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-server text-warning"></i>
+                                <p>
+                                    Minha Licença FOCO 7
+                                    @if(auth()->user()->licencaAtiva())
+                                        <span class="badge bg-success ms-auto" style="font-size: 0.65rem;">Ativa</span>
+                                    @endif
+                                </p>
                             </a>
                         </li>
 
