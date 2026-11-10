@@ -1,7 +1,7 @@
-fix(whatsapp): prefixo api/ automatico para endpoints evolution go, deteccao de conexao e correcao do erro 405
+feat(whatsapp): integracao oficial token bearer sanctum e suporte a rotas api/
 
-- Resolucao automatica de prefixo /api/ nas rotas da Evolution API Go (corrige erro 'The POST method is not supported for route instance/create')
-- Suporte a endpoints REST sob /api/instance/create, /api/instance/connect, /api/instance/disconnect e /api/message/sendText
-- Tratamento gracioso quando a instancia ja existe no servidor
-- Deteccao de conexao ativa via instance.state com confirmacao imediata no modal e no badge
-- Métodos de desconexao e logout com DELETE e GET para total conformidade
+- Configuracao do token oficial Bearer 8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7 como padrao do sistema
+- Envio do cabecalho Authorization: Bearer nativo em todas as requisicoes HTTP da Evolution API
+- Resolucao automatica de rotas com prefixo /api/ (/api/instance/create, /api/instance/connect, /api/message/sendText)
+- Deteccao de conexao instantanea via instance.state: open
+- Suporte a multiplas instancias com custo recorrente de R$ 60,00/mes

@@ -931,8 +931,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Token da Instância (API Key)</label>
-                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" value="{{ (!empty($configs['apikey']) && !str_contains($configs['apikey'], '•')) ? $configs['apikey'] : 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d' }}" placeholder="Chave de segurança da instância">
+                    <label class="form-label fw-semibold">Token da Instância (API Key / Laravel Sanctum Token)</label>
+                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" value="{{ (!empty($configs['apikey']) && !str_contains($configs['apikey'], '•')) ? $configs['apikey'] : '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7' }}" placeholder="Chave de segurança da instância">
                 </div>
 
                 <div class="alert alert-info border-info small mb-0">

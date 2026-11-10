@@ -145,7 +145,7 @@ class EvolutionApiService
     {
         $key = trim((string) CmsSetting::get('evolution_global_apikey', ''));
         if (empty($key) || str_contains($key, '•')) {
-            return 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
+            return self::getInstanceApiKey();
         }
 
         return $key;
@@ -165,13 +165,13 @@ class EvolutionApiService
     }
 
     /**
-     * Retorna o Token / API Key específico da instância
+     * Retorna o Token / API Key específico da instância (suporte nativo a Laravel Sanctum e tokens padrão)
      */
     public static function getInstanceApiKey(): string
     {
         $key = trim((string) CmsSetting::get('evolution_apikey', ''));
         if (empty($key) || str_contains($key, '•')) {
-            return 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+            return '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7';
         }
 
         return $key;
