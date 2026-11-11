@@ -2705,11 +2705,11 @@
                     window.foco7Notify.success(res.message || 'Esta instância já está conectada!');
                     return;
                 }
-                if (res.qrcode) {
+                if (ehQrBase64Valido(res.qrcode)) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
                 } else {
-                    verificarSeConectou();
+                    recarregarQrCode(false);
                 }
             },
             error: function (xhr) {
@@ -2721,8 +2721,19 @@
         });
     }
 
+    function ehQrBase64Valido(str) {
+        if (!str || typeof str !== 'string') return false;
+        var s = str.trim();
+        if (s.length < 100 || s.startsWith('http://') || s.startsWith('https://')) return false;
+        return s.startsWith('data:image/') || s.startsWith('iVBORw0KGgo');
+    }
+
     function exibirQrCode(base64) {
-        var src = base64;
+        if (!ehQrBase64Valido(base64)) {
+            recarregarQrCode(false);
+            return;
+        }
+        var src = base64.trim();
         if (!src.startsWith('data:image')) {
             src = 'data:image/png;base64,' + src;
         }
@@ -2746,11 +2757,11 @@
             type: 'GET',
             data: {
                 instancia: instanciaModalAtual,
-                forcar_qr: 1
+                forcar_qr: 0
             },
             dataType: 'json',
             success: function (res) {
-                if (res.qrcode) {
+                if (ehQrBase64Valido(res.qrcode)) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
                 } else {
@@ -2865,7 +2876,7 @@
                     }
                     $('#qrConectadoBox').show();
                     verificarStatusApi(false);
-                } else if (res.qrcode) {
+                } else if (ehQrBase64Valido(res.qrcode)) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
                 } else {
@@ -3122,12 +3133,21 @@
 
     function preencherDadosFranqueadoModalQr(f) {
         if (!f || typeof f !== 'object') return;
-        $('#txtModalQrFranqueadoNome').text(f.nome_franqueado || 'Administrador / Operação Local');
-        $('#txtModalQrFranqueadoEmpresa').text(f.empresa_franqueado || f.tipo_label || 'Sistema FOCO 7');
-        $('#badgeModalQrFranqueadoTipo').text(f.tipo_label || 'Franqueado');
-        $('#txtModalQrFranqueadoTelefone').text(f.telefone_franqueado || 'Não informado');
-        $('#txtModalQrFranqueadoEmail').text(f.email_franqueado || 'Não informado');
-        $('#txtModalQrFranqueadoLicenca').text(f.chave_licenca || f.dominio_franqueado || 'Painel Principal');
+        var nome = f.nome_franqueado || 'Administrador / Operação Local';
+        var empresa = f.empresa_franqueado || f.tipo_label || 'Sistema FOCO 7';
+        var tipo = f.tipo_label || 'Franqueado / Titular';
+        var tel = f.telefone_franqueado || 'Não informado';
+        var email = f.email_franqueado || 'Não informado';
+        var domLic = f.chave_licenca || f.dominio_franqueado || 'Painel Principal';
+        var venc = f.data_vencimento_fmt || '-';
+
+        $('#txtQrFranqueadoNome, #txtModalQrFranqueadoNome').text(nome);
+        $('#txtQrFranqueadoEmpresa, #txtModalQrFranqueadoEmpresa').text(empresa);
+        $('#txtQrFranqueadoTipoBadge, #badgeModalQrFranqueadoTipo').html('<i class="fas fa-user-tie me-1"></i> ' + tipo);
+        $('#txtQrFranqueadoTelefone, #txtModalQrFranqueadoTelefone').text(tel);
+        $('#txtModalQrFranqueadoEmail').text(email);
+        $('#txtQrFranqueadoDominio, #txtModalQrFranqueadoLicenca').text(domLic);
+        $('#txtQrFranqueadoVencimento').text(venc);
         $('#boxInfoFranqueadoModalQr').show();
     }
 

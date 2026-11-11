@@ -1923,33 +1923,73 @@ class EvolutionApiService
     }
 
     /**
+     * Verifica se a string retornada é realmente uma imagem QR Code Base64 válida (e não uma URL wa.me ou texto bruto)
+     */
+    public static function ehImagemQrCodeBase64Valida(?string $qr): bool
+    {
+        if (! is_string($qr) || strlen(trim($qr)) < 100) {
+            return false;
+        }
+        $qr = trim($qr);
+        if (str_starts_with($qr, 'http://') || str_starts_with($qr, 'https://')) {
+            return false;
+        }
+
+        return str_starts_with($qr, 'data:image/') || str_starts_with($qr, 'iVBORw0KGgo');
+    }
+
+    /**
+     * Reinicia de forma limpa a sessão da instância no servidor Evolution Go mantendo o mesmo nome e token.
+     * Resolve definitivamente o caso em que o Evolution Go mantém um JID órfão com "client disconnected"
+     * e se recusa a gerar novo QR Code após desconexão.
+     */
+    public static function resetarInstanciaNoServidorMantendoToken(string $instName, ?string $token = null): string
+    {
+        $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
+
+        // 1. Tenta logout e disconnect padrão
+        self::request('DELETE', 'instance/logout', [], false, 8, $tok);
+        self::request('POST', 'instance/disconnect', [], false, 8, $tok);
+
+        // 2. Consulta GET /instance/all para obter o UUID da instância e verificar se o JID ficou preso ou desconectado
+        $uuid = self::obterUuidInstancia($instName);
+        if (! empty($uuid)) {
+            self::request('DELETE', "instance/delete/{$uuid}", [], true, 12);
+            usleep(250000);
+        }
+
+        // 3. Recria a instância com exatamente o mesmo nome e token (zera o JID órfão no banco do Evolution Go)
+        $cr = self::criarInstancia($instName, $tok);
+        if ($cr['success']) {
+            $novoTok = $cr['data']['token'] ?? ($cr['data']['data']['token'] ?? ($cr['data']['instance']['token'] ?? $tok));
+            if (! empty($novoTok)) {
+                $tok = (string) $novoTok;
+            }
+        }
+
+        return $tok;
+    }
+
+    /**
      * Desconecta e limpa toda a sessão de uma instância específica no servidor Evolution Go e no sistema local
      */
     public static function desconectarInstanciaEspecifica(string $instName, ?string $token = null): array
     {
         $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
 
-        // 1. Executa DELETE /instance/logout para apagar a sessão vinculada e limpar o JID no Evolution Go
-        $resLogout = self::request('DELETE', 'instance/logout', ['instance' => $instName], false, 12, $tok);
-        if (! $resLogout['success']) {
-            self::request('DELETE', "instance/logout/{$instName}", [], false, 10, $tok);
-        }
+        // 1. Limpa sessão e remove eventual JID órfão mantendo o mesmo nome e token da instância no Evolution Go
+        $tok = self::resetarInstanciaNoServidorMantendoToken($instName, $tok);
 
-        // 2. Executa POST /instance/disconnect para encerrar o socket ativo
-        $resDisc = self::request('POST', 'instance/disconnect', ['instance' => $instName], false, 12, $tok);
-        if (! $resDisc['success']) {
-            self::request('POST', "instance/disconnect/{$instName}", [], false, 10, $tok);
-        }
-
-        // 3. Limpa todos os dados locais da instância
+        // 2. Limpa todos os dados locais da instância
         self::limparDadosInstanciaLocal($instName);
 
         return [
             'success' => true,
             'instancia' => $instName,
+            'token' => $tok,
             'limpo' => true,
             'message' => "Instância '{$instName}' desconectada e todos os dados da sessão foram limpos com sucesso.",
-            'data' => $resLogout['data'] ?? ($resDisc['data'] ?? []),
+            'data' => [],
         ];
     }
 
@@ -2455,14 +2495,21 @@ class EvolutionApiService
             }
         }
 
+        // 2.1 Se a instância estava desconectada mas o POST /instance/connect retornou um JID órfão antigo,
+        // o Evolution Go não gera QR Code ("client disconnected"). Limpamos o JID órfão imediatamente mantendo o mesmo nome e token!
+        $jidRetornado = (string) ($res['data']['data']['jid'] ?? ($res['data']['jid'] ?? ''));
+        if (! empty($jidRetornado)) {
+            $tokenReal = self::resetarInstanciaNoServidorMantendoToken($instName, $tokenReal);
+            $res = self::request('POST', 'instance/connect', $payload, false, 20, $tokenReal);
+        }
+
         // 3. Aguarda o whatsmeow gerar o QR Code e faz até 4 tentativas rápidas (650ms) em GET /instance/qr
         $qrcode = self::obterQrCodeComRetry($instName, $tokenReal, 4, 650000);
 
-        // 4. Se ainda não gerou QR Code (ex: sessão anterior presa no whatsmeow), limpa com DELETE /instance/logout e reconecta!
-        if (empty($qrcode)) {
-            self::request('DELETE', 'instance/logout', [], false, 10, $tokenReal);
-            self::request('POST', 'instance/disconnect', [], false, 10, $tokenReal);
-            usleep(400000);
+        // 4. Se ainda não gerou QR Code válido, executa o reset completo da sessão mantendo o mesmo nome/token e reconecta!
+        if (! self::ehImagemQrCodeBase64Valida($qrcode)) {
+            $tokenReal = self::resetarInstanciaNoServidorMantendoToken($instName, $tokenReal);
+            usleep(300000);
             $res = self::request('POST', 'instance/connect', $payload, false, 20, $tokenReal);
             $qrcode = self::obterQrCodeComRetry($instName, $tokenReal, 4, 700000);
         }
@@ -2478,12 +2525,18 @@ class EvolutionApiService
             $res['data'] = [];
         }
 
-        if (! empty($qrcode)) {
+        if (self::ehImagemQrCodeBase64Valida($qrcode)) {
+            if (! str_starts_with($qrcode, 'data:image/')) {
+                $qrcode = 'data:image/png;base64,'.$qrcode;
+            }
             $res['success'] = true;
             $res['qrcode'] = $qrcode;
             $res['data']['qrcode'] = ['base64' => $qrcode];
             $res['data']['base64'] = $qrcode;
             CmsSetting::set('evolution_last_qrcode', $qrcode, 'whatsapp');
+        } else {
+            $qrcode = null;
+            $res['qrcode'] = null;
         }
 
         if (! empty($pairingCode)) {
@@ -2518,8 +2571,8 @@ class EvolutionApiService
                 ?? ($qrRes['data']['Qrcode']
                 ?? ($qrRes['data']['data']['Qrcode'] ?? null))));
 
-            if (is_string($qr) && ! empty($qr)) {
-                return $qr;
+            if (self::ehImagemQrCodeBase64Valida($qr)) {
+                return str_starts_with($qr, 'data:image/') ? $qr : 'data:image/png;base64,'.$qr;
             }
         }
 
@@ -2595,13 +2648,15 @@ class EvolutionApiService
 
                     // Se não está conectado mas tem QR Code gerado na instância, está conectando
                     if (! empty($item['qrcode']) || in_array($statusRaw, ['connecting', 'conectando'])) {
+                        $qrImg = self::ehImagemQrCodeBase64Valida($item['qrcode'] ?? null) ? $item['qrcode'] : null;
+
                         return [
                             'success' => true,
                             'status' => 200,
                             'conectado' => false,
                             'estado' => 'conectando',
                             'owner' => $owner,
-                            'qrcode' => $item['qrcode'] ?? null,
+                            'qrcode' => $qrImg,
                             'data' => $item,
                             'error' => null,
                         ];
@@ -2667,7 +2722,10 @@ class EvolutionApiService
         if ($res['success']) {
             $d = $res['data']['data'] ?? ($res['data'] ?? []);
             $qr = $d['Qrcode'] ?? ($d['qrcode']['base64'] ?? ($d['qrcode'] ?? ($d['base64'] ?? null)));
-            if (is_string($qr) && ! empty($qr)) {
+            if (self::ehImagemQrCodeBase64Valida($qr)) {
+                if (! str_starts_with($qr, 'data:image/')) {
+                    $qr = 'data:image/png;base64,'.$qr;
+                }
                 $res['qrcode'] = $qr;
                 $res['data']['base64'] = $qr;
                 $res['data']['qrcode'] = ['base64' => $qr];
@@ -2689,19 +2747,24 @@ class EvolutionApiService
             ];
         }
 
-        // 2. Verifica se o QR Code está presente em GET /instance/all
+        // 2. Verifica se o QR Code em Base64 está presente em GET /instance/all
+        // ATENÇÃO: Na Evolution Go, $item['qrcode'] em /instance/all pode conter apenas a URL wa.me/settings/linked_devices
+        // e não uma imagem Base64. Só aceitamos se for uma imagem Base64 real!
         $allRes = self::listarInstancias();
         if ($allRes['success']) {
             foreach (self::extrairListaInstancias($allRes['data'] ?? []) as $item) {
                 $nome = $item['name'] ?? '';
-                if (strtolower((string) $nome) === strtolower($instName) && ! empty($item['qrcode'])) {
+                $qrCandidato = $item['qrcode'] ?? null;
+                if (strtolower((string) $nome) === strtolower($instName) && self::ehImagemQrCodeBase64Valida($qrCandidato)) {
+                    $qrValido = str_starts_with($qrCandidato, 'data:image/') ? $qrCandidato : 'data:image/png;base64,'.$qrCandidato;
+
                     return [
                         'success' => true,
                         'status' => 200,
-                        'qrcode' => $item['qrcode'],
+                        'qrcode' => $qrValido,
                         'data' => [
-                            'base64' => $item['qrcode'],
-                            'qrcode' => ['base64' => $item['qrcode']],
+                            'base64' => $qrValido,
+                            'qrcode' => ['base64' => $qrValido],
                         ],
                         'error' => null,
                     ];
@@ -2733,12 +2796,23 @@ class EvolutionApiService
 
         // 1. Garante que o socket da instância está aberto para pareamento na Evolution Go
         if ($garantirConnect) {
-            self::request('POST', 'instance/connect', [
+            $conRes = self::request('POST', 'instance/connect', [
                 'phone' => $num,
                 'immediate' => false,
                 'webhookUrl' => url('/webhook/evolution'),
                 'subscribe' => $eventos,
             ], false, 15, $tok);
+
+            $jidPreso = (string) ($conRes['data']['data']['jid'] ?? ($conRes['data']['jid'] ?? ''));
+            if (! empty($jidPreso)) {
+                $tok = self::resetarInstanciaNoServidorMantendoToken($inst, $tok);
+                self::request('POST', 'instance/connect', [
+                    'phone' => $num,
+                    'immediate' => false,
+                    'webhookUrl' => url('/webhook/evolution'),
+                    'subscribe' => $eventos,
+                ], false, 15, $tok);
+            }
             usleep(600000);
         }
 
@@ -2750,10 +2824,9 @@ class EvolutionApiService
         // 2. Chama POST /instance/pair
         $res = self::request('POST', 'instance/pair', $payload, false, 20, $tok);
 
-        // Se falhou porque havia uma sessão antiga travada, limpa com logout, reconecta e pede o código novamente
+        // Se falhou porque havia uma sessão antiga travada, reseta mantendo o mesmo nome/token, reconecta e pede o código novamente
         if (! $res['success']) {
-            self::request('DELETE', 'instance/logout', [], false, 10, $tok);
-            self::request('POST', 'instance/disconnect', [], false, 10, $tok);
+            $tok = self::resetarInstanciaNoServidorMantendoToken($inst, $tok);
             usleep(400000);
             self::request('POST', 'instance/connect', [
                 'phone' => $num,

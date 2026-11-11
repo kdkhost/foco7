@@ -458,7 +458,8 @@ class WhatsappCobrancaController extends Controller
                     // Tenta buscar o QR Code
                     $qrRes = EvolutionApiService::obterQrCode();
                     if ($qrRes['success']) {
-                        $qrcodeBase64 = $qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null);
+                        $cand = $qrRes['qrcode'] ?? ($qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null));
+                        $qrcodeBase64 = EvolutionApiService::ehImagemQrCodeBase64Valida($cand) ? $cand : null;
                     }
                 } else {
                     $estado = 'desconectado';
@@ -543,12 +544,17 @@ class WhatsappCobrancaController extends Controller
                 ]);
             }
 
-            if (! $qrcode) {
-                $qrcode = $data['qrcode']['base64'] ?? ($data['base64'] ?? ($data['Qrcode'] ?? null));
+            if (! EvolutionApiService::ehImagemQrCodeBase64Valida($qrcode)) {
+                $candidato = $data['qrcode']['base64'] ?? ($data['base64'] ?? ($data['Qrcode'] ?? null));
+                $qrcode = EvolutionApiService::ehImagemQrCodeBase64Valida($candidato) ? $candidato : null;
             }
 
-            if (! $qrcode) {
+            if (! EvolutionApiService::ehImagemQrCodeBase64Valida($qrcode)) {
                 $qrcode = EvolutionApiService::obterQrCodeComRetry($instanciaNome, $res['token'] ?? null, 3, 600000);
+            }
+
+            if (EvolutionApiService::ehImagemQrCodeBase64Valida($qrcode) && ! str_starts_with($qrcode, 'data:image/')) {
+                $qrcode = 'data:image/png;base64,'.$qrcode;
             }
 
             return response()->json([
@@ -635,32 +641,35 @@ class WhatsappCobrancaController extends Controller
     public function obterQrCode(Request $request)
     {
         $instancia = trim((string) $request->input('instancia', ''));
-        $forcarNovo = $request->boolean('forcar_novo', false);
+        $forcarNovo = $request->boolean('forcar_novo', false) || $request->boolean('forcar_qr', false);
 
         if ($forcarNovo) {
             $connRes = EvolutionApiService::conectar(url('/webhook/evolution'), ['ALL'], true, null, ! empty($instancia) ? $instancia : null);
             $qr = $connRes['qrcode'] ?? null;
-            if ($qr) {
+            if (EvolutionApiService::ehImagemQrCodeBase64Valida($qr)) {
                 return response()->json([
                     'success' => true,
                     'qrcode' => $qr,
                     'instancia' => $connRes['instancia'] ?? ($instancia ?: EvolutionApiService::getInstanceName()),
+                    'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia(! empty($instancia) ? $instancia : null),
                     'data' => $connRes['data'] ?? [],
                 ]);
             }
         }
 
         $qrRes = EvolutionApiService::obterQrCode(! empty($instancia) ? $instancia : null);
-        $qrcode = $qrRes['qrcode'] ?? ($qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? ($qrRes['data']['Qrcode'] ?? null)));
+        $cand = $qrRes['qrcode'] ?? ($qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? ($qrRes['data']['Qrcode'] ?? null)));
+        $qrcode = EvolutionApiService::ehImagemQrCodeBase64Valida($cand) ? $cand : null;
 
         if (! $qrcode && empty($qrRes['conectado'])) {
             $connRes = EvolutionApiService::conectar(url('/webhook/evolution'), ['ALL'], false, null, ! empty($instancia) ? $instancia : null);
-            $qrcode = $connRes['qrcode'] ?? null;
+            $qrcode = EvolutionApiService::ehImagemQrCodeBase64Valida($connRes['qrcode'] ?? null) ? $connRes['qrcode'] : null;
             if (! empty($connRes['conectado'])) {
                 return response()->json([
                     'success' => true,
                     'conectado' => true,
                     'qrcode' => null,
+                    'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia(! empty($instancia) ? $instancia : null),
                     'data' => $connRes['data'] ?? [],
                 ]);
             }
@@ -671,6 +680,7 @@ class WhatsappCobrancaController extends Controller
                 'success' => true,
                 'conectado' => ! empty($qrRes['conectado']),
                 'qrcode' => $qrcode,
+                'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia(! empty($instancia) ? $instancia : null),
                 'data' => $qrRes['data'] ?? [],
             ]);
         }
