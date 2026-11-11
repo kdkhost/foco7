@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $titulo ?? 'Foco 7 | Site em Manutenção' }}</title>
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
@@ -245,22 +246,27 @@
                         Swal.showValidationMessage('Por favor, informe o token ou senha.');
                         return false;
                     }
+                    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    var csrfVal = csrfMeta ? csrfMeta.getAttribute('content') : '{{ csrf_token() }}';
+
                     return fetch('{{ route("site.manutencao.bypass") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfVal
                         },
-                        body: JSON.stringify({ token: token.trim() })
+                        body: JSON.stringify({ token: token.trim(), _token: csrfVal })
                     })
                     .then(response => {
                         if (!response.ok) {
-                            return response.json().then(err => { throw new Error(err.message || 'Token inválido'); });
+                            return response.json().then(err => { throw new Error(err.message || 'Token ou senha inválida.'); });
                         }
                         return response.json();
                     })
                     .catch(error => {
-                        Swal.showValidationMessage(error.message || 'Falha ao autorizar dispositivo.');
+                        // Se falhou no fetch (ex: bloqueio de cabeçalhos/WAF), tenta bypass direto via GET
+                        window.location.href = '{{ url("/manutencao/bypass") }}/' + encodeURIComponent(token.trim());
                     });
                 },
                 allowOutsideClick: () => !Swal.isLoading()

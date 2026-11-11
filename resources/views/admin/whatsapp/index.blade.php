@@ -1,11 +1,68 @@
 @extends('admin.layouts.app')
 
-@section('title', 'WhatsApp Cobranças & Evolution API')
+@section('title', 'WhatsApp Evolution Go & Cobranças PIX')
 @section('page_title', 'WhatsApp Cobranças & Evolution API Go (v3.0)')
-@section('page_description', 'Gerencie instâncias do WhatsApp, conexões via QR Code e automação de cobranças com PIX nativo e botões interativos.')
+@section('page_description', 'Gerencie instâncias dedicadas, cobranças recorrentes PIX (R$ 60/mês), suspensão automática e mensageria inteligente.')
 
 @section('styles')
 <style>
+    /* Estilos Modernos & Microinterações */
+    .pulse-online {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #198754;
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+        animation: pulseGreen 1.8s infinite;
+    }
+    .pulse-offline {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #dc3545;
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        animation: pulseRed 1.8s infinite;
+    }
+    .pulse-warning {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ffc107;
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        animation: pulseYellow 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(25, 135, 84, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    }
+    @keyframes pulseRed {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    @keyframes pulseYellow {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    }
+
+    .kpi-card {
+        border-radius: 14px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="dark"] .kpi-card {
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
     .tarja-dev-bloqueado {
         letter-spacing: 2px !important;
         font-weight: 700 !important;
@@ -13,54 +70,332 @@
         color: var(--bs-secondary-color) !important;
         cursor: not-allowed;
     }
+
+    /* Simulador de Smartphone WhatsApp */
+    .smartphone-mockup {
+        width: 100%;
+        max-width: 360px;
+        height: 600px;
+        background: #0b141a;
+        border: 10px solid #2a2f32;
+        border-radius: 36px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        margin: 0 auto;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    .phone-notch {
+        width: 130px;
+        height: 20px;
+        background: #2a2f32;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        margin: 0 auto;
+        z-index: 10;
+    }
+    .phone-header {
+        background: #202c33;
+        color: #e9edef;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #2a3942;
+    }
+    .phone-body {
+        flex: 1;
+        background-color: #0b141a;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 16px 16px;
+        padding: 14px;
+        overflow-y: auto;
+    }
+    .chat-bubble-wpp {
+        background: #005c4b;
+        color: #e9edef;
+        border-radius: 10px 10px 2px 10px;
+        padding: 10px 12px;
+        max-width: 90%;
+        margin-left: auto;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    .chat-bubble-footer {
+        font-size: 10px;
+        color: rgba(255,255,255,0.6);
+        text-align: right;
+        margin-top: 4px;
+    }
+    .chat-btn-action {
+        background: #202c33;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        color: #53bdeb;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        padding: 8px;
+        margin-top: 6px;
+        border-radius: 6px;
+        display: block;
+        text-decoration: none;
+    }
+    .chat-btn-action:hover {
+        background: #2a3942;
+        color: #70c7ed;
+    }
+
+    /* Timeline Régua */
+    .timeline-regua {
+        position: relative;
+        padding-left: 28px;
+    }
+    .timeline-regua::before {
+        content: '';
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: 10px;
+        width: 3px;
+        background: #dee2e6;
+    }
+    [data-bs-theme="dark"] .timeline-regua::before {
+        background: #373b3e;
+    }
+    .timeline-step {
+        position: relative;
+        margin-bottom: 24px;
+    }
+    .timeline-step-icon {
+        position: absolute;
+        left: -28px;
+        top: 2px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--bs-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        z-index: 2;
+    }
+    [data-bs-theme="dark"] .timeline-step-icon {
+        background: #212529;
+    }
+
+    .formato-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid var(--bs-border-color, #dee2e6) !important;
+        background-color: var(--bs-body-bg, #ffffff) !important;
+        border-radius: 10px;
+    }
+    .formato-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(var(--bs-primary-rgb, 217, 0, 0), 0.45) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .formato-card.selecionado {
+        border-color: var(--bs-primary, #d90000) !important;
+        background-color: rgba(var(--bs-primary-rgb, 217, 0, 0), 0.04) !important;
+        box-shadow: 0 4px 16px rgba(var(--bs-primary-rgb, 217, 0, 0), 0.12) !important;
+    }
+    .formato-card.selecionado h6 {
+        color: var(--bs-primary, #d90000) !important;
+        font-weight: 700;
+    }
+    .formato-card.selecionado p,
+    .formato-card.selecionado ul,
+    .formato-card.selecionado li {
+        color: var(--bs-body-color) !important;
+    }
+    [data-bs-theme="dark"] .formato-card {
+        border-color: #373b3e !important;
+        background-color: #1e2227 !important;
+    }
+    [data-bs-theme="dark"] .formato-card.selecionado {
+        border-color: #ff4d4d !important;
+        background-color: rgba(255, 77, 77, 0.12) !important;
+        box-shadow: 0 4px 16px rgba(255, 77, 77, 0.2) !important;
+    }
+    [data-bs-theme="dark"] .formato-card.selecionado p,
+    [data-bs-theme="dark"] .formato-card.selecionado ul,
+    [data-bs-theme="dark"] .formato-card.selecionado li {
+        color: #e9ecef !important;
+    }
+
+    .nav-tabs .nav-link {
+        font-weight: 600;
+        color: var(--bs-secondary-color);
+        padding: 12px 18px;
+        border: none;
+        border-bottom: 3px solid transparent;
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--bs-primary) !important;
+        border-bottom: 3px solid var(--bs-primary) !important;
+        background: transparent !important;
+    }
+
+    /* Personalização e Integração do Summernote BS5 */
+    .note-editor.note-frame {
+        border-radius: 8px !important;
+        border-color: var(--bs-border-color, #dee2e6) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    [data-bs-theme="dark"] .note-editor.note-frame {
+        background-color: #212529 !important;
+        border-color: #373b3e !important;
+        color: #f8f9fa !important;
+    }
+    [data-bs-theme="dark"] .note-editor.note-frame .note-toolbar {
+        background-color: #2c3035 !important;
+        border-bottom-color: #373b3e !important;
+    }
+    [data-bs-theme="dark"] .note-editor.note-frame .note-statusbar {
+        background-color: #2c3035 !important;
+        border-top-color: #373b3e !important;
+    }
+    [data-bs-theme="dark"] .note-editor.note-frame .note-editing-area .note-editable {
+        background-color: #1e2227 !important;
+        color: #e9ecef !important;
+    }
+    [data-bs-theme="dark"] .note-editor .note-btn {
+        background-color: #373b3e !important;
+        border-color: #495057 !important;
+        color: #e9ecef !important;
+    }
+    [data-bs-theme="dark"] .note-editor .note-btn:hover {
+        background-color: #495057 !important;
+        color: #fff !important;
+    }
+    [data-bs-theme="dark"] .note-editor .dropdown-menu {
+        background-color: #2c3035 !important;
+        color: #e9ecef !important;
+        border-color: #373b3e !important;
+    }
+    [data-bs-theme="dark"] .note-editor .dropdown-item {
+        color: #e9ecef !important;
+    }
+    [data-bs-theme="dark"] .note-editor .dropdown-item:hover {
+        background-color: #373b3e !important;
+    }
 </style>
 @endsection
 
 @section('content')
 <div class="row g-4">
 
-    <!-- BANNER DE STATUS DA CONEXÃO & CRIPTOGRAFIA -->
+    <!-- ===================================================================
+         HERO HEADER: STATUS EM TEMPO REAL & CONTROLE RÁPIDO DO CLUSTER
+         =================================================================== -->
     <div class="col-12">
-        <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card shadow-sm border-0 overflow-hidden bg-body">
             <div class="card-body p-4 bg-body-secondary border-bottom">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle p-3 d-flex align-items-center justify-content-center shadow-sm" id="statusIconBox" style="width: 58px; height: 58px; background-color: rgba(25, 135, 84, 0.15);">
-                            <i class="fab fa-whatsapp fs-2 text-success" id="statusIcon"></i>
+                        <div class="rounded-circle p-3 d-flex align-items-center justify-content-center shadow-sm" id="statusIconBox" style="width: 64px; height: 64px; background-color: rgba(25, 135, 84, 0.15);">
+                            <i class="fab fa-whatsapp fs-1 text-success" id="statusIcon"></i>
                         </div>
                         <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h4 class="fw-bold mb-0 text-body">WhatsApp Evolution API Go</h4>
-                                <span class="badge {{ $statusCache === 'conectado' ? 'bg-success' : 'bg-secondary' }} px-3 py-1 fs-6 text-uppercase" id="badgeStatusGeral">
-                                    <i class="fas {{ $statusCache === 'conectado' ? 'fa-check-circle' : 'fa-circle-xmark' }} me-1" id="badgeStatusIcon"></i>
+                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                <h3 class="fw-bold mb-0 text-body">WhatsApp Evolution API Go</h3>
+                                <span class="badge {{ $statusCache === 'conectado' ? 'bg-success' : 'bg-secondary' }} px-3 py-2 fs-6 text-uppercase shadow-xs" id="badgeStatusGeral">
+                                    <span class="{{ $statusCache === 'conectado' ? 'pulse-online' : 'pulse-offline' }} me-2" id="badgeStatusPulse"></span>
                                     <span id="badgeStatusTexto">{{ $statusCache === 'conectado' ? 'Conectado' : ucfirst($statusCache) }}</span>
                                 </span>
-                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary px-2 py-1 small" title="Credenciais criptografadas no banco via AES-256">
+                                <span class="badge {{ $statusCache === 'conectado' ? 'bg-success-subtle text-success border border-success' : 'd-none' }} px-2 py-1 small" id="badgeNumeroConectadoHero">
+                                    <i class="fab fa-whatsapp me-1"></i> <span id="txtNumeroConectadoHero">{{ $numeroConectado ?? '' }}</span>
+                                </span>
+                                <span class="badge bg-dark text-white border border-secondary px-2 py-1 small">
                                     <i class="fas fa-lock text-warning me-1"></i> AES-256 Protegido
+                                </span>
+                                <span class="badge bg-primary text-white px-2 py-1 small" id="badgeLatenciaPing">
+                                    <i class="fas fa-bolt me-1"></i> <span id="txtLatenciaMs">Ping: Testar</span>
                                 </span>
                             </div>
                             <p class="text-secondary small mb-0">
-                                Instância ativa: <strong class="text-body font-monospace" id="txtInstanciaNome">{{ $configs['instance'] }}</strong> | 
-                                Servidor: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="text-primary font-monospace fw-semibold" id="txtApiUrl">{{ $configs['api_url'] }}</a> | 
+                                Instância Principal: <strong class="text-body font-monospace" id="txtInstanciaNome">{{ $configs['instance'] }}</strong> | 
+                                Servidor: <a href="https://api.kdkhost.com.br/docs/llms.txt" target="_blank" class="text-primary font-monospace fw-semibold" id="txtApiUrl">{{ $configs['api_url'] }}</a> | 
                                 Instâncias Extras: <strong class="text-danger">{{ $totalInstanciasExtras ?? 0 }} (R$ {{ number_format($custoTotalRecorrente ?? 0, 2, ',', '.') }}/mês)</strong> | 
-                                Cobranças Disparadas: <strong class="text-primary">{{ $totalCobrancasWpp }}</strong>
+                                Chave PIX Recorrência: 
+                                @if($configs['dev_desbloqueado'])
+                                    <strong class="font-monospace text-primary" id="txtHeroPixRecorrencia">{{ $configs['pix_email_recorrencia'] }}</strong>
+                                @else
+                                    <span class="badge bg-secondary-subtle text-secondary font-monospace" id="txtHeroPixRecorrencia" title="Clique para desbloquear com a Senha Master" style="cursor: pointer;" onclick="solicitarSenhaSegurancaWpp()">
+                                        <i class="fas fa-lock me-1"></i> ••••••••••••••• (Restrito Master)
+                                    </span>
+                                @endif
                             </p>
                         </div>
                     </div>
 
                     <!-- BOTÕES DE AÇÃO RÁPIDA -->
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" id="btnVerificarStatus" onclick="verificarStatusApi(true)">
+                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" id="btnTestarLatencia" onclick="testarLatenciaServidor()">
+                            <i class="fas fa-bolt me-1" id="iconLatencia"></i> Testar Latência
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" id="btnVerificarStatus" onclick="verificarStatusApi(true)">
                             <i class="fas fa-rotate me-1" id="iconVerificarStatus"></i> Verificar Status
                         </button>
-                        <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" id="btnAbrirModalQr" onclick="conectarEabrirQr()">
+                        <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm px-3" id="btnAbrirModalQr" onclick="conectarEabrirQr()">
                             <i class="fas fa-qrcode me-1"></i> Conectar / QR Code
                         </button>
                         <button type="button" class="btn btn-outline-danger btn-sm fw-semibold" id="btnDesconectarWpp" onclick="desconectarInstancia()">
                             <i class="fas fa-power-off me-1"></i> Desconectar
                         </button>
-                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
-                            <i class="fas fa-plus-circle me-1"></i> Criar Instância
+                        <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
+                            <i class="fas fa-plus-circle me-1"></i> Criar Minha Instância (+R$ 60/mês)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANNER DE REGRA DE NEGÓCIO: INSTÂNCIA PRÓPRIA DO ADMIN X COBRANÇA VIA E-MAIL -->
+            <div class="card-footer px-4 py-3 border-0 {{ ($permissaoWhatsapp['permitido'] ?? false) ? 'bg-success bg-opacity-10' : 'bg-warning bg-opacity-10' }}">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-circle {{ ($permissaoWhatsapp['permitido'] ?? false) ? 'bg-success bg-opacity-20 text-success' : 'bg-warning bg-opacity-25 text-warning' }}">
+                            <i class="fas {{ ($permissaoWhatsapp['permitido'] ?? false) ? 'fa-check-double' : 'fa-triangle-exclamation' }} fs-5"></i>
+                        </div>
+                        <div>
+                            @if($permissaoWhatsapp['permitido'] ?? false)
+                                <div class="fw-bold text-success small text-uppercase">
+                                    <i class="fab fa-whatsapp me-1"></i> Cobranças de Clientes via WhatsApp Liberadas
+                                </div>
+                                <div class="small text-body">
+                                    Sua instância própria (<code class="fw-bold">{{ $permissaoWhatsapp['instancia_propria']['nome'] ?? $configs['instance'] }}</code>) está ativa e em dia no Módulo Mercado Pago do Desenvolvedor. Disparos via WhatsApp e E-mail operacionais.
+                                </div>
+                            @else
+                                <div class="fw-bold text-danger small text-uppercase">
+                                    <i class="fas fa-envelope-circle-check me-1"></i> Modo Somente E-mail Ativo — Crie Sua Própria Instância para Cobrar via WhatsApp
+                                </div>
+                                <div class="small text-body">
+                                    {{ $permissaoWhatsapp['message'] ?? 'A instância atual de configuração (foco7) é exclusiva para configuração técnica. O Administrador deve criar e ativar sua própria instância através deste painel antes de realizar cobranças via WhatsApp; fora isso, só é possível cobrar clientes via E-mail.' }}
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        @if(!($permissaoWhatsapp['permitido'] ?? false))
+                            @if(!empty($permissaoWhatsapp['instancia_propria']['nome']))
+                                <button type="button" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm" onclick="abrirCheckoutPixInstancia('{{ $permissaoWhatsapp['instancia_propria']['nome'] }}')">
+                                    <i class="fab fa-pix me-1"></i> Pagar PIX de '{{ $permissaoWhatsapp['instancia_propria']['nome'] }}' p/ Ativar WhatsApp
+                                </button>
+                            @else
+                                <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
+                                    <i class="fas fa-plus-circle me-1"></i> Criar Minha Própria Instância Agora
+                                </button>
+                            @endif
+                        @endif
+                        <button type="button" class="btn btn-outline-dark btn-sm fw-semibold" onclick="abrirAbaMpDev()">
+                            <i class="fas fa-hand-holding-dollar me-1"></i> Módulo Mercado Pago (Dev)
                         </button>
                     </div>
                 </div>
@@ -68,44 +403,155 @@
         </div>
     </div>
 
-    <!-- NAVEGAÇÃO POR GUIAS (TABS) -->
+    <!-- ===================================================================
+         CARDS DE MÉTRICAS & KPIS GERAIS (4 COLUNAS)
+         =================================================================== -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card kpi-card shadow-sm h-100 bg-body">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Servidor Evolution Go</span>
+                    <div class="p-2 bg-success bg-opacity-10 text-success rounded-circle">
+                        <i class="fas fa-server fs-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold mb-1 text-body font-monospace" style="font-size: 1.15rem;">api.kdkhost.com.br</h4>
+                <div class="d-flex justify-content-between align-items-center small mt-2 pt-2 border-top">
+                    <span class="text-secondary"><i class="fas fa-code-branch me-1"></i> Versão Go v3.0</span>
+                    <a href="https://api.kdkhost.com.br/docs/llms.txt" target="_blank" class="fw-bold text-primary">Swagger / LLMs &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card kpi-card shadow-sm h-100 bg-body">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Instâncias no Cluster</span>
+                    <div class="p-2 bg-primary bg-opacity-10 text-primary rounded-circle">
+                        <i class="fas fa-layer-group fs-5"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2 mb-1">
+                    <h3 class="fw-bold mb-0 text-body">{{ ($totalInstanciasExtras ?? 0) + 1 }}</h3>
+                    <small class="text-secondary">({{ $instanciasAtivas ?? 1 }} ativas / {{ $instanciasSuspensas ?? 0 }} pendentes)</small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small mt-2 pt-2 border-top">
+                    <span class="text-primary fw-semibold"><i class="fas fa-sliders me-1"></i> 1 Config ({{ $instanciaConfiguracao['nome'] ?? 'foco7' }})</span>
+                    <span class="badge bg-danger">{{ $totalInstanciasExtras ?? 0 }} Criadas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card kpi-card shadow-sm h-100 bg-body border-warning border-opacity-50">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Recorrência PIX Mensal</span>
+                    <div class="p-2 bg-warning bg-opacity-15 text-warning rounded-circle">
+                        <i class="fab fa-pix fs-5"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2 mb-1">
+                    @if($configs['dev_desbloqueado'])
+                        <h3 class="fw-bold mb-0 text-danger">R$ {{ number_format($custoTotalRecorrente ?? 0, 2, ',', '.') }}</h3>
+                        <small class="text-secondary">/ mês</small>
+                    @else
+                        <h3 class="fw-bold mb-0 text-secondary font-monospace"><span class="badge bg-secondary-subtle text-secondary fs-5" title="Protegido por Senha Master"><i class="fas fa-lock me-1"></i> ••••••</span></h3>
+                        <small class="text-secondary">(Protegido)</small>
+                    @endif
+                </div>
+                <div class="d-flex justify-content-between align-items-center small mt-2 pt-2 border-top">
+                    <span class="text-secondary">
+                        <i class="fas fa-coins me-1"></i>
+                        @if($configs['dev_desbloqueado'])
+                            R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }}/instância
+                        @else
+                            R$ •••••• / instância
+                        @endif
+                    </span>
+                    <span class="badge {{ ($configs['suspensao_automatica'] ?? true) ? 'bg-success' : 'bg-secondary' }}">
+                        {{ ($configs['suspensao_automatica'] ?? true) ? 'Auto-Suspensão Ativa' : 'Suspensão Manual' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card kpi-card shadow-sm h-100 bg-body">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Disparos de Cobrança</span>
+                    <div class="p-2 bg-info bg-opacity-10 text-info rounded-circle">
+                        <i class="fas fa-paper-plane fs-5"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2 mb-1">
+                    <h3 class="fw-bold mb-0 text-body">{{ $totalCobrancasWpp ?? 0 }}</h3>
+                    <small class="text-secondary">mensagens enviadas</small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small mt-2 pt-2 border-top">
+                    <span class="text-secondary"><i class="fas fa-clock-rotate-left me-1"></i> Canal Ativo:</span>
+                    @if($permissaoWhatsapp['permitido'] ?? false)
+                        <span class="badge bg-success-subtle text-success"><i class="fab fa-whatsapp me-1"></i> WhatsApp + E-mail</span>
+                    @else
+                        <span class="badge bg-warning-subtle text-warning-emphasis"><i class="fas fa-envelope me-1"></i> Somente E-mail</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         NAVEGAÇÃO POR GUIAS (TABS) PRINCIPAL
+         =================================================================== -->
     <div class="col-12">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-transparent p-0 border-bottom">
                 <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="whatsappTabs" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active fw-semibold" id="tab-conexao-btn" data-bs-toggle="tab" data-bs-target="#tab-conexao" type="button" role="tab">
-                            <i class="fas fa-network-wired text-primary me-2"></i> Conexão & Credenciais
+                        <button class="nav-link active" id="tab-conexao-btn" data-bs-toggle="tab" data-bs-target="#tab-conexao" type="button" role="tab">
+                            <i class="fas fa-network-wired text-primary me-2"></i> Conexão &amp; Credenciais
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-pix-btn" data-bs-toggle="tab" data-bs-target="#tab-pix" type="button" role="tab">
-                            <i class="fab fa-pix text-success me-2"></i> Cobrança PIX & Formato
+                        <button class="nav-link" id="tab-instancias-btn" data-bs-toggle="tab" data-bs-target="#tab-instancias" type="button" role="tab">
+                            <i class="fas fa-layer-group text-warning me-2"></i> Instâncias &amp; Cobrança PIX
+                            <span class="badge bg-danger ms-1">R$ 60/mês</span>
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-regua-btn" data-bs-toggle="tab" data-bs-target="#tab-regua" type="button" role="tab">
+                        <button class="nav-link" id="tab-mp-dev-btn" data-bs-toggle="tab" data-bs-target="#tab-mp-dev" type="button" role="tab">
+                            <i class="fas fa-hand-holding-dollar text-primary me-2"></i> Mercado Pago (Desenvolvedor)
+                            <span class="badge bg-dark ms-1"><i class="fas fa-lock text-warning me-1"></i> Master</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-pix-btn" data-bs-toggle="tab" data-bs-target="#tab-pix" type="button" role="tab">
+                            <i class="fab fa-pix text-success me-2"></i> Cobrança PIX de Clientes
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-regua-btn" data-bs-toggle="tab" data-bs-target="#tab-regua" type="button" role="tab">
                             <i class="fas fa-clock-rotate-left text-danger me-2"></i> Régua de Cobrança
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-templates-btn" data-bs-toggle="tab" data-bs-target="#tab-templates" type="button" role="tab">
-                            <i class="fas fa-comments text-info me-2"></i> Templates de Mensagens
+                        <button class="nav-link" id="tab-templates-btn" data-bs-toggle="tab" data-bs-target="#tab-templates" type="button" role="tab">
+                            <i class="fas fa-mobile-screen-button text-info me-2"></i> Templates &amp; Smartphone
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-teste-btn" data-bs-toggle="tab" data-bs-target="#tab-teste" type="button" role="tab">
+                        <button class="nav-link" id="tab-teste-btn" data-bs-toggle="tab" data-bs-target="#tab-teste" type="button" role="tab">
                             <i class="fas fa-vial text-warning me-2"></i> Disparo de Teste
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-webhook-btn" data-bs-toggle="tab" data-bs-target="#tab-webhook" type="button" role="tab">
-                            <i class="fas fa-satellite-dish text-secondary me-2"></i> Webhook & Callbacks
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-semibold" id="tab-instancias-btn" data-bs-toggle="tab" data-bs-target="#tab-instancias" type="button" role="tab">
-                            <i class="fas fa-layer-group text-warning me-2"></i> Instâncias & Licenciados <span class="badge bg-danger ms-1">R$ 60/mês</span>
+                        <button class="nav-link" id="tab-webhook-btn" data-bs-toggle="tab" data-bs-target="#tab-webhook" type="button" role="tab">
+                            <i class="fas fa-satellite-dish text-secondary me-2"></i> Webhook &amp; Eventos
                         </button>
                     </li>
                 </ul>
@@ -130,7 +576,7 @@
                                             <span id="badgeTextoSegurancaWpp">{{ $configs['dev_desbloqueado'] ? 'Acesso Liberado' : 'Protegido por Senha Master' }}</span>
                                         </span>
                                     </div>
-                                    <p class="text-secondary small mb-0">Todas as chaves e tokens são gravados criptografados com AES-256 no banco de dados.</p>
+                                    <p class="text-secondary small mb-0">Todas as credenciais e tokens são gravados criptografados com AES-256 no banco de dados.</p>
                                 </div>
                                 <div class="d-flex align-items-center gap-3 flex-wrap">
                                     <button type="button" class="btn btn-sm {{ $configs['dev_desbloqueado'] ? 'btn-outline-secondary' : 'btn-danger' }} fw-bold shadow-sm" id="btnAcaoSegurancaWpp" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}">
@@ -148,9 +594,7 @@
 
                             <div class="alert alert-warning py-2 px-3 mb-3 small d-flex align-items-center gap-2 {{ $configs['dev_desbloqueado'] ? 'd-none' : '' }}" id="alertaTarjaWpp">
                                 <i class="fas fa-shield-alt text-warning fa-lg"></i>
-                                <div>
-                                    <strong>Dados do Servidor Protegidos por Senha Particular:</strong> A URL da API, Nome da Instância, Token e Chave Mestra estão bloqueados contra acesso de administradores comuns. Para visualizar ou alterar, utilize a Senha Master Particular.
-                                </div>
+                                <div>Os parâmetros de conexão e dados de cobrança do cluster estão protegidos por segurança. Para visualizar ou alterar, confirme a <strong>Senha Master Exclusiva</strong>.</div>
                             </div>
 
                             <div class="row g-3">
@@ -158,450 +602,940 @@
                                     <label class="form-label fw-semibold">URL Base do Servidor Evolution API <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-link"></i></span>
-                                        <input type="{{ $configs['dev_desbloqueado'] ? 'url' : 'password' }}" 
-                                               name="api_url" 
-                                               id="inputApiUrl" 
-                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                               value="{{ $configs['api_url'] }}" 
-                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
-                                               required 
-                                               placeholder="https://api.seuservidor.com ou http://localhost:8080">
+                                        <input type="{{ $configs['dev_desbloqueado'] ? 'url' : 'text' }}" name="api_url" id="inputApiUrl" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['api_url'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} required>
                                     </div>
-                                    <div class="form-text small">Sem barra no final. Exemplo: <code>http://localhost:8080</code> ou <code>https://whatsapp.meudominio.com</code></div>
+                                    <div class="form-text small">Servidor oficial: <code>https://api.kdkhost.com.br</code> (Sem barra no final).</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label class="form-label fw-semibold mb-0">Nome da Instância (Instance Name) <span class="text-danger">*</span></label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="listarInstanciasServidor()" style="font-size: 0.75rem;" title="Consultar instâncias no servidor Evolution">
-                                            <i class="fas fa-cloud-arrow-down me-1"></i> Ver no Servidor
-                                        </button>
-                                    </div>
+                                    <label class="form-label fw-semibold">Nome da Instância Principal <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-robot"></i></span>
-                                        <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" 
-                                               name="instance" 
-                                               id="inputInstance" 
-                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                               value="{{ $configs['instance'] }}" 
-                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
-                                               required 
-                                               placeholder="foco7">
+                                        <input type="text" name="instance" id="inputInstance" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['instance'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="listarInstanciasServidor()" title="Buscar instâncias no servidor">
+                                            <i class="fas fa-list me-1"></i> Ver no Servidor
+                                        </button>
                                     </div>
-                                    <div class="form-text small">Identificador único da instância na Evolution API. Ex: <code>foco7</code>, <code>foco7-cobrancas</code></div>
+                                    <div class="form-text small">Identificador único da instância principal da empresa. Ex: <code>foco7</code>.</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Token da Instância (Instance API Key) <span class="text-danger">*</span>
-                                        <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span>
-                                    </label>
+                                    <label class="form-label fw-semibold">Token da Instância (Instance API Key / Sanctum Token) <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-fingerprint"></i></span>
-                                        <input type="password" 
-                                               name="apikey" 
-                                               id="inputApiKey" 
-                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                               value="{{ $configs['apikey'] }}" 
-                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
-                                               placeholder="Token de autenticação da instância">
+                                        <input type="password" name="apikey" id="inputApiKey" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['apikey'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputApiKey', this)">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text small">Enviado no header <code>apikey: &lt;token&gt;</code> para enviar mensagens, conectar e consultar status.</div>
+                                    <div class="form-text small">Enviado no header <code>Authorization: Bearer &lt;token&gt;</code> e <code>apikey</code>.</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Global API Key (Chave Mestra Admin) <span class="badge bg-secondary-subtle text-secondary small ms-1">Opcional</span>
-                                        <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span>
-                                    </label>
+                                    <label class="form-label fw-semibold">Global API Key (Chave Mestra Admin) <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
-                                        <input type="password" 
-                                               name="global_apikey" 
-                                               id="inputGlobalApiKey" 
-                                               class="form-control font-monospace {{ $configs['dev_desbloqueado'] ? '' : 'tarja-dev-bloqueado' }}" 
-                                               value="{{ $configs['global_apikey'] }}" 
-                                               {{ $configs['dev_desbloqueado'] ? '' : 'readonly' }} 
-                                               placeholder="Chave mestra (opcional se já conectada)">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        <input type="password" name="global_apikey" id="inputGlobalApiKey" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['global_apikey'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputGlobalApiKey', this)">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text small">
-                                        <strong>Não é necessária se a instância já estiver conectada</strong> no outro sistema. Preencha apenas para criar/listar instâncias globais.
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Delay entre Disparos (Milissegundos)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-stopwatch"></i></span>
-                                        <input type="number" name="delay" class="form-control" value="{{ $configs['delay'] }}" min="0" max="10000" step="100" placeholder="0">
-                                        <span class="input-group-text">ms</span>
-                                    </div>
-                                    <div class="form-text small">Intervalo simulado antes de enviar (Ex: 1200ms para humanizar envios).</div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Anexo de Documento PDF (Boleto / Carnê)</label>
-                                    <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" name="enviar_pdf" id="enviar_pdf" value="1" {{ $configs['enviar_pdf'] ? 'checked' : '' }}>
-                                        <label class="form-check-label fw-semibold" for="enviar_pdf">
-                                            Enviar automaticamente PDF da fatura/carnê via WhatsApp
-                                        </label>
-                                    </div>
-                                    <div class="form-text small">Se marcado, além do texto/botão, envia o arquivo PDF do carnê/fatura quando disponível.</div>
+                                    <div class="form-text small">Necessário para criar, listar e gerenciar instâncias de licenciados automaticamente.</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ===================================================================
-                             GUIA 2: COBRANÇA PIX & FORMATO DE ENVIO
+                             GUIA 2: GESTÃO DE INSTÂNCIAS EXTRAS & RECORRÊNCIA PIX (R$ 60/MÊS)
+                             =================================================================== -->
+                        <div class="tab-pane fade" id="tab-instancias" role="tabpanel">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+                                <div>
+                                    <h5 class="fw-bold text-body mb-1">
+                                        <i class="fas fa-layer-group text-warning me-2"></i> Cobrança Recorrente de Instâncias (Master &amp; Extras)
+                                    </h5>
+                                    <p class="text-secondary small mb-0">
+                                        Recebimento via PIX Transparente 
+                                        @if($configs['dev_desbloqueado'])
+                                            na conta <strong class="text-primary font-monospace" id="txtGuiaPixRecorrencia">{{ $configs['pix_email_recorrencia'] }}</strong>
+                                        @else
+                                            <span class="badge bg-secondary-subtle text-secondary font-monospace" id="txtGuiaPixRecorrencia" title="Clique para desbloquear com a Senha Master" style="cursor: pointer;" onclick="solicitarSenhaSegurancaWpp()"><i class="fas fa-lock me-1"></i> ••••••••••••••• (Protegido por Senha Master)</span>
+                                        @endif
+                                        com suspensão automática no vencimento.
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-outline-warning btn-sm fw-bold" onclick="executarCobrancaPreventivaWpp()" title="Disparar lembrete e código PIX para instâncias com vencimento próximo">
+                                        <i class="fas fa-paper-plane me-1"></i> Disparar Régua Preventiva
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success btn-sm fw-semibold" onclick="sincronizarPagamentosMpWpp()" title="Verificar na API do Mercado Pago faturas pagas e reativar instâncias">
+                                        <i class="fab fa-pix me-1"></i> Sincronizar MP
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="processarVarreduraVencidos()">
+                                        <i class="fas fa-gavel me-1"></i> Verificar &amp; Suspender Vencidos
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="listarInstanciasServidor()">
+                                        <i class="fas fa-rotate me-1"></i> Sincronizar Servidor
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
+                                        <i class="fas fa-plus-circle me-1"></i> Nova Instância (+R$ 60/mês)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- PARÂMETROS DA RECORRÊNCIA PIX -->
+                            <div class="card bg-body-tertiary border mb-4 shadow-none">
+                                <div class="card-body p-3">
+                                    <div class="row g-3 align-items-center mb-3">
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold mb-1">
+                                                Chave PIX / Conta de Recebimento das Instâncias Extras
+                                                <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} small ms-1" id="badgePixRecorrenciaLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }}"></i> {{ $configs['dev_desbloqueado'] ? 'Liberado' : 'Protegido Master' }}
+                                                </span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-envelope text-primary"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'email' : 'password' }}" name="pix_email_recorrencia" id="inputPixEmailRecorrencia" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['pix_email_recorrencia'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="••••••••••••••••••••••••">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}" title="{{ $configs['dev_desbloqueado'] ? 'Bloquear e Ofuscar' : 'Desbloquear com Senha Master' }}" id="btnPixRecorrenciaLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }}"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text small">Checkout transparente: o parceiro ou licenciado realiza o pagamento sem visualizar dados privados da conta.</div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+                                                <span>Valor por Instância (R$)</span>
+                                                <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} small" id="badgeCustoExtraLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }}"></i> {{ $configs['dev_desbloqueado'] ? 'Liberado' : 'Protegido Master' }}
+                                                </span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">R$</span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'number' : 'password' }}" step="0.01" name="custo_instancia_extra" id="inputCustoInstanciaExtra" class="form-control fw-bold font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado text-secondary' : 'text-danger' }}" value="{{ $configs['dev_desbloqueado'] ? number_format($custoInstanciaExtra ?? 60.00, 2, '.', '') : '••••••' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}" title="{{ $configs['dev_desbloqueado'] ? 'Bloquear e Ofuscar' : 'Desbloquear com Senha Master' }}" id="btnCustoExtraLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }}"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text small">Recorrência mensal (Master e Adicionais).</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold mb-1">Política de Suspensão no Vencimento</label>
+                                            <div class="form-check form-switch fs-6 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="suspensao_automatica" id="checkSuspensaoAuto" value="1" {{ ($configs['suspensao_automatica'] ?? true) ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-semibold" for="checkSuspensaoAuto">
+                                                    Suspender Automaticamente no Vencimento
+                                                </label>
+                                            </div>
+                                            <div class="form-text small">Com carência protetiva de 24h para não cortar clientes de surpresa.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- LINHA DO ACCESS TOKEN MERCADO PAGO EXCLUSIVO PARA INSTÂNCIAS -->
+                                    <div class="row g-3 align-items-center pt-2 border-top">
+                                        <div class="col-md-8">
+                                            <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+                                                <span>Access Token Mercado Pago (Recebimento Direto na sua Conta)</span>
+                                                <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} small" id="badgeMpTokenLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }}"></i> {{ $configs['dev_desbloqueado'] ? 'Liberado' : 'Protegido Master' }}
+                                                </span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fab fa-pix text-warning"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="evolution_mp_access_token" id="inputEvolutionMpAccessToken" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['evolution_mp_access_token'] }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="APP_USR-...">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}" title="{{ $configs['dev_desbloqueado'] ? 'Bloquear e Ofuscar' : 'Desbloquear com Senha Master' }}" id="btnMpTokenLock">
+                                                    <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }}"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text small">O dinheiro das instâncias cai direto na sua conta do Mercado Pago sem passar por painel de terceiros.</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="p-2 border rounded bg-body-tertiary">
+                                                <div class="small fw-bold text-success mb-1"><i class="fas fa-bolt me-1"></i> Automação e Reativação em Segundos</div>
+                                                <div class="small text-secondary" style="font-size: 0.75rem;">
+                                                    Ao pagar via PIX, o Mercado Pago notifica o webhook e a instância é reativada instantaneamente no servidor.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TABELA DE INSTÂNCIAS REGISTRADAS -->
+                            <div class="card border">
+                                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <h6 class="fw-bold mb-0 text-body">
+                                        <i class="fas fa-list me-2 text-primary"></i> Instâncias Provisionadas &amp; Monitoramento de Vencimentos
+                                    </h6>
+                                    <span class="badge bg-secondary">Total: {{ ($totalInstanciasExtras ?? 0) + 1 }} instâncias monitoradas</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light small">
+                                            <tr>
+                                                <th>Identificador / Nome</th>
+                                                <th>Proprietário / Tipo</th>
+                                                <th>Vencimento / Próxima Cobrança</th>
+                                                <th>Mensalidade</th>
+                                                <th>Status da Conexão</th>
+                                                <th class="text-end">Ações de Gestão &amp; PIX</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- INSTÂNCIA ATUAL DE CONFIGURAÇÃO (TAMBÉM COBRADA PELO MÓDULO MERCADO PAGO DO DESENVOLVEDOR) -->
+                                            @php
+                                                $nomeInstConfig = $instanciaConfiguracao['nome'] ?? 'foco7';
+                                                $vencInstConfig = $instanciaConfiguracao['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days'));
+                                                $stInstConfig = $instanciaConfiguracao['status'] ?? 'ativa';
+                                                $hashInstConfig = $instanciaConfiguracao['hash_pagamento'] ?? md5($nomeInstConfig.'wpp_sec');
+                                            @endphp
+                                            <tr class="table-light">
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="{{ $stInstConfig === 'suspensa' ? 'pulse-offline' : 'pulse-online' }}"></span>
+                                                        @if($configs['dev_desbloqueado'])
+                                                            <strong class="font-monospace text-primary fs-6">{{ $nomeInstConfig }}</strong>
+                                                        @else
+                                                            <span class="badge bg-secondary-subtle text-secondary font-monospace" title="Protegido por Senha Master"><i class="fas fa-lock me-1"></i> ••••••••••••</span>
+                                                        @endif
+                                                        <span class="badge bg-dark ms-1"><i class="fas fa-sliders text-warning me-1"></i> Instância de Configuração</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-dark"><i class="fas fa-crown text-warning me-1"></i> Desenvolvedor / Config</span>
+                                                </td>
+                                                <td>
+                                                    @if($configs['dev_desbloqueado'])
+                                                        <strong>{{ date('d/m/Y', strtotime($vencInstConfig)) }}</strong>
+                                                        <small class="text-secondary d-block">Cobrança Recorrente MP Dev</small>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle text-secondary font-monospace" title="Protegido por Senha Master"><i class="fas fa-lock me-1"></i> ••••••••••••</span>
+                                                        <small class="text-secondary d-block">Cobrança Ativa (MP Dev)</small>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($configs['dev_desbloqueado'])
+                                                        <strong class="text-danger">R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }}</strong>
+                                                        <small class="text-muted">/ mês</small>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle text-secondary font-monospace" title="Protegido por Senha Master"><i class="fas fa-lock me-1"></i> ••••••</span>
+                                                        <small class="text-muted">(Protegido)</small>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <span class="badge {{ $statusCache === 'conectado' ? 'bg-success' : 'bg-secondary' }}" id="badgeStatusPrincipalTabela">
+                                                        <span class="{{ $statusCache === 'conectado' ? 'pulse-online' : 'pulse-offline' }} me-1" id="pulseStatusPrincipalTabela"></span>
+                                                        <span id="txtStatusPrincipalTabela">{{ $statusCache === 'conectado' ? 'Conectado' : ucfirst($statusCache) }}</span>
+                                                    </span>
+                                                    @if(!empty($numeroConectado))
+                                                        <small class="text-secondary d-block mt-1 font-monospace" id="txtOwnerPrincipalTabela">{{ $numeroConectado }}</small>
+                                                    @endif
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button type="button" class="btn btn-warning fw-bold text-dark" onclick="abrirCheckoutPixInstancia('{{ $nomeInstConfig }}')" title="Cobrar PIX desta instância no Módulo Mercado Pago do Desenvolvedor">
+                                                            <i class="fab fa-pix me-1"></i> Cobrar PIX
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-info" onclick="copiarLinkPagamentoInstancia('{{ url('/pagar/instancia/' . $hashInstConfig) }}')" title="Copiar link direto de pagamento público">
+                                                            <i class="fas fa-link"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-success" onclick="confirmarPagamentoManualInstancia('{{ $nomeInstConfig }}')" title="Confirmar pagamento recebido manualmente (Restrito Senha Master)">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        @if($stInstConfig === 'suspensa')
+                                                            <button type="button" class="btn btn-outline-primary" onclick="reativarInstanciaManual('{{ $nomeInstConfig }}')" title="Reativar instância (Restrito Master)">
+                                                                <i class="fas fa-play"></i>
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="btn btn-outline-danger" onclick="suspenderInstanciaManual('{{ $nomeInstConfig }}')" title="Suspender instância (Restrito Master)">
+                                                                <i class="fas fa-pause"></i>
+                                                            </button>
+                                                        @endif
+                                                        <button type="button" class="btn btn-outline-success fw-semibold" onclick="conectarEabrirQr()" title="Gerar ou visualizar QR Code">
+                                                            <i class="fas fa-qrcode me-1"></i> QR Code
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- INSTÂNCIAS CRIADAS ATRAVÉS DESTE PAINEL (PRÓPRIA DO ADMIN, EMPRESA E LICENCIADOS) -->
+                                            @if(!empty($instanciasExtras) && is_array($instanciasExtras))
+                                                @foreach($instanciasExtras as $extra)
+                                                @php
+                                                    $st = $extra['status'] ?? 'ativa';
+                                                    $venc = $extra['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days'));
+                                                    $isVencida = ($venc < date('Y-m-d')) || $st === 'pendente_pagamento';
+                                                    $diasRestantes = (int) round((strtotime($venc) - strtotime('today')) / 86400);
+                                                @endphp
+                                                <tr class="{{ $st === 'suspensa' ? 'table-danger table-opacity-10' : ($isVencida ? 'table-warning table-opacity-10' : '') }}">
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="{{ $st === 'suspensa' ? 'pulse-offline' : ($isVencida ? 'pulse-warning' : 'pulse-online') }}"></span>
+                                                            <strong class="font-monospace text-body fs-6">{{ $extra['nome'] ?? 'N/D' }}</strong>
+                                                            @if(strtolower($extra['nome'] ?? '') === strtolower($configs['instance'] ?? ''))
+                                                                <span class="badge bg-success-subtle text-success border border-success small">Em Uso no Painel</span>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if(($extra['tipo'] ?? '') === 'licenciado')
+                                                            <span class="badge bg-primary"><i class="fas fa-id-badge me-1"></i> Licenciado #{{ $extra['licenciado_id'] ?? '' }}</span>
+                                                        @elseif(($extra['tipo'] ?? '') === 'propria_admin')
+                                                            <span class="badge bg-success"><i class="fas fa-user-check me-1"></i> Própria do Admin</span>
+                                                        @else
+                                                            <span class="badge bg-secondary"><i class="fas fa-building me-1"></i> Instância Admin / Empresa</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            @if($st === 'pendente_pagamento')
+                                                                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Aguardando 1º Pagamento PIX</span>
+                                                                <small class="text-danger d-block fw-semibold">Pague p/ liberar WhatsApp</small>
+                                                            @else
+                                                                <strong class="{{ $isVencida ? 'text-danger' : 'text-body' }}">
+                                                                    {{ date('d/m/Y', strtotime($venc)) }}
+                                                                </strong>
+                                                                @if($isVencida)
+                                                                    <span class="badge bg-danger ms-1">Vencida (há {{ abs($diasRestantes) }}d)</span>
+                                                                @else
+                                                                    <small class="text-secondary d-block">Vence em {{ $diasRestantes }} dias</small>
+                                                                @endif
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if($configs['dev_desbloqueado'])
+                                                            <strong class="text-danger">R$ {{ number_format($extra['valor_recorrente'] ?? 60.00, 2, ',', '.') }}</strong>
+                                                            <small class="text-muted">/ mês</small>
+                                                        @else
+                                                            <span class="badge bg-secondary-subtle text-secondary font-monospace" title="Protegido por Senha Master"><i class="fas fa-lock me-1"></i> ••••••</span>
+                                                            <small class="text-muted">(Protegido)</small>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if($st === 'suspensa')
+                                                            <span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Suspensa</span>
+                                                        @elseif($st === 'pendente_pagamento')
+                                                            <span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half me-1"></i> Pendente PIX</span>
+                                                        @elseif($isVencida)
+                                                            <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Aguardando PIX</span>
+                                                        @else
+                                                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Ativa &amp; Liberada</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <div class="btn-group btn-group-sm">
+                                                            <button type="button" class="btn btn-warning fw-bold text-dark" onclick="abrirCheckoutPixInstancia('{{ $extra['nome'] }}')" title="Pagar / Gerar cobrança PIX no Módulo Mercado Pago do Desenvolvedor">
+                                                                <i class="fab fa-pix me-1"></i> {{ $st === 'pendente_pagamento' ? 'Pagar p/ Ativar' : 'Cobrar PIX' }}
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-info" onclick="copiarLinkPagamentoInstancia('{{ url('/pagar/instancia/' . ($extra['hash_pagamento'] ?? $extra['nome'])) }}')" title="Copiar link direto de pagamento público">
+                                                                <i class="fas fa-link"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-success" onclick="confirmarPagamentoManualInstancia('{{ $extra['nome'] }}')" title="Confirmar pagamento manual (Restrito Senha Master)">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                            @if(in_array($st, ['suspensa', 'pendente_pagamento']))
+                                                                <button type="button" class="btn btn-outline-primary" onclick="reativarInstanciaManual('{{ $extra['nome'] }}')" title="Reativar instância (Restrito Senha Master)">
+                                                                    <i class="fas fa-play"></i>
+                                                                </button>
+                                                            @else
+                                                                <button type="button" class="btn btn-outline-danger" onclick="suspenderInstanciaManual('{{ $extra['nome'] }}')" title="Suspender e cortar conexão (Restrito Senha Master)">
+                                                                    <i class="fas fa-pause"></i>
+                                                                </button>
+                                                            @endif
+                                                            <button type="button" class="btn btn-outline-secondary" onclick="selecionarInstanciaServidor('{{ $extra['nome'] }}', '{{ $extra['token'] ?? '' }}')" title="Usar esta instância no painel">
+                                                                <i class="fas fa-arrow-right"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-danger" onclick="excluirInstanciaExtra('{{ $extra['nome'] }}')" title="Excluir monitoramento (Restrito Senha Master)">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===================================================================
+                             GUIA 2.5: SEGUNDO MÓDULO MERCADO PAGO EM PARALELO (EXCLUSIVO DO DESENVOLVEDOR)
+                             =================================================================== -->
+                        <div class="tab-pane fade" id="tab-mp-dev" role="tabpanel">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                        <h5 class="fw-bold text-body mb-0">
+                                            <i class="fas fa-hand-holding-dollar text-primary me-2"></i> Segundo Módulo Mercado Pago (Exclusivo do Desenvolvedor)
+                                        </h5>
+                                        <span class="badge {{ $configs['dev_desbloqueado'] ? 'bg-success' : 'bg-danger' }} px-3 py-1">
+                                            <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-unlock' : 'fa-lock' }} me-1"></i>
+                                            {{ $configs['dev_desbloqueado'] ? 'Desbloqueado pelo Master' : 'Ofuscado • Restrito Master' }}
+                                        </span>
+                                        <span class="badge bg-success-subtle text-success border border-success px-2 py-1">
+                                            <i class="fab fa-pix me-1"></i> Cobrança via PIX Apenas
+                                        </span>
+                                        <span class="badge bg-info-subtle text-info border border-info px-2 py-1">
+                                            <i class="fas fa-bolt me-1"></i> Webhook Dinâmico por Requisição
+                                        </span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1">
+                                            <i class="fas fa-rotate me-1"></i> Retorno Automático Transparente
+                                        </span>
+                                    </div>
+                                    <p class="text-secondary small mb-0">
+                                        Módulo em paralelo 100% independente do gateway da empresa: cobra <strong>exclusivamente via PIX Transparente</strong> as instâncias criadas no Evolution Go através deste painel (inclusive a atual de configuração), com <strong>webhook dinâmico a cada requisição</strong> e <strong>retorno automático</strong>.
+                                    </p>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-outline-primary btn-sm fw-bold" id="btnTestarMpDev" onclick="testarConexaoMpDev()">
+                                        <i class="fas fa-plug-circle-check me-1"></i> Testar Conexão MP (<span id="txtBtnAmbienteMpDev">{{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'Sandbox' : 'Produção' }}</span>)
+                                    </button>
+                                    <button type="button" class="btn btn-sm {{ $configs['dev_desbloqueado'] ? 'btn-outline-secondary' : 'btn-danger' }} fw-bold" onclick="{{ $configs['dev_desbloqueado'] ? 'bloquearSegurancaWpp()' : 'solicitarSenhaSegurancaWpp()' }}">
+                                        <i class="fas {{ $configs['dev_desbloqueado'] ? 'fa-lock' : 'fa-key' }} me-1"></i>
+                                        {{ $configs['dev_desbloqueado'] ? 'Bloquear & Ofuscar' : 'Desbloquear c/ Senha Master' }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-body-tertiary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold small text-uppercase text-secondary">Status &amp; Método Exclusivo</span>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" name="dev_mp_ativo" id="inputDevMpAtivo" value="1" {{ ($configs['dev_mp_ativo'] ?? true) ? 'checked' : '' }} {{ !$configs['dev_desbloqueado'] ? 'disabled' : '' }}>
+                                                <label class="form-check-label small fw-bold" for="inputDevMpAtivo">Módulo Ativo</label>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <span class="badge bg-success"><i class="fab fa-pix me-1"></i> Somente PIX</span>
+                                            <span class="badge bg-dark-subtle text-body border">Checkout Transparente Íntegro</span>
+                                        </div>
+                                        <div class="small text-secondary">
+                                            Opera isolado de <code>/admin/gateways</code> exclusivamente via PIX com retorno automático após compensação.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-body-tertiary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small fw-bold text-uppercase text-secondary mb-0">Ambiente Dinâmico (Dev)</label>
+                                            <span class="badge {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'bg-warning text-dark' : 'bg-success' }}" id="badgeAmbienteAtivoMpDev">
+                                                <i class="fas {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'fa-flask' : 'fa-check-circle' }} me-1"></i>
+                                                {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'Modo Sandbox Ativo' : 'Modo Produção Ativo' }}
+                                            </span>
+                                        </div>
+                                        <select name="dev_mp_ambiente" id="inputDevMpAmbiente" class="form-select form-select-sm fw-bold mb-2" onchange="alternarAmbienteMpDev(this.value)" {{ !$configs['dev_desbloqueado'] ? 'disabled' : '' }}>
+                                            <option value="producao" {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'producao' ? 'selected' : '' }}>Produção (Recebimento Real PIX)</option>
+                                            <option value="sandbox" {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'selected' : '' }}>Sandbox (Homologação / Testes PIX)</option>
+                                        </select>
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <button type="button" class="btn {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'producao' ? 'btn-success' : 'btn-outline-secondary' }} fw-semibold" id="btnTabAmbProd" onclick="selecionarAmbienteMpDevClick('producao')">
+                                                <i class="fas fa-shield-halved me-1"></i> Produção
+                                            </button>
+                                            <button type="button" class="btn {{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'btn-warning text-dark' : 'btn-outline-secondary' }} fw-semibold" id="btnTabAmbSandbox" onclick="selecionarAmbienteMpDevClick('sandbox')">
+                                                <i class="fas fa-flask me-1"></i> Sandbox
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded-3 bg-body-tertiary h-100">
+                                        <label class="form-label small fw-bold text-uppercase text-secondary mb-1">Titular / Beneficiário (EMV PIX)</label>
+                                        <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="dev_mp_beneficiario" id="inputDevMpBeneficiario" class="form-control form-control-sm font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_beneficiario'] ?? 'FOCO 7 TECNOLOGIA' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                        <div class="form-text small">Identificação exibida no checkout transparente de ativação de instâncias.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BLOCO DINÂMICO 1: CREDENCIAIS DE PRODUÇÃO DO DESENVOLVEDOR -->
+                            <div class="card border border-success border-opacity-50 mb-4 shadow-none" id="boxCredenciaisMpDevProd" style="{{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? 'display: none;' : '' }}">
+                                <div class="card-header bg-success bg-opacity-10 py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <span class="fw-bold small text-body">
+                                        <i class="fas fa-shield-halved text-success me-2"></i> Credenciais Dinâmicas de PRODUÇÃO — Conta Mercado Pago do Desenvolvedor
+                                    </span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success"><i class="fab fa-pix me-1"></i> PIX Produção Ativo</span>
+                                        <span class="badge bg-success-subtle text-success border border-success small">Criptografia AES-256</span>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Public Key (Produção - Desenvolvedor)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-key text-success"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="dev_mp_public_key_prod" id="inputDevMpPublicKeyProd" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_public_key_prod'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="APP_USR-...">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpPublicKeyProd', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Access Token (Produção - Desenvolvedor) <span class="text-danger">*</span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fab fa-pix text-success"></i></span>
+                                                <input type="password" name="dev_mp_access_token_prod" id="inputDevMpAccessTokenProd" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_access_token_prod'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="APP_USR-...">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpAccessTokenProd', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Client ID (Produção - Opcional)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="dev_mp_client_id_prod" id="inputDevMpClientIdProd" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_client_id_prod'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpClientIdProd', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Client Secret (Produção - Opcional)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-user-secret"></i></span>
+                                                <input type="password" name="dev_mp_client_secret_prod" id="inputDevMpClientSecretProd" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_client_secret_prod'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpClientSecretProd', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BLOCO DINÂMICO 2: CREDENCIAIS DE SANDBOX DO DESENVOLVEDOR -->
+                            <div class="card border border-warning border-opacity-50 mb-4 shadow-none" id="boxCredenciaisMpDevSandbox" style="{{ ($configs['dev_mp_ambiente'] ?? 'producao') === 'sandbox' ? '' : 'display: none;' }}">
+                                <div class="card-header bg-warning bg-opacity-10 py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <span class="fw-bold small text-body">
+                                        <i class="fas fa-flask text-warning me-2"></i> Credenciais Dinâmicas de SANDBOX (Homologação) — Conta Mercado Pago do Desenvolvedor
+                                    </span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-vial me-1"></i> PIX Sandbox Ativo</span>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning small">Criptografia AES-256</span>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Public Key (Sandbox - Desenvolvedor)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-key text-warning"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="dev_mp_public_key_sandbox" id="inputDevMpPublicKeySandbox" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_public_key_sandbox'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="TEST-...">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpPublicKeySandbox', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Access Token (Sandbox - Desenvolvedor) <span class="text-danger">*</span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fab fa-pix text-warning"></i></span>
+                                                <input type="password" name="dev_mp_access_token_sandbox" id="inputDevMpAccessTokenSandbox" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_access_token_sandbox'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }} placeholder="TEST-...">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpAccessTokenSandbox', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Client ID (Sandbox - Opcional)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                                <input type="{{ $configs['dev_desbloqueado'] ? 'text' : 'password' }}" name="dev_mp_client_id_sandbox" id="inputDevMpClientIdSandbox" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_client_id_sandbox'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpClientIdSandbox', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Client Secret (Sandbox - Opcional)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-user-secret"></i></span>
+                                                <input type="password" name="dev_mp_client_secret_sandbox" id="inputDevMpClientSecretSandbox" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_client_secret_sandbox'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpClientSecretSandbox', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WEBHOOK DINÂMICO A CADA REQUISIÇÃO & RETORNO AUTOMÁTICO -->
+                            <div class="card border shadow-none">
+                                <div class="card-header bg-body-secondary py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <span class="fw-bold small text-body">
+                                        <i class="fas fa-satellite-dish text-info me-2"></i> Webhook Dinâmico a Cada Requisição &amp; Retorno Automático (PIX Transparente)
+                                    </span>
+                                    <span class="badge bg-info text-dark">
+                                        <i class="fas fa-bolt me-1"></i> Injeção Automática em <code>notification_url</code>
+                                    </span>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-semibold mb-1">Assinatura Secreta Webhook (Opcional)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-shield-virus"></i></span>
+                                                <input type="password" name="dev_mp_webhook_secret" id="inputDevMpWebhookSecret" class="form-control font-monospace {{ !$configs['dev_desbloqueado'] ? 'tarja-dev-bloqueado' : '' }}" value="{{ $configs['dev_mp_webhook_secret'] ?? '' }}" {{ !$configs['dev_desbloqueado'] ? 'readonly' : '' }}>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidadeSenha('inputDevMpWebhookSecret', this)"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label class="form-label small fw-semibold mb-1">Endpoint Base do Webhook Dinâmico (Gerado Automaticamente a Cada Requisição PIX)</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" id="inputWebhookMpDevUrl" class="form-control font-monospace" value="{{ $webhookUrlMpDev ?? url('/webhook/mercadopago?origem=instancia_wpp&modulo=mp_dev_paralelo&metodo=pix') }}" readonly>
+                                                <button class="btn btn-primary fw-bold" type="button" onclick="copiarWebhookMpDevUrl()">
+                                                    <i class="fas fa-copy me-1"></i> Copiar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 small text-secondary">
+                                        <i class="fas fa-circle-info text-info me-1"></i>
+                                        A cada geração de QR Code PIX, o sistema injeta automaticamente na API do Mercado Pago uma <code>notification_url</code> exclusiva contendo <code>ambiente</code> (<code>producao</code>/<code>sandbox</code>), <code>wpp_instancia</code>, <code>fatura_id</code>, <code>req_token</code> único e <code>ts</code>, garantindo baixa imediata e retorno automático no checkout transparente sem necessidade de configuração manual.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===================================================================
+                             GUIA 3: COBRANÇA PIX & FORMATO DOS DISPAROS DE CLIENTES
                              =================================================================== -->
                         <div class="tab-pane fade" id="tab-pix" role="tabpanel">
                             <div class="mb-4 pb-3 border-bottom">
-                                <h5 class="fw-bold text-body mb-1"><i class="fab fa-pix text-success me-2"></i> Configurações de Pagamento PIX no WhatsApp</h5>
-                                <p class="text-secondary small mb-0">Escolha o formato interativo que seus clientes receberão no aplicativo do WhatsApp.</p>
+                                <h5 class="fw-bold text-body mb-1"><i class="fab fa-pix text-success me-2"></i> Formato de Cobrança PIX para Faturas de Clientes</h5>
+                                <p class="text-secondary small mb-0">Selecione como os clientes da sua empresa ou licenciados receberão as mensagens e botões interativos no WhatsApp.</p>
                             </div>
 
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold d-block">Formato de Envio das Cobranças</label>
-                                    <div class="row g-3">
-                                        <div class="col-md-6 col-lg-3">
-                                            <div class="card h-100 border p-3 cursor-pointer formato-card {{ $configs['tipo_envio'] === 'botoes_interativos' ? 'border-primary bg-primary bg-opacity-10' : '' }}" onclick="selecionarFormato('botoes_interativos')">
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="radio" name="tipo_envio" id="fmt_botoes" value="botoes_interativos" {{ $configs['tipo_envio'] === 'botoes_interativos' ? 'checked' : '' }}>
-                                                    <label class="form-check-label fw-bold" for="fmt_botoes">Botões Interativos (Recomendado)</label>
-                                                </div>
-                                                <p class="small text-secondary mb-0">Envia a mensagem com botão de <strong>Pagar Online</strong> (Link) e botão de <strong>Copiar Código PIX</strong> em um toque.</p>
-                                            </div>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-4">
+                                    <div class="card h-100 p-3 formato-card shadow-sm {{ $configs['tipo_envio'] === 'botoes_interativos' ? 'selecionado' : '' }}" onclick="selecionarFormato('botoes_interativos')">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge bg-danger text-white">Recomendado</span>
+                                            <input class="form-check-input fs-5" type="radio" name="tipo_envio" value="botoes_interativos" {{ $configs['tipo_envio'] === 'botoes_interativos' ? 'checked' : '' }} onchange="selecionarFormato('botoes_interativos')">
                                         </div>
-
-                                        <div class="col-md-6 col-lg-3">
-                                            <div class="card h-100 border p-3 cursor-pointer formato-card {{ $configs['tipo_envio'] === 'pix_nativo' ? 'border-primary bg-primary bg-opacity-10' : '' }}" onclick="selecionarFormato('pix_nativo')">
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="radio" name="tipo_envio" id="fmt_pix" value="pix_nativo" {{ $configs['tipo_envio'] === 'pix_nativo' ? 'checked' : '' }}>
-                                                    <label class="form-check-label fw-bold" for="fmt_pix">Botão PIX Nativo (/send/pix)</label>
-                                                </div>
-                                                <p class="small text-secondary mb-0">Usa o endpoint dedicado <code>/send/pix</code> com cabeçalho de pagamento nativo e chave PIX direta.</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6 col-lg-3">
-                                            <div class="card h-100 border p-3 cursor-pointer formato-card {{ $configs['tipo_envio'] === 'review_and_pay' ? 'border-primary bg-primary bg-opacity-10' : '' }}" onclick="selecionarFormato('review_and_pay')">
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="radio" name="tipo_envio" id="fmt_review" value="review_and_pay" {{ $configs['tipo_envio'] === 'review_and_pay' ? 'checked' : '' }}>
-                                                    <label class="form-check-label fw-bold" for="fmt_review">Revisar e Pagar (/send/button)</label>
-                                                </div>
-                                                <p class="small text-secondary mb-0">Exibe botão 'Revisar e Pagar' com lista de itens, SKU e valor em centavos integrado com o WhatsApp Pay.</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6 col-lg-3">
-                                            <div class="card h-100 border p-3 cursor-pointer formato-card {{ $configs['tipo_envio'] === 'texto' ? 'border-primary bg-primary bg-opacity-10' : '' }}" onclick="selecionarFormato('texto')">
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="radio" name="tipo_envio" id="fmt_texto" value="texto" {{ $configs['tipo_envio'] === 'texto' ? 'checked' : '' }}>
-                                                    <label class="form-check-label fw-bold" for="fmt_texto">Texto Completo com Link</label>
-                                                </div>
-                                                <p class="small text-secondary mb-0">Mensagem de texto formatada tradicional, compatível com 100% dos aparelhos e versões de WhatsApp.</p>
-                                            </div>
-                                        </div>
+                                        <h6 class="fw-bold mb-1"><i class="fas fa-arrow-pointer text-primary me-1"></i> Botões Interativos</h6>
+                                        <p class="text-secondary small mb-2">Dispara o texto completo com botões nativos clicáveis:</p>
+                                        <ul class="text-secondary small mb-0 ps-3">
+                                            <li><strong>Botão URL:</strong> Abrir Fatura Online</li>
+                                            <li><strong>Botão Copiar:</strong> Copia o código PIX com 1 toque</li>
+                                        </ul>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Nome do Comerciante / Empresa <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                        <input type="text" name="merchant_name" class="form-control" value="{{ $configs['merchant_name'] }}" required placeholder="Foco 7 Rastreamento">
+                                    <div class="card h-100 p-3 formato-card shadow-sm {{ $configs['tipo_envio'] === 'pix_nativo' ? 'selecionado' : '' }}" onclick="selecionarFormato('pix_nativo')">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge bg-success">Nativo WhatsApp</span>
+                                            <input class="form-check-input fs-5" type="radio" name="tipo_envio" value="pix_nativo" {{ $configs['tipo_envio'] === 'pix_nativo' ? 'checked' : '' }} onchange="selecionarFormato('pix_nativo')">
+                                        </div>
+                                        <h6 class="fw-bold mb-1"><i class="fab fa-pix text-success me-1"></i> Botão PIX Nativo (/send/pix)</h6>
+                                        <p class="text-secondary small mb-2">Utiliza o endpoint nativo da Evolution Go v3.0 com o botão oficial PIX do WhatsApp.</p>
                                     </div>
-                                    <div class="form-text small">Exibido nos botões de pagamento e cabeçalhos PIX.</div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Tipo da Chave PIX <span class="text-danger">*</span></label>
-                                    <select name="pix_key_type" class="form-select fw-semibold">
-                                        <option value="CPF" {{ $configs['pix_key_type'] === 'CPF' ? 'selected' : '' }}>CPF</option>
-                                        <option value="CNPJ" {{ $configs['pix_key_type'] === 'CNPJ' ? 'selected' : '' }}>CNPJ</option>
-                                        <option value="EMAIL" {{ $configs['pix_key_type'] === 'EMAIL' ? 'selected' : '' }}>E-mail</option>
-                                        <option value="PHONE" {{ $configs['pix_key_type'] === 'PHONE' ? 'selected' : '' }}>Telefone / Celular</option>
-                                        <option value="EVP" {{ $configs['pix_key_type'] === 'EVP' ? 'selected' : '' }}>EVP (Chave Aleatória)</option>
-                                    </select>
-                                    <div class="form-text small">Exigido pela Evolution API para botões de pagamento.</div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">
-                                        Chave PIX da Empresa
-                                        <span class="badge bg-warning text-dark small ms-1"><i class="fas fa-lock"></i> Criptografado</span>
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fab fa-pix"></i></span>
-                                        <input type="text" name="pix_key" class="form-control font-monospace" value="{{ $configs['pix_key'] }}" placeholder="Chave PIX cadastrada">
+                                    <div class="card h-100 p-3 formato-card shadow-sm {{ $configs['tipo_envio'] === 'texto' ? 'selecionado' : '' }}" onclick="selecionarFormato('texto')">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge bg-secondary">Universal</span>
+                                            <input class="form-check-input fs-5" type="radio" name="tipo_envio" value="texto" {{ $configs['tipo_envio'] === 'texto' ? 'checked' : '' }} onchange="selecionarFormato('texto')">
+                                        </div>
+                                        <h6 class="fw-bold mb-1"><i class="fas fa-align-left text-secondary me-1"></i> Texto com PIX Copia e Cola</h6>
+                                        <p class="text-secondary small mb-2">Mensagem de texto formatada com emoji, link e o código Copia e Cola em bloco monoespaçado.</p>
                                     </div>
-                                    <div class="form-text small">Chave usada para gerar os botões diretos de PIX no WhatsApp.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ===================================================================
-                             GUIA 3: RÉGUA DE COBRANÇA AUTOMATIZADA
-                             =================================================================== -->
-                        <div class="tab-pane fade" id="tab-regua" role="tabpanel">
-                            <div class="mb-4 pb-3 border-bottom">
-                                <h5 class="fw-bold text-body mb-1"><i class="fas fa-clock-rotate-left text-danger me-2"></i> Disparos Automatizados da Régua de Cobrança</h5>
-                                <p class="text-secondary small mb-0">Defina quais etapas da régua financeira enviarão notificações automáticas via WhatsApp.</p>
-                            </div>
-
-                            <div class="alert alert-info border-info d-flex align-items-center mb-4">
-                                <i class="fas fa-info-circle fs-3 me-3 text-info"></i>
-                                <div>
-                                    <strong>Integração com o Cron do Sistema:</strong> Quando a Régua de Cobrança for executada (automaticamente via Cron Job diário ou manualmente), todas as faturas que atingirem as datas de vencimento configuradas serão notificadas pelo WhatsApp além do e-mail.
                                 </div>
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border h-100">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_lembrete_1" id="regua_lembrete_1" value="1" {{ $configs['regua_lembrete_1'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold" for="regua_lembrete_1">1º Lembrete (10 dias antes)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Avisa o cliente que a fatura do mês já está emitida e disponível.</p>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nome do Estabelecimento / Beneficiário <span class="text-danger">*</span></label>
+                                    <input type="text" name="merchant_name" class="form-control" value="{{ $configs['merchant_name'] }}" required>
+                                    <div class="form-text small">Exibido no título da cobrança PIX no WhatsApp.</div>
                                 </div>
 
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border h-100">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_lembrete_2" id="regua_lembrete_2" value="1" {{ $configs['regua_lembrete_2'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold" for="regua_lembrete_2">2º Lembrete (5 dias antes)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Lembrete amigável avisando sobre o vencimento próximo.</p>
-                                    </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Tipo de Chave PIX</label>
+                                    <select name="pix_key_type" class="form-select">
+                                        <option value="CPF" {{ $configs['pix_key_type'] === 'CPF' ? 'selected' : '' }}>CPF</option>
+                                        <option value="CNPJ" {{ $configs['pix_key_type'] === 'CNPJ' ? 'selected' : '' }}>CNPJ</option>
+                                        <option value="EMAIL" {{ $configs['pix_key_type'] === 'EMAIL' ? 'selected' : '' }}>E-mail</option>
+                                        <option value="PHONE" {{ $configs['pix_key_type'] === 'PHONE' ? 'selected' : '' }}>Telefone</option>
+                                        <option value="EVP" {{ $configs['pix_key_type'] === 'EVP' ? 'selected' : '' }}>Chave Aleatória (EVP)</option>
+                                    </select>
                                 </div>
 
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border h-100">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_lembrete_3" id="regua_lembrete_3" value="1" {{ $configs['regua_lembrete_3'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold" for="regua_lembrete_3">3º Lembrete (Véspera - 1 dia antes)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Alerta de véspera para evitar que o cliente esqueça a data de vencimento.</p>
-                                    </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Chave PIX de Cobrança de Faturas</label>
+                                    <input type="text" name="pix_key" class="form-control" value="{{ $configs['pix_key'] }}" placeholder="Chave para faturas de clientes">
                                 </div>
 
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border border-warning h-100 bg-warning bg-opacity-10">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_vencimento_hoje" id="regua_vencimento_hoje" value="1" {{ $configs['regua_vencimento_hoje'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold text-dark" for="regua_vencimento_hoje">Vencimento Hoje (D-0)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Mensagem disparada na manhã do dia do vencimento.</p>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Delay Anti-Bloqueio entre Disparos (Milissegundos)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-stopwatch"></i></span>
+                                        <input type="number" name="delay" class="form-control" value="{{ $configs['delay'] ?? 1200 }}" min="0" step="100">
+                                        <span class="input-group-text">ms</span>
                                     </div>
+                                    <div class="form-text small">Intervalo simulado antes de cada envio (Ex: 1200ms para humanização anti-spam).</div>
                                 </div>
 
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border border-danger h-100 bg-danger bg-opacity-10">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_atraso_1" id="regua_atraso_1" value="1" {{ $configs['regua_atraso_1'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold text-danger" for="regua_atraso_1">1º Aviso de Atraso (1 dia após)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Notifica sobre o vencimento expirado com valor atualizado.</p>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border border-danger h-100 bg-danger bg-opacity-10">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_atraso_2" id="regua_atraso_2" value="1" {{ $configs['regua_atraso_2'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold text-danger" for="regua_atraso_2">2º Aviso de Atraso (5 dias após)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Cobrança formal com cálculo automático de multa e juros diários.</p>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 col-lg-4">
-                                    <div class="card p-3 border border-danger h-100 bg-danger bg-opacity-15">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="regua_atraso_3" id="regua_atraso_3" value="1" {{ $configs['regua_atraso_3'] ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold text-danger" for="regua_atraso_3">3º Aviso (10 dias - Risco Suspensão)</label>
-                                        </div>
-                                        <p class="small text-secondary mb-0">Notificação grave informando sobre o risco iminente de suspensão do rastreamento.</p>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Anexo de Carnê / Fatura em PDF</label>
+                                    <div class="form-check form-switch fs-5 mt-1">
+                                        <input class="form-check-input" type="checkbox" name="enviar_pdf" id="checkEnviarPdf" value="1" {{ $configs['enviar_pdf'] ? 'checked' : '' }}>
+                                        <label class="form-check-label fs-6 fw-bold" for="checkEnviarPdf">
+                                            Enviar automaticamente o PDF da fatura/carnê como mídia em anexo
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ===================================================================
-                             GUIA 4: TEMPLATES DAS MENSAGENS DE COBRANÇA
+                             GUIA 4: RÉGUA DE COBRANÇA AUTOMATIZADA (TIMELINE VISUAL)
                              =================================================================== -->
-                        <div class="tab-pane fade" id="tab-templates" role="tabpanel">
-                            <div class="mb-3 pb-3 border-bottom">
-                                <h5 class="fw-bold text-body mb-1"><i class="fas fa-comments text-info me-2"></i> Modelos das Mensagens de WhatsApp</h5>
-                                <p class="text-secondary small mb-0">Personalize o texto de cada etapa. Clique em uma variável abaixo para copiá-la.</p>
-                            </div>
-
-                            <!-- PAINEL DE TAGS / VARIÁVEIS DISPONÍVEIS -->
-                            <div class="card bg-body-tertiary border mb-4">
-                                <div class="card-body p-3">
-                                    <span class="small fw-bold text-uppercase text-secondary d-block mb-2">Variáveis Disponíveis para os Textos:</span>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{cliente_nome}')" title="Nome do cliente">{cliente_nome}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{fatura_id}')" title="Código da fatura">{fatura_id}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{plano_nome}')" title="Nome do plano">{plano_nome}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{valor}')" title="Valor base da fatura">{valor}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{valor_atualizado}')" title="Valor com encargos de atraso">{valor_atualizado}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{multa}')" title="Valor calculado da multa">{multa}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{juros}')" title="Valor calculado dos juros">{juros}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{data_vencimento}')" title="Data no formato DD/MM/AAAA">{data_vencimento}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{dias_atraso}')" title="Dias em atraso">{dias_atraso}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{link_fatura}')" title="Link direto para pagamento">{link_fatura}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{pix_copia_cola}')" title="Código PIX copia-e-cola">{pix_copia_cola}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{chave_pix}')" title="Chave PIX da empresa">{chave_pix}</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" onclick="copiarTag('{empresa_nome}')" title="Nome da empresa">{empresa_nome}</button>
-                                    </div>
+                        <div class="tab-pane fade" id="tab-regua" role="tabpanel">
+                            <div class="mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h5 class="fw-bold text-body mb-1"><i class="fas fa-clock-rotate-left text-danger me-2"></i> Régua de Cobrança Automatizada via WhatsApp</h5>
+                                    <p class="text-secondary small mb-0">Habilite ou desabilite as etapas de disparo automático sincronizadas com o agendador Cron.</p>
                                 </div>
                             </div>
 
-                            <!-- ACCORDION COM OS TEMPLATES -->
-                            <div class="accordion" id="accordionTemplatesWpp">
-
-                                <!-- 1º Lembrete -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#acc-lembrete-1">
-                                            <i class="fas fa-bell text-primary me-2"></i> 1º Lembrete Pré-Vencimento (10 dias antes)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-lembrete-1" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_lembrete_1" rows="6" class="form-control font-monospace">{{ $configs['tpl_lembrete_1'] }}</textarea>
+                            <div class="timeline-regua">
+                                <!-- Lembrete 1 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-primary"><i class="fas fa-bell"></i></div>
+                                    <div class="card shadow-xs border p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-body">1. Primeiro Lembrete Preventivo (10 Dias Antes)</h6>
+                                                <small class="text-secondary">Avisa o cliente amigavelmente sobre a disponibilidade da fatura com link do boleto/PIX.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_1" value="1" {{ $configs['regua_lembrete_1'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 2º Lembrete -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#acc-lembrete-2">
-                                            <i class="fas fa-clock text-primary me-2"></i> 2º Lembrete Pré-Vencimento (5 dias antes)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-lembrete-2" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_lembrete_2" rows="6" class="form-control font-monospace">{{ $configs['tpl_lembrete_2'] }}</textarea>
+                                <!-- Lembrete 2 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-info"><i class="fas fa-calendar-check"></i></div>
+                                    <div class="card shadow-xs border p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-body">2. Segundo Lembrete Preventivo (5 Dias Antes)</h6>
+                                                <small class="text-secondary">Reforça a proximidade da data de vencimento com botão de pagamento imediato.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_2" value="1" {{ $configs['regua_lembrete_2'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 3º Lembrete -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#acc-lembrete-3">
-                                            <i class="fas fa-hourglass-half text-warning me-2"></i> 3º Lembrete Pré-Vencimento (Véspera - 1 dia antes)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-lembrete-3" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_lembrete_3" rows="6" class="form-control font-monospace">{{ $configs['tpl_lembrete_3'] }}</textarea>
+                                <!-- Lembrete 3 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-warning"><i class="fas fa-hourglass-half"></i></div>
+                                    <div class="card shadow-xs border p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-body">3. Terceiro Lembrete Preventivo (1 Dia Antes)</h6>
+                                                <small class="text-secondary">Avisa que a fatura vence no dia seguinte, prevenindo juros e mora.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_lembrete_3" value="1" {{ $configs['regua_lembrete_3'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Vencimento Hoje -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#acc-vencimento-hoje">
-                                            <i class="fas fa-exclamation-triangle text-danger me-2"></i> Cobrança no Vencimento (Vence HOJE / D-0)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-vencimento-hoje" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_vencimento_hoje" rows="6" class="form-control font-monospace">{{ $configs['tpl_vencimento_hoje'] }}</textarea>
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-danger"><i class="fas fa-circle-exclamation"></i></div>
+                                    <div class="card shadow-xs border border-danger border-opacity-50 p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-danger">4. Cobrança no Dia do Vencimento (HOJE)</h6>
+                                                <small class="text-secondary">Notificação prioritária com chave PIX copia e cola direto na mensagem.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_vencimento_hoje" value="1" {{ $configs['regua_vencimento_hoje'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 1º Aviso de Atraso -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#acc-atraso-1">
-                                            <i class="fas fa-calendar-xmark text-danger me-2"></i> 1º Aviso de Atraso (1 dia vencido)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-atraso-1" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_atraso_1" rows="6" class="form-control font-monospace">{{ $configs['tpl_atraso_1'] }}</textarea>
+                                <!-- Atraso 1 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-secondary"><i class="fas fa-triangle-exclamation"></i></div>
+                                    <div class="card shadow-xs border p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-body">5. Primeiro Aviso de Atraso (1 Dia Após Vencimento)</h6>
+                                                <small class="text-secondary">Alerta sobre a expiração do vencimento e orienta a regularização rápida.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_1" value="1" {{ $configs['regua_atraso_1'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 2º Aviso de Atraso -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#acc-atraso-2">
-                                            <i class="fas fa-fire text-danger me-2"></i> 2º Aviso de Atraso (5 dias com Multa e Juros)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-atraso-2" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_atraso_2" rows="6" class="form-control font-monospace">{{ $configs['tpl_atraso_2'] }}</textarea>
+                                <!-- Atraso 2 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-danger"><i class="fas fa-file-invoice-dollar"></i></div>
+                                    <div class="card shadow-xs border p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-body">6. Segundo Aviso de Atraso com Encargos (5 Dias Após)</h6>
+                                                <small class="text-secondary">Atualiza o valor total com incidência automática de multa e juros diários.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_2" value="1" {{ $configs['regua_atraso_2'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 3º Aviso de Atraso -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#acc-atraso-3">
-                                            <i class="fas fa-ban text-danger me-2"></i> 3º Aviso de Atraso &amp; Suspensão de Sinal (10 dias)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-atraso-3" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_atraso_3" rows="6" class="form-control font-monospace">{{ $configs['tpl_atraso_3'] }}</textarea>
+                                <!-- Atraso 3 -->
+                                <div class="timeline-step">
+                                    <div class="timeline-step-icon text-danger"><i class="fas fa-ban"></i></div>
+                                    <div class="card shadow-xs border border-danger p-3 bg-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-danger">7. Aviso de Suspensão Preventiva de Sinal (10 Dias Após)</h6>
+                                                <small class="text-secondary">Notifica sobre a iminente interrupção de sinal de rastreamento veicular por inadimplência.</small>
+                                            </div>
+                                            <div class="form-check form-switch fs-5">
+                                                <input class="form-check-input" type="checkbox" name="regua_atraso_3" value="1" {{ $configs['regua_atraso_3'] ? 'checked' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Nova Fatura Gerada -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#acc-fatura-gerada">
-                                            <i class="fas fa-file-invoice-dollar text-success me-2"></i> Notificação de Nova Fatura Gerada
-                                        </button>
-                                    </h2>
-                                    <div id="acc-fatura-gerada" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_fatura_gerada" rows="6" class="form-control font-monospace">{{ $configs['tpl_fatura_gerada'] }}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Pagamento Confirmado -->
-                                <div class="accordion-item border mb-2 rounded overflow-hidden">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-semibold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#acc-pagamento-confirmado">
-                                            <i class="fas fa-check-circle text-success me-2"></i> Notificação de Pagamento Confirmado (Baixa Automática)
-                                        </button>
-                                    </h2>
-                                    <div id="acc-pagamento-confirmado" class="accordion-collapse collapse" data-bs-parent="#accordionTemplatesWpp">
-                                        <div class="accordion-body">
-                                            <textarea name="tpl_pagamento_confirmado" rows="6" class="form-control font-monospace">{{ $configs['tpl_pagamento_confirmado'] }}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
 
                         <!-- ===================================================================
-                             GUIA 5: DISPARO DE TESTE & DIAGNÓSTICO
+                             GUIA 5: TEMPLATES DE MENSAGENS & VISUALIZADOR DE SMARTPHONE
+                             =================================================================== -->
+                        <div class="tab-pane fade" id="tab-templates" role="tabpanel">
+                            <div class="mb-4 pb-3 border-bottom">
+                                <h5 class="fw-bold text-body mb-1"><i class="fas fa-mobile-screen-button text-info me-2"></i> Templates de Mensagens com Simulador em Tempo Real</h5>
+                                <p class="text-secondary small mb-0">Personalize o texto de cada etapa da régua e visualize instantaneamente como ela aparecerá no WhatsApp do cliente.</p>
+                            </div>
+
+                            <!-- TAGS DINÂMICAS CLICÁVEIS -->
+                            <div class="card bg-body-tertiary border p-3 mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <strong class="small text-body"><i class="fas fa-tags text-primary me-1"></i> Tags Dinâmicas Disponíveis:</strong>
+                                    <span class="text-secondary small">(Clique em qualquer tag para copiar)</span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{cliente_nome}')">{cliente_nome}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{fatura_id}')">{fatura_id}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{plano_nome}')">{plano_nome}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{valor}')">{valor}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{valor_atualizado}')">{valor_atualizado}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{data_vencimento}')">{data_vencimento}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{link_fatura}')">{link_fatura}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{pix_copia_cola}')">{pix_copia_cola}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{dias_atraso}')">{dias_atraso}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarTag('{empresa_nome}')">{empresa_nome}</button>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <!-- COLUNA DA ESQUERDA: EDITOR DE TEMPLATES -->
+                                <div class="col-lg-7">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Selecione o Template para Editar:</label>
+                                        <select id="selectTemplateAtivo" class="form-select fw-semibold" onchange="trocarTemplateEdicao()">
+                                            <option value="tpl_vencimento_hoje">Vencimento Hoje (Prioritário)</option>
+                                            <option value="tpl_lembrete_1">Lembrete 1 (10 dias antes)</option>
+                                            <option value="tpl_lembrete_2">Lembrete 2 (5 dias antes)</option>
+                                            <option value="tpl_lembrete_3">Lembrete 3 (1 dia antes)</option>
+                                            <option value="tpl_atraso_1">Atraso 1 (1 dia após)</option>
+                                            <option value="tpl_atraso_2">Atraso 2 (5 dias após - com juros)</option>
+                                            <option value="tpl_atraso_3">Atraso 3 (10 dias após - aviso suspensão)</option>
+                                            <option value="tpl_fatura_gerada">Nova Fatura Gerada</option>
+                                            <option value="tpl_pagamento_confirmado">Pagamento Confirmado (Baixa Automática)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- ÁREAS DE TEXTO COM SUMMERNOTE WYSIWYG CONFORME SELEÇÃO -->
+                                    <div class="box-template-editor" id="box_tpl_vencimento_hoje">
+                                        <label class="form-label small fw-bold text-danger">Template: Vencimento Hoje</label>
+                                        <textarea name="tpl_vencimento_hoje" id="textarea_tpl_vencimento_hoje" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_vencimento_hoje'], '<') ? nl2br(e($configs['tpl_vencimento_hoje'])) : $configs['tpl_vencimento_hoje'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_lembrete_1">
+                                        <label class="form-label small fw-bold text-primary">Template: Primeiro Lembrete (10 Dias Antes)</label>
+                                        <textarea name="tpl_lembrete_1" id="textarea_tpl_lembrete_1" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_lembrete_1'], '<') ? nl2br(e($configs['tpl_lembrete_1'])) : $configs['tpl_lembrete_1'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_lembrete_2">
+                                        <label class="form-label small fw-bold text-info">Template: Segundo Lembrete (5 Dias Antes)</label>
+                                        <textarea name="tpl_lembrete_2" id="textarea_tpl_lembrete_2" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_lembrete_2'], '<') ? nl2br(e($configs['tpl_lembrete_2'])) : $configs['tpl_lembrete_2'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_lembrete_3">
+                                        <label class="form-label small fw-bold text-warning">Template: Terceiro Lembrete (1 Dia Antes)</label>
+                                        <textarea name="tpl_lembrete_3" id="textarea_tpl_lembrete_3" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_lembrete_3'], '<') ? nl2br(e($configs['tpl_lembrete_3'])) : $configs['tpl_lembrete_3'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_atraso_1">
+                                        <label class="form-label small fw-bold text-secondary">Template: Atraso 1 (1 Dia Após)</label>
+                                        <textarea name="tpl_atraso_1" id="textarea_tpl_atraso_1" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_atraso_1'], '<') ? nl2br(e($configs['tpl_atraso_1'])) : $configs['tpl_atraso_1'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_atraso_2">
+                                        <label class="form-label small fw-bold text-danger">Template: Atraso 2 (5 Dias Após)</label>
+                                        <textarea name="tpl_atraso_2" id="textarea_tpl_atraso_2" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_atraso_2'], '<') ? nl2br(e($configs['tpl_atraso_2'])) : $configs['tpl_atraso_2'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_atraso_3">
+                                        <label class="form-label small fw-bold text-danger">Template: Atraso 3 (10 Dias Após - Urgente)</label>
+                                        <textarea name="tpl_atraso_3" id="textarea_tpl_atraso_3" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_atraso_3'], '<') ? nl2br(e($configs['tpl_atraso_3'])) : $configs['tpl_atraso_3'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_fatura_gerada">
+                                        <label class="form-label small fw-bold text-primary">Template: Nova Fatura Gerada</label>
+                                        <textarea name="tpl_fatura_gerada" id="textarea_tpl_fatura_gerada" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_fatura_gerada'], '<') ? nl2br(e($configs['tpl_fatura_gerada'])) : $configs['tpl_fatura_gerada'] !!}</textarea>
+                                    </div>
+
+                                    <div class="box-template-editor d-none" id="box_tpl_pagamento_confirmado">
+                                        <label class="form-label small fw-bold text-success">Template: Pagamento Confirmado</label>
+                                        <textarea name="tpl_pagamento_confirmado" id="textarea_tpl_pagamento_confirmado" class="form-control summernote" data-height="240">{!! !str_contains($configs['tpl_pagamento_confirmado'], '<') ? nl2br(e($configs['tpl_pagamento_confirmado'])) : $configs['tpl_pagamento_confirmado'] !!}</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- COLUNA DA DIREITA: SMARTPHONE MOCKUP PREVIEW -->
+                                <div class="col-lg-5 text-center">
+                                    <div class="small fw-bold text-secondary text-uppercase mb-2">
+                                        <i class="fas fa-eye me-1"></i> Visualização Realista no WhatsApp
+                                    </div>
+                                    <div class="smartphone-mockup">
+                                        <div class="phone-notch"></div>
+                                        <div class="phone-header">
+                                            <i class="fas fa-arrow-left small"></i>
+                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 14px;">
+                                                <i class="fas fa-car-side"></i>
+                                            </div>
+                                            <div class="text-start">
+                                                <div class="fw-bold small lh-1">{{ $configs['merchant_name'] ?? 'Foco 7 Rastreamento' }}</div>
+                                                <small class="text-success" style="font-size: 10px;">online agora</small>
+                                            </div>
+                                        </div>
+                                        <div class="phone-body text-start">
+                                            <div class="chat-bubble-wpp" id="previewChatBubbleText">
+                                                <!-- Texto renderizado dinamicamente via JS -->
+                                            </div>
+                                            <div id="previewBotoesAcao">
+                                                <a href="javascript:void(0)" class="chat-btn-action"><i class="fas fa-up-right-from-square me-1"></i> Pagar Fatura Online</a>
+                                                <a href="javascript:void(0)" class="chat-btn-action"><i class="fas fa-copy me-1"></i> Copiar Código PIX</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===================================================================
+                             GUIA 6: DISPARO DE TESTE & CONSOLE DE DIAGNÓSTICO
                              =================================================================== -->
                         <div class="tab-pane fade" id="tab-teste" role="tabpanel">
                             <div class="mb-4 pb-3 border-bottom">
@@ -609,20 +1543,20 @@
                                 <p class="text-secondary small mb-0">Envie uma mensagem de teste para o seu próprio WhatsApp para validar a conexão e a renderização dos botões.</p>
                             </div>
 
-                            <div class="row g-3 max-w-700">
+                            <div class="row g-3" style="max-width: 750px;">
                                 <div class="col-md-7">
                                     <label class="form-label fw-semibold">Número de WhatsApp para Teste <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fab fa-whatsapp"></i></span>
-                                        <input type="text" id="inputTelefoneTeste" class="form-control mascara-telefone" placeholder="(11) 99999-9999 ou 5511999999999">
+                                        <input type="text" id="inputTelefoneTeste" class="form-control" placeholder="(11) 99999-9999 ou 5511999999999">
                                     </div>
-                                    <div class="form-text small">Pode digitar com ou sem máscara. O sistema ajusta para o formato internacional.</div>
+                                    <div class="form-text small">Pode digitar com ou sem máscara. O sistema adiciona o DDI 55 do Brasil automaticamente.</div>
                                 </div>
 
                                 <div class="col-md-5">
-                                    <label class="form-label fw-semibold">Tipo do Teste <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold">Tipo do Disparo <span class="text-danger">*</span></label>
                                     <select id="selectTipoTeste" class="form-select fw-semibold">
-                                        <option value="texto">Texto Formatado</option>
+                                        <option value="texto">Texto Formatado Oficial</option>
                                         <option value="pix">Botão PIX Nativo (/send/pix)</option>
                                         <option value="botoes">Botões Interativos (URL + Copiar)</option>
                                     </select>
@@ -635,14 +1569,14 @@
                                 </div>
 
                                 <div class="col-12 mt-4" id="boxRespostaTeste" style="display: none;">
-                                    <label class="form-label fw-semibold small text-secondary">Retorno da API:</label>
-                                    <pre class="bg-body-secondary p-3 rounded font-monospace small mb-0" id="jsonRespostaTeste" style="max-height: 250px; overflow-y: auto;"></pre>
+                                    <label class="form-label fw-semibold small text-secondary">Retorno do Servidor Evolution API:</label>
+                                    <pre class="bg-body-secondary p-3 rounded font-monospace small mb-0 border" id="jsonRespostaTeste" style="max-height: 250px; overflow-y: auto;"></pre>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ===================================================================
-                             GUIA 6: WEBHOOK & CALLBACKS
+                             GUIA 7: WEBHOOK & MONITOR DE EVENTOS
                              =================================================================== -->
                         <div class="tab-pane fade" id="tab-webhook" role="tabpanel">
                             <div class="mb-4 pb-3 border-bottom">
@@ -651,7 +1585,7 @@
                             </div>
 
                             <div class="card bg-body-tertiary border p-4 mb-4">
-                                <label class="form-label fw-semibold">URL de Webhook do Seu Sistema</label>
+                                <label class="form-label fw-semibold">URL de Webhook Oficial do Sistema</label>
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control font-monospace" id="inputWebhookUrl" value="{{ $webhookUrl }}" readonly>
                                     <button class="btn btn-primary" type="button" onclick="copiarWebhookUrl()">
@@ -665,7 +1599,7 @@
 
                             <div class="card border">
                                 <div class="card-header bg-transparent py-2">
-                                    <strong class="small text-body"><i class="fas fa-list-check me-1"></i> Eventos Sincronizados via Webhook:</strong>
+                                    <strong class="small text-body"><i class="fas fa-list-check me-1"></i> Eventos Monitorados em Tempo Real:</strong>
                                 </div>
                                 <div class="card-body p-3">
                                     <ul class="mb-0 small text-secondary">
@@ -674,128 +1608,6 @@
                                         <li><code>SEND_MESSAGE</code>: Notificações de confirmação de envio no WhatsApp.</li>
                                         <li><code>MESSAGE</code>: Mensagens recebidas dos clientes.</li>
                                     </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ===================================================================
-                             GUIA 7: GESTÃO DE INSTÂNCIAS (EMPRESA & LICENCIADOS - R$ 60/MÊS)
-                             =================================================================== -->
-                        <div class="tab-pane fade" id="tab-instancias" role="tabpanel">
-                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
-                                <div>
-                                    <h5 class="fw-bold text-body mb-1"><i class="fas fa-network-wired text-warning me-2"></i> Controle Central de Instâncias WhatsApp Evolution Go</h5>
-                                    <p class="text-secondary small mb-0">Servidor oficial: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-primary font-monospace">https://whatsapp.km.site.nom.br</a> | Documentação: <a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-info">/api/docs</a></p>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="listarInstanciasServidor()">
-                                        <i class="fas fa-rotate me-1"></i> Sincronizar Servidor
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarInstancia">
-                                        <i class="fas fa-plus-circle me-1"></i> Nova Instância (+ R$ 60,00/mês)
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- CARDS DE RESUMO DE TARIFAS -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <div class="card border-0 bg-success bg-opacity-10 h-100">
-                                        <div class="card-body p-3">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span class="small fw-semibold text-success text-uppercase">1ª Instância (Principal)</span>
-                                                <i class="fas fa-shield-halved text-success fs-5"></i>
-                                            </div>
-                                            <h4 class="fw-bold text-success mb-1">INCLUSA</h4>
-                                            <small class="text-secondary">Instância padrão <strong class="font-monospace text-body">{{ $configs['instance'] }}</strong> da empresa Foco 7.</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card border-0 bg-warning bg-opacity-10 h-100">
-                                        <div class="card-body p-3">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span class="small fw-semibold text-warning text-uppercase">Instâncias Extras / Licenciados</span>
-                                                <i class="fas fa-layer-group text-warning fs-5"></i>
-                                            </div>
-                                            <h4 class="fw-bold text-body mb-1">{{ $totalInstanciasExtras ?? 0 }} <small class="fs-6 text-muted">instâncias extras</small></h4>
-                                            <small class="text-secondary">Custo fixo por instância extra: <strong>R$ {{ number_format($custoInstanciaExtra ?? 60.00, 2, ',', '.') }} / mês</strong>.</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card border-0 bg-danger bg-opacity-10 h-100">
-                                        <div class="card-body p-3">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span class="small fw-semibold text-danger text-uppercase">Recorrência Mensal Extra</span>
-                                                <i class="fas fa-receipt text-danger fs-5"></i>
-                                            </div>
-                                            <h4 class="fw-bold text-danger mb-1">R$ {{ number_format($custoTotalRecorrente ?? 0, 2, ',', '.') }} <small class="fs-6 text-muted">/mês</small></h4>
-                                            <small class="text-secondary">Faturamento total gerado pelas instâncias extras contratadas.</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- TABELA DE INSTÂNCIAS REGISTRADAS -->
-                            <div class="card border">
-                                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="fw-bold mb-0 text-body"><i class="fas fa-list me-2 text-primary"></i> Instâncias Provisionadas no Servidor Central</h6>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light small">
-                                            <tr>
-                                                <th>Identificador / Nome</th>
-                                                <th>Tipo / Proprietário</th>
-                                                <th>Custo Recorrente</th>
-                                                <th>Criado em</th>
-                                                <th>Status</th>
-                                                <th class="text-end">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="table-success table-opacity-25">
-                                                <td>
-                                                    <strong class="font-monospace text-primary">{{ $configs['instance'] }}</strong>
-                                                    <span class="badge bg-success ms-1">Principal Foco 7</span>
-                                                </td>
-                                                <td><span class="badge bg-dark">Empresa Master</span></td>
-                                                <td><strong class="text-success">Inclusa no Plano</strong></td>
-                                                <td>-</td>
-                                                <td><span class="badge {{ $statusCache === 'conectado' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($statusCache) }}</span></td>
-                                                <td class="text-end">
-                                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="conectarEabrirQr()">
-                                                        <i class="fas fa-qrcode me-1"></i> Conectar / QR Code
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            @if(!empty($instanciasExtras) && is_array($instanciasExtras))
-                                                @foreach($instanciasExtras as $extra)
-                                                <tr>
-                                                    <td>
-                                                        <strong class="font-monospace text-body">{{ $extra['nome'] ?? 'N/D' }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        @if(($extra['tipo'] ?? '') === 'licenciado')
-                                                            <span class="badge bg-primary">Licenciado FOCO 7</span>
-                                                        @else
-                                                            <span class="badge bg-secondary">Instância Extra Empresa</span>
-                                                        @endif
-                                                    </td>
-                                                    <td><strong class="text-danger">R$ {{ number_format($extra['valor_recorrente'] ?? 60.00, 2, ',', '.') }} / mês</strong></td>
-                                                    <td><small class="text-muted">{{ !empty($extra['criado_em']) ? date('d/m/Y H:i', strtotime($extra['criado_em'])) : '-' }}</small></td>
-                                                    <td><span class="badge bg-success">Ativa</span></td>
-                                                    <td class="text-end">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selecionarInstanciaServidor('{{ $extra['nome'] }}', '{{ $extra['token'] ?? '' }}')">
-                                                            <i class="fas fa-arrow-right me-1"></i> Selecionar
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            @endif
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -817,7 +1629,7 @@
 </div>
 
 <!-- ===================================================================
-     MODAL DE CONEXÃO & QR CODE
+     MODAL 1: CONEXÃO & QR CODE
      =================================================================== -->
 <div class="modal fade" id="modalQrCode" tabindex="-1" aria-labelledby="modalQrCodeLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
@@ -828,14 +1640,12 @@
             </div>
             <div class="modal-body p-4 text-center">
 
-                <!-- ÁREA DE CARREGANDO / SPINNER -->
                 <div id="qrLoadingBox" class="py-4">
                     <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                     <h6 class="fw-bold text-body">Gerando QR Code na Evolution API...</h6>
                     <p class="text-secondary small mb-0">Por favor, aguarde enquanto comunicamos com a instância.</p>
                 </div>
 
-                <!-- ÁREA DO QR CODE -->
                 <div id="qrCodeContentBox" style="display: none;">
                     <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm border mb-3">
                         <img id="imgQrCodeDisplay" src="" alt="QR Code WhatsApp" class="img-fluid" style="width: 260px; height: 260px; object-fit: contain;">
@@ -843,40 +1653,40 @@
                     <div class="alert alert-light border small text-start mb-3">
                         <ol class="mb-0 ps-3">
                             <li>Abra o <strong>WhatsApp</strong> no seu celular.</li>
-                            <li>Toque no menu (3 pontinhos) ou <strong>Configurações</strong>.</li>
-                            <li>Selecione <strong>Aparelhos conectados</strong> e depois <strong>Conectar um aparelho</strong>.</li>
+                            <li>Toque em <strong>Aparelhos conectados</strong> &rarr; <strong>Conectar um aparelho</strong>.</li>
                             <li>Aponte a câmera do celular para este QR Code.</li>
                         </ol>
                     </div>
-                    <div class="d-flex justify-content-center align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="recarregarQrCode()">
-                            <i class="fas fa-rotate me-1"></i> Atualizar QR Code
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="recarregarQrCode()">
+                        <i class="fas fa-rotate me-1"></i> Recarregar QR Code
+                    </button>
                 </div>
 
-                <!-- ÁREA DE JÁ CONECTADO -->
                 <div id="qrConectadoBox" style="display: none;" class="py-4">
                     <div class="bg-success bg-opacity-15 text-success rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 70px; height: 70px;">
                         <i class="fas fa-check-circle fs-1"></i>
                     </div>
                     <h5 class="fw-bold text-success mb-1">WhatsApp Conectado com Sucesso!</h5>
-                    <p class="text-secondary small mb-3">Sua instância está online e pronta para disparar cobranças.</p>
-                    <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">
-                        Concluído
-                    </button>
+                    <p class="text-secondary small mb-2">Sua instância está 100% online e operando no cluster Evolution Go.</p>
+                    <div class="badge bg-success-subtle text-success border border-success px-3 py-2 fs-6 mb-3 font-monospace" id="boxModalNumeroConectado">
+                        <i class="fab fa-whatsapp me-1"></i> <span id="txtModalNumeroConectado">{{ $numeroConectado ?? '5521981900390:35' }}</span>
+                    </div>
+                    <div class="d-block">
+                        <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">
+                            <i class="fas fa-check me-1"></i> Pronto para Envios
+                        </button>
+                    </div>
                 </div>
 
-                <!-- ÁREA DE ERRO -->
                 <div id="qrErroBox" style="display: none;" class="py-3">
                     <div class="bg-danger bg-opacity-15 text-danger rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2" style="width: 60px; height: 60px;">
                         <i class="fas fa-triangle-exclamation fs-2"></i>
                     </div>
                     <h6 class="fw-bold text-danger mb-1">Não foi possível obter o QR Code</h6>
-                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">Nenhum QR Code retornado. A instância pode já estar conectada ou precisando de reinicialização.</p>
+                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">A instância pode já estar conectada ou precisando de sincronização.</p>
                     <div class="d-flex justify-content-center gap-2 flex-wrap">
                         <button type="button" class="btn btn-success btn-sm fw-bold" onclick="verificarSeConectou()">
-                            <i class="fas fa-check-circle me-1"></i> Verificar se já Conectou
+                            <i class="fas fa-check-circle me-1"></i> Já Conectou?
                         </button>
                         <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" onclick="conectarEabrirQr()">
                             <i class="fas fa-rotate me-1"></i> Tentar Novamente
@@ -893,56 +1703,204 @@
 </div>
 
 <!-- ===================================================================
-     MODAL DE CRIAÇÃO ADMINISTRATIVA DA INSTÂNCIA (RECORRÊNCIA R$ 60/MÊS)
+     MODAL 2: CRIAÇÃO DE NOVA INSTÂNCIA (+ R$ 60,00/MÊS)
      =================================================================== -->
 <div class="modal fade" id="modalCriarInstancia" tabindex="-1" aria-labelledby="modalCriarInstanciaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-primary text-white py-3">
-                <h5 class="modal-title fw-bold" id="modalCriarInstanciaLabel"><i class="fas fa-plus-circle me-2"></i> Criar Nova Instância na Evolution API</h5>
+                <h5 class="modal-title fw-bold" id="modalCriarInstanciaLabel"><i class="fas fa-plus-circle me-2"></i> Criar Minha Própria Instância / Adicional</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <!-- CARD DE PRECIFICAÇÃO E RECORRÊNCIA DA INSTÂNCIA -->
                 <div class="card border-warning bg-warning bg-opacity-10 mb-3 shadow-none">
                     <div class="card-body p-3">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                             <span class="badge bg-danger text-white px-2 py-1 fs-6">
-                                <i class="fas fa-tag me-1"></i> R$ 60,00 / mês por Instância Adicional
+                                <i class="fas fa-tag me-1"></i> R$ 60,00 / mês • Módulo Mercado Pago (Dev)
                             </span>
-                            <span class="badge bg-success text-white">Evolution Go Dedicado</span>
+                            <span class="badge bg-success text-white">Cluster Evolution Go</span>
                         </div>
                         <p class="small text-secondary mb-2">
-                            A primeira instância (<code class="fw-bold text-dark">foco7</code>) está inclusa no plano. A criação de instâncias extras para a empresa ou licenciados possui cobrança recorrente de <strong>R$ 60,00 cada</strong> provisionada diretamente no cluster oficial central (<a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="fw-bold text-primary font-monospace">whatsapp.km.site.nom.br</a>).
+                            A instância atual (<code class="fw-bold text-dark">foco7</code>) é de uso exclusivo para configuração. O Administrador <strong>deve criar e ativar sua própria instância</strong> através deste painel antes de começar a realizar cobranças via WhatsApp (fora isso, as cobranças ocorrem somente via E-mail).
                         </p>
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" id="checkConcordoValorExtra" checked>
                             <label class="form-check-label small fw-semibold text-body" for="checkConcordoValorExtra">
-                                Estou ciente do custo recorrente de <strong>R$ 60,00/mês</strong> para instâncias extras criadas.
+                                Estou ciente da mensalidade recorrente de <strong>R$ 60,00/mês</strong> cobrada pelo Módulo Mercado Pago do Desenvolvedor.
                             </label>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Nome da Instância</label>
-                    <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="{{ (!empty($configs['instance']) && !str_contains($configs['instance'], '•')) ? $configs['instance'] : 'foco7' }}" placeholder="Ex: foco7_cobranca ou foco7_vendas">
-                    <div class="form-text small">Identificador único no servidor <code>https://whatsapp.km.site.nom.br</code></div>
+                    <label class="form-label fw-semibold">Nome da Sua Instância <span class="text-danger">*</span></label>
+                    <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="minha_empresa_{{ rand(100, 999) }}" placeholder="Ex: minha_empresa_wpp ou filial_belem">
+                    <div class="form-text small">Identificador único no servidor <code>https://api.kdkhost.com.br</code></div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Token da Instância (API Key / Laravel Sanctum Token)</label>
-                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" value="{{ (!empty($configs['apikey']) && !str_contains($configs['apikey'], '•')) ? $configs['apikey'] : '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7' }}" placeholder="Chave de segurança da instância">
+                    <label class="form-label fw-semibold">Finalidade / Tipo da Instância</label>
+                    <select id="modalInstanciaTipo" class="form-select">
+                        <option value="propria_admin" selected>Minha Própria Instância Admin (Para Cobrar Clientes via WhatsApp)</option>
+                        <option value="empresa">Instância Adicional da Empresa / Filial</option>
+                        <option value="licenciado">Instância Dedicada de Licenciado</option>
+                    </select>
                 </div>
 
-                <div class="alert alert-info border-info small mb-0">
-                    <i class="fas fa-info-circle text-info me-1"></i> Servidor Central Evolution Go: <strong>https://whatsapp.km.site.nom.br</strong> (<a href="https://whatsapp.km.site.nom.br/api/docs" target="_blank" class="text-primary fw-bold">Swagger Docs /api/docs</a>).
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nome do Responsável / Cliente</label>
+                        <input type="text" id="modalInstanciaNomeResp" class="form-control" placeholder="Ex: João da Silva ou Empresa XPTO">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">WhatsApp para Cobrança Automática</label>
+                        <input type="text" id="modalInstanciaTelResp" class="form-control mascara-telefone" placeholder="(99) 99999-9999">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">E-mail do Responsável (Opcional)</label>
+                    <input type="email" id="modalInstanciaEmailResp" class="form-control" placeholder="cliente@email.com">
+                    <div class="form-text small">Usado para identificação do pagador no Mercado Pago.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Token da Instância (Opcional - Gerado automaticamente se vazio)</label>
+                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" placeholder="Deixe em branco para auto-geração">
                 </div>
             </div>
             <div class="modal-footer bg-body-tertiary">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary fw-bold" id="btnConfirmarCriarInstancia" onclick="executarCriacaoInstancia()">
-                    <i class="fas fa-check me-1"></i> Confirmar &amp; Criar Instância (R$ 60,00/mês se extra)
+                    <i class="fas fa-check me-1"></i> Confirmar &amp; Criar Instância
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================
+     MODAL 3: CHECKOUT TRANSPARENTE PIX ÍNTEGRO DE INSTÂNCIA (SOMENTE PIX + RETORNO AUTOMÁTICO)
+     =================================================================== -->
+<div class="modal fade" id="modalCheckoutPixInstancia" tabindex="-1" aria-labelledby="modalCheckoutPixLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fab fa-pix text-warning fs-5"></i>
+                    <div>
+                        <h6 class="modal-title fw-bold mb-0" id="modalCheckoutPixLabel">
+                            Checkout Transparente PIX • Instância WhatsApp
+                        </h6>
+                        <small class="text-white-50" style="font-size: 0.72rem;">Módulo Mercado Pago (Desenvolvedor) • Somente PIX • Retorno Automático</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="pararPollingPixInstancia()"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+
+                <!-- Loading PIX -->
+                <div id="checkoutPixLoadingBox" class="py-4">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <h6 class="fw-bold text-body">Gerando Checkout Transparente PIX...</h6>
+                    <p class="text-secondary small mb-0">Injetando Webhook Dinâmico exclusivo e comunicando com o Mercado Pago.</p>
+                </div>
+
+                <!-- Conteúdo do Checkout Transparente Íntegro -->
+                <div id="checkoutPixConteudoBox" style="display: none;">
+                    <div class="d-flex align-items-center justify-content-center flex-wrap gap-1 mb-2">
+                        <span class="badge bg-success"><i class="fab fa-pix me-1"></i> Somente PIX Transparente</span>
+                        <span class="badge bg-primary" id="checkoutPixBadgeAmbiente">Produção • PIX Oficial</span>
+                        <span class="badge bg-info text-dark"><i class="fas fa-bolt me-1"></i> Webhook Dinâmico Ativo</span>
+                    </div>
+
+                    <h3 class="fw-extrabold text-danger mb-1" id="checkoutPixValor">R$ 60,00</h3>
+                    <p class="text-secondary small mb-2">
+                        Instância: <strong class="font-monospace text-body" id="checkoutPixNomeInstancia">foco7</strong> | 
+                        Vencimento: <strong class="text-body" id="checkoutPixDataVenc">--</strong>
+                    </p>
+                    <div class="small text-secondary mb-3" style="font-size: 0.75rem;">
+                        Fatura: <code id="checkoutPixCodigoFatura">--</code> • Transação: <code id="checkoutPixTransacaoId">--</code>
+                    </div>
+
+                    <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm border mb-2">
+                        <img id="checkoutPixImgQr" src="" alt="QR Code PIX" class="img-fluid" style="width: 210px; height: 210px; object-fit: contain;">
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 small" onclick="abrirCheckoutPixInstancia(checkoutInstanciaAtual, true)">
+                            <i class="fas fa-rotate me-1"></i> Gerar Novo QR Code PIX (Nova Requisição &amp; Webhook Dinâmico)
+                        </button>
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold text-secondary mb-1 d-flex justify-content-between">
+                            <span>Código PIX Copia e Cola:</span>
+                            <span class="text-success"><i class="fas fa-lock me-1"></i> Checkout Íntegro</span>
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="checkoutPixCopiaCola" class="form-control font-monospace small" readonly>
+                            <button type="button" class="btn btn-warning fw-bold text-dark" onclick="copiarPixCopiaCola()">
+                                <i class="fas fa-copy me-1"></i> Copiar PIX
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border small text-start mb-0">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-1 mb-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="spinner-grow spinner-grow-sm text-success" role="status"></div>
+                                <strong class="text-success">Radar de Retorno Automático Ativo...</strong>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary font-monospace" id="checkoutPixReqTokenBadge">REQ: --</span>
+                        </div>
+                        <span class="text-secondary d-block" style="font-size: 0.78rem;">
+                            Assim que o PIX for compensado, o Webhook Dinâmico notifica o sistema e este checkout retorna automaticamente liberando a instância.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Box de Sucesso com Retorno Automático dentro do Checkout Transparente -->
+                <div id="checkoutPixSucessoBox" style="display: none;" class="py-3">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 text-success mb-3" style="width: 72px; height: 72px;">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-success mb-1">Pagamento PIX Confirmado!</h4>
+                    <p class="text-secondary small mb-3" id="checkoutPixSucessoMsg">
+                        Sua instância foi ativada automaticamente e as cobranças via WhatsApp estão liberadas.
+                    </p>
+
+                    <div class="p-3 rounded-3 bg-body-tertiary border text-start small mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary">Instância Ativada:</span>
+                            <strong class="font-monospace text-body" id="checkoutPixSucessoInstancia">--</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary">Método / Módulo:</span>
+                            <span class="badge bg-success"><i class="fab fa-pix me-1"></i> PIX • MP Desenvolvedor</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary">Nova Vigência (+30 dias):</span>
+                            <strong class="text-success" id="checkoutPixSucessoVigencia">--</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary">Status da Instância:</span>
+                            <span class="badge bg-success"><i class="fas fa-bolt me-1"></i> Ativa &amp; Liberada</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success py-2 small mb-0">
+                        <i class="fas fa-circle-notch fa-spin me-1"></i>
+                        Retornando automaticamente ao painel em <strong id="checkoutPixContadorRetorno">3</strong>s...
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer bg-body-tertiary d-flex justify-content-between" id="checkoutPixModalFooter">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" onclick="pararPollingPixInstancia()">Fechar</button>
+                <button type="button" class="btn btn-success btn-sm fw-bold" id="btnJaEfetueiPagamentoPix" onclick="checarStatusPixManual()">
+                    <i class="fas fa-check-circle me-1"></i> Já Efetuei o Pagamento PIX
                 </button>
             </div>
         </div>
@@ -953,6 +1911,45 @@
 @section('scripts')
 <script>
     var pollingTimer = null;
+    var pollingPixTimer = null;
+    var retornoPixTimer = null;
+    var checkoutInstanciaAtual = null;
+
+    // Alternância dinâmica entre os campos de Produção e Sandbox no Módulo Mercado Pago (Desenvolvedor)
+    function alternarAmbienteMpDev(ambiente) {
+        var amb = (ambiente === 'sandbox') ? 'sandbox' : 'producao';
+        $('#inputDevMpAmbiente').val(amb);
+
+        if (amb === 'sandbox') {
+            $('#boxCredenciaisMpDevProd').slideUp(180);
+            $('#boxCredenciaisMpDevSandbox').slideDown(220);
+            $('#badgeAmbienteAtivoMpDev')
+                .removeClass('bg-success')
+                .addClass('bg-warning text-dark')
+                .html('<i class="fas fa-flask me-1"></i> Modo Sandbox Ativo');
+            $('#btnTabAmbSandbox').removeClass('btn-outline-secondary').addClass('btn-warning text-dark');
+            $('#btnTabAmbProd').removeClass('btn-success').addClass('btn-outline-secondary');
+            $('#txtBtnAmbienteMpDev').text('Sandbox');
+        } else {
+            $('#boxCredenciaisMpDevSandbox').slideUp(180);
+            $('#boxCredenciaisMpDevProd').slideDown(220);
+            $('#badgeAmbienteAtivoMpDev')
+                .removeClass('bg-warning text-dark')
+                .addClass('bg-success')
+                .html('<i class="fas fa-check-circle me-1"></i> Modo Produção Ativo');
+            $('#btnTabAmbProd').removeClass('btn-outline-secondary').addClass('btn-success');
+            $('#btnTabAmbSandbox').removeClass('btn-warning text-dark').addClass('btn-outline-secondary');
+            $('#txtBtnAmbienteMpDev').text('Produção');
+        }
+    }
+
+    function selecionarAmbienteMpDevClick(ambiente) {
+        if ($('#inputDevMpAmbiente').prop('disabled')) {
+            solicitarSenhaSegurancaWpp();
+            return;
+        }
+        alternarAmbienteMpDev(ambiente);
+    }
 
     // Alternador de visualização de senha
     function toggleVisibilidadeSenha(inputId, btn) {
@@ -975,17 +1972,17 @@
 
     function solicitarSenhaSegurancaWpp() {
         Swal.fire({
-            title: 'Parâmetros Restritos do Servidor',
+            title: 'Acesso Restrito do Master',
             html: `
                 <div class="text-start mb-2">
                     <p class="small text-secondary mb-3">
-                        Informe a <strong>Senha Master Particular</strong> para liberar a visualização e edição das credenciais e URL do servidor Evolution API Go.
+                        Informe a <strong>Senha Master Exclusiva</strong> para liberar a visualização e gestão das credenciais do servidor e dados restritos de cobrança das instâncias.
                     </p>
                 </div>
             `,
             input: 'password',
-            inputLabel: 'Senha Master Particular',
-            inputPlaceholder: 'Digite sua senha master...',
+            inputLabel: 'Senha Master Exclusiva',
+            inputPlaceholder: '••••••••••••••••',
             inputAttributes: {
                 autocapitalize: 'off',
                 autocorrect: 'off',
@@ -1025,19 +2022,52 @@
 
                 $('#wpp_dev_password_hidden').val(senha);
 
-                // Preenche os campos reais e remove a tarja
                 $('#inputApiUrl').val(dados.api_url).attr('type', 'url').removeClass('tarja-dev-bloqueado').prop('readonly', false);
                 $('#inputInstance').val(dados.instance).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
                 $('#inputApiKey').val(dados.apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
                 $('#inputGlobalApiKey').val(dados.global_apikey).removeClass('tarja-dev-bloqueado').prop('readonly', false);
 
-                $('#modalInstanciaNome').val(dados.instance);
+                // Desmascara os dados de cobrança de instâncias
+                if (dados.pix_email_recorrencia) {
+                    $('#inputPixEmailRecorrencia').val(dados.pix_email_recorrencia).attr('type', 'email').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                    $('#txtHeroPixRecorrencia').replaceWith(`<strong class="font-monospace text-primary" id="txtHeroPixRecorrencia">${dados.pix_email_recorrencia}</strong>`);
+                    $('#txtGuiaPixRecorrencia').replaceWith(`na conta <strong class="text-primary font-monospace" id="txtGuiaPixRecorrencia">${dados.pix_email_recorrencia}</strong>`);
+                    $('#badgePixRecorrenciaLock').removeClass('bg-danger').addClass('bg-success').html('<i class="fas fa-unlock"></i> Liberado');
+                    $('#btnPixRecorrenciaLock').attr('onclick', 'bloquearSegurancaWpp()').attr('title', 'Bloquear e Ofuscar').html('<i class="fas fa-lock"></i>');
+                }
+
+                if (dados.custo_instancia_extra !== undefined) {
+                    $('#inputCustoInstanciaExtra').val(Number(dados.custo_instancia_extra).toFixed(2)).attr('type', 'number').removeClass('tarja-dev-bloqueado text-secondary').addClass('text-danger').prop('readonly', false);
+                    $('#badgeCustoExtraLock').removeClass('bg-danger').addClass('bg-success').html('<i class="fas fa-unlock"></i> Liberado');
+                    $('#btnCustoExtraLock').attr('onclick', 'bloquearSegurancaWpp()').attr('title', 'Bloquear e Ofuscar').html('<i class="fas fa-lock"></i>');
+                }
+
+                if (dados.evolution_mp_access_token) {
+                    $('#inputEvolutionMpAccessToken').val(dados.evolution_mp_access_token).attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                    $('#badgeMpTokenLock').removeClass('bg-danger').addClass('bg-success').html('<i class="fas fa-unlock"></i> Liberado');
+                    $('#btnMpTokenLock').attr('onclick', 'bloquearSegurancaWpp()').attr('title', 'Bloquear e Ofuscar').html('<i class="fas fa-lock"></i>');
+                }
+
+                // Desmascara os campos do Segundo Módulo Mercado Pago (Exclusivo do Desenvolvedor)
+                $('#inputDevMpAtivo').prop('disabled', false).prop('checked', !!dados.dev_mp_ativo);
+                $('#inputDevMpAmbiente').prop('disabled', false).val(dados.dev_mp_ambiente || 'producao');
+                alternarAmbienteMpDev(dados.dev_mp_ambiente || 'producao');
+                $('#inputDevMpBeneficiario').val(dados.dev_mp_beneficiario || 'FOCO 7 TECNOLOGIA').attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpPublicKeyProd').val(dados.dev_mp_public_key_prod || '').attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpAccessTokenProd').val(dados.dev_mp_access_token_prod || '').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpClientIdProd').val(dados.dev_mp_client_id_prod || '').attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpClientSecretProd').val(dados.dev_mp_client_secret_prod || '').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpPublicKeySandbox').val(dados.dev_mp_public_key_sandbox || '').attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpAccessTokenSandbox').val(dados.dev_mp_access_token_sandbox || '').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpClientIdSandbox').val(dados.dev_mp_client_id_sandbox || '').attr('type', 'text').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpClientSecretSandbox').val(dados.dev_mp_client_secret_sandbox || '').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+                $('#inputDevMpWebhookSecret').val(dados.dev_mp_webhook_secret || '').removeClass('tarja-dev-bloqueado').prop('readonly', false);
+
                 $('#modalInstanciaToken').val(dados.apikey);
 
                 $('#txtInstanciaNome').text(dados.instance);
                 $('#txtApiUrl').text(dados.api_url);
 
-                // Atualiza badges e botões
                 $('#badgeStatusSegurancaWpp').removeClass('bg-danger').addClass('bg-success');
                 $('#badgeStatusSegurancaWpp i').removeClass('fa-lock').addClass('fa-unlock');
                 $('#badgeTextoSegurancaWpp').text('Acesso Liberado');
@@ -1046,11 +2076,68 @@
                 $('#btnAcaoSegurancaWpp i').removeClass('fa-key').addClass('fa-lock');
                 $('#alertaTarjaWpp').addClass('d-none');
 
+                window.foco7Notify.success('Credenciais e Módulo Mercado Pago do Desenvolvedor desbloqueados com sucesso!');
+                setTimeout(function() {
+                    location.reload();
+                }, 900);
+            }
+        });
+    }
+
+    function abrirAbaMpDev() {
+        var tabEl = document.getElementById('tab-mp-dev-btn');
+        if (tabEl) {
+            var tab = new bootstrap.Tab(tabEl);
+            tab.show();
+            tabEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function copiarWebhookMpDevUrl() {
+        var input = document.getElementById('inputWebhookMpDevUrl');
+        if (!input) return;
+        input.select();
+        navigator.clipboard.writeText(input.value).then(function () {
+            window.foco7Notify.success('URL de Webhook do Módulo Mercado Pago (Desenvolvedor) copiada!');
+        });
+    }
+
+    function testarConexaoMpDev() {
+        var $btn = $('#btnTestarMpDev');
+        var origHtml = $btn.html();
+        var ambienteAtivo = $('#inputDevMpAmbiente').val() || 'producao';
+        var tokenAtivo = ambienteAtivo === 'sandbox'
+            ? $('#inputDevMpAccessTokenSandbox').val()
+            : $('#inputDevMpAccessTokenProd').val();
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Testando ' + (ambienteAtivo === 'sandbox' ? 'Sandbox' : 'Produção') + '...');
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.testar_mp_dev") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            data: {
+                ambiente: ambienteAtivo,
+                token: tokenAtivo
+            },
+            dataType: 'json',
+            success: function(res) {
+                $btn.prop('disabled', false).html(origHtml);
                 Swal.fire({
                     icon: 'success',
-                    title: 'Acesso Liberado!',
-                    text: 'As credenciais do servidor foram liberadas para visualização e edição nesta sessão.',
+                    title: 'Mercado Pago (Desenvolvedor) Conectado!',
+                    text: res.message,
                     confirmButtonColor: '#28a745'
+                });
+            },
+            error: function(xhr) {
+                $btn.prop('disabled', false).html(origHtml);
+                var msg = xhr.responseJSON?.message || 'Falha ao testar conexão com o Mercado Pago do Desenvolvedor.';
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção no Módulo MP (Dev)',
+                    text: msg,
+                    confirmButtonColor: '#d90000'
                 });
             }
         });
@@ -1062,38 +2149,36 @@
             type: 'POST',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             success: function(res) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Servidor Bloqueado!',
-                    text: res.message || 'As credenciais do servidor foram bloqueadas novamente.',
-                    confirmButtonColor: '#d90000'
-                }).then(() => {
-                    location.reload();
-                });
+                window.foco7Notify.info(res.message);
+                location.reload();
             }
         });
     }
 
-    // Seleção de cards de formato
-    function selecionarFormato(val) {
-        $('input[name="tipo_envio"][value="' + val + '"]').prop('checked', true);
-        $('.formato-card').removeClass('border-primary bg-primary bg-opacity-10');
-        $('input[name="tipo_envio"]:checked').closest('.formato-card').addClass('border-primary bg-primary bg-opacity-10');
-    }
+    // Teste de latência em milissegundos
+    function testarLatenciaServidor() {
+        var $btn = $('#btnTestarLatencia');
+        var $icon = $('#iconLatencia');
+        $icon.addClass('fa-spin');
+        $btn.prop('disabled', true);
 
-    // Copia tags do painel para o clipboard
-    function copiarTag(tag) {
-        navigator.clipboard.writeText(tag).then(function () {
-            window.foco7Notify.success('Tag ' + tag + ' copiada para a área de transferência!');
-        });
-    }
-
-    // Copia URL de webhook
-    function copiarWebhookUrl() {
-        var input = document.getElementById('inputWebhookUrl');
-        input.select();
-        navigator.clipboard.writeText(input.value).then(function () {
-            window.foco7Notify.success('URL de Webhook copiada com sucesso!');
+        $.ajax({
+            url: '{{ route("admin.whatsapp.testar_latencia") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                var ms = res.latencia_ms || 0;
+                $('#txtLatenciaMs').text('Ping: ' + ms + 'ms');
+                window.foco7Notify.success('Latência do Servidor Evolution Go: ' + ms + 'ms');
+            },
+            error: function() {
+                $('#txtLatenciaMs').text('Ping: Erro');
+                window.foco7Notify.error('Falha ao medir latência do servidor.');
+            },
+            complete: function() {
+                $icon.removeClass('fa-spin');
+                $btn.prop('disabled', false);
+            }
         });
     }
 
@@ -1111,27 +2196,50 @@
             success: function (res) {
                 if (res.conectado) {
                     $('#badgeStatusGeral').removeClass('bg-secondary bg-danger bg-warning').addClass('bg-success');
-                    $('#badgeStatusIcon').removeClass('fa-circle-xmark fa-spinner').addClass('fa-check-circle');
+                    $('#badgeStatusPulse').removeClass('pulse-offline pulse-warning').addClass('pulse-online');
                     $('#badgeStatusTexto').text('Conectado');
                     $('#statusIconBox').css('background-color', 'rgba(25, 135, 84, 0.15)');
                     $('#statusIcon').removeClass('text-secondary text-danger text-warning').addClass('text-success');
+
+                    if (res.numero_conectado || res.owner) {
+                        var num = res.numero_conectado || res.owner;
+                        $('#txtNumeroConectadoHero').text(num);
+                        $('#badgeNumeroConectadoHero').removeClass('d-none');
+                        $('#txtOwnerPrincipalTabela').text(num);
+                    }
+
+                    // Atualiza linha da tabela de instâncias
+                    $('#badgeStatusPrincipalTabela').removeClass('bg-secondary bg-danger bg-warning').addClass('bg-success');
+                    $('#pulseStatusPrincipalTabela').removeClass('pulse-offline pulse-warning').addClass('pulse-online');
+                    $('#txtStatusPrincipalTabela').text('Conectado');
 
                     if (showNotification) {
                         window.foco7Notify.success('WhatsApp está conectado e pronto para envios!');
                     }
                 } else if (res.estado === 'conectando') {
                     $('#badgeStatusGeral').removeClass('bg-secondary bg-success bg-danger').addClass('bg-warning text-dark');
-                    $('#badgeStatusIcon').removeClass('fa-check-circle fa-circle-xmark').addClass('fa-spinner fa-spin');
+                    $('#badgeStatusPulse').removeClass('pulse-online pulse-offline').addClass('pulse-warning');
                     $('#badgeStatusTexto').text('Conectando...');
+                    $('#badgeNumeroConectadoHero').addClass('d-none');
+
+                    $('#badgeStatusPrincipalTabela').removeClass('bg-secondary bg-success bg-danger').addClass('bg-warning text-dark');
+                    $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-offline').addClass('pulse-warning');
+                    $('#txtStatusPrincipalTabela').text('Conectando...');
+
                     if (showNotification) {
                         window.foco7Notify.warning('Instância aguardando leitura do QR Code.');
                     }
                 } else {
                     $('#badgeStatusGeral').removeClass('bg-success bg-warning').addClass('bg-secondary');
-                    $('#badgeStatusIcon').removeClass('fa-check-circle fa-spinner').addClass('fa-circle-xmark');
+                    $('#badgeStatusPulse').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
                     $('#badgeStatusTexto').text('Desconectado');
                     $('#statusIconBox').css('background-color', 'rgba(108, 117, 125, 0.15)');
                     $('#statusIcon').removeClass('text-success text-danger text-warning').addClass('text-secondary');
+                    $('#badgeNumeroConectadoHero').addClass('d-none');
+
+                    $('#badgeStatusPrincipalTabela').removeClass('bg-success bg-warning').addClass('bg-secondary');
+                    $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
+                    $('#txtStatusPrincipalTabela').text('Desconectado');
 
                     if (showNotification) {
                         window.foco7Notify.info('WhatsApp está desconectado.');
@@ -1140,7 +2248,14 @@
             },
             error: function () {
                 $('#badgeStatusGeral').removeClass('bg-success bg-warning bg-secondary').addClass('bg-danger');
+                $('#badgeStatusPulse').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
                 $('#badgeStatusTexto').text('Erro de Conexão');
+                $('#badgeNumeroConectadoHero').addClass('d-none');
+
+                $('#badgeStatusPrincipalTabela').removeClass('bg-success bg-warning').addClass('bg-danger');
+                $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
+                $('#txtStatusPrincipalTabela').text('Erro');
+
                 if (showNotification) {
                     window.foco7Notify.error('Não foi possível conectar ao servidor Evolution API.');
                 }
@@ -1178,6 +2293,9 @@
                     $('#qrLoadingBox').hide();
                     $('#qrCodeContentBox').hide();
                     $('#qrErroBox').hide();
+                    if (res.numero_conectado || res.owner) {
+                        $('#txtModalNumeroConectado').text(res.numero_conectado || res.owner);
+                    }
                     $('#qrConectadoBox').show();
                     verificarStatusApi(false);
                     window.foco7Notify.success(res.message || 'Esta instância já está conectada!');
@@ -1187,7 +2305,6 @@
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
                 } else {
-                    // Verifica se já está conectado
                     verificarSeConectou();
                 }
             },
@@ -1200,160 +2317,6 @@
         });
     }
 
-    // Auto-criação ou sincronização inteligente a partir do modal de QR Code
-    function autoCriarOuSincronizarInstanciaModal() {
-        $('#qrErroBox').hide();
-        $('#qrLoadingBox').show();
-        $('#qrLoadingBox h6').text('Sincronizando com o Servidor Evolution API...');
-
-        $.ajax({
-            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
-            type: 'POST',
-            data: { _token: '{{ csrf_token() }}' },
-            dataType: 'json',
-            success: function (res) {
-                $('#qrLoadingBox').hide();
-                if (res.conectado) {
-                    $('#qrConectadoBox').show();
-                    verificarStatusApi(false);
-                    window.foco7Notify.success(res.message || 'Instância sincronizada e já conectada!');
-                } else {
-                    window.foco7Notify.info(res.message);
-                    verificarStatusApi(true);
-                }
-            },
-            error: function () {
-                var nome = $('#inputInstance').val() || 'carlos_americo_cavalcante_silva_8_1';
-                var token = $('#inputApiKey').val() || '';
-                $.ajax({
-                    url: '{{ route("admin.whatsapp.criar_instancia") }}',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        nome: nome,
-                        token: token
-                    },
-                    dataType: 'json',
-                    success: function (res) {
-                        $('#qrLoadingBox').hide();
-                        window.foco7Notify.success(res.message);
-                        if (res.qrcode) {
-                            exibirQrCode(res.qrcode);
-                            iniciarPollingStatusQr();
-                        } else {
-                            verificarSeConectou();
-                        }
-                    },
-                    error: function (xhr) {
-                        $('#qrLoadingBox').hide();
-                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao sincronizar/criar instância.';
-                        $('#txtMensagemErroQr').text(msg);
-                        $('#qrErroBox').show();
-                    }
-                });
-            }
-        });
-    }
-
-    // Consulta e exibe as instâncias diretamente do servidor Evolution API
-    function listarInstanciasServidor() {
-        Swal.fire({
-            title: 'Consultando Servidor...',
-            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i><p class="text-secondary small mb-0">Buscando instâncias cadastradas na Evolution API...</p></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-
-        $.ajax({
-            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
-            type: 'POST',
-            data: { _token: '{{ csrf_token() }}' },
-            dataType: 'json',
-            success: function (res) {
-                if (!res.success || !res.instancias) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Nenhuma Instância',
-                        text: res.message || 'Nenhuma instância retornada pelo servidor.',
-                        confirmButtonColor: '#d90000'
-                    });
-                    return;
-                }
-
-                var lista = res.instancias;
-                if (!Array.isArray(lista) && typeof lista === 'object') {
-                    lista = Object.values(lista);
-                }
-
-                if (lista.length === 0) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Nenhuma Instância Encontrada',
-                        html: `
-                            <p class="small text-secondary mb-3">O servidor Evolution API está online, mas nenhuma instância foi criada ainda.</p>
-                            <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="Swal.close(); abrirModalCriarInstancia();">
-                                <i class="fas fa-plus me-1"></i> Criar Instância Agora
-                            </button>
-                        `,
-                        showConfirmButton: false
-                    });
-                    return;
-                }
-
-                var htmlInst = '<div class="list-group text-start my-2" style="max-height: 280px; overflow-y: auto;">';
-                lista.forEach(function (inst) {
-                    var nome = inst.name || (inst.instance && inst.instance.name) || (inst.instanceName) || 'Sem Nome';
-                    var status = inst.status || (inst.instance && inst.instance.status) || (inst.state) || 'desconectado';
-                    var token = inst.token || (inst.instance && inst.instance.token) || (inst.apikey) || '';
-                    var isConnected = (status === 'open' || status === 'connected' || status === 'conectado');
-                    var statusBadge = isConnected 
-                        ? '<span class="badge bg-success">Conectado</span>' 
-                        : '<span class="badge bg-secondary">' + status + '</span>';
-
-                    htmlInst += `
-                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2 mb-1 border rounded">
-                            <div>
-                                <strong class="d-block text-body font-monospace">${nome}</strong>
-                                <small class="text-secondary">${statusBadge}</small>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="selecionarInstanciaServidor('${nome}', '${token}')">
-                                <i class="fas fa-check me-1"></i> Selecionar
-                            </button>
-                        </div>
-                    `;
-                });
-                htmlInst += '</div>';
-
-                Swal.fire({
-                    title: 'Instâncias no Servidor Evolution',
-                    html: htmlInst,
-                    showCloseButton: true,
-                    showConfirmButton: false
-                });
-            },
-            error: function (xhr) {
-                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao consultar servidor.';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro de Comunicação',
-                    text: msg,
-                    confirmButtonColor: '#d90000'
-                });
-            }
-        });
-    }
-
-    function selecionarInstanciaServidor(nome, token) {
-        Swal.close();
-        $('#inputInstance').val(nome);
-        $('#txtInstanciaNome').text(nome);
-        if (token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
-            $('#inputApiKey').val(token);
-        }
-        window.foco7Notify.success('Instância "' + nome + '" selecionada! Salve as configurações ou clique em Conectar / QR Code.');
-    }
-
-    // Exibe imagem do QR Code
     function exibirQrCode(base64) {
         var src = base64;
         if (!src.startsWith('data:image')) {
@@ -1364,7 +2327,6 @@
         $('#qrCodeContentBox').show();
     }
 
-    // Recarrega o QR Code
     function recarregarQrCode() {
         $('#qrCodeContentBox').hide();
         $('#qrLoadingBox').show();
@@ -1386,7 +2348,6 @@
         });
     }
 
-    // Polling contínuo enquanto o modal de QR code estiver aberto
     function iniciarPollingStatusQr() {
         pararPollingQr();
         pollingTimer = setInterval(function () {
@@ -1441,7 +2402,157 @@
         });
     }
 
-    // Desconectar instância com SweetAlert2
+    function autoCriarOuSincronizarInstanciaModal() {
+        $('#qrErroBox').hide();
+        $('#qrLoadingBox').show();
+        $('#qrLoadingBox h6').text('Sincronizando com o Servidor Evolution API...');
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            dataType: 'json',
+            success: function (res) {
+                $('#qrLoadingBox').hide();
+                if (res.conectado) {
+                    $('#qrConectadoBox').show();
+                    verificarStatusApi(false);
+                    window.foco7Notify.success(res.message || 'Instância sincronizada e já conectada!');
+                } else {
+                    window.foco7Notify.info(res.message);
+                    verificarStatusApi(true);
+                }
+            },
+            error: function () {
+                var nome = $('#inputInstance').val() || 'foco7';
+                var token = $('#inputApiKey').val() || '';
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.criar_instancia") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        nome: nome,
+                        token: token
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        $('#qrLoadingBox').hide();
+                        window.foco7Notify.success(res.message);
+                        if (res.qrcode) {
+                            exibirQrCode(res.qrcode);
+                            iniciarPollingStatusQr();
+                        } else {
+                            verificarSeConectou();
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#qrLoadingBox').hide();
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao sincronizar/criar instância.';
+                        $('#txtMensagemErroQr').text(msg);
+                        $('#qrErroBox').show();
+                    }
+                });
+            }
+        });
+    }
+
+    function listarInstanciasServidor() {
+        Swal.fire({
+            title: 'Consultando Servidor...',
+            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i><p class="text-secondary small mb-0">Buscando instâncias cadastradas na Evolution API...</p></div>',
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.sincronizar_instancias") }}',
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            dataType: 'json',
+            success: function (res) {
+                if (!res.success || !res.instancias) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nenhuma Instância',
+                        text: res.message || 'Nenhuma instância retornada pelo servidor.',
+                        confirmButtonColor: '#d90000'
+                    });
+                    return;
+                }
+
+                var lista = (res.instancias && Array.isArray(res.instancias.data)) ? res.instancias.data : res.instancias;
+                if (!Array.isArray(lista) && typeof lista === 'object') {
+                    lista = Object.values(lista);
+                }
+
+                if (lista.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Nenhuma Instância Encontrada',
+                        text: 'O servidor Evolution API está online, mas nenhuma instância foi criada ainda.',
+                        confirmButtonColor: '#d90000'
+                    });
+                    return;
+                }
+
+                var htmlInst = '<div class="list-group text-start my-2" style="max-height: 300px; overflow-y: auto;">';
+                lista.forEach(function (inst) {
+                    if (!inst || typeof inst !== 'object') return;
+                    var nome = inst.name || (inst.instance && inst.instance.name) || (inst.instanceName) || 'Sem Nome';
+                    var status = inst.status || (inst.instance && inst.instance.status) || (inst.state) || (inst.connected ? 'open' : 'close');
+                    var token = inst.token || (inst.instance && inst.instance.token) || (inst.apikey) || '';
+                    var owner = String(inst.owner || inst.jid || '').replace('@s.whatsapp.net', '').replace('@c.us', '');
+                    var isConnected = (inst.connected === true || inst.Connected === true || status === 'open' || status === 'connected' || status === 'conectado');
+                    var statusBadge = isConnected 
+                        ? '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Conectado (open)</span>' 
+                        : '<span class="badge bg-danger">Desconectado (close)</span>';
+                    var ownerBadge = owner ? `<span class="badge bg-dark-subtle text-body font-monospace ms-1"><i class="fab fa-whatsapp text-success me-1"></i>${owner}</span>` : '';
+
+                    htmlInst += `
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2 mb-1 border rounded">
+                            <div>
+                                <strong class="d-block text-body font-monospace">${nome}</strong>
+                                <div class="mt-1">${statusBadge}${ownerBadge}</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="selecionarInstanciaServidor('${nome}', '${token}')">
+                                <i class="fas fa-check me-1"></i> Selecionar
+                            </button>
+                        </div>
+                    `;
+                });
+                htmlInst += '</div>';
+
+                verificarStatusApi(false);
+
+                Swal.fire({
+                    title: 'Instâncias no Servidor Evolution Go',
+                    html: htmlInst,
+                    showCloseButton: true,
+                    showConfirmButton: false
+                });
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao consultar servidor.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro de Comunicação',
+                    text: msg,
+                    confirmButtonColor: '#d90000'
+                });
+            }
+        });
+    }
+
+    function selecionarInstanciaServidor(nome, token) {
+        Swal.close();
+        $('#inputInstance').val(nome);
+        $('#txtInstanciaNome').text(nome);
+        if (token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
+            $('#inputApiKey').val(token);
+        }
+        window.foco7Notify.success('Instância "' + nome + '" selecionada! Salve as configurações ou clique em Conectar / QR Code.');
+    }
+
     function desconectarInstancia() {
         window.confirmarAcao(
             'Desconectar WhatsApp?',
@@ -1469,10 +2580,14 @@
         );
     }
 
-    // Criar instância administrativamente
     function executarCriacaoInstancia() {
         var nome = $('#modalInstanciaNome').val();
         var token = $('#modalInstanciaToken').val();
+        var tipo = $('#modalInstanciaTipo').val();
+        var nomeResp = $('#modalInstanciaNomeResp').val();
+        var telResp = $('#modalInstanciaTelResp').val();
+        var emailResp = $('#modalInstanciaEmailResp').val();
+
         var $btn = $('#btnConfirmarCriarInstancia');
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Criando...');
 
@@ -1482,27 +2597,24 @@
             data: {
                 _token: '{{ csrf_token() }}',
                 nome: nome,
-                token: token
+                token: token,
+                tipo: tipo,
+                nome_responsavel: nomeResp,
+                telefone_responsavel: telResp,
+                email_responsavel: emailResp
             },
             dataType: 'json',
             success: function (res) {
                 $('#modalCriarInstancia').modal('hide');
                 window.foco7Notify.success(res.message);
-                if (res.instancia) {
-                    $('#txtInstanciaNome').text(res.instancia);
-                    $('#inputInstance').val(res.instancia);
-                }
-                if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
-                    $('#inputApiKey').val(res.token);
-                }
-                verificarStatusApi(false);
-                if (res.qrcode) {
-                    var modalQr = new bootstrap.Modal(document.getElementById('modalQrCode'));
-                    modalQr.show();
-                    exibirQrCode(res.qrcode);
-                    iniciarPollingStatusQr();
+
+                // Se exigir pagamento inicial via PIX no Módulo Mercado Pago do Desenvolvedor, abre o Checkout PIX automaticamente
+                if (res.requer_pagamento_imediato && res.instancia) {
+                    setTimeout(function() {
+                        abrirCheckoutPixInstancia(res.instancia);
+                    }, 400);
                 } else {
-                    conectarEabrirQr();
+                    setTimeout(function() { location.reload(); }, 1200);
                 }
             },
             error: function (xhr) {
@@ -1510,9 +2622,472 @@
                 window.foco7Notify.error(msg);
             },
             complete: function () {
-                $btn.prop('disabled', false).html('<i class="fas fa-check me-1"></i> Criar Instância Agora');
+                $btn.prop('disabled', false).html('<i class="fas fa-check me-1"></i> Confirmar &amp; Criar Instância');
             }
         });
+    }
+
+    function copiarLinkPagamentoInstancia(url) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url).then(function() {
+                window.foco7Notify.success('Link direto de pagamento copiado! Envie ao cliente para pagamento rápido via PIX.');
+            }).catch(function() {
+                copiarFallback(url);
+            });
+        } else {
+            copiarFallback(url);
+        }
+    }
+
+    function copiarFallback(texto) {
+        var tempInput = document.createElement('input');
+        tempInput.value = texto;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        window.foco7Notify.success('Link direto de pagamento copiado com sucesso!');
+    }
+
+    function executarCobrancaPreventivaWpp() {
+        Swal.fire({
+            title: 'Disparar Régua Preventiva?',
+            text: 'O sistema varrerá as instâncias com vencimento em até 3 dias e enviará o código PIX e link de pagamento direto no WhatsApp de cada responsável.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-paper-plane me-1"></i> Disparar Agora',
+            confirmButtonColor: '#e0a800',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processando Envios...',
+                    html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-warning mb-3"></i><p class="text-secondary small mb-0">Gerando cobranças Mercado Pago e disparando mensagens...</p></div>',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.instancias.cobranca_preventiva") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    dataType: 'json',
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cobrança Preventiva Executada!',
+                            text: res.message,
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON?.message || 'Falha ao processar régua preventiva.';
+                        Swal.fire({ icon: 'error', title: 'Erro', text: msg, confirmButtonColor: '#d90000' });
+                    }
+                });
+            }
+        });
+    }
+
+    function sincronizarPagamentosMpWpp() {
+        Swal.fire({
+            title: 'Sincronizando com Mercado Pago...',
+            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-success mb-3"></i><p class="text-secondary small mb-0">Consultando status bancário na API do Mercado Pago...</p></div>',
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.instancias.sincronizar_mp") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            dataType: 'json',
+            success: function(res) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sincronização Concluída!',
+                    text: res.message,
+                    confirmButtonColor: '#28a745'
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.message || 'Falha ao sincronizar com o Mercado Pago.';
+                Swal.fire({ icon: 'error', title: 'Erro', text: msg, confirmButtonColor: '#d90000' });
+            }
+        });
+    }
+
+    // =========================================================================
+    // RECORRÊNCIA PIX & GESTÃO DE INSTÂNCIAS EXTRAS
+    // =========================================================================
+
+    function abrirCheckoutPixInstancia(nome, forcarNova = false) {
+        checkoutInstanciaAtual = nome;
+        var modalEl = document.getElementById('modalCheckoutPixInstancia');
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+
+        $('#checkoutPixSucessoBox').hide();
+        $('#checkoutPixConteudoBox').hide();
+        $('#checkoutPixLoadingBox').show();
+        $('#btnJaEfetueiPagamentoPix').show();
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.instancias.gerar_pix") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            data: {
+                nome: nome,
+                forcar_nova: forcarNova ? 1 : 0
+            },
+            dataType: 'json',
+            success: function(res) {
+                $('#checkoutPixLoadingBox').hide();
+                if (res.success) {
+                    $('#checkoutPixNomeInstancia').text(res.instancia);
+                    $('#checkoutPixValor').text(res.valor_formatado);
+                    $('#checkoutPixDataVenc').text(res.data_vencimento);
+                    $('#checkoutPixCodigoFatura').text(res.codigo_fatura || '--');
+                    $('#checkoutPixTransacaoId').text(res.transacao_id || '--');
+                    $('#checkoutPixReqTokenBadge').text('REQ: ' + (res.req_token ? res.req_token.substring(0, 8).toUpperCase() : 'DINÂMICO'));
+
+                    if (res.ambiente === 'sandbox') {
+                        $('#checkoutPixBadgeAmbiente')
+                            .removeClass('bg-primary bg-success')
+                            .addClass('bg-warning text-dark')
+                            .html('<i class="fas fa-flask me-1"></i> Sandbox • Homologação PIX');
+                    } else {
+                        $('#checkoutPixBadgeAmbiente')
+                            .removeClass('bg-warning text-dark')
+                            .addClass('bg-primary')
+                            .html('<i class="fas fa-shield-halved me-1"></i> Produção • PIX Oficial');
+                    }
+
+                    $('#checkoutPixImgQr').attr('src', res.pix_qr_url);
+                    $('#checkoutPixCopiaCola').val(res.pix_copia_cola);
+                    $('#checkoutPixConteudoBox').show();
+
+                    if (forcarNova) {
+                        window.foco7Notify.success('Novo QR Code PIX e Webhook Dinâmico gerados com sucesso!');
+                    }
+
+                    iniciarPollingPixInstancia(nome);
+                } else {
+                    window.foco7Notify.error(res.message || 'Erro ao gerar cobrança PIX.');
+                    modal.hide();
+                }
+            },
+            error: function(xhr) {
+                $('#checkoutPixLoadingBox').hide();
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao processar checkout PIX.';
+                window.foco7Notify.error(msg);
+                modal.hide();
+            }
+        });
+    }
+
+    function copiarPixCopiaCola() {
+        var input = document.getElementById('checkoutPixCopiaCola');
+        input.select();
+        navigator.clipboard.writeText(input.value).then(function() {
+            window.foco7Notify.success('Código PIX Copia e Cola copiado com sucesso!');
+        });
+    }
+
+    function acionarRetornoAutomaticoCheckoutPix(res) {
+        pararPollingPixInstancia();
+        $('#checkoutPixLoadingBox').hide();
+        $('#checkoutPixConteudoBox').fadeOut(200, function() {
+            $('#checkoutPixSucessoInstancia').text(res.instancia || checkoutInstanciaAtual || '--');
+            $('#checkoutPixSucessoVigencia').text(res.novo_vencimento || '+30 dias');
+            if (res.message) {
+                $('#checkoutPixSucessoMsg').text(res.message);
+            }
+            $('#btnJaEfetueiPagamentoPix').hide();
+            $('#checkoutPixSucessoBox').fadeIn(250);
+        });
+
+        window.foco7Notify.success(res.message || 'Pagamento PIX aprovado! Retornando automaticamente...');
+
+        var segundos = 3;
+        $('#checkoutPixContadorRetorno').text(segundos);
+        if (retornoPixTimer) clearInterval(retornoPixTimer);
+        retornoPixTimer = setInterval(function() {
+            segundos--;
+            if (segundos <= 0) {
+                clearInterval(retornoPixTimer);
+                location.reload();
+            } else {
+                $('#checkoutPixContadorRetorno').text(segundos);
+            }
+        }, 1000);
+    }
+
+    function iniciarPollingPixInstancia(nome) {
+        pararPollingPixInstancia();
+        pollingPixTimer = setInterval(function() {
+            $.ajax({
+                url: '/admin/whatsapp/instancias/verificar-pix/' + encodeURIComponent(nome),
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.pago) {
+                        acionarRetornoAutomaticoCheckoutPix(res);
+                    }
+                }
+            });
+        }, 3000);
+    }
+
+    function pararPollingPixInstancia() {
+        if (pollingPixTimer) {
+            clearInterval(pollingPixTimer);
+            pollingPixTimer = null;
+        }
+        if (retornoPixTimer) {
+            clearInterval(retornoPixTimer);
+            retornoPixTimer = null;
+        }
+    }
+
+    function checarStatusPixManual() {
+        if (!checkoutInstanciaAtual) return;
+        $.ajax({
+            url: '/admin/whatsapp/instancias/verificar-pix/' + encodeURIComponent(checkoutInstanciaAtual),
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                if (res.pago) {
+                    acionarRetornoAutomaticoCheckoutPix(res);
+                } else {
+                    window.foco7Notify.info('Pagamento PIX ainda não identificado. Assim que compensado no banco, o checkout retornará automaticamente.');
+                }
+            }
+        });
+    }
+
+    function confirmarPagamentoManualInstancia(nome) {
+        window.confirmarAcao(
+            'Confirmar Pagamento Manual (Restrito Master)?',
+            `Você confirma que recebeu a mensalidade de R$ 60,00 da instância "${nome}" no Módulo Mercado Pago do Desenvolvedor? A vigência será renovada por +30 dias.`,
+            'question',
+            function() {
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.instancias.confirmar_manual") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { nome: nome },
+                    dataType: 'json',
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pagamento Confirmado!',
+                            text: res.message,
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON?.message || 'Falha ao confirmar pagamento manual.';
+                        window.foco7Notify.error(msg);
+                        if (xhr.status === 403 || xhr.responseJSON?.requer_senha_master) {
+                            solicitarSenhaSegurancaWpp();
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function suspenderInstanciaManual(nome) {
+        window.confirmarAcao(
+            'Suspender Instância (Restrito Master)?',
+            `A instância "${nome}" terá sua conexão cortada no servidor e não poderá disparar mensagens até ser reativada.`,
+            'warning',
+            function() {
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.instancias.suspender") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { nome: nome, motivo: 'Suspensão manual via painel' },
+                    dataType: 'json',
+                    success: function(res) {
+                        window.foco7Notify.success(res.message);
+                        setTimeout(() => { location.reload(); }, 1000);
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON?.message || 'Falha ao suspender instância.';
+                        window.foco7Notify.error(msg);
+                        if (xhr.status === 403 || xhr.responseJSON?.requer_senha_master) {
+                            solicitarSenhaSegurancaWpp();
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function reativarInstanciaManual(nome) {
+        $.ajax({
+            url: '{{ route("admin.whatsapp.instancias.reativar") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            data: { nome: nome },
+            dataType: 'json',
+            success: function(res) {
+                window.foco7Notify.success(res.message);
+                setTimeout(() => { location.reload(); }, 1000);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.message || 'Falha ao reativar instância.';
+                window.foco7Notify.error(msg);
+                if (xhr.status === 403 || xhr.responseJSON?.requer_senha_master) {
+                    solicitarSenhaSegurancaWpp();
+                }
+            }
+        });
+    }
+
+    function processarVarreduraVencidos() {
+        Swal.fire({
+            title: 'Varrendo Vencimentos...',
+            html: '<p class="small text-secondary mb-0">Verificando inadimplência em todas as instâncias adicionais...</p>',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.instancias.processar_vencimentos") }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            dataType: 'json',
+            success: function(res) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Varredura Concluída',
+                    text: res.message,
+                    confirmButtonColor: '#d90000'
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function() {
+                Swal.fire('Erro', 'Falha ao executar varredura de vencimentos.', 'error');
+            }
+        });
+    }
+
+    function excluirInstanciaExtra(nome) {
+        window.confirmarAcao(
+            'Excluir Monitoramento da Instância (Restrito Master)?',
+            `A instância "${nome}" será removida do painel de cobrança recorrente.`,
+            'warning',
+            function() {
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.instancias.excluir") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { nome: nome },
+                    dataType: 'json',
+                    success: function(res) {
+                        window.foco7Notify.success(res.message);
+                        setTimeout(() => { location.reload(); }, 1000);
+                    },
+                    error: function(xhr) {
+                        var msg = xhr.responseJSON?.message || 'Falha ao excluir instância.';
+                        window.foco7Notify.error(msg);
+                        if (xhr.status === 403 || xhr.responseJSON?.requer_senha_master) {
+                            solicitarSenhaSegurancaWpp();
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    // =========================================================================
+    // TEMPLATES & SIMULADOR SMARTPHONE
+    // =========================================================================
+
+    function trocarTemplateEdicao() {
+        var val = $('#selectTemplateAtivo').val();
+        $('.box-template-editor').addClass('d-none');
+        var $box = $('#box_' + val);
+        $box.removeClass('d-none');
+
+        var $ta = $('#textarea_' + val);
+        if ($ta.length && !$ta.next('.note-editor').length && window.initSummernote) {
+            window.initSummernote($box);
+        }
+
+        var texto = '';
+        if ($ta.length && $ta.next('.note-editor').length && $.fn.summernote) {
+            texto = $ta.summernote('code');
+        } else {
+            texto = $ta.val();
+        }
+        atualizarMockupPreview(texto);
+    }
+
+    function atualizarMockupPreview(texto) {
+        if (!texto) texto = '';
+        var preview = texto
+            .replace(/{cliente_nome}/g, 'Carlos Silva')
+            .replace(/{fatura_id}/g, 'FAT-2026-9812')
+            .replace(/{plano_nome}/g, 'Plano Ouro 4G')
+            .replace(/{valor}/g, 'R$ 79,90')
+            .replace(/{valor_original}/g, 'R$ 79,90')
+            .replace(/{valor_atualizado}/g, 'R$ 83,50')
+            .replace(/{data_vencimento}/g, '15/11/2026')
+            .replace(/{link_fatura}/g, 'https://foco7.com.br/faturas/123')
+            .replace(/{pix_copia_cola}/g, '00020126580014br.gov.bcb.pix...')
+            .replace(/{empresa_nome}/g, 'Foco 7 Rastreamento')
+            .replace(/{dias_atraso}/g, '3');
+
+        // Formatação WhatsApp caso o usuário tenha usado sintaxe markdown nativa (*texto*, _texto_, ~texto~)
+        preview = preview.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+        preview = preview.replace(/_(.*?)_/g, '<em>$1</em>');
+        preview = preview.replace(/~(.*?)~/g, '<del>$1</del>');
+
+        // Se for texto plano sem quebra HTML, converte \n para <br>
+        if (!preview.includes('<p>') && !preview.includes('<br>')) {
+            preview = preview.replace(/\n/g, '<br>');
+        }
+
+        $('#previewChatBubbleText').html(preview + '<div class="chat-bubble-footer">10:42 <i class="fas fa-check-double text-info ms-1"></i></div>');
+    }
+
+    function copiarTag(tag) {
+        navigator.clipboard.writeText(tag).then(function () {
+            window.foco7Notify.success('Tag ' + tag + ' copiada!');
+        });
+
+        // Insere diretamente na posição do cursor no Summernote ativo
+        var val = $('#selectTemplateAtivo').val();
+        var $ta = $('#textarea_' + val);
+        if ($ta.length && $ta.next('.note-editor').length && $.fn.summernote) {
+            $ta.summernote('insertText', tag);
+            atualizarMockupPreview($ta.summernote('code'));
+        }
+    }
+
+    function copiarWebhookUrl() {
+        var input = document.getElementById('inputWebhookUrl');
+        input.select();
+        navigator.clipboard.writeText(input.value).then(function () {
+            window.foco7Notify.success('URL de Webhook copiada com sucesso!');
+        });
+    }
+
+    function selecionarFormato(val) {
+        $('input[name="tipo_envio"][value="' + val + '"]').prop('checked', true);
+        $('.formato-card').removeClass('selecionado border-primary bg-primary bg-opacity-10');
+        $('input[name="tipo_envio"]:checked').closest('.formato-card').addClass('selecionado');
     }
 
     // Disparo de teste via AJAX
@@ -1555,23 +3130,48 @@
         });
     }
 
-    // Auto-checagem suave de status no carregamento da página e interceptação AJAX do formulário
+    // Inicialização
     $(function () {
         verificarStatusApi(false);
+        trocarTemplateEdicao();
 
-        // Ao clicar em qualquer campo protegido por tarja, solicita a senha master
+        // Inicializa o Summernote quando o usuário abre a aba Templates
+        $('button[data-bs-target="#tab-templates"], a[data-bs-target="#tab-templates"]').on('shown.bs.tab', function () {
+            trocarTemplateEdicao();
+        });
+
+        // Sincroniza em tempo real com o smartphone mockup enquanto o usuário digita
+        $(document).on('input change summernote.change', '.box-template-editor .summernote', function () {
+            var val = $('#selectTemplateAtivo').val();
+            if ($(this).attr('id') === 'textarea_' + val) {
+                var c = $(this).val();
+                if ($.fn.summernote && $(this).next('.note-editor').length) {
+                    c = $(this).summernote('code');
+                }
+                atualizarMockupPreview(c);
+            }
+        });
+
         $(document).on('click', '.tarja-dev-bloqueado', function () {
             solicitarSenhaSegurancaWpp();
         });
 
-        // Submissão do formulário de configurações via AJAX com SweetAlert2 e Toastr
         $('#formWhatsappConfig').on('submit', function (e) {
             e.preventDefault();
             var $form = $(this);
+
+            // Garante a sincronização de todas as instâncias do Summernote para os textareas antes do envio AJAX
+            $form.find('.summernote').each(function () {
+                var $t = $(this);
+                if ($.fn.summernote && $t.next('.note-editor').length) {
+                    $t.val($t.summernote('code'));
+                }
+            });
+
             var $btn = $('#btnSalvarConfigs');
             var origHtml = $btn.html();
 
-            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando e Criptografando...');
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Gravando e Criptografando...');
 
             $.ajax({
                 url: $form.attr('action'),
@@ -1584,10 +3184,9 @@
                         window.foco7Notify.success(res.message);
                         Swal.fire({
                             icon: 'success',
-                            title: 'Configurações Salvas!',
+                            title: 'Configurações Gravadas!',
                             text: res.message,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Entendido'
+                            confirmButtonColor: '#28a745'
                         });
 
                         if (res.instance && !$('#inputInstance').hasClass('tarja-dev-bloqueado')) {
@@ -1597,32 +3196,16 @@
                             $('#txtApiUrl').text(res.api_url);
                         }
                     } else {
-                        window.foco7Notify.error(res.message || 'Erro ao salvar configurações.');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro ao Salvar',
-                            text: res.message || 'Ocorreu um erro ao gravar as alterações.',
-                            confirmButtonColor: '#d90000'
-                        });
+                        window.foco7Notify.error(res.message || 'Erro ao salvar.');
                     }
                 },
                 error: function (xhr) {
                     $btn.prop('disabled', false).html(origHtml);
-                    var msg = 'Erro ao processar o salvamento das configurações.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                    }
+                    var msg = xhr.responseJSON?.message || 'Erro ao processar o salvamento.';
                     window.foco7Notify.error(msg);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Falha no Salvamento',
-                        text: msg,
-                        confirmButtonColor: '#d90000'
-                    });
                 }
             });
         });
     });
 </script>
 @endsection
-

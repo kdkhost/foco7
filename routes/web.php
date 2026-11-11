@@ -11,13 +11,13 @@ use App\Http\Controllers\Admin\EmailTemplatesController;
 use App\Http\Controllers\Admin\FaturasController;
 use App\Http\Controllers\Admin\FiliaisController;
 use App\Http\Controllers\Admin\GatewaysController;
+use App\Http\Controllers\Admin\LicenciadosController;
 use App\Http\Controllers\Admin\ManutencaoController;
 use App\Http\Controllers\Admin\NotificacoesController;
 use App\Http\Controllers\Admin\ParceirosController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\PlanosController;
 use App\Http\Controllers\Admin\SeoController;
-use App\Http\Controllers\Admin\LicenciadosController;
 use App\Http\Controllers\Admin\ServicosEsteticaController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\WhatsappCobrancaController;
@@ -47,6 +47,8 @@ Route::match(['get', 'post'], '/manutencao/bypass/{token?}', [SiteController::cl
 Route::post('/checkout/gerar', [CheckoutController::class, 'checkout'])->name('checkout.gerar');
 Route::get('/checkout/calcular-taxas', [CheckoutController::class, 'calcularTaxas'])->name('checkout.calcular_taxas');
 Route::get('/faturas/carne/{codigo}/pdf', [CheckoutController::class, 'downloadCarnePdf'])->name('faturas.carne.pdf');
+Route::get('/pagar/instancia/{hash}', [WhatsappCobrancaController::class, 'paginaPublicaPagamento'])->name('whatsapp.pagar_instancia_publica');
+Route::get('/pagar/instancia/{hash}/status', [WhatsappCobrancaController::class, 'statusPagamentoPublico'])->name('whatsapp.status_pagamento_publico');
 Route::get('/uploads/{path}', [SiteController::class, 'servirMidiaUpload'])->where('path', '.*')->name('midia.uploads');
 Route::get('/storage/{path}', [SiteController::class, 'servirMidiaStorage'])->where('path', '.*')->name('midia.storage');
 
@@ -246,6 +248,19 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/sincronizar-instancias', [WhatsappCobrancaController::class, 'sincronizarInstancias'])->name('admin.whatsapp.sincronizar_instancias');
         Route::post('/teste', [WhatsappCobrancaController::class, 'enviarTeste'])->name('admin.whatsapp.teste');
         Route::post('/cobrar/{id}', [WhatsappCobrancaController::class, 'cobrarFatura'])->name('admin.whatsapp.cobrar_fatura');
+        Route::get('/testar-latencia', [WhatsappCobrancaController::class, 'testarLatencia'])->name('admin.whatsapp.testar_latencia');
+        Route::post('/testar-mp-dev', [WhatsappCobrancaController::class, 'testarMercadoPagoDev'])->name('admin.whatsapp.testar_mp_dev');
+
+        // Gestão de Tarifação Recorrente & Cobrança PIX de Instâncias Extras (R$ 60,00/mês)
+        Route::post('/instancias/gerar-pix', [WhatsappCobrancaController::class, 'gerarPixInstancia'])->name('admin.whatsapp.instancias.gerar_pix');
+        Route::get('/instancias/verificar-pix/{nome}', [WhatsappCobrancaController::class, 'verificarPixInstancia'])->name('admin.whatsapp.instancias.verificar_pix');
+        Route::post('/instancias/confirmar-manual', [WhatsappCobrancaController::class, 'confirmarPagamentoManual'])->name('admin.whatsapp.instancias.confirmar_manual');
+        Route::post('/instancias/suspender', [WhatsappCobrancaController::class, 'suspenderInstancia'])->name('admin.whatsapp.instancias.suspender');
+        Route::post('/instancias/reativar', [WhatsappCobrancaController::class, 'reativarInstancia'])->name('admin.whatsapp.instancias.reativar');
+        Route::post('/instancias/processar-vencimentos', [WhatsappCobrancaController::class, 'processarSuspensaoVencidos'])->name('admin.whatsapp.instancias.processar_vencimentos');
+        Route::post('/instancias/cobranca-preventiva', [WhatsappCobrancaController::class, 'executarCobrancaPreventiva'])->name('admin.whatsapp.instancias.cobranca_preventiva');
+        Route::post('/instancias/sincronizar-mp', [WhatsappCobrancaController::class, 'sincronizarPagamentosMp'])->name('admin.whatsapp.instancias.sincronizar_mp');
+        Route::post('/instancias/excluir', [WhatsappCobrancaController::class, 'excluirInstancia'])->name('admin.whatsapp.instancias.excluir');
     });
 
     // Licenciados FOCO 7 & Gestão de Servidores / White Label
@@ -256,10 +271,16 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/salvar', [LicenciadosController::class, 'salvar'])->name('admin.licenciados.salvar');
         Route::post('/status/{id}', [LicenciadosController::class, 'alterarStatus'])->name('admin.licenciados.status');
         Route::post('/{id}/status', [LicenciadosController::class, 'alterarStatus']);
+        Route::post('/{id}/toggle-status', [LicenciadosController::class, 'toggleStatus'])->name('admin.licenciados.toggle_status');
+        Route::post('/{id}/toggle-modo', [LicenciadosController::class, 'toggleModo'])->name('admin.licenciados.toggle_modo');
+        Route::post('/{id}/pix-adesao', [LicenciadosController::class, 'gerarPixAdesao'])->name('admin.licenciados.pix_adesao');
+        Route::post('/{id}/pix-mensalidade', [LicenciadosController::class, 'gerarPixMensalidade'])->name('admin.licenciados.pix_mensalidade');
+        Route::post('/{id}/confirmar-pagamento', [LicenciadosController::class, 'confirmarPagamentoManual'])->name('admin.licenciados.confirmar_pagamento');
         Route::post('/regenerar-chave/{id}', [LicenciadosController::class, 'regenerarChave'])->name('admin.licenciados.regenerar_chave');
         Route::post('/{id}/regenerar-chave', [LicenciadosController::class, 'regenerarChave']);
         Route::post('/configuracoes', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.configuracoes');
         Route::post('/salvar-configs', [LicenciadosController::class, 'salvarConfiguracoes'])->name('admin.licenciados.salvar_configs');
+        Route::post('/toggle-programa', [LicenciadosController::class, 'togglePrograma'])->name('admin.licenciados.toggle_programa');
         Route::get('/download-pacote/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download_pacote');
         Route::get('/download-zip/{id}', [LicenciadosController::class, 'downloadPacote'])->name('admin.licenciados.download-zip');
         Route::get('/download-vps/{id}', [LicenciadosController::class, 'downloadScriptVps'])->name('admin.licenciados.download_vps');
@@ -391,5 +412,7 @@ Route::prefix('cliente')->middleware(['auth', 'role:cliente'])->group(function (
         Route::get('/whatsapp/qr/{id}', [LicenciadoPortalController::class, 'qrWhatsapp'])->name('cliente.licenca.whatsapp.qr');
         Route::get('/whatsapp/status/{id}', [LicenciadoPortalController::class, 'statusWhatsapp'])->name('cliente.licenca.whatsapp.status');
         Route::post('/whatsapp/desconectar/{id}', [LicenciadoPortalController::class, 'desconectarWhatsapp'])->name('cliente.licenca.whatsapp.desconectar');
+        Route::get('/whatsapp/cobranca/{id}', [LicenciadoPortalController::class, 'cobrancaWhatsapp'])->name('cliente.licenca.whatsapp.cobranca');
+        Route::get('/whatsapp/verificar-pagamento/{id}', [LicenciadoPortalController::class, 'verificarPagamentoWhatsapp'])->name('cliente.licenca.whatsapp.verificar_pagamento');
     });
 });

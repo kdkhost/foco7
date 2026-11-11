@@ -7,8 +7,6 @@ use App\Models\Fatura;
 use App\Models\Notificacao;
 use App\Models\Plano;
 use App\Models\User;
-use App\Services\EvolutionApiService;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -96,7 +94,7 @@ class ReguaCobrancaService
         $params = $params ?: self::obterParametros();
         $base = (float) ($fatura->valor_original ?: $fatura->valor);
 
-        if (!$fatura->data_vencimento) {
+        if (! $fatura->data_vencimento) {
             return [
                 'dias_atraso' => 0,
                 'multa' => 0.00,
@@ -175,7 +173,7 @@ class ReguaCobrancaService
 
         foreach ($clientes as $cliente) {
             $plano = $cliente->plano;
-            if (!$plano || (float) $plano->preco_mensal <= 0) {
+            if (! $plano || (float) $plano->preco_mensal <= 0) {
                 continue;
             }
 
@@ -188,7 +186,7 @@ class ReguaCobrancaService
             $hoje = now()->startOfDay();
             $proximoVencimento = null;
 
-            if (!$ultimaFatura) {
+            if (! $ultimaFatura) {
                 // Primeira fatura recorrente: vence em $dias a partir de hoje
                 $proximoVencimento = $hoje->copy()->addDays($dias);
             } else {
@@ -206,14 +204,14 @@ class ReguaCobrancaService
                         ->whereMonth('data_vencimento', $candidatoVenc->month)
                         ->exists();
 
-                    if (!$jaExiste) {
+                    if (! $jaExiste) {
                         $proximoVencimento = $candidatoVenc;
                     }
                 }
             }
 
             if ($proximoVencimento) {
-                $codigoFatura = 'FAT-' . date('Ym') . '-' . strtoupper(Str::random(5));
+                $codigoFatura = 'FAT-'.date('Ym').'-'.strtoupper(Str::random(5));
                 $valor = (float) $plano->preco_mensal;
 
                 // Monta PIX padrão ou utiliza EfiPaymentService
@@ -221,7 +219,7 @@ class ReguaCobrancaService
                     'user_id' => $cliente->id,
                     'plano_id' => $plano->id,
                     'codigo_fatura' => $codigoFatura,
-                    'descricao' => "Mensalidade Recorrente: {$plano->nome} (" . $proximoVencimento->format('m/Y') . ")",
+                    'descricao' => "Mensalidade Recorrente: {$plano->nome} (".$proximoVencimento->format('m/Y').')',
                     'valor' => $valor,
                     'valor_original' => $valor,
                     'gateway' => CmsSetting::get('gateway_padrao', 'efi'),
@@ -233,13 +231,13 @@ class ReguaCobrancaService
                 // Dispara a criação de cobrança PIX real via EfiPaymentService se disponível
                 try {
                     $resPix = EfiPaymentService::criarCobrancaPix($fatura, $cliente);
-                    if (!empty($resPix['qr_code'])) {
+                    if (! empty($resPix['qr_code'])) {
                         $fatura->qr_code_pix = $resPix['qr_code'];
                         $fatura->qr_code_pix_url = $resPix['imagem_qrcode'] ?? null;
                         $fatura->save();
                     }
                 } catch (\Throwable $e) {
-                    Log::warning("Falha ao gerar PIX para fatura recorrente {$fatura->codigo_fatura}: " . $e->getMessage());
+                    Log::warning("Falha ao gerar PIX para fatura recorrente {$fatura->codigo_fatura}: ".$e->getMessage());
                 }
 
                 $geradas++;
@@ -265,7 +263,7 @@ class ReguaCobrancaService
     {
         $params = self::obterParametros();
 
-        if (!$params['regua_ativa']) {
+        if (! $params['regua_ativa']) {
             return [
                 'sucesso' => false,
                 'mensagem' => 'A régua de cobrança automatizada está desativada no painel administrativo.',
@@ -303,7 +301,7 @@ class ReguaCobrancaService
 
         foreach ($faturasAbertas as $fatura) {
             // Guarda defensiva: se por concorrência a fatura já estiver quitada ou cancelada, ignora
-            if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
+            if ($fatura->isLiquidadaOuCancelada() || ! empty($fatura->data_pagamento)) {
                 continue;
             }
 
@@ -443,23 +441,24 @@ class ReguaCobrancaService
     public static function dispararEtapa(Fatura $fatura, string $etapa, array $encargosExtras = []): bool
     {
         // BLINDAGEM DE SEGURANÇA: Faturas já quitadas, pagas ou canceladas NUNCA recebem cobrança para evitar duplicidade
-        if ($fatura->isLiquidadaOuCancelada() || !empty($fatura->data_pagamento)) {
-            Log::info("Cobrança bloqueada para evitar duplicidade: A fatura #{$fatura->codigo_fatura} já se encontra quitada/liquidada (status: {$fatura->status}, data_pagamento: " . ($fatura->data_pagamento ? $fatura->data_pagamento->format('d/m/Y H:i') : 'null') . ").");
+        if ($fatura->isLiquidadaOuCancelada() || ! empty($fatura->data_pagamento)) {
+            Log::info("Cobrança bloqueada para evitar duplicidade: A fatura #{$fatura->codigo_fatura} já se encontra quitada/liquidada (status: {$fatura->status}, data_pagamento: ".($fatura->data_pagamento ? $fatura->data_pagamento->format('d/m/Y H:i') : 'null').').');
+
             return false;
         }
 
         $cliente = $fatura->user;
-        if (!$cliente || empty($cliente->email)) {
+        if (! $cliente || empty($cliente->email)) {
             return false;
         }
 
         $params = self::obterParametros();
-        $encargos = !empty($encargosExtras) ? $encargosExtras : self::calcularEncargos($fatura, $params);
+        $encargos = ! empty($encargosExtras) ? $encargosExtras : self::calcularEncargos($fatura, $params);
 
-        $valorOriginalFormatado = 'R$ ' . number_format($fatura->valor_original ?: $fatura->valor, 2, ',', '.');
-        $valorAtualizadoFormatado = 'R$ ' . number_format($encargos['total_atualizado'], 2, ',', '.');
-        $multaFormatada = 'R$ ' . number_format($encargos['multa'], 2, ',', '.');
-        $jurosFormatados = 'R$ ' . number_format($encargos['juros'], 2, ',', '.');
+        $valorOriginalFormatado = 'R$ '.number_format($fatura->valor_original ?: $fatura->valor, 2, ',', '.');
+        $valorAtualizadoFormatado = 'R$ '.number_format($encargos['total_atualizado'], 2, ',', '.');
+        $multaFormatada = 'R$ '.number_format($encargos['multa'], 2, ',', '.');
+        $jurosFormatados = 'R$ '.number_format($encargos['juros'], 2, ',', '.');
 
         $dadosPayload = [
             'cliente_nome' => $cliente->name,
@@ -480,23 +479,30 @@ class ReguaCobrancaService
         ];
 
         $enviado = false;
+        $permissaoWhatsapp = EvolutionApiService::verificarPermissaoCobrancaWhatsapp();
+        $whatsappLiberado = (bool) ($permissaoWhatsapp['permitido'] ?? false);
+
+        // Regra de negócio: se o administrador ainda não criou e ativou sua própria instância no Evolution Go,
+        // toda cobrança deve ocorrer obrigatoriamente via E-mail.
+        $forcarEmailFallback = ! $whatsappLiberado;
 
         // Disparo por e-mail
-        if ($params['enviar_email']) {
+        if (($params['enviar_email'] || $forcarEmailFallback) && ! empty($cliente->email)) {
             $enviado = EmailTemplateService::enviar($cliente->email, $etapa, $dadosPayload);
         }
 
-        // Disparo por WhatsApp (Evolution API Go v3.0)
+        // Disparo por WhatsApp (Evolution API Go v3.0) - Somente se a instância própria do admin estiver criada e paga
         $etapaSlug = str_replace('cobranca_', '', $etapa);
-        $deveEnviarWhatsapp = !empty($params['enviar_whatsapp'])
+        $deveEnviarWhatsapp = ! empty($params['enviar_whatsapp'])
             && ($params["whatsapp_{$etapaSlug}"] ?? true)
-            && EvolutionApiService::isAtivo();
+            && EvolutionApiService::isAtivo()
+            && $whatsappLiberado;
 
-        if ($deveEnviarWhatsapp && !empty($cliente->telefone)) {
+        if ($deveEnviarWhatsapp && ! empty($cliente->telefone)) {
             try {
                 EvolutionApiService::enviarCobrancaFatura($fatura, $etapa, $encargos);
             } catch (\Throwable $e) {
-                Log::warning("Falha ao enviar cobrança via WhatsApp para {$fatura->codigo_fatura}: " . $e->getMessage());
+                Log::warning("Falha ao enviar cobrança via WhatsApp para {$fatura->codigo_fatura}: ".$e->getMessage());
             }
         }
 
@@ -518,7 +524,7 @@ class ReguaCobrancaService
             'user_id' => $cliente->id,
             'tipo' => $tipoNotif,
             'titulo' => $tituloNotif,
-            'mensagem' => "Fatura #{$fatura->codigo_fatura} com vencimento em " . ($fatura->data_vencimento ? $fatura->data_vencimento->format('d/m/Y') : '') . ". Valor: {$valorAtualizadoFormatado}.",
+            'mensagem' => "Fatura #{$fatura->codigo_fatura} com vencimento em ".($fatura->data_vencimento ? $fatura->data_vencimento->format('d/m/Y') : '').". Valor: {$valorAtualizadoFormatado}.",
             'link' => "/cliente/faturas/{$fatura->id}",
             'lida' => false,
         ]);

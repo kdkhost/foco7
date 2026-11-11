@@ -1303,102 +1303,203 @@
             <div class="row g-4 mb-5">
                 <!-- Pilar 1 -->
                 <div class="col-md-6 col-lg-3">
-                    <div class="card-licenciado-pilar">
+                    <div class="card-licenciado-pilar position-relative overflow-hidden">
+                        <span class="pilar-numero">01</span>
                         <div class="licenciado-icon-box">
-                            <i class="fas fa-server"></i>
+                            <i class="fas {{ $configs['licenciamento_pilar1_icone'] ?? 'fa-server' }}"></i>
                         </div>
-                        <h5 class="fw-bold mb-2 text-dark">Servidor Próprio</h5>
+                        <h5 class="fw-bold mb-2 text-dark">{{ $configs['licenciamento_pilar1_titulo'] ?? 'Servidor Próprio' }}</h5>
                         <p class="small text-secondary mb-0 leading-relaxed">
-                            Instale no seu próprio cPanel, VPS Linux (Ubuntu/Debian), Dedicated ou Cloud (AWS, DigitalOcean). O código e os dados são 100% seus.
+                            {{ $configs['licenciamento_pilar1_desc'] ?? 'Instale no seu próprio cPanel, VPS Linux (Ubuntu/Debian), Dedicated ou Cloud (AWS, DigitalOcean). O código e os dados são 100% seus.' }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 2 -->
                 <div class="col-md-6 col-lg-3">
-                    <div class="card-licenciado-pilar">
+                    <div class="card-licenciado-pilar position-relative overflow-hidden">
+                        <span class="pilar-numero">02</span>
                         <div class="licenciado-icon-box">
-                            <i class="fas fa-paint-roller"></i>
+                            <i class="fas {{ $configs['licenciamento_pilar2_icone'] ?? 'fa-paint-roller' }}"></i>
                         </div>
-                        <h5 class="fw-bold mb-2 text-dark">100% White Label</h5>
+                        <h5 class="fw-bold mb-2 text-dark">{{ $configs['licenciamento_pilar2_titulo'] ?? '100% White Label' }}</h5>
                         <p class="small text-secondary mb-0 leading-relaxed">
-                            Sua própria marca, domínio, logotipo, cores e CNPJ. Seus clientes utilizam o sistema com a sua identidade, sem nenhuma menção à Foco 7.
+                            {{ $configs['licenciamento_pilar2_desc'] ?? 'Sua própria marca, domínio, logotipo, cores e CNPJ. Seus clientes utilizam o sistema com a sua identidade, sem nenhuma menção à Foco 7.' }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 3 -->
                 <div class="col-md-6 col-lg-3">
-                    <div class="card-licenciado-pilar">
+                    <div class="card-licenciado-pilar position-relative overflow-hidden">
+                        <span class="pilar-numero">03</span>
                         <div class="licenciado-icon-box">
-                            <i class="fas fa-hand-holding-dollar"></i>
+                            <i class="fas {{ $configs['licenciamento_pilar3_icone'] ?? 'fa-hand-holding-dollar' }}"></i>
                         </div>
-                        <h5 class="fw-bold mb-2 text-dark">Lucro 100% Seu</h5>
+                        <h5 class="fw-bold mb-2 text-dark">{{ $configs['licenciamento_pilar3_titulo'] ?? 'Lucro 100% Seu' }}</h5>
                         <p class="small text-secondary mb-0 leading-relaxed">
-                            Receba mensalidades via Pix, Boleto e Cartão direto na sua conta (Mercado Pago ou Efí Bank). Sem cobrança por veículo rastreado.
+                            {{ $configs['licenciamento_pilar3_desc'] ?? 'Receba mensalidades via Pix, Boleto e Cartão direto na sua conta (Mercado Pago ou Efí Bank). Sem cobrança por veículo rastreado.' }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 4 -->
                 <div class="col-md-6 col-lg-3">
-                    <div class="card-licenciado-pilar">
+                    <div class="card-licenciado-pilar position-relative overflow-hidden">
+                        <span class="pilar-numero">04</span>
                         <div class="licenciado-icon-box">
-                            <i class="fas fa-magic"></i>
+                            <i class="fas {{ $configs['licenciamento_pilar4_icone'] ?? 'fa-magic' }}"></i>
                         </div>
-                        <h5 class="fw-bold mb-2 text-dark">Instalador Web Fácil</h5>
+                        <h5 class="fw-bold mb-2 text-dark">{{ $configs['licenciamento_pilar4_titulo'] ?? 'Instalador Web Fácil' }}</h5>
                         <p class="small text-secondary mb-0 leading-relaxed">
-                            Assistente web gráfico integrado (<code>/instalar</code>). Criação automática de banco de dados, migrações e administrador em poucos cliques.
+                            {!! $configs['licenciamento_pilar4_desc'] ?? 'Assistente web gráfico integrado (<code>/instalar</code>). Criação automática de banco de dados, migrações e administrador em poucos cliques.' !!}
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Card de Oferta & Ação de Conversão -->
-            <div class="row justify-content-center">
-                <div class="col-lg-10 col-xl-9">
+            <!-- Card de Oferta & Ação de Conversão (Largura Total da Grade / 100% Responsivo) -->
+            <div class="row">
+                <div class="col-12">
                     <div class="card-oferta-licenciado shadow-lg">
-                        <div class="row align-items-center g-4">
-                            <div class="col-md-7">
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 fw-bold small rounded-pill mb-2">
-                                    PACOTE COMPLETO DE DISTRIBUIÇÃO
-                                </span>
-                                <h3 class="fw-bold mb-2 text-dark">Software Foco 7 para Seu Servidor</h3>
-                                <p class="text-secondary small mb-3 leading-relaxed">
-                                    Receba o pacote completo <code>.ZIP</code> pronto para descompactar, script de instalação automatizada VPS (<code>install-vps.sh</code>) e sua chave de licença criptografada com ativação imediata.
-                                </p>
-                                <ul class="list-unstyled small text-secondary mb-0 d-flex flex-column gap-2">
-                                    <li class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                        <span>Painel Administrativo Completo + Painel do Cliente</span>
-                                    </li>
-                                    <li class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                        <span>WhatsApp Automático (Evolution API Go) + Gateways de Pagamento</span>
-                                    </li>
-                                    <li class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                        <span>Validação Remota &amp; Suporte Técnico Especializado</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-5 text-center text-md-end border-start-md ps-md-4">
-                                <div class="text-secondary small text-uppercase fw-semibold mb-1">Taxa de Adesão / Licença</div>
-                                <div class="display-5 fw-black text-danger mb-1">
-                                    R$ {{ number_format($configs['licenciamento_preco_adesao'] ?? 1497.00, 2, ',', '.') }}
+                        <div class="row align-items-center g-4 g-xl-5">
+                            <!-- Coluna Esquerda: Especificações, Entrega & Diferenciais -->
+                            <div class="col-lg-7 col-xl-7">
+                                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-danger-subtle text-danger rounded-pill fw-bold small mb-3 border border-danger-subtle badge-licenciado-pulse">
+                                    <i class="fas fa-crown text-warning"></i> {{ $configs['licenciamento_card_badge'] ?? 'PACOTE COMPLETO DE DISTRIBUIÇÃO & WHITE LABEL' }}
                                 </div>
-                                <div class="badge bg-light text-dark border small mb-3">Pagamento Único • Sem Royalties</div>
+                                <h3 class="display-6 fw-black text-dark mb-3" style="font-size: calc(1.35rem + 0.9vw); line-height: 1.25;">
+                                    {{ $configs['licenciamento_card_titulo'] ?? 'Software FOCO 7 Completo para o Seu Próprio Servidor' }}
+                                </h3>
+                                <p class="text-secondary fs-6 mb-4 leading-relaxed">
+                                    {!! $configs['licenciamento_card_desc'] ?? 'Receba o pacote completo <code>.ZIP</code> pronto para descompactar, script de instalação automatizada VPS (<code>install-vps.sh</code>) e sua chave de licença criptografada com ativação imediata. Faturamento 100% seu direto na sua conta bancária sem intermediários e sem cobrança por placa rastreada.' !!}
+                                </p>
 
-                                <div class="d-grid gap-2">
-                                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['licenciamento_whatsapp_suporte'] ?? $configs['whatsapp']) }}?text={{ urlencode('Olá! Gostaria de mais detalhes e adquirir a licença White Label do sistema FOCO 7 para instalar no meu próprio servidor.') }}" 
-                                       target="_blank" 
-                                       rel="noopener noreferrer" 
-                                       class="btn btn-danger btn-lg fw-bold shadow-sm py-3 d-flex align-items-center justify-content-center gap-2">
-                                        <i class="fab fa-whatsapp fs-5"></i> Quero Ser Licenciado
-                                    </a>
-                                    <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-sm py-2 fw-semibold">
-                                        <i class="fas fa-user-lock me-1"></i> Já sou Licenciado / Acessar Downloads
-                                    </a>
+                                <!-- Grade de Diferenciais Inclusos (2 colunas fluidas) -->
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="fas {{ $configs['licenciamento_feat1_icone'] ?? 'fa-server' }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat1_titulo'] ?? 'Servidor & Dados Próprios' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat1_desc'] ?? 'Instale na sua VPS Ubuntu/Debian, cPanel ou Cloud com total autonomia.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="fas {{ $configs['licenciamento_feat2_icone'] ?? 'fa-paint-roller' }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat2_titulo'] ?? '100% White Label' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat2_desc'] ?? 'Sua marca, logotipo, cores, domínio próprio e sem nenhuma menção à FOCO 7.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="{{ str_starts_with($configs['licenciamento_feat3_icone'] ?? 'fa-whatsapp', 'fa') && !str_starts_with($configs['licenciamento_feat3_icone'] ?? 'fa-whatsapp', 'fab ') && !str_starts_with($configs['licenciamento_feat3_icone'] ?? 'fa-whatsapp', 'fas ') ? 'fab ' . ($configs['licenciamento_feat3_icone'] ?? 'fa-whatsapp') : ($configs['licenciamento_feat3_icone'] ?? 'fab fa-whatsapp') }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat3_titulo'] ?? 'WhatsApp Evolution Go' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat3_desc'] ?? 'Envio de faturas, régua de cobrança automática e botões interativos PIX.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="fas {{ $configs['licenciamento_feat4_icone'] ?? 'fa-qrcode' }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat4_titulo'] ?? 'Gateways Integrados' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat4_desc'] ?? 'Receba via PIX Copia e Cola, Mercado Pago e Efí Bank direto na sua conta.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="fas {{ $configs['licenciamento_feat5_icone'] ?? 'fa-magic' }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat5_titulo'] ?? 'Instalador Gráfico /instalar' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat5_desc'] ?? 'Setup em minutos com criação automática do banco de dados e admin.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="licenciado-feature-item">
+                                            <div class="licenciado-feature-icon">
+                                                <i class="fas {{ $configs['licenciamento_feat6_icone'] ?? 'fa-shield-alt' }}"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">{{ $configs['licenciamento_feat6_titulo'] ?? 'Sem Royalties por Veículo' }}</h6>
+                                                <p class="small text-secondary mb-0">{{ $configs['licenciamento_feat6_desc'] ?? 'Cadastre clientes e veículos ilimitados retendo 100% do seu lucro.' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Coluna Direita: Box de Conversão, Preço & CTA -->
+                            <div class="col-lg-5 col-xl-5">
+                                <div class="card-oferta-conversao-box">
+                                    <div class="text-center mb-3">
+                                        <span class="badge bg-danger text-white rounded-pill px-3 py-1 text-uppercase fw-bold shadow-sm" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                            <i class="fas fa-bolt me-1 text-warning"></i> {{ $configs['licenciamento_cta_badge'] ?? 'CONDIÇÃO ESPECIAL DE DISTRIBUIÇÃO' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="text-center mb-3">
+                                        <div class="text-secondary small text-uppercase fw-bold letter-spacing-1">{{ $configs['licenciamento_cta_label'] ?? 'TAXA DE ADESÃO / IMPLANTAÇÃO' }}</div>
+                                        <div class="d-flex align-items-baseline justify-content-center gap-1 my-1">
+                                            <span class="fs-4 fw-bold text-danger">R$</span>
+                                            <span class="display-4 fw-black text-danger tracking-tight">
+                                                {{ number_format($configs['licenciamento_preco_adesao'] ?? 1497.00, 2, ',', '.') }}
+                                            </span>
+                                        </div>
+                                        <div class="badge-sem-royalties-pill">
+                                            <i class="fas fa-check-circle text-success me-1"></i> {{ $configs['licenciamento_cta_selo'] ?? 'Pagamento Único • Sem Royalties por Placa' }}
+                                        </div>
+                                        <div class="small text-muted mt-2">
+                                            {{ $configs['licenciamento_cta_subtexto'] ?? 'Ativação imediata da licença • Pacote pronto para deploy' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2 mb-3">
+                                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $configs['licenciamento_whatsapp_suporte'] ?? $configs['whatsapp']) }}?text={{ urlencode($configs['licenciamento_whatsapp_msg'] ?? 'Olá! Gostaria de mais detalhes e adquirir a licença White Label do sistema FOCO 7 para instalar no meu próprio servidor.') }}" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer" 
+                                           class="btn btn-danger btn-lg fw-bold shadow-sm py-3 d-flex align-items-center justify-content-center gap-2 btn-cta-licenciado">
+                                            <i class="fab fa-whatsapp fs-5"></i> {{ $configs['licenciamento_btn_whatsapp_texto'] ?? 'Quero Ser Licenciado Agora' }}
+                                        </a>
+                                        <a href="{{ $configs['licenciamento_btn_portal_url'] ?? route('login') }}" class="btn btn-outline-secondary py-2 fw-semibold d-flex align-items-center justify-content-center gap-2 btn-login-licenciado">
+                                            <i class="fas fa-user-lock"></i> {{ $configs['licenciamento_btn_portal_texto'] ?? 'Já sou Licenciado / Acessar Downloads' }}
+                                        </a>
+                                    </div>
+
+                                    <!-- Micro Trust Badges de Credibilidade -->
+                                    <div class="pt-3 border-top border-light-subtle">
+                                        <div class="row g-2 text-center text-secondary small">
+                                            <div class="col-4">
+                                                <i class="fas {{ $configs['licenciamento_trust1_icone'] ?? 'fa-bolt' }} text-danger d-block mb-1"></i>
+                                                <span style="font-size: 0.72rem; line-height: 1.2; display: block;">{{ $configs['licenciamento_trust1_texto'] ?? 'Ativação Imediata' }}</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <i class="fas {{ $configs['licenciamento_trust2_icone'] ?? 'fa-code' }} text-danger d-block mb-1"></i>
+                                                <span style="font-size: 0.72rem; line-height: 1.2; display: block;">{{ $configs['licenciamento_trust2_texto'] ?? 'Código Homologado' }}</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <i class="fas {{ $configs['licenciamento_trust3_icone'] ?? 'fa-headset' }} text-danger d-block mb-1"></i>
+                                                <span style="font-size: 0.72rem; line-height: 1.2; display: block;">{{ $configs['licenciamento_trust3_texto'] ?? 'Suporte Técnico' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

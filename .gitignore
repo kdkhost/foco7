@@ -1,6 +1,10 @@
 test.bat
 test_*.bat
 test_*.php
+run_commit.bat
+git_commit_push.bat
+check.php
+check_*.php
 runner.php
 commit_msg.txt
 deploy-auto.bat

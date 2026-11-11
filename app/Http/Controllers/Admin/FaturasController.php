@@ -142,6 +142,14 @@ class FaturasController extends Controller
                     \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
                 }
             }
+
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'whatsapp') || str_contains(strtolower($fatura->descricao ?? ''), 'instancia') || str_starts_with($fatura->codigo_fatura ?? '', 'FAT-WPP-')) {
+                try {
+                    \App\Services\EvolutionApiService::processarPagamentoFaturaInstancia($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar instância WhatsApp na baixa manual: " . $e->getMessage());
+                }
+            }
         }
 
         return response()->json([
@@ -191,6 +199,14 @@ class FaturasController extends Controller
                     \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
+                }
+            }
+
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'whatsapp') || str_contains(strtolower($fatura->descricao ?? ''), 'instancia') || str_starts_with($fatura->codigo_fatura ?? '', 'FAT-WPP-')) {
+                try {
+                    \App\Services\EvolutionApiService::processarPagamentoFaturaInstancia($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar instância WhatsApp na baixa manual: " . $e->getMessage());
                 }
             }
         }
@@ -398,6 +414,14 @@ class FaturasController extends Controller
                     \App\Services\LicenciamentoService::ativarLicencaPosPagamento($fatura);
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::warning("Falha ao ativar licença na baixa manual: " . $e->getMessage());
+                }
+            }
+
+            if (str_contains(strtolower($fatura->descricao ?? ''), 'whatsapp') || str_contains(strtolower($fatura->descricao ?? ''), 'instancia') || str_starts_with($fatura->codigo_fatura ?? '', 'FAT-WPP-')) {
+                try {
+                    \App\Services\EvolutionApiService::processarPagamentoFaturaInstancia($fatura);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Falha ao ativar instância WhatsApp na baixa manual: " . $e->getMessage());
                 }
             }
         }

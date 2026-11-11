@@ -3165,8 +3165,8 @@ img, svg, video, canvas, audio, iframe, embed, object {
  * ============================================================================== */
 .section-licenciado {
     position: relative;
-    padding: 90px 0;
-    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 95px 0;
+    background: radial-gradient(circle at 50% 0%, rgba(217, 0, 0, 0.035) 0%, transparent 65%), linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
     border-top: 1px solid var(--foco-border);
     border-bottom: 1px solid var(--foco-border);
 }
@@ -3174,47 +3174,67 @@ img, svg, video, canvas, audio, iframe, embed, object {
 .card-licenciado-pilar {
     background: #ffffff;
     border: 1px solid var(--foco-border);
-    border-radius: 16px;
-    padding: 28px 24px;
+    border-radius: 18px;
+    padding: 30px 24px;
     height: 100%;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
 }
 
 .card-licenciado-pilar:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 36px rgba(217, 0, 0, 0.08);
+    box-shadow: 0 16px 36px rgba(217, 0, 0, 0.09);
     border-color: rgba(217, 0, 0, 0.35);
 }
 
+.card-licenciado-pilar .pilar-numero {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: rgba(15, 23, 42, 0.06);
+    pointer-events: none;
+    user-select: none;
+    transition: color 0.3s ease;
+}
+
+.card-licenciado-pilar:hover .pilar-numero {
+    color: rgba(217, 0, 0, 0.12);
+}
+
 .licenciado-icon-box {
-    width: 60px;
-    height: 60px;
+    width: 58px;
+    height: 58px;
     border-radius: 14px;
     background: rgba(217, 0, 0, 0.08);
     color: #d90000;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    font-size: 1.55rem;
     margin-bottom: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
 .card-licenciado-pilar:hover .licenciado-icon-box {
     background: #d90000;
     color: #ffffff;
+    transform: scale(1.05);
 }
 
 .card-oferta-licenciado {
     background: #ffffff;
-    border: 2px solid #d90000;
-    border-radius: 20px;
-    padding: 36px 32px;
-    box-shadow: 0 20px 48px rgba(217, 0, 0, 0.12);
+    border: 2px solid rgba(217, 0, 0, 0.22);
+    border-radius: 24px;
+    padding: 44px 42px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08), 0 6px 20px rgba(217, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .card-oferta-licenciado::before {
@@ -3224,7 +3244,140 @@ img, svg, video, canvas, audio, iframe, embed, object {
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(90deg, #d90000, #ff4d4d);
+    background: linear-gradient(90deg, #d90000 0%, #ff4d4d 50%, #d90000 100%);
+}
+
+.badge-licenciado-pulse {
+    animation: esteticaPulse 2.5s infinite ease-in-out;
+}
+
+.licenciado-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 14px;
+    height: 100%;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.licenciado-feature-item:hover {
+    background: #ffffff;
+    border-color: rgba(217, 0, 0, 0.3);
+    box-shadow: 0 6px 18px rgba(217, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.licenciado-feature-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+    background: rgba(217, 0, 0, 0.08);
+    color: #d90000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: all 0.25s ease;
+}
+
+.licenciado-feature-item:hover .licenciado-feature-icon {
+    background: #d90000;
+    color: #ffffff;
+}
+
+.card-oferta-conversao-box {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid rgba(217, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 34px 28px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+    position: relative;
+}
+
+.badge-sem-royalties-pill {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(34, 197, 94, 0.09);
+    color: #166534;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.btn-cta-licenciado {
+    background: linear-gradient(135deg, #d90000 0%, #b30000 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-cta-licenciado:hover {
+    background: linear-gradient(135deg, #b30000 0%, #8f0000 100%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(217, 0, 0, 0.35);
+}
+
+.btn-login-licenciado {
+    border-radius: 12px;
+    font-size: 0.88rem;
+    color: #475569;
+    border-color: #cbd5e1;
+    transition: all 0.25s ease;
+}
+
+.btn-login-licenciado:hover {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
+@media (max-width: 991.98px) {
+    .section-licenciado {
+        padding: 60px 0;
+    }
+
+    .card-oferta-licenciado {
+        padding: 30px 22px;
+        border-radius: 20px;
+    }
+
+    .card-oferta-conversao-box {
+        padding: 26px 20px;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .section-licenciado {
+        padding: 45px 0;
+    }
+
+    .card-licenciado-pilar {
+        padding: 24px 18px;
+    }
+
+    .card-oferta-licenciado {
+        padding: 22px 14px;
+        border-radius: 16px;
+    }
+
+    .card-oferta-conversao-box {
+        padding: 20px 14px;
+    }
+
+    .licenciado-feature-item {
+        padding: 12px 10px;
+    }
 }
 
 

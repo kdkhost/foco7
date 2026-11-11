@@ -15,6 +15,26 @@ Schedule::call(function () {
     \App\Models\CmsSetting::set('cron_heartbeat_datahora', date('d/m/Y H:i:s'), 'cron');
 })->everyMinute()->name('cron-heartbeat');
 
+// Rotina Diária de Suspensão Automática de Instâncias de WhatsApp Vencidas (R$ 60,00/mês com tolerância de 24h)
+Schedule::call(function () {
+    \App\Services\EvolutionApiService::processarSuspensaoInstanciasVencidas();
+})->dailyAt('06:30')->name('whatsapp-suspensao-vencidos');
+
+// Rotina Diária de Cobrança Preventiva Automática via WhatsApp das Instâncias (Mercado Pago PIX)
+Schedule::call(function () {
+    \App\Services\EvolutionApiService::processarCobrancasRecorrentesInstancias();
+})->dailyAt('08:00')->name('whatsapp-cobranca-preventiva');
+
+// Sincronização e Reativação Automática de Pagamentos Pendentes de Instâncias no Mercado Pago
+Schedule::call(function () {
+    \App\Services\EvolutionApiService::sincronizarPagamentosPendentesInstancias();
+})->everyTenMinutes()->name('whatsapp-sincronizar-mp');
+
+// Rotina Diária de Suspensão Automática de Licenças Vencidas (Mensalidades)
+Schedule::call(function () {
+    \App\Services\LicenciamentoService::processarVencimentoLicencas();
+})->dailyAt('06:45')->name('licencas-suspensao-vencidos');
+
 // Carregamento dinâmico de tarefas ativas cadastradas no banco de dados
 try {
     if (\Illuminate\Support\Facades\Schema::hasTable('cron_jobs')) {

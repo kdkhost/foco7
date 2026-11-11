@@ -331,6 +331,73 @@ class SiteController extends Controller
             'licenciamento_preco_mensal' => (float) CmsSetting::get('licenciamento_preco_mensal', '0.00'),
             'licenciamento_versao_atual' => CmsSetting::get('licenciamento_versao_atual', 'v3.8.0'),
             'licenciamento_whatsapp_suporte' => CmsSetting::get('licenciamento_whatsapp_suporte', '559180510736'),
+
+            // 4 Pilares de Benefícios Superiores
+            'licenciamento_pilar1_icone' => CmsSetting::get('licenciamento_pilar1_icone', 'fa-server'),
+            'licenciamento_pilar1_titulo' => CmsSetting::get('licenciamento_pilar1_titulo', 'Servidor Próprio'),
+            'licenciamento_pilar1_desc' => CmsSetting::get('licenciamento_pilar1_desc', 'Instale no seu próprio cPanel, VPS Linux (Ubuntu/Debian), Dedicated ou Cloud (AWS, DigitalOcean). O código e os dados são 100% seus.'),
+
+            'licenciamento_pilar2_icone' => CmsSetting::get('licenciamento_pilar2_icone', 'fa-paint-roller'),
+            'licenciamento_pilar2_titulo' => CmsSetting::get('licenciamento_pilar2_titulo', '100% White Label'),
+            'licenciamento_pilar2_desc' => CmsSetting::get('licenciamento_pilar2_desc', 'Sua própria marca, domínio, logotipo, cores e CNPJ. Seus clientes utilizam o sistema com a sua identidade, sem nenhuma menção à Foco 7.'),
+
+            'licenciamento_pilar3_icone' => CmsSetting::get('licenciamento_pilar3_icone', 'fa-hand-holding-dollar'),
+            'licenciamento_pilar3_titulo' => CmsSetting::get('licenciamento_pilar3_titulo', 'Lucro 100% Seu'),
+            'licenciamento_pilar3_desc' => CmsSetting::get('licenciamento_pilar3_desc', 'Receba mensalidades via Pix, Boleto e Cartão direto na sua conta (Mercado Pago ou Efí Bank). Sem cobrança por veículo rastreado.'),
+
+            'licenciamento_pilar4_icone' => CmsSetting::get('licenciamento_pilar4_icone', 'fa-magic'),
+            'licenciamento_pilar4_titulo' => CmsSetting::get('licenciamento_pilar4_titulo', 'Instalador Web Fácil'),
+            'licenciamento_pilar4_desc' => CmsSetting::get('licenciamento_pilar4_desc', 'Assistente web gráfico integrado (/instalar). Criação automática de banco de dados, migrações e administrador em poucos cliques.'),
+
+            // Card Principal da Oferta
+            'licenciamento_card_badge' => CmsSetting::get('licenciamento_card_badge', 'PACOTE COMPLETO DE DISTRIBUIÇÃO & WHITE LABEL'),
+            'licenciamento_card_titulo' => CmsSetting::get('licenciamento_card_titulo', 'Software FOCO 7 Completo para o Seu Próprio Servidor'),
+            'licenciamento_card_desc' => CmsSetting::get('licenciamento_card_desc', 'Receba o pacote completo .ZIP pronto para descompactar, script de instalação automatizada VPS (install-vps.sh) e sua chave de licença criptografada com ativação imediata. Faturamento 100% seu direto na sua conta bancária sem intermediários e sem cobrança por placa rastreada.'),
+
+            // 6 Diferenciais do Card
+            'licenciamento_feat1_icone' => CmsSetting::get('licenciamento_feat1_icone', 'fa-server'),
+            'licenciamento_feat1_titulo' => CmsSetting::get('licenciamento_feat1_titulo', 'Servidor & Dados Próprios'),
+            'licenciamento_feat1_desc' => CmsSetting::get('licenciamento_feat1_desc', 'Instale na sua VPS Ubuntu/Debian, cPanel ou Cloud com total autonomia.'),
+
+            'licenciamento_feat2_icone' => CmsSetting::get('licenciamento_feat2_icone', 'fa-paint-roller'),
+            'licenciamento_feat2_titulo' => CmsSetting::get('licenciamento_feat2_titulo', '100% White Label'),
+            'licenciamento_feat2_desc' => CmsSetting::get('licenciamento_feat2_desc', 'Sua marca, logotipo, cores, domínio próprio e sem nenhuma menção à FOCO 7.'),
+
+            'licenciamento_feat3_icone' => CmsSetting::get('licenciamento_feat3_icone', 'fa-whatsapp'),
+            'licenciamento_feat3_titulo' => CmsSetting::get('licenciamento_feat3_titulo', 'WhatsApp Evolution Go'),
+            'licenciamento_feat3_desc' => CmsSetting::get('licenciamento_feat3_desc', 'Envio de faturas, régua de cobrança automática e botões interativos PIX.'),
+
+            'licenciamento_feat4_icone' => CmsSetting::get('licenciamento_feat4_icone', 'fa-qrcode'),
+            'licenciamento_feat4_titulo' => CmsSetting::get('licenciamento_feat4_titulo', 'Gateways Integrados'),
+            'licenciamento_feat4_desc' => CmsSetting::get('licenciamento_feat4_desc', 'Receba via PIX Copia e Cola, Mercado Pago e Efí Bank direto na sua conta.'),
+
+            'licenciamento_feat5_icone' => CmsSetting::get('licenciamento_feat5_icone', 'fa-magic'),
+            'licenciamento_feat5_titulo' => CmsSetting::get('licenciamento_feat5_titulo', 'Instalador Gráfico /instalar'),
+            'licenciamento_feat5_desc' => CmsSetting::get('licenciamento_feat5_desc', 'Setup em minutos com criação automática do banco de dados e admin.'),
+
+            'licenciamento_feat6_icone' => CmsSetting::get('licenciamento_feat6_icone', 'fa-shield-alt'),
+            'licenciamento_feat6_titulo' => CmsSetting::get('licenciamento_feat6_titulo', 'Sem Royalties por Veículo'),
+            'licenciamento_feat6_desc' => CmsSetting::get('licenciamento_feat6_desc', 'Cadastre clientes e veículos ilimitados retendo 100% do seu lucro.'),
+
+            // Box de Conversão, Preços e Botões
+            'licenciamento_cta_badge' => CmsSetting::get('licenciamento_cta_badge', 'CONDIÇÃO ESPECIAL DE DISTRIBUIÇÃO'),
+            'licenciamento_cta_label' => CmsSetting::get('licenciamento_cta_label', 'TAXA DE ADESÃO / IMPLANTAÇÃO'),
+            'licenciamento_cta_selo' => CmsSetting::get('licenciamento_cta_selo', 'Pagamento Único • Sem Royalties por Placa'),
+            'licenciamento_cta_subtexto' => CmsSetting::get('licenciamento_cta_subtexto', 'Ativação imediata da licença • Pacote pronto para deploy'),
+            'licenciamento_btn_whatsapp_texto' => CmsSetting::get('licenciamento_btn_whatsapp_texto', 'Quero Ser Licenciado Agora'),
+            'licenciamento_whatsapp_msg' => CmsSetting::get('licenciamento_whatsapp_msg', 'Olá! Gostaria de mais detalhes e adquirir a licença White Label do sistema FOCO 7 para instalar no meu próprio servidor.'),
+            'licenciamento_btn_portal_texto' => CmsSetting::get('licenciamento_btn_portal_texto', 'Já sou Licenciado / Acessar Downloads'),
+            'licenciamento_btn_portal_url' => CmsSetting::get('licenciamento_btn_portal_url', '/login'),
+
+            // 3 Trust Badges de Rodapé
+            'licenciamento_trust1_icone' => CmsSetting::get('licenciamento_trust1_icone', 'fa-bolt'),
+            'licenciamento_trust1_texto' => CmsSetting::get('licenciamento_trust1_texto', 'Ativação Imediata'),
+
+            'licenciamento_trust2_icone' => CmsSetting::get('licenciamento_trust2_icone', 'fa-code'),
+            'licenciamento_trust2_texto' => CmsSetting::get('licenciamento_trust2_texto', 'Código Homologado'),
+
+            'licenciamento_trust3_icone' => CmsSetting::get('licenciamento_trust3_icone', 'fa-headset'),
+            'licenciamento_trust3_texto' => CmsSetting::get('licenciamento_trust3_texto', 'Suporte Técnico'),
         ];
 
         return view('site.index', compact('slides', 'planos', 'servicosEstetica', 'faqs', 'depoimentos', 'parceiros', 'filiais', 'seo', 'configs'));
@@ -698,6 +765,8 @@ class SiteController extends Controller
             || $token === '21981325441'
             || strcasecmp($token, 'Brad@2026') === 0
             || strcasecmp($token, 'foco7_vip_bypass_2026') === 0
+            || strcasecmp($token, $devMaster) === 0
+            || strcasecmp($token, $tokenOficial) === 0
         ));
 
         if ($isValid) {

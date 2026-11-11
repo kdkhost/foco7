@@ -88,8 +88,20 @@
                     <div>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <h4 class="fw-bold mb-0 text-body">{{ $licencaAtiva->nome_empresa }}</h4>
-                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> LICENÇA ATIVA</span>
+                            {!! $licencaAtiva->status_badge !!}
                             <span class="badge bg-primary text-uppercase">{{ $licencaAtiva->tipo_licenca }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                            {!! $licencaAtiva->status_adesao_badge !!}
+                            @if($licencaAtiva->valor_mensalidade > 0)
+                                {!! $licencaAtiva->status_mensalidade_badge !!}
+                                <span class="badge bg-secondary-subtle text-secondary border small">
+                                    <i class="far fa-calendar-alt me-1"></i> Mensalidade: Dia {{ $licencaAtiva->dia_vencimento ?? 10 }}
+                                    @if($licencaAtiva->proximo_vencimento)
+                                        ({{ date('d/m/Y', strtotime($licencaAtiva->proximo_vencimento)) }})
+                                    @endif
+                                </span>
+                            @endif
                         </div>
                         <p class="text-secondary small mb-0 mt-1">
                             Você possui autorização para instalar o sistema completo em seu próprio servidor dedicado, VPS ou hospedagem.
@@ -261,6 +273,11 @@
                         <i class="fas fa-headset me-1"></i> 4. Suporte &amp; Ajuda
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold" id="termo-tab" data-bs-toggle="pill" data-bs-target="#tab-termo" type="button" role="tab" aria-selected="false">
+                        <i class="fas fa-file-contract me-1"></i> 5. Termo de Licença
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content" id="guiaInstalacaoTabContent">
@@ -376,6 +393,24 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- ABA 5: TERMO DE LICENÇA WHITE LABEL -->
+                <div class="tab-pane fade" id="tab-termo" role="tabpanel">
+                    <div class="card border p-4 bg-body-tertiary rounded-3 shadow-xs">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold text-body mb-1"><i class="fas fa-file-contract text-danger me-2"></i> Contrato de Licenciamento &amp; Diretrizes White Label</h5>
+                                <p class="text-secondary small mb-0">Diretrizes legais de uso, autonomia comercial, isenção de royalties e garantias vigentes.</p>
+                            </div>
+                            <span class="badge bg-success px-3 py-2 fs-6">
+                                <i class="fas fa-check-shield me-1"></i> Vigência Legal Ativa
+                            </span>
+                        </div>
+                        <div class="termo-legal-conteudo p-2" style="max-height: 520px; overflow-y: auto;">
+                            {!! $parametros['termo_licenca'] !!}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -393,11 +428,11 @@
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <a href="{{ $evolutionDocsUrl ?? 'https://whatsapp.km.site.nom.br/api/docs' }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-book me-1"></i> Documentação Swagger API
+                <a href="{{ $evolutionDocsUrl ?? 'https://api.kdkhost.com.br/docs/llms.txt' }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-book me-1"></i> Documentação API &amp; LLMs
                 </a>
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                    <i class="fas fa-server me-1"></i> {{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}
+                    <i class="fas fa-server me-1"></i> {{ $evolutionBaseUrl ?? 'https://api.kdkhost.com.br' }}
                 </span>
             </div>
         </div>
@@ -447,7 +482,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2" onclick="copiarCredenciaisEnv()">
                                     <i class="fas fa-copy me-1"></i> Copiar .env
                                 </button>
-                                <pre class="mb-0 text-white" id="blocoEnvWhatsapp" style="white-space: pre-wrap; font-family: monospace;">EVOLUTION_API_URL={{ $evolutionBaseUrl ?? 'https://whatsapp.km.site.nom.br' }}
+                                <pre class="mb-0 text-white" id="blocoEnvWhatsapp" style="white-space: pre-wrap; font-family: monospace;">EVOLUTION_API_URL={{ $evolutionBaseUrl ?? 'https://api.kdkhost.com.br' }}
 EVOLUTION_INSTANCE={{ $whatsappDados['instancia'] }}
 EVOLUTION_APIKEY={{ $whatsappDados['token'] ?? '' }}
 EVOLUTION_ATENDE_COBRANCAS=true</pre>
@@ -461,10 +496,35 @@ EVOLUTION_ATENDE_COBRANCAS=true</pre>
                     <div class="col-lg-5">
                         <div class="p-3 bg-light-subtle border rounded-3 h-100 text-center d-flex flex-column justify-content-between">
                             <div>
-                                <h6 class="fw-bold mb-2 text-body">Ações da Instância WhatsApp</h6>
-                                <p class="text-secondary small mb-3">
+                                <h6 class="fw-bold mb-1 text-body">Ações da Instância WhatsApp</h6>
+                                <p class="text-secondary small mb-2">
                                     Instância: <code class="fw-bold text-danger">{{ $whatsappDados['instancia'] }}</code>
                                 </p>
+
+                                @php
+                                    $statusCobranca = $whatsappDados['status_cobranca'] ?? 'ativa';
+                                    $dataVenc = !empty($whatsappDados['data_vencimento']) ? date('d/m/Y', strtotime($whatsappDados['data_vencimento'])) : date('d/m/Y', strtotime('+30 days'));
+                                @endphp
+
+                                @if($statusCobranca === 'suspensa')
+                                    <div class="alert alert-danger py-2 px-3 small text-start my-2 border border-danger">
+                                        <div class="d-flex align-items-center gap-1 mb-1">
+                                            <i class="fas fa-ban text-danger"></i>
+                                            <strong class="text-danger">Instância Suspensa por Vencimento</strong>
+                                        </div>
+                                        <p class="mb-2" style="font-size: 11px;">A renovação da infraestrutura (R$ 60,00) não foi identificada. Efetue o pagamento via PIX para reativação imediata.</p>
+                                        <button type="button" class="btn btn-danger btn-sm w-100 fw-bold shadow-sm" onclick="abrirCheckoutPixLicenciado()">
+                                            <i class="fab fa-pix me-1"></i> Pagar e Reativar via PIX (R$ 60,00)
+                                        </button>
+                                    </div>
+                                @else
+                                    <div class="d-flex justify-content-between align-items-center p-2 mb-3 bg-body rounded border small">
+                                        <span class="text-secondary"><i class="fas fa-calendar-check text-success me-1"></i> Próxima Renovação: <strong>{{ $dataVenc }}</strong></span>
+                                        <button type="button" class="btn btn-warning btn-sm py-0 px-2 fw-bold text-dark" onclick="abrirCheckoutPixLicenciado()" title="Renovar / Antecipar">
+                                            <i class="fab fa-pix me-1"></i> Renovar PIX
+                                        </button>
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="d-grid gap-2 my-auto">
@@ -884,6 +944,188 @@ EVOLUTION_ATENDE_COBRANCAS=true</pre>
             }
         });
     }
+
+    // =========================================================================
+    // CHECKOUT TRANSPARENTE PIX DA INSTÂNCIA (WHITELABEL R$ 60,00)
+    // =========================================================================
+    var pollingPixLicenciadoTimer = null;
+
+    function abrirCheckoutPixLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalCheckoutPixLicenciado'));
+        modal.show();
+
+        $('#boxCheckoutPixLicLoading').show();
+        $('#boxCheckoutPixLicContent').hide();
+
+        fetch(`/cliente/licenca/whatsapp/cobranca/${licencaId}`, {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(res => {
+            $('#boxCheckoutPixLicLoading').hide();
+            if (res.success) {
+                $('#txtCheckoutPixLicValor').text(res.valor_formatado);
+                $('#txtCheckoutPixLicVenc').text(res.data_vencimento);
+                $('#imgCheckoutPixLicQr').attr('src', res.pix_qr_url);
+                $('#inputCheckoutPixLicCopia').val(res.pix_copia_cola);
+                $('#boxCheckoutPixLicContent').show();
+
+                iniciarPollingPixLicenciado(licencaId);
+            } else {
+                modal.hide();
+                Swal.fire('Aviso', res.message || 'Erro ao carregar checkout PIX.', 'warning');
+            }
+        })
+        .catch(() => {
+            $('#boxCheckoutPixLicLoading').hide();
+            modal.hide();
+            Swal.fire('Erro', 'Falha ao processar checkout transparente.', 'error');
+        });
+    }
+
+    function copiarPixCopiaColaLicenciado() {
+        var input = document.getElementById('inputCheckoutPixLicCopia');
+        input.select();
+        navigator.clipboard.writeText(input.value).then(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Código Copiado!',
+                text: 'Cole no aplicativo do seu banco para efetuar o pagamento via PIX.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+    }
+
+    function iniciarPollingPixLicenciado(licencaId) {
+        pararPollingPixLicenciado();
+        pollingPixLicenciadoTimer = setInterval(function() {
+            fetch(`/cliente/licenca/whatsapp/verificar-pagamento/${licencaId}`, {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.pago) {
+                    pararPollingPixLicenciado();
+                    $('#modalCheckoutPixLicenciado').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pagamento Confirmado!',
+                        text: 'Sua instância de WhatsApp foi renovada e reativada com sucesso!',
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            })
+            .catch(() => {});
+        }, 3000);
+    }
+
+    function pararPollingPixLicenciado() {
+        if (pollingPixLicenciadoTimer) {
+            clearInterval(pollingPixLicenciadoTimer);
+            pollingPixLicenciadoTimer = null;
+        }
+    }
+
+    function checarStatusPixManualLicenciado() {
+        @if($licencaAtiva)
+            const licencaId = "{{ $licencaAtiva->id }}";
+        @else
+            const licencaId = null;
+        @endif
+
+        if (!licencaId) return;
+
+        fetch(`/cliente/licenca/whatsapp/verificar-pagamento/${licencaId}`, {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.pago) {
+                pararPollingPixLicenciado();
+                $('#modalCheckoutPixLicenciado').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pagamento Confirmado!',
+                    text: 'Sua instância foi liberada com sucesso!',
+                    confirmButtonColor: '#28a745'
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire('Aguardando Compensação', 'O banco ainda está processando seu PIX. Assim que concluído, a liberação ocorre em instantes.', 'info');
+            }
+        });
+    }
 </script>
+
+<!-- MODAL CHECKOUT TRANSPARENTE PIX WHITELABEL (LICENCIADO) -->
+<div class="modal fade" id="modalCheckoutPixLicenciado" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white py-3">
+                <h5 class="modal-title fw-bold">
+                    <i class="fab fa-pix text-warning me-2"></i> Manutenção de Servidor - WhatsApp Cloud
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="pararPollingPixLicenciado()"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="boxCheckoutPixLicLoading" class="py-4">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <h6 class="fw-bold">Gerando Chave PIX...</h6>
+                    <p class="text-secondary small mb-0">Aguarde a geração do QR Code de pagamento seguro.</p>
+                </div>
+
+                <div id="boxCheckoutPixLicContent" style="display: none;">
+                    <div class="badge bg-danger-subtle text-danger px-3 py-1 fs-6 mb-2">
+                        Infraestrutura Dedicada de Mensageria Foco 7
+                    </div>
+                    <h3 class="fw-extrabold text-danger mb-1" id="txtCheckoutPixLicValor">R$ 60,00</h3>
+                    <p class="text-secondary small mb-3">
+                        Vencimento da Fatura: <strong class="text-body" id="txtCheckoutPixLicVenc">--</strong>
+                    </p>
+
+                    <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm border mb-3">
+                        <img id="imgCheckoutPixLicQr" src="" alt="QR Code PIX" class="img-fluid" style="width: 220px; height: 220px; object-fit: contain;">
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold text-secondary mb-1">PIX Copia e Cola:</label>
+                        <div class="input-group">
+                            <input type="text" id="inputCheckoutPixLicCopia" class="form-control font-monospace small" readonly>
+                            <button type="button" class="btn btn-warning fw-bold text-dark" onclick="copiarPixCopiaColaLicenciado()">
+                                <i class="fas fa-copy me-1"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border small text-start mb-0">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div class="spinner-grow spinner-grow-sm text-success" role="status"></div>
+                            <strong class="text-success">Aguardando pagamento...</strong>
+                        </div>
+                        <span class="text-secondary">Pague pelo aplicativo do seu banco via PIX. A confirmação é instantânea e reativa seu WhatsApp na hora.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-body-tertiary d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" onclick="pararPollingPixLicenciado()">Fechar</button>
+                <button type="button" class="btn btn-success btn-sm fw-bold" onclick="checarStatusPixManualLicenciado()">
+                    <i class="fas fa-check-circle me-1"></i> Já Efetuei o Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 

@@ -1,7 +1,0 @@
-feat(whatsapp): integracao oficial token bearer sanctum e suporte a rotas api/
-
-- Configuracao do token oficial Bearer 8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7 como padrao do sistema
-- Envio do cabecalho Authorization: Bearer nativo em todas as requisicoes HTTP da Evolution API
-- Resolucao automatica de rotas com prefixo /api/ (/api/instance/create, /api/instance/connect, /api/message/sendText)
-- Deteccao de conexao instantanea via instance.state: open
-- Suporte a multiplas instancias com custo recorrente de R$ 60,00/mes

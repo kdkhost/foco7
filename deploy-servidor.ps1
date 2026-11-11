@@ -18,6 +18,9 @@ Write-Host "[1/5] Preparando arquivos no Git..." -ForegroundColor Yellow
 if (Test-Path ".git\index.lock") {
     Remove-Item ".git\index.lock" -Force -ErrorAction SilentlyContinue
 }
+@("check.php", "check_temp.php", "test.bat") | ForEach-Object {
+    if (Test-Path $_) { Remove-Item $_ -Force -ErrorAction SilentlyContinue }
+}
 git add -A
 
 # 2. Commit e Push
@@ -26,8 +29,9 @@ $status = git status --porcelain
 if ($status) {
     if (Test-Path "commit_msg.txt") {
         git commit -F commit_msg.txt
+        Remove-Item "commit_msg.txt" -Force -ErrorAction SilentlyContinue
     } else {
-        git commit -m "feat(whatsapp): integracao oficial evolution go central e bypass por senha master"
+        git commit -m "fix(whatsapp): ajustar rota oficial post send/text e endpoints evolution go v3"
     }
 }
 

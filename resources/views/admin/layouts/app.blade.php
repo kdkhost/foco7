@@ -265,19 +265,19 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.agendamentos.index') }}" class="nav-link {{ request()->routeIs('admin.agendamentos.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-calendar-day text-info"></i>
                                             <p>Agenda &amp; Ordens</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.estetica.index') }}" class="nav-link {{ request()->routeIs('admin.estetica.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-spray-can-sparkles text-warning"></i>
                                             <p>Estética Automotiva</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.planos.index') }}" class="nav-link {{ request()->routeIs('admin.planos.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-tags text-danger"></i>
                                             <p>Planos &amp; Preços</p>
                                         </a>
                                     </li>
@@ -298,19 +298,19 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-users text-info"></i>
                                             <p>Base de Clientes</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.faturas.index') }}" class="nav-link {{ request()->routeIs('admin.faturas.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-receipt text-warning"></i>
                                             <p>Faturas &amp; Mensalidades</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.gateways.index') }}" class="nav-link {{ request()->routeIs('admin.gateways.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-credit-card text-primary"></i>
                                             <p>Gateways de Pagamento</p>
                                         </a>
                                     </li>
@@ -361,25 +361,25 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cms.index') }}" class="nav-link {{ request()->routeIs('admin.cms.index') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-palette text-danger"></i>
                                             <p>Editor Geral (CMS)</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.filiais.index') }}" class="nav-link {{ request()->routeIs('admin.filiais.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-map-location-dot text-info"></i>
                                             <p>Unidades &amp; Filiais</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.parceiros.index') }}" class="nav-link {{ request()->routeIs('admin.parceiros.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-handshake text-success"></i>
                                             <p>Empresas Parceiras</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.depoimentos.index') }}" class="nav-link {{ request()->routeIs('admin.depoimentos.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-comments text-warning"></i>
                                             <p>
                                                 Depoimentos
                                                 @php $pendentesDepCount = \App\Models\Depoimento::where('ativo', false)->count(); @endphp
@@ -391,7 +391,7 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.seo.index') }}" class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-magnifying-glass-chart text-primary"></i>
                                             <p>SEO &amp; Google</p>
                                         </a>
                                     </li>
@@ -412,13 +412,13 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.index') }}" class="nav-link {{ request()->routeIs('admin.emails.index') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-envelope-open-text text-info"></i>
                                             <p>Todos os Modelos</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.emails.create') }}" class="nav-link {{ request()->routeIs('admin.emails.create') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-plus-circle text-success"></i>
                                             <p>Novo Modelo</p>
                                         </a>
                                     </li>
@@ -442,31 +442,31 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.usuarios.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-user-shield text-primary"></i>
                                             <p>Usuários &amp; Permissões</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.configuracoes.index') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-sliders text-info"></i>
                                             <p>Configurações do Sistema</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.cron.index') }}" class="nav-link {{ request()->routeIs('admin.cron.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-clock text-warning"></i>
                                             <p>Central de Cron Jobs</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.manutencao.index') }}" class="nav-link {{ request()->routeIs('admin.manutencao.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-screwdriver-wrench text-danger"></i>
                                             <p>Modo Manutenção</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.perfil.index') }}" class="nav-link {{ request()->routeIs('admin.perfil.*') ? 'active' : '' }}">
-                                            <i class="nav-icon far fa-circle"></i>
+                                            <i class="nav-icon fas fa-user-gear text-success"></i>
                                             <p>Meu Perfil</p>
                                         </a>
                                     </li>

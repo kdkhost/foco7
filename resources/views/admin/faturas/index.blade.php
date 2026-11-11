@@ -1118,19 +1118,43 @@
                         etapa: 'manual'
                     },
                     success: function (res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Cobrança Enviada!',
-                            text: res.message,
-                            confirmButtonColor: '#28a745'
-                        });
+                        if (res.enviado_apenas_email) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cobrança Enviada via E-mail!',
+                                text: res.message,
+                                showCancelButton: true,
+                                confirmButtonText: '<i class="fab fa-whatsapp me-1"></i> Criar Minha Instância WhatsApp',
+                                confirmButtonColor: '#28a745',
+                                cancelButtonText: 'Entendi'
+                            }).then((r) => {
+                                if (r.isConfirmed) {
+                                    window.location.href = '{{ route("admin.whatsapp.index") }}';
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Cobrança Enviada via WhatsApp!',
+                                text: res.message,
+                                confirmButtonColor: '#28a745'
+                            });
+                        }
                     },
                     error: function (xhr) {
+                        var isBloqueadoWpp = xhr.responseJSON?.bloqueado_whatsapp;
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Falha no Envio',
+                            icon: isBloqueadoWpp ? 'warning' : 'error',
+                            title: isBloqueadoWpp ? 'Instância Própria Necessária' : 'Falha no Envio',
                             text: xhr.responseJSON?.message || 'Erro ao conectar à Evolution API.',
-                            confirmButtonColor: '#d90000'
+                            showCancelButton: !!isBloqueadoWpp,
+                            confirmButtonText: isBloqueadoWpp ? '<i class="fab fa-whatsapp me-1"></i> Criar Minha Instância' : 'OK',
+                            confirmButtonColor: '#d90000',
+                            cancelButtonText: 'Fechar'
+                        }).then((r) => {
+                            if (isBloqueadoWpp && r.isConfirmed) {
+                                window.location.href = '{{ route("admin.whatsapp.index") }}';
+                            }
                         });
                     }
                 });

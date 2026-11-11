@@ -6,6 +6,16 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "evolution-go": {
+            "command": "evolution-mcp",
+            "args": [
+                "--stdio"
+            ],
+            "env": {
+                "EVOLUTION_MCP_URL": "https://api.kdkhost.com.br/mcp",
+                "EVOLUTION_API_KEY": "${EVOLUTION_GLOBAL_APIKEY}"
+            }
         }
     }
 }

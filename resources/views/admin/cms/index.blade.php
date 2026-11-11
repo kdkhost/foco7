@@ -139,6 +139,11 @@
                     <i class="fas fa-spray-can-sparkles text-danger me-1"></i> Estética Automotiva (Em Breve)
                 </button>
             </li>
+            <li class="nav-item">
+                <a class="nav-link fw-semibold text-danger" href="{{ route('admin.licenciados.index') }}#tab-configuracoes">
+                    <i class="fas fa-crown me-1"></i> Seção White Label &amp; Licenciamento &rarr;
+                </a>
+            </li>
         </ul>
     </div>
 

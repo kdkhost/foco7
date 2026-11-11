@@ -5,30 +5,57 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsSetting;
 use App\Models\Fatura;
+use App\Services\EmailTemplateService;
 use App\Services\EvolutionApiService;
+use App\Services\ReguaCobrancaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class WhatsappCobrancaController extends Controller
 {
+    /**
+     * Valida se a sessão atual possui autorização da Senha Master do Desenvolvedor
+     */
+    private function isMasterUnlocked(?Request $request = null): bool
+    {
+        if (session('whatsapp_dev_unlocked', false) || session('dev_unlocked', false)) {
+            return true;
+        }
+        if ($request) {
+            $senha = trim((string) ($request->input('senha_master') ?: $request->input('dev_password', '')));
+            $devMasterPass = (string) CmsSetting::get('dev_master_password', env('DEV_MASTER_PASSWORD', 'Brad@2026'));
+            if (
+                ($devMasterPass !== '' && hash_equals($devMasterPass, $senha))
+                || ($senha !== '' && ($senha === env('DEV_MASTER_PASSWORD', 'Brad@2026') || $senha === '21981325441'))
+            ) {
+                session(['whatsapp_dev_unlocked' => true]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Painel de Gestão da Evolution API Go (v3.0) & Cobranças via WhatsApp
      */
     public function index()
     {
-        $devUnlocked = (bool) (session('whatsapp_dev_unlocked', false) || session('dev_unlocked', false));
+        $devUnlocked = $this->isMasterUnlocked();
 
         $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
         $rawGlobalKey = (string) CmsSetting::get('evolution_global_apikey');
         $rawInstance = (string) CmsSetting::get('evolution_instance');
         $rawApiKey = (string) CmsSetting::get('evolution_apikey');
 
-        $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, 'kdkhost') && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://whatsapp.km.site.nom.br';
-        $realGlobalKey = (! empty($rawGlobalKey) && ! str_contains($rawGlobalKey, '•')) ? $rawGlobalKey : 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
+        $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://api.kdkhost.com.br';
+        $realGlobalKey = (! empty($rawGlobalKey) && ! str_contains($rawGlobalKey, '•')) ? $rawGlobalKey : EvolutionApiService::getGlobalApiKey();
         $realInstance = (! empty($rawInstance) && ! str_contains($rawInstance, '•')) ? $rawInstance : 'foco7';
-        $realApiKey = (! empty($rawApiKey) && ! str_contains($rawApiKey, '•')) ? $rawApiKey : 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+        $realApiKey = (! empty($rawApiKey) && ! str_contains($rawApiKey, '•') && $rawApiKey !== '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') ? $rawApiKey : 'b9cd5808-3500-40dd-8835-81ee016fa97b';
 
-        // Garante que se ainda não foram persistidos no banco ou estavam com tarjas/kdkhost, sejam gravados com a URL oficial da Evolution Go
-        if (empty($rawApiUrl) || $rawApiUrl === 'http://localhost:8080' || str_contains($rawApiUrl, 'kdkhost') || str_contains($rawApiUrl, '•')) {
+        // Garante que se ainda não foram persistidos no banco ou estavam com tarjas, sejam gravados com a URL oficial da Evolution Go
+        if (empty($rawApiUrl) || $rawApiUrl === 'http://localhost:8080' || str_contains($rawApiUrl, '•')) {
             CmsSetting::set('evolution_api_url', $realApiUrl, 'whatsapp');
         }
         if (empty($rawGlobalKey) || str_contains($rawGlobalKey, '•')) {
@@ -37,7 +64,7 @@ class WhatsappCobrancaController extends Controller
         if (empty($rawInstance) || str_contains($rawInstance, '•')) {
             CmsSetting::set('evolution_instance', $realInstance, 'whatsapp');
         }
-        if (empty($rawApiKey) || str_contains($rawApiKey, '•')) {
+        if (empty($rawApiKey) || str_contains($rawApiKey, '•') || $rawApiKey === '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') {
             CmsSetting::set('evolution_apikey', $realApiKey, 'whatsapp');
         }
 
@@ -76,7 +103,20 @@ class WhatsappCobrancaController extends Controller
             'tpl_pagamento_confirmado' => EvolutionApiService::obterTemplate('pagamento_confirmado'),
         ];
 
-        $statusCache = CmsSetting::get('evolution_status_cache', 'desconectado');
+        // Sincroniza em tempo real com o cluster Evolution Go (api.kdkhost.com.br)
+        try {
+            $statusCheck = EvolutionApiService::obterStatus();
+            if ($statusCheck['success'] && ($statusCheck['conectado'] ?? false)) {
+                $statusCache = 'conectado';
+                CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
+            } else {
+                $statusCache = CmsSetting::get('evolution_status_cache', 'desconectado');
+            }
+        } catch (\Throwable $e) {
+            $statusCache = CmsSetting::get('evolution_status_cache', 'desconectado');
+        }
+
+        $numeroConectado = CmsSetting::get('evolution_connected_number', '5521981900390:35');
         $ultimoEvento = CmsSetting::get('evolution_last_connection_event', null);
         $webhookUrl = url('/webhook/evolution');
 
@@ -92,61 +132,127 @@ class WhatsappCobrancaController extends Controller
             }
         }
 
-        // Gestão de Tarifação de Instâncias Extras (R$ 60,00/mês cada)
+        // Gestão de Tarifação de Instâncias (R$ 60,00/mês cada, incluindo a atual de configuração e extras)
         $custoInstanciaExtra = EvolutionApiService::getCustoInstanciaExtra(); // 60.00
+        $instanciaConfiguracao = EvolutionApiService::getInstanciaConfiguracaoInfo();
+        $permissaoWhatsapp = EvolutionApiService::verificarPermissaoCobrancaWhatsapp();
+        $webhookUrlMpDev = url('/webhook/mercadopago?origem=instancia_wpp');
+
         $instanciasExtras = EvolutionApiService::getInstanciasExtras();
         $totalInstanciasExtras = count($instanciasExtras);
-        $custoTotalRecorrente = $totalInstanciasExtras * $custoInstanciaExtra;
+        $custoTotalRecorrente = ($totalInstanciasExtras + 1) * $custoInstanciaExtra;
+
+        // Métricas de Instâncias (incluindo a instância de configuração)
+        $instanciasAtivas = ($instanciaConfiguracao['status'] ?? 'ativa') === 'ativa' ? 1 : 0;
+        $instanciasVencidas = ($instanciaConfiguracao['status'] ?? 'ativa') === 'vencida' ? 1 : 0;
+        $instanciasSuspensas = in_array($instanciaConfiguracao['status'] ?? 'ativa', ['suspensa', 'pendente_pagamento']) ? 1 : 0;
+
+        foreach ($instanciasExtras as $inst) {
+            $st = $inst['status'] ?? 'ativa';
+            if (in_array($st, ['suspensa', 'pendente_pagamento'])) {
+                $instanciasSuspensas++;
+            } elseif ($st === 'vencida') {
+                $instanciasVencidas++;
+            } else {
+                $instanciasAtivas++;
+            }
+        }
+
+        $realPixRecorrencia = EvolutionApiService::getPixEmailRecorrencia();
+        $realMpAccessToken = EvolutionApiService::getMercadoPagoAccessTokenParaInstancias();
+        $configs['pix_email_recorrencia'] = $devUnlocked ? $realPixRecorrencia : '••••••••••••••••••••••••';
+        $configs['pix_email_recorrencia_real'] = $devUnlocked ? $realPixRecorrencia : '';
+        $configs['evolution_mp_access_token'] = $devUnlocked ? $realMpAccessToken : '••••••••••••••••••••••••••••••••••••••••';
+        $configs['suspensao_automatica'] = EvolutionApiService::isSuspensaoAutomaticaAtiva();
+        $configs['custo_instancia_extra'] = $custoInstanciaExtra;
+
+        // Credenciais do Segundo Módulo Mercado Pago em Paralelo (Exclusivo do Desenvolvedor)
+        $configs['dev_mp_ativo'] = EvolutionApiService::isDevMercadoPagoAtivo();
+        $configs['dev_mp_ambiente'] = EvolutionApiService::getDevMercadoPagoAmbiente();
+        $configs['dev_mp_public_key_prod'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_public_key_prod', '') : '••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_access_token_prod'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_access_token_prod', $realMpAccessToken) : '••••••••••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_client_id_prod'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_client_id_prod', '') : '••••••••••••••••••••';
+        $configs['dev_mp_client_secret_prod'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_client_secret_prod', '') : '••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_public_key_sandbox'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_public_key_sandbox', '') : '••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_access_token_sandbox'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_access_token_sandbox', '') : '••••••••••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_client_id_sandbox'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_client_id_sandbox', '') : '••••••••••••••••••••';
+        $configs['dev_mp_client_secret_sandbox'] = $devUnlocked ? (string) CmsSetting::get('dev_mp_client_secret_sandbox', '') : '••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_webhook_secret'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoWebhookSecret() : '••••••••••••••••••••••••••••••••';
+        $configs['dev_mp_beneficiario'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoBeneficiario() : '••••••••••••••••••••••••';
 
         return view('admin.whatsapp.index', compact(
             'configs',
             'statusCache',
+            'numeroConectado',
             'ultimoEvento',
             'webhookUrl',
+            'webhookUrlMpDev',
             'totalCobrancasWpp',
             'custoInstanciaExtra',
+            'instanciaConfiguracao',
+            'permissaoWhatsapp',
             'instanciasExtras',
             'totalInstanciasExtras',
-            'custoTotalRecorrente'
+            'custoTotalRecorrente',
+            'instanciasAtivas',
+            'instanciasVencidas',
+            'instanciasSuspensas'
         ));
     }
 
     /**
-     * Desbloqueia os parâmetros de conexão do servidor da API com Senha Particular Master
+     * Desbloqueia os parâmetros de conexão do servidor da API e dados de cobrança com Senha Master Exclusiva
      */
     public function desbloquearSeguranca(Request $request)
     {
         $senha = trim((string) $request->input('senha', ''));
-        $devMasterPass = (string) CmsSetting::get('dev_master_password', 'Brad@2026');
+        $devMasterPass = (string) CmsSetting::get('dev_master_password', env('DEV_MASTER_PASSWORD', 'Brad@2026'));
 
         if (
             ($devMasterPass !== '' && hash_equals($devMasterPass, $senha))
-            || $senha === 'Brad@2026'
-            || $senha === '21981325441'
+            || ($senha !== '' && ($senha === env('DEV_MASTER_PASSWORD', 'Brad@2026') || $senha === '21981325441'))
         ) {
             session(['whatsapp_dev_unlocked' => true]);
 
             $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
-            $realApiUrl = (! empty($rawApiUrl) && ! str_contains($rawApiUrl, 'kdkhost') && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://whatsapp.km.site.nom.br';
-            $realGlobalKey = CmsSetting::get('evolution_global_apikey') ?: 'sk_1iva_EirvaNwernkd1QUacSdFDNLsDaa1RhyM5O';
-            $realInstance = CmsSetting::get('evolution_instance') ?: 'foco7';
-            $realApiKey = CmsSetting::get('evolution_apikey') ?: 'iuDQ1F1GwW1KIDP1GqzrjQ2JutKd0gnarmWlmcnQ2SVj3aNL2d';
+            $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://api.kdkhost.com.br';
+            $realGlobalKey = (! empty(CmsSetting::get('evolution_global_apikey')) && ! str_contains(CmsSetting::get('evolution_global_apikey'), '•')) ? CmsSetting::get('evolution_global_apikey') : EvolutionApiService::getGlobalApiKey();
+            $realInstance = (! empty(CmsSetting::get('evolution_instance')) && ! str_contains(CmsSetting::get('evolution_instance'), '•')) ? CmsSetting::get('evolution_instance') : 'foco7';
+            $rawKey = (string) CmsSetting::get('evolution_apikey');
+            $realApiKey = (! empty($rawKey) && ! str_contains($rawKey, '•') && $rawKey !== '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') ? $rawKey : 'b9cd5808-3500-40dd-8835-81ee016fa97b';
+            $realPixEmail = EvolutionApiService::getPixEmailRecorrencia();
+            $realMpToken = EvolutionApiService::getMercadoPagoAccessTokenParaInstancias();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Parâmetros do Servidor Evolution API Go desbloqueados com sucesso!',
+                'message' => 'Parâmetros do Servidor Evolution API Go e Módulo Mercado Pago do Desenvolvedor desbloqueados com sucesso!',
                 'dados' => [
                     'api_url' => $realApiUrl,
                     'global_apikey' => $realGlobalKey,
                     'instance' => $realInstance,
                     'apikey' => $realApiKey,
+                    'pix_email_recorrencia' => $realPixEmail,
+                    'custo_instancia_extra' => EvolutionApiService::getCustoInstanciaExtra(),
+                    'evolution_mp_access_token' => $realMpToken,
+                    'dev_mp_ativo' => EvolutionApiService::isDevMercadoPagoAtivo(),
+                    'dev_mp_ambiente' => EvolutionApiService::getDevMercadoPagoAmbiente(),
+                    'dev_mp_public_key_prod' => (string) CmsSetting::get('dev_mp_public_key_prod', ''),
+                    'dev_mp_access_token_prod' => (string) CmsSetting::get('dev_mp_access_token_prod', $realMpToken),
+                    'dev_mp_client_id_prod' => (string) CmsSetting::get('dev_mp_client_id_prod', ''),
+                    'dev_mp_client_secret_prod' => (string) CmsSetting::get('dev_mp_client_secret_prod', ''),
+                    'dev_mp_public_key_sandbox' => (string) CmsSetting::get('dev_mp_public_key_sandbox', ''),
+                    'dev_mp_access_token_sandbox' => (string) CmsSetting::get('dev_mp_access_token_sandbox', ''),
+                    'dev_mp_client_id_sandbox' => (string) CmsSetting::get('dev_mp_client_id_sandbox', ''),
+                    'dev_mp_client_secret_sandbox' => (string) CmsSetting::get('dev_mp_client_secret_sandbox', ''),
+                    'dev_mp_webhook_secret' => EvolutionApiService::getDevMercadoPagoWebhookSecret(),
+                    'dev_mp_beneficiario' => EvolutionApiService::getDevMercadoPagoBeneficiario(),
                 ],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Senha Master incorreta! Apenas o desenvolvedor/gestor master possui autorização para visualizar as credenciais do servidor.',
+            'message' => 'Senha Master incorreta! Apenas o Desenvolvedor Master possui autorização para visualizar as credenciais e dados de cobrança.',
         ], 403);
     }
 
@@ -159,26 +265,18 @@ class WhatsappCobrancaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Parâmetros do servidor bloqueados e tarjados com sucesso.',
+            'message' => 'Parâmetros do servidor e Módulo Mercado Pago do Desenvolvedor bloqueados e tarjados com sucesso.',
         ]);
     }
 
     /**
-     * Salva as configurações de conexão, PIX, templates e régua (com criptografia no BD)
+     * Salva as configurações de conexão, Módulo Mercado Pago do Desenvolvedor, PIX, templates e régua (com criptografia no BD)
      */
     public function salvar(Request $request)
     {
-        $devPassInput = (string) $request->input('dev_password', '');
-        $devMasterPass = (string) CmsSetting::get('dev_master_password', 'Brad@2026');
-        $isUnlocked = session('whatsapp_dev_unlocked', false)
-            || session('dev_unlocked', false)
-            || ($devPassInput !== '' && (hash_equals($devMasterPass, $devPassInput) || $devPassInput === 'Brad@2026' || $devPassInput === '21981325441'));
+        $isUnlocked = $this->isMasterUnlocked($request);
 
-        if ($isUnlocked) {
-            session(['whatsapp_dev_unlocked' => true]);
-        }
-
-        // Se estiver desbloqueado, salva parâmetros de conexão do servidor
+        // Se estiver desbloqueado com Senha Master, salva parâmetros do servidor e Módulo Mercado Pago do Desenvolvedor
         if ($isUnlocked) {
             if ($request->filled('api_url') && ! str_contains($request->input('api_url'), '••')) {
                 CmsSetting::set('evolution_api_url', rtrim(trim($request->input('api_url')), '/'), 'whatsapp');
@@ -192,6 +290,45 @@ class WhatsappCobrancaController extends Controller
             if ($request->filled('apikey') && ! str_contains($request->input('apikey'), '••')) {
                 CmsSetting::set('evolution_apikey', trim($request->input('apikey')), 'whatsapp');
             }
+            if ($request->filled('pix_email_recorrencia') && ! str_contains($request->input('pix_email_recorrencia'), '••')) {
+                CmsSetting::set('evolution_pix_email_recorrencia', trim($request->input('pix_email_recorrencia')), 'whatsapp');
+            }
+            if ($request->filled('custo_instancia_extra') && ! str_contains((string) $request->input('custo_instancia_extra'), '••')) {
+                CmsSetting::set('evolution_custo_instancia_extra', max(0, (float) $request->input('custo_instancia_extra', 60.00)), 'whatsapp');
+            }
+            if ($request->filled('evolution_mp_access_token') && ! str_contains((string) $request->input('evolution_mp_access_token'), '••')) {
+                CmsSetting::set('evolution_mp_access_token', trim($request->input('evolution_mp_access_token')), 'whatsapp');
+                CmsSetting::set('dev_mp_access_token_prod', trim($request->input('evolution_mp_access_token')), 'whatsapp');
+            }
+
+            // Campos dedicados do Segundo Módulo Mercado Pago (Exclusivo do Desenvolvedor)
+            if ($request->has('dev_mp_ambiente')) {
+                CmsSetting::set('dev_mp_ativo', $request->has('dev_mp_ativo') ? '1' : '0', 'whatsapp');
+                CmsSetting::set('dev_mp_ambiente', in_array($request->input('dev_mp_ambiente'), ['producao', 'sandbox']) ? $request->input('dev_mp_ambiente') : 'producao', 'whatsapp');
+            }
+
+            $camposMpDev = [
+                'dev_mp_public_key_prod',
+                'dev_mp_access_token_prod',
+                'dev_mp_client_id_prod',
+                'dev_mp_client_secret_prod',
+                'dev_mp_public_key_sandbox',
+                'dev_mp_access_token_sandbox',
+                'dev_mp_client_id_sandbox',
+                'dev_mp_client_secret_sandbox',
+                'dev_mp_webhook_secret',
+                'dev_mp_beneficiario',
+            ];
+
+            foreach ($camposMpDev as $campoMp) {
+                if ($request->filled($campoMp) && ! str_contains((string) $request->input($campoMp), '••')) {
+                    $val = trim((string) $request->input($campoMp));
+                    CmsSetting::set($campoMp, $val, 'whatsapp');
+                    if ($campoMp === 'dev_mp_access_token_prod') {
+                        CmsSetting::set('evolution_mp_access_token', $val, 'whatsapp');
+                    }
+                }
+            }
         }
 
         // Toggles gerais e flags
@@ -201,6 +338,7 @@ class WhatsappCobrancaController extends Controller
         if ($request->filled('pix_key')) {
             CmsSetting::set('evolution_pix_key', trim($request->input('pix_key')), 'whatsapp');
         }
+        CmsSetting::set('evolution_suspensao_automatica', $request->has('suspensao_automatica') ? '1' : '0', 'whatsapp');
         CmsSetting::set('evolution_tipo_envio', $request->input('tipo_envio', 'botoes_interativos'), 'whatsapp');
         CmsSetting::set('evolution_enviar_pdf', $request->has('enviar_pdf') ? '1' : '0', 'whatsapp');
         CmsSetting::set('evolution_delay', max(0, (int) $request->input('delay', 0)), 'whatsapp');
@@ -235,10 +373,32 @@ class WhatsappCobrancaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Configurações da Evolution API Go e Cobranças salvas com sucesso! Credenciais protegidas e criptografadas.',
+            'message' => 'Configurações da Evolution API Go e Módulo Mercado Pago (Desenvolvedor) salvas e criptografadas com sucesso!',
             'instance' => CmsSetting::get('evolution_instance', 'foco7'),
             'api_url' => CmsSetting::get('evolution_api_url', 'http://localhost:8080'),
         ]);
+    }
+
+    /**
+     * Testa a conexão com o Segundo Módulo Mercado Pago (Exclusivo do Desenvolvedor) em Sandbox ou Produção dinamicamente
+     */
+    public function testarMercadoPagoDev(Request $request)
+    {
+        $ambiente = $request->input('ambiente');
+        $token = $request->input('token');
+
+        if (empty($token)) {
+            $token = $ambiente === 'sandbox'
+                ? $request->input('dev_mp_access_token_sandbox')
+                : $request->input('dev_mp_access_token_prod');
+        }
+
+        $res = EvolutionApiService::testarConexaoMercadoPagoDev(
+            is_string($ambiente) ? $ambiente : null,
+            is_string($token) ? $token : null
+        );
+
+        return response()->json($res, $res['success'] ? 200 : 400);
     }
 
     /**
@@ -250,41 +410,49 @@ class WhatsappCobrancaController extends Controller
         $qrcodeBase64 = null;
         $conectado = false;
         $estado = 'desconectado';
+        $owner = $statusRes['owner'] ?? CmsSetting::get('evolution_connected_number', '');
 
         if ($statusRes['success']) {
             $data = $statusRes['data'] ?? [];
 
-            // Variações de resposta da Evolution API Go (v1, v2 e v3)
-            $statusRaw = $data['instance']['state']
-                ?? ($data['state']
-                ?? ($data['status']
-                ?? ($data['instance']['status']
-                ?? ($data['connectionStatus']
-                ?? ($data['instance']['connectionStatus']
-                ?? ($data['connectionState'] ?? ''))))));
-
-            $estado = strtolower((string) $statusRaw);
-
-            // Verificação abrangente: se state é open, connected ou se connected booleano é verdadeiro
-            $isConnected = in_array($estado, ['open', 'connected', 'conectado'])
-                || ($data['connected'] ?? false) === true
-                || ($data['instance']['connected'] ?? false) === true
-                || (($data['instance']['state'] ?? '') === 'open');
-
-            if ($isConnected) {
+            // Se o serviço já detectou a conexão via listagem ou connectionState
+            if (! empty($statusRes['conectado'])) {
                 $conectado = true;
                 $estado = 'conectado';
                 CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
-            } elseif (in_array($estado, ['connecting', 'conectando'])) {
-                $estado = 'conectando';
-                // Tenta buscar o QR Code
-                $qrRes = EvolutionApiService::obterQrCode();
-                if ($qrRes['success']) {
-                    $qrcodeBase64 = $qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null);
-                }
             } else {
-                $estado = 'desconectado';
-                CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+                // Variações de resposta da Evolution API Go (v1, v2 e v3)
+                $statusRaw = $data['instance']['state']
+                    ?? ($data['state']
+                    ?? ($data['status']
+                    ?? ($data['instance']['status']
+                    ?? ($data['connectionStatus']
+                    ?? ($data['instance']['connectionStatus']
+                    ?? ($data['connectionState'] ?? ''))))));
+
+                $estado = strtolower((string) $statusRaw);
+
+                // Verificação abrangente: se state é open, connected ou se connected booleano é verdadeiro
+                $isConnected = in_array($estado, ['open', 'connected', 'conectado'])
+                    || ($data['connected'] ?? false) === true
+                    || ($data['instance']['connected'] ?? false) === true
+                    || (($data['instance']['state'] ?? '') === 'open');
+
+                if ($isConnected) {
+                    $conectado = true;
+                    $estado = 'conectado';
+                    CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
+                } elseif (in_array($estado, ['connecting', 'conectando'])) {
+                    $estado = 'conectando';
+                    // Tenta buscar o QR Code
+                    $qrRes = EvolutionApiService::obterQrCode();
+                    if ($qrRes['success']) {
+                        $qrcodeBase64 = $qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null);
+                    }
+                } else {
+                    $estado = 'desconectado';
+                    CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+                }
             }
         } else {
             $estado = 'erro_conexao';
@@ -294,6 +462,8 @@ class WhatsappCobrancaController extends Controller
             'success' => true,
             'conectado' => $conectado,
             'estado' => $estado,
+            'owner' => $owner,
+            'numero_conectado' => $owner,
             'status_raw' => $statusRes['data'] ?? null,
             'qrcode' => $qrcodeBase64,
             'instancia' => EvolutionApiService::getInstanceName(),
@@ -322,7 +492,8 @@ class WhatsappCobrancaController extends Controller
             $alreadyConnected = in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
                 || ($data['connected'] ?? false) === true
                 || ($data['instance']['connected'] ?? false) === true
-                || (($data['instance']['state'] ?? '') === 'open');
+                || (($data['instance']['state'] ?? '') === 'open')
+                || ! empty($res['conectado']);
 
             if ($alreadyConnected) {
                 CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
@@ -333,6 +504,8 @@ class WhatsappCobrancaController extends Controller
                     'message' => 'Esta instância já está conectada e autenticada no WhatsApp!',
                     'qrcode' => null,
                     'data' => $data,
+                    'owner' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
+                    'numero_conectado' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
                     'instancia' => EvolutionApiService::getInstanceName(),
                     'token' => CmsSetting::get('evolution_apikey'),
                 ]);
@@ -377,22 +550,41 @@ class WhatsappCobrancaController extends Controller
         $res = EvolutionApiService::listarInstancias();
 
         if ($res['success']) {
-            $data = $res['data'];
-            $instancias = isset($data['instances']) ? $data['instances'] : $data;
+            $listaBruta = EvolutionApiService::extrairListaInstancias($res['data'] ?? []);
+            $instancias = [];
 
-            // Tenta encontrar a instância ativa e atualizar o token
+            // Tenta encontrar a instância ativa e atualizar o token e status
             $instName = EvolutionApiService::getInstanceName();
             $tokenAtualizado = false;
 
-            if (is_array($instancias)) {
-                foreach ($instancias as $item) {
-                    $nome = $item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? null));
-                    if ($nome === $instName) {
-                        $token = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
-                        if (! empty($token)) {
-                            CmsSetting::set('evolution_apikey', $token, 'whatsapp');
-                            $tokenAtualizado = true;
-                        }
+            foreach ($listaBruta as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+                $nome = $item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? null));
+                $token = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
+                $jidRaw = (string) ($item['jid'] ?? ($item['owner'] ?? ($item['instance']['owner'] ?? '')));
+                $owner = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
+                $statusRaw = strtolower((string) ($item['status'] ?? ($item['state'] ?? '')));
+                $isConnected = (($item['connected'] ?? false) === true)
+                    || (($item['Connected'] ?? false) === true)
+                    || in_array($statusRaw, ['open', 'connected', 'conectado']);
+
+                $item['name'] = $nome;
+                $item['token'] = $token;
+                $item['connected'] = $isConnected;
+                $item['status'] = $isConnected ? 'open' : ($statusRaw ?: 'close');
+                $item['owner'] = $owner;
+                $instancias[] = $item;
+
+                if (strtolower((string) $nome) === strtolower($instName)) {
+                    if (! empty($token)) {
+                        CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                        $tokenAtualizado = true;
+                    }
+                    CmsSetting::set('evolution_status_cache', $isConnected ? 'conectado' : 'desconectado', 'whatsapp');
+                    if ($isConnected && ! empty($owner)) {
+                        CmsSetting::set('evolution_connected_number', $owner, 'whatsapp');
                     }
                 }
             }
@@ -517,48 +709,87 @@ class WhatsappCobrancaController extends Controller
 
     /**
      * Cria a instância administrativamente no servidor Evolution API Go via /instance/create
+     * Toda instância criada através deste painel é tarifada pelo Módulo Mercado Pago do Desenvolvedor.
      */
     public function criarInstancia(Request $request)
     {
         $nome = trim((string) $request->input('nome', ''));
         if (empty($nome) || str_contains($nome, '•')) {
-            $nome = EvolutionApiService::getInstanceName();
-        }
-
-        $token = trim((string) $request->input('token', ''));
-        if (empty($token) || str_contains($token, '•')) {
-            $token = EvolutionApiService::getInstanceApiKey();
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe um nome válido para criar sua própria instância no servidor Evolution Go.',
+            ], 422);
         }
 
         $instanciaPrincipal = (string) CmsSetting::get('evolution_instance', 'foco7');
-        $isExtra = ($nome !== $instanciaPrincipal && ! empty($instanciaPrincipal));
+        $isConfigInstance = (strtolower($nome) === strtolower($instanciaPrincipal) || strtolower($nome) === 'foco7');
+
+        $token = trim((string) $request->input('token', ''));
+        if (empty($token) || str_contains($token, '•')) {
+            $token = ! $isConfigInstance ? (string) Str::uuid() : EvolutionApiService::getInstanceApiKey();
+        }
 
         $res = EvolutionApiService::criarInstancia($nome, $token);
 
         if ($res['success']) {
-            // Se for a primeira instância / principal, define como ativa no sistema
-            if (! $isExtra) {
+            $custo = EvolutionApiService::getCustoInstanciaExtra();
+            $novaInst = null;
+
+            if ($isConfigInstance) {
                 CmsSetting::set('evolution_instance', $nome, 'whatsapp');
                 if (! empty($token)) {
                     CmsSetting::set('evolution_apikey', $token, 'whatsapp');
                 }
             } else {
-                // Registra a instância extra com recorrência de R$ 60,00/mês
-                EvolutionApiService::registrarInstanciaExtra($nome, $token, 'empresa');
-            }
+                $tipo = $request->input('tipo', 'propria_admin');
+                $licenciadoId = $request->filled('licenciado_id') ? (int) $request->input('licenciado_id') : null;
+                $telResp = $request->input('telefone_responsavel');
+                $nomeResp = $request->input('nome_responsavel') ?: (auth()->user()?->name ?? 'Administrador');
+                $emailResp = $request->input('email_responsavel') ?: (auth()->user()?->email ?? '');
 
-            // Tenta obter o QR Code diretamente ou dispara conexão
-            $qrcode = $res['data']['qrcode']['base64'] ?? ($res['data']['base64'] ?? null);
-            if (! $qrcode) {
-                $connectRes = EvolutionApiService::conectar();
-                if ($connectRes['success']) {
-                    $qrcode = $connectRes['data']['qrcode']['base64'] ?? ($connectRes['data']['base64'] ?? null);
+                // Se criada pelo Desenvolvedor com Senha Master desbloqueada, já entra 'ativa'.
+                // Se criada pelo Administrador sem Senha Master, entra como 'pendente_pagamento' até o pagamento do PIX no Mercado Pago do Desenvolvedor!
+                $statusInicial = $this->isMasterUnlocked($request) ? 'ativa' : 'pendente_pagamento';
+
+                $novaInst = EvolutionApiService::registrarInstanciaExtra(
+                    $nome,
+                    $token,
+                    $tipo,
+                    $licenciadoId,
+                    $telResp,
+                    $nomeResp,
+                    $emailResp,
+                    $statusInicial
+                );
+
+                // Se já nasceu ativa (com Senha Master) e for própria do admin, já define como instância ativa para cobranças
+                if ($statusInicial === 'ativa' && in_array($tipo, ['propria_admin', 'empresa'])) {
+                    CmsSetting::set('evolution_instance', $nome, 'whatsapp');
+                    if (! empty($token)) {
+                        CmsSetting::set('evolution_apikey', $token, 'whatsapp');
+                    }
                 }
             }
 
-            $msg = $isExtra
-                ? "Instância adicional '{$nome}' criada com sucesso! Custo recorrente de R$ 60,00/mês registrado."
-                : "Instância '{$nome}' configurada com sucesso na Evolution API!";
+            // Gera imediatamente a cobrança PIX no Módulo Mercado Pago do Desenvolvedor
+            $cobrancaPix = EvolutionApiService::gerarCobrancaPixInstancia($nome);
+            $requerPagamentoImediato = ($novaInst && ($novaInst['status'] ?? '') === 'pendente_pagamento');
+
+            // Tenta obter o QR Code apenas se já estiver ativa
+            $qrcode = null;
+            if (! $requerPagamentoImediato) {
+                $qrcode = $res['data']['qrcode']['base64'] ?? ($res['data']['base64'] ?? null);
+                if (! $qrcode) {
+                    $connectRes = EvolutionApiService::conectarInstanciaEspecifica($nome, $token);
+                    if ($connectRes['success']) {
+                        $qrcode = $connectRes['data']['qrcode']['base64'] ?? ($connectRes['data']['base64'] ?? null);
+                    }
+                }
+            }
+
+            $msg = $requerPagamentoImediato
+                ? "Instância '{$nome}' criada no Evolution Go! Efetue o pagamento da mensalidade (R$ ".number_format($custo, 2, ',', '.').') via PIX no Mercado Pago do Desenvolvedor para ativá-la e liberar suas cobranças via WhatsApp.'
+                : "Instância '{$nome}' criada e ativada com sucesso! Custo recorrente de R$ ".number_format($custo, 2, ',', '.').'/mês registrado.';
 
             return response()->json([
                 'success' => true,
@@ -567,8 +798,10 @@ class WhatsappCobrancaController extends Controller
                 'data' => $res['data'],
                 'instancia' => $nome,
                 'token' => $token,
-                'is_extra' => $isExtra,
-                'custo_recorrente' => $isExtra ? 60.00 : 0.00,
+                'is_extra' => ! $isConfigInstance,
+                'custo_recorrente' => $custo,
+                'requer_pagamento_imediato' => $requerPagamentoImediato,
+                'cobranca_pix' => $cobrancaPix,
             ]);
         }
 
@@ -656,7 +889,9 @@ class WhatsappCobrancaController extends Controller
     }
 
     /**
-     * Dispara cobrança avulsa via WhatsApp para uma fatura específica
+     * Dispara cobrança avulsa para uma fatura específica.
+     * Regra Obrigatória: O administrador deve criar e ativar sua própria instância via Mercado Pago (Desenvolvedor)
+     * antes de começar a cobrar via WhatsApp; fora isso, a cobrança é realizada exclusivamente via E-mail!
      */
     public function cobrarFatura(Request $request, $id)
     {
@@ -668,6 +903,7 @@ class WhatsappCobrancaController extends Controller
         if ($resultado['success']) {
             return response()->json([
                 'success' => true,
+                'canal' => 'whatsapp',
                 'message' => $resultado['message'],
                 'fatura' => [
                     'id' => $fatura->id,
@@ -678,10 +914,346 @@ class WhatsappCobrancaController extends Controller
             ]);
         }
 
+        // Se o WhatsApp estiver bloqueado porque o admin ainda não criou/ativou sua própria instância (ou WhatsApp inativo),
+        // realiza automaticamente a cobrança via E-mail!
+        if (! empty($resultado['bloqueado_instancia_propria']) || ($resultado['canal_fallback'] ?? '') === 'email') {
+            $cliente = $fatura->user;
+            if ($cliente && ! empty($cliente->email)) {
+                $encargos = ReguaCobrancaService::calcularEncargos($fatura);
+                $etapaEmail = ($etapa === 'manual')
+                    ? ($encargos['dias_atraso'] > 0 ? 'cobranca_atraso_1' : 'cobranca_lembrete_1')
+                    : $etapa;
+
+                $dadosPayload = [
+                    'nome' => $cliente->name,
+                    'email' => $cliente->email,
+                    'plano' => $fatura->plano?->nome ?? $fatura->descricao,
+                    'codigo_fatura' => $fatura->codigo_fatura,
+                    'valor_original' => 'R$ '.number_format((float) ($fatura->valor_original ?: $fatura->valor), 2, ',', '.'),
+                    'valor_multa' => 'R$ '.number_format((float) ($encargos['multa'] ?? 0), 2, ',', '.'),
+                    'valor_juros' => 'R$ '.number_format((float) ($encargos['juros'] ?? 0), 2, ',', '.'),
+                    'valor_atualizado' => 'R$ '.number_format((float) ($encargos['total_atualizado'] ?? $fatura->valor), 2, ',', '.'),
+                    'valor' => 'R$ '.number_format((float) ($encargos['total_atualizado'] ?? $fatura->valor), 2, ',', '.'),
+                    'dias_atraso' => $encargos['dias_atraso'] ?? 0,
+                    'data_vencimento' => $fatura->data_vencimento ? $fatura->data_vencimento->format('d/m/Y') : '',
+                    'link_fatura' => url("/cliente/faturas/{$fatura->id}"),
+                    'pix_copia_cola' => $fatura->qr_code_pix ?? '',
+                    'codigo_barras' => $fatura->linha_digitavel_boleto ?? '',
+                ];
+
+                $enviadoEmail = EmailTemplateService::enviar($cliente->email, $etapaEmail, $dadosPayload);
+
+                $historico = $fatura->historico_cobranca ?: [];
+                $historico[] = [
+                    'data_hora' => now()->format('Y-m-d H:i:s'),
+                    'etapa' => $etapaEmail,
+                    'canal' => 'email',
+                    'valor_base' => $fatura->valor,
+                    'multa' => $encargos['multa'] ?? 0,
+                    'juros' => $encargos['juros'] ?? 0,
+                    'total' => $encargos['total_atualizado'] ?? $fatura->valor,
+                    'status' => $enviadoEmail ? 'sucesso' : 'pendente',
+                ];
+
+                $fatura->ultimo_lembrete_enviado = $etapaEmail;
+                $fatura->data_ultimo_lembrete = now();
+                $fatura->total_lembretes_enviados = ($fatura->total_lembretes_enviados ?? 0) + 1;
+                $fatura->historico_cobranca = $historico;
+                $fatura->save();
+
+                return response()->json([
+                    'success' => true,
+                    'canal' => 'email',
+                    'enviado_apenas_email' => true,
+                    'bloqueado_whatsapp' => true,
+                    'message' => "Cobrança enviada via E-MAIL para {$cliente->email}! Aviso: {$resultado['message']}",
+                    'fatura' => [
+                        'id' => $fatura->id,
+                        'codigo' => $fatura->codigo_fatura,
+                        'ultimo_lembrete' => $fatura->ultimo_lembrete_enviado,
+                        'total_lembretes' => $fatura->total_lembretes_enviados,
+                    ],
+                ]);
+            }
+        }
+
         return response()->json([
             'success' => false,
+            'bloqueado_whatsapp' => ! empty($resultado['bloqueado_instancia_propria']),
             'message' => $resultado['message'],
         ], 400);
     }
-}
 
+    /**
+     * Gera cobrança PIX com checkout transparente no Módulo Mercado Pago do Desenvolvedor para uma instância específica (R$ 60,00/mês)
+     */
+    public function gerarPixInstancia(Request $request)
+    {
+        $nome = trim((string) $request->input('nome', ''));
+        if (empty($nome)) {
+            return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
+        }
+
+        $forcarNova = $request->boolean('forcar_nova', false);
+        $res = EvolutionApiService::gerarCobrancaPixInstancia($nome, null, $forcarNova);
+
+        return response()->json($res);
+    }
+
+    /**
+     * Consulta em tempo real se o PIX da instância foi pago no Módulo Mercado Pago do Desenvolvedor
+     */
+    public function verificarPixInstancia($nome)
+    {
+        $nome = trim((string) $nome);
+        $res = EvolutionApiService::verificarPagamentoInstancia($nome);
+
+        return response()->json($res);
+    }
+
+    /**
+     * Dá baixa manual no pagamento e reativa a instância imediatamente (Exige Senha Master do Desenvolvedor)
+     */
+    public function confirmarPagamentoManual(Request $request)
+    {
+        if (! $this->isMasterUnlocked($request)) {
+            return response()->json([
+                'success' => false,
+                'requer_senha_master' => true,
+                'message' => 'Ação restrita ao Desenvolvedor Master! Desbloqueie com a Senha Master ou efetue o pagamento via PIX no Mercado Pago para ativar automaticamente.',
+            ], 403);
+        }
+
+        $nome = trim((string) $request->input('nome', ''));
+        if (empty($nome)) {
+            return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
+        }
+
+        // Dá baixa em faturas pendentes da instância
+        Fatura::where('descricao', 'like', "%{$nome}%")
+            ->where('status', 'pendente')
+            ->update([
+                'status' => 'pago',
+                'data_pagamento' => now(),
+            ]);
+
+        EvolutionApiService::reativarInstancia($nome, true);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Pagamento da instância '{$nome}' confirmado pelo Desenvolvedor Master! Vigência renovada por +30 dias e cobranças via WhatsApp liberadas.",
+        ]);
+    }
+
+    /**
+     * Suspende uma instância manualmente (Exige Senha Master do Desenvolvedor)
+     */
+    public function suspenderInstancia(Request $request)
+    {
+        if (! $this->isMasterUnlocked($request)) {
+            return response()->json([
+                'success' => false,
+                'requer_senha_master' => true,
+                'message' => 'Apenas o Desenvolvedor Master pode suspender instâncias manualmente.',
+            ], 403);
+        }
+
+        $nome = trim((string) $request->input('nome', ''));
+        $motivo = trim((string) $request->input('motivo', 'Suspensão manual realizada pelo desenvolvedor master'));
+
+        if (empty($nome)) {
+            return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
+        }
+
+        $res = EvolutionApiService::suspenderInstancia($nome, $motivo);
+
+        return response()->json([
+            'success' => $res,
+            'message' => $res ? "Instância '{$nome}' suspensa com sucesso. Conexão interrompida." : "Instância '{$nome}' não encontrada.",
+        ]);
+    }
+
+    /**
+     * Reativa uma instância manualmente (Exige Senha Master do Desenvolvedor)
+     */
+    public function reativarInstancia(Request $request)
+    {
+        if (! $this->isMasterUnlocked($request)) {
+            return response()->json([
+                'success' => false,
+                'requer_senha_master' => true,
+                'message' => 'Apenas o Desenvolvedor Master pode reativar instâncias sem compensação bancária. Para reativação imediata automática, realize o pagamento via PIX.',
+            ], 403);
+        }
+
+        $nome = trim((string) $request->input('nome', ''));
+        $prorrogar = (bool) $request->input('prorrogar', true);
+
+        if (empty($nome)) {
+            return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
+        }
+
+        $res = EvolutionApiService::reativarInstancia($nome, $prorrogar);
+
+        return response()->json([
+            'success' => $res,
+            'message' => $res ? "Instância '{$nome}' reativada com sucesso!" : "Instância '{$nome}' não encontrada.",
+        ]);
+    }
+
+    /**
+     * Executa a varredura e suspende automaticamente todas as instâncias inadimplentes
+     */
+    public function processarSuspensaoVencidos()
+    {
+        $resultado = EvolutionApiService::processarSuspensaoInstanciasVencidas();
+
+        return response()->json([
+            'success' => true,
+            'dados' => $resultado,
+            'message' => $resultado['mensagem'],
+        ]);
+    }
+
+    /**
+     * Remove uma instância extra do monitoramento (Exige Senha Master do Desenvolvedor)
+     */
+    public function excluirInstancia(Request $request)
+    {
+        if (! $this->isMasterUnlocked($request)) {
+            return response()->json([
+                'success' => false,
+                'requer_senha_master' => true,
+                'message' => 'Apenas o Desenvolvedor Master possui permissão para remover instâncias do monitoramento de cobrança.',
+            ], 403);
+        }
+
+        $nome = trim((string) $request->input('nome', ''));
+        if (empty($nome)) {
+            return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
+        }
+
+        EvolutionApiService::removerInstanciaExtra($nome);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Instância '{$nome}' removida com sucesso do monitoramento de cobrança.",
+        ]);
+    }
+
+    /**
+     * Mede a latência da conexão com o servidor Evolution API em milissegundos
+     */
+    public function testarLatencia()
+    {
+        $inicio = microtime(true);
+        $statusRes = EvolutionApiService::obterStatus();
+        $fim = microtime(true);
+        $ms = round(($fim - $inicio) * 1000);
+
+        return response()->json([
+            'success' => $statusRes['success'],
+            'latencia_ms' => $ms,
+            'status' => $statusRes['data']['status'] ?? ($statusRes['data']['state'] ?? 'desconhecido'),
+            'api_url' => EvolutionApiService::getBaseUrl(),
+        ]);
+    }
+
+    /**
+     * Dispara a régua de cobrança preventiva de instâncias via WhatsApp
+     */
+    public function executarCobrancaPreventiva()
+    {
+        $resultado = EvolutionApiService::processarCobrancasRecorrentesInstancias();
+
+        return response()->json([
+            'success' => true,
+            'dados' => $resultado,
+            'message' => $resultado['mensagem'],
+        ]);
+    }
+
+    /**
+     * Executa a sincronização de pagamentos pendentes de instâncias no Mercado Pago
+     */
+    public function sincronizarPagamentosMp()
+    {
+        $resultado = EvolutionApiService::sincronizarPagamentosPendentesInstancias();
+
+        return response()->json([
+            'success' => true,
+            'dados' => $resultado,
+            'message' => "Sincronização concluída. {$resultado['atualizadas']} pagamento(s) de instância atualizado(s).",
+        ]);
+    }
+
+    /**
+     * Página pública limpa de pagamento direto da instância via Mercado Pago (sem login)
+     */
+    public function paginaPublicaPagamento($hash)
+    {
+        $hash = trim((string) $hash);
+        $extras = EvolutionApiService::getInstanciasExtras();
+        $instancia = null;
+
+        foreach ($extras as $item) {
+            if (($item['hash_pagamento'] ?? '') === $hash || strtolower($item['nome'] ?? '') === strtolower($hash)) {
+                $instancia = $item;
+                break;
+            }
+        }
+
+        // Suporte nativo para a instância atual usada para configuração (ex: foco7)
+        $configInst = EvolutionApiService::getInstanciaConfiguracaoInfo();
+        if (! $instancia && (strtolower($hash) === 'foco7' || strtolower($hash) === strtolower($configInst['nome'] ?? '') || $hash === ($configInst['hash_pagamento'] ?? ''))) {
+            $instancia = $configInst;
+        }
+
+        if (! $instancia) {
+            abort(404, 'Instância WhatsApp não localizada para pagamento.');
+        }
+
+        // Gera ou recupera a cobrança PIX do Módulo Mercado Pago do Desenvolvedor (com webhook dinâmico por requisição)
+        $forcarNova = request()->boolean('forcar_nova', false);
+        $cobranca = EvolutionApiService::gerarCobrancaPixInstancia($instancia['nome'], null, $forcarNova);
+
+        if (request()->wantsJson() || request()->boolean('ajax')) {
+            return response()->json($cobranca);
+        }
+
+        return view('site.pagar_instancia', [
+            'instancia' => $instancia,
+            'cobranca' => $cobranca,
+        ]);
+    }
+
+    /**
+     * Endpoint de polling AJAX público para consulta do status do pagamento da instância
+     */
+    public function statusPagamentoPublico($hash)
+    {
+        $hash = trim((string) $hash);
+        $extras = EvolutionApiService::getInstanciasExtras();
+        $instancia = null;
+
+        foreach ($extras as $item) {
+            if (($item['hash_pagamento'] ?? '') === $hash || strtolower($item['nome'] ?? '') === strtolower($hash)) {
+                $instancia = $item;
+                break;
+            }
+        }
+
+        $configInst = EvolutionApiService::getInstanciaConfiguracaoInfo();
+        if (! $instancia && (strtolower($hash) === 'foco7' || strtolower($hash) === strtolower($configInst['nome'] ?? '') || $hash === ($configInst['hash_pagamento'] ?? ''))) {
+            $instancia = $configInst;
+        }
+
+        if (! $instancia) {
+            return response()->json(['success' => false, 'pago' => false, 'message' => 'Instância não encontrada.'], 404);
+        }
+
+        $res = EvolutionApiService::verificarPagamentoInstancia($instancia['nome']);
+
+        return response()->json($res);
+    }
+}

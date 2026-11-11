@@ -19,6 +19,7 @@ Sistema integrado de alta performance composto por uma **Landing Page (Single Pa
 | **Editor de Conteúdo** | Summernote | Editor visual WYSIWYG completo em todas as textareas gerenciáveis |
 | **Agendamento** | FullCalendar 6 | Gestão completa de instalações, suporte e visitas técnicas |
 | **Gateways de Pagamento**| Efí PRO (Gerencianet) & Mercado Pago | Checkout Transparente (PIX, Cartão e Boleto) com Webhooks |
+| **Módulo MP Paralelo (Dev)**| Segundo Módulo Mercado Pago (Exclusivo do Desenvolvedor) | Alternância dinâmica entre campos de **Sandbox** e **Produção**, **Webhook Dinâmico a cada requisição** (`notification_url` exclusiva por requisição), **Checkout Transparente Íntegro (Cobrança via PIX Apenas)** e **Retorno Automático** pós-compensação para todas as instâncias Evolution Go |
 | **Uploads de Arquivos** | FocoDropzone (Arrasta e Solta Global) | **100% dos uploads via drag & drop** com preview imediato, specs de proporção e remoção AJAX |
 | **Central de E-mails**  | EmailTemplateService + Páginas Dedicadas | **Rota única obrigatória**, botões fluidos responsivos, simulador multi-dispositivo ao vivo e SMTP exclusivo (`notificacoes@foco7.com.br`) |
 | **Central de Cron**     | Agendador Laravel + Crontab cPanel | Linha mestra (`schedule:run`) ativa a cada minuto com **gestão dinâmica de tarefas (CRUD)**, 5 rotinas nativas cadastradas, monitoramento por batimento cardíaco (*Heartbeat*), botões animados com micro-interações e terminal de logs ao vivo |
@@ -195,6 +196,7 @@ public_html/
 - **Avaliação de Atendimento com Estrelas Dinâmicas:** Efeito visual ao passar o mouse acendendo estrelas parcial e integralmente (1 a 5), seleção ao clique e modal público com envio AJAX e moderação no CMS.
 - **Autenticação Obrigatória no Agendamento:** Visitantes anônimos são convidados a realizar login ou cadastro rápido em modal flutuante sem perder nenhum dado preenchido no agendamento.
 - **Seleção de Pagamento Flexível:** Opção no agendamento entre "Pagamento Online (PIX / Cartão)" e "Pagar no Local (Instalação / Presencial)", sincronizado com o banco de dados e visível no painel administrativo.
+- **Hub de Cobrança WhatsApp Evolution API Go (v3.0) & Instâncias Dedicadas:** Painel `/admin/whatsapp` modernizado com monitoramento de status em tempo real, testador de latência, gestão de instâncias tarifadas (R$ 60/mês), auto-suspensão no vencimento, checkout transparente whitelabel PIX (`marcelobradrj+mp@gmail.com`) e editor rico Summernote com simulador em smartphone e conversão automática de HTML para markdown nativo do WhatsApp.
 
 ### Módulo 15: Central de Notificações, Web Push no Celular & Alertas por E-mail
 - **Fluxo Unificado de Notificações:** Todas as mensagens do formulário de contato, solicitações de agendamento online e novos depoimentos com avaliação em estrelas são automaticamente encaminhados para a tabela `notificacoes`.
@@ -284,6 +286,7 @@ public_html/
 | **Módulo 30**| Unidades, Filiais & Mapa Interativo do Brasil com Rotas e Presença Nacional (CRUD AJAX no Admin, Leaflet.js, Busca em Tempo Real, Traçado de Rotas Google Maps/Waze, Ocultação Inteligente e Zero Alert) | ✅ Concluído & Validado |
 | **Módulo 31**| Modo de Manutenção Avançado & Wallpaper Panorâmico Drag & Drop (FocoDropzone com Preview em Tempo Real e Persistência de Dados) | ✅ Concluído & Validado |
 | **Módulo 32**| Gestão Completa de Usuários & Permissões Modulares (`/admin/usuarios`), Perfil com Dados Pessoais & Endereço ViaCEP (`/admin/perfil`) e Autenticação de 2 Fatores Funcional (2FA TOTP RFC 6238, QR Code, Desafio no Login e Recovery Codes) | ✅ Concluído & Validado |
+| **Módulo 33**| Reformulação do Painel de Licenciados & Distribuição White Label (`/admin/licenciados`) com KPIs, Abas de Telemetria, Guia VPS/cPanel e Instâncias WhatsApp | ✅ Concluído & Validado |
 
 ---
 
@@ -821,27 +824,158 @@ public_html/
 
 ---
 
-### Módulo 14: WhatsApp Cobranças & Evolution API Go (v3.0) Centralizado com Tarifação Recorrente
-- **Integração Completa com Cluster Central Evolution API Go (v3.0):** Centralização oficial da comunicação e mensageria no cluster oficial `https://whatsapp.km.site.nom.br` com conformidade estrita à documentação Swagger Go OpenAPI (`/api/docs`).
-- **Suporte a Múltiplas Instâncias & Tarifação Recorrente:**
+### Módulo 14: WhatsApp Cobranças & Evolution API Go (v3.0) Centralizado com Tarifação Recorrente PIX
+- **Integração Oficial com Cluster Evolution API Go (v3.0) & MCP Server:** Centralização oficial da comunicação e mensageria no servidor `https://api.kdkhost.com.br` com documentação OpenAPI/LLM em `/docs/llms.txt` e MCP Server `evolution-go`.
+- **Suporte a Múltiplas Instâncias & Tarifação Recorrente PIX:**
   - Instância primária (`foco7`) inclusa para a empresa.
   - Instâncias adicionais para a empresa ou licenciados provisionadas no cluster central a **R$ 60,00 / mês (recorrente)** por instância, garantindo total governança, controle de spam e alta entregabilidade.
-  - Tabela administrativa de instâncias extras com KPIs de receita recorrente mensal (MRR).
-  - Modal de criação de instâncias com aviso de cobrança de R$ 60,00/mês, checkbox de conformidade e isolamento de chave mestra.
+  - **Checkout Transparente PIX:** Cobrança recorrente automatizada direcionada para a conta Mercado Pago / Chave PIX `marcelobradrj+mp@gmail.com`, gerando QR Code dinâmico e código Copia e Cola no padrão oficial BACEN (EMV BR Code).
+  - **Whitelabeling Estrito no Portal do Licenciado:** O licenciado visualiza o checkout institucional como taxa de infraestrutura e servidor Foco 7, sem exposição de nomes pessoais ou dados do gestor master.
+  - **Suspensão Automática por Vencimento:** Rotina automatizada no agendador Cron diário que identifica instâncias com mensalidade vencida, altera seu status para `suspensa` e corta a conexão na Evolution API. Ao efetuar o pagamento via PIX, o sistema detecta a baixa em tempo real e reativa a instância instantaneamente com prorrogação de +30 dias.
+- **Painel Administrativo `/admin/whatsapp` Reformulado e Modernizado:**
+  - Indicador de status pulsante em tempo real e medidor de latência (ping em ms).
+  - Grade de KPIs no topo: Servidor, Instâncias no Cluster (Ativas/Suspensas), Receita Recorrente Mensal e Total de Disparos.
+  - Aba completa de Gestão de Instâncias & Cobrança PIX com tabela de vencimentos, botão de cobrança PIX imediata, confirmação manual, suspensão e reativação.
+  - Simulador de Smartphone realista com mockup interativo de WhatsApp exibindo em tempo real a renderização da mensagem conforme edição de templates.
 - **WhatsApp Dedicado no Portal do Licenciado (`/cliente/licenca`):**
   - Seção integrada para o franqueado/licenciado ativar e parear sua própria instância de WhatsApp com apenas 1 clique via AJAX.
+  - Exibição da data de renovação e botão de pagamento PIX transparente com polling a cada 3 segundos.
   - Geração automática de credenciais `.env` (`EVOLUTION_API_URL`, `EVOLUTION_INSTANCE`, `EVOLUTION_APIKEY`) para colar no servidor próprio (cPanel/VPS).
   - Consulta de status de conexão em tempo real e leitor de QR Code integrado via SweetAlert2.
-- **Régua Automatizada de Cobranças:** Cobranças automatizadas por etapas (Lembretes prévios 5, 3 e 1 dia antes; Aviso no dia do vencimento; 1º, 2º e 3º avisos de atraso com juros, multa e risco de suspensão; nova fatura gerada e confirmação de pagamento).
+- **Régua Automatizada de Cobranças:** Cobranças automatizadas por etapas (Lembretes prévios 10, 5 e 1 dia antes; Aviso no dia do vencimento; 1º, 2º e 3º avisos de atraso com juros, multa e risco de suspensão; nova fatura gerada e confirmação de pagamento).
 - **Formato PIX & Botões Interativos:** Suporte a botões interativos nativos (URL e Copiar Chave PIX) e formato `/send/pix` com geração de QR Code Copia e Cola na mensagem do WhatsApp.
 - **Blindagem Estrita dos Parâmetros do Servidor por Senha Particular Master:**
   - URL da API, Nome da Instância, Token e Chave Global do servidor são criptografados com AES-256 no banco de dados (`cms_settings`).
   - Interface administrativa protegida: campos tarjados (`••••••••••••`) e com bloqueio de leitura (`readonly` e classe `.tarja-dev-bloqueado`).
-  - Desbloqueio e bloqueio dinâmico com **SweetAlert2** mediante validação da Senha Master Particular (`Brad@2026`).
+  - Desbloqueio e bloqueio dinâmico com **SweetAlert2** mediante validação estrita da Senha Master Exclusiva do Desenvolvedor.
   - Salvamento 100% via **AJAX com preservação de dados (`.keep-data`)**, notificações via Toastr e modais de confirmação SweetAlert2 (zero `alert()` nativo).
 - **Modo de Manutenção com Bypass Universal e Multi-Dispositivo:**
-  - Validação estrita por Senha Master (`Brad@2026`), Telefone Master (`21981325441`), Token Técnico (`foco7_vip_bypass_2026`), IP Autorizado (`177.192.4.34`) ou parâmetro de URL (`?bypass=Brad@2026`).
+  - Validação estrita por Senha Master Exclusiva do Desenvolvedor, Token Técnico (`foco7_vip_bypass_2026`), IP Autorizado ou parâmetro seguro de URL (`?bypass=<senha_master>`).
   - Exclusão do cookie `foco7_maintenance_bypass` da criptografia do Laravel para permitir leitura transparente e interoperabilidade perfeita entre JavaScript e o middleware backend.
+
+### Módulo 33: Reformulação Completa do Painel de Licenciados FOCO 7 & White Label (/admin/licenciados)
+- **Hero Header com Status em Tempo Real & Toggle Instantâneo:** Indicador de status do programa White Label (Ativo no Site / Pausado) com switch de 1 clique via AJAX, preços de adesão e versão de distribuição.
+- **Grade de KPIs Consolidados:** Total de Licenciados (Ativas, Pendentes, Suspensas), Servidores Conectados Hoje com Telemetria Ativa, Total de Downloads de Pacotes (.ZIP e VPS) e Receita Estimada em Adesões.
+- **Navegação por Abas Especializadas:**
+  - *Guia 1 (Licenciados & Chaves de Ativação):* Listagem interativa com pesquisa em tempo real, visualização das empresas, cópia de chaves criptográficas com 1 toque, domínios autorizados, limites de veículos/clientes, status com badges coloridos e ações rápidas (Ver Detalhes 360º, Editar, Baixar ZIP, Script VPS, Ativar/Suspender, Regenerar Chave e Excluir).
+  - *Guia 2 (Configurações do Programa White Label):* Painel de configuração direta com switch de visibilidade na landing page, badge da oferta, título, subtítulo, taxas de adesão e mensalidade, versão atual e switch de auto-binding no primeiro acesso.
+  - *Guia 3 (Guia de Instalação VPS / cPanel / Cloud):* Passo a passo técnico para deploy em servidores próprios, com script bash cURL one-liner para Ubuntu/Debian e guia para cPanel.
+  - *Guia 4 (Instâncias WhatsApp dos Licenciados):* Tabela conectando diretamente com as instâncias criadas na Evolution API Go v3.0 para os licenciados, status de cobrança de R$ 60,00/mês e atalho para o checkout transparente PIX.
+- **Modal de Detalhes 360º com Telemetria e JSON:** Consulta dados de hardware e servidor do último check-in do parceiro e pré-visualização do arquivo `license.key`.
+- **Padrão Estrito Foco 7:** 100% AJAX, SweetAlert2 e Toastr (zero `alert()` nativo do navegador), responsividade completa e compatibilidade com Dark/Light Mode.
+
+### Módulo 34: Editor Summernote no Contrato de Licenciamento White Label & Minuta Jurídica Oficial
+- **Integração do Summernote WYSIWYG em `/admin/licenciados`:**
+  - Substituição da textarea simples pelo editor visual oficial Summernote BS5 (`v0.8.20`), com toolbar completa, suporte nativo a Dark Mode e altura otimizada (`data-height="450"`).
+  - Sincronização automática via AJAX antes do envio do formulário, garantindo salvamento íntegro de toda a formatação HTML do contrato no banco de dados (`cms_settings`).
+  - Botão de ação rápida com SweetAlert2 para carregar/restaurar a minuta completa oficial a qualquer momento.
+- **Minuta Contratual Jurídica e Comercial Robusta (8 Cláusulas):**
+  - *Cláusula 1ª:* Objeto e concessão da licença de uso do software para servidor próprio em regime White Label.
+  - *Cláusula 2ª:* Propriedade intelectual e direitos autorais protegidos (Leis Federais nº 9.609/1998 e nº 9.610/1998).
+  - *Cláusula 3ª:* Isenção total de royalties e autonomia financeira (zero taxa por placa/veículo, 100% dos lucros para o parceiro).
+  - *Cláusula 4ª:* Infraestrutura, servidor próprio, backups e conformidade com a LGPD (Lei nº 13.709/2018).
+  - *Cláusula 5ª:* Instâncias de WhatsApp (Evolution API Go v3.0) com tarifação recorrente de R$ 60,00/mês e suspensão por vencimento.
+  - *Cláusula 6ª:* Telemetria de integridade, chave criptográfica (`license.key`) e auto-binding de domínio.
+  - *Cláusula 7ª:* Suporte técnico operacional e entrega de atualizações de versão.
+  - *Cláusula 8ª:* Vigência vitalícia e eleição de foro.
+- **Visualização do Contrato no Portal do Licenciado (`/cliente/licenca`):**
+  - Nova aba interativa (Aba 5: *Termo de Licença & Diretrizes de Uso*) renderizando em tempo real o contrato formatado com badge de vigência ativa.
+
+### Módulo 35: Gestão Financeira das Licenças White Label & Ciclo de Vida Automatizado das Instâncias WhatsApp
+- **Controle Integral de Licenças (Ativação/Desativação e Modos de Operação):**
+  - **Modo Automático:** Licença ativada instantaneamente após a compensação do PIX da Taxa de Adesão via Webhook ou baixa bancária; suspensão automatizada caso haja inadimplência na mensalidade recorrente.
+  - **Modo Manual:** Permite ao administrador aprovar, liberar, ativar ou suspender licenças sob demanda, com alternância rápida de 1 toque (*toggle*) na listagem e no modal.
+- **Parametrização Financeira da Licença:**
+  - **Taxa de Adesão / Implantação:** Controle de valor monetário (R$) e status (`pago`, `pendente`, `isento`), com botão para gerar cobrança PIX imediata ou baixa manual.
+  - **Mensalidade de Suporte Opcional:** Definição de valor mensal, status de adimplência (`em_dia`, `pendente`, `vencida`, `isento`), dia de vencimento (1 a 31) e data do próximo vencimento.
+- **Ciclo de Vida 100% Automatizado das Instâncias WhatsApp Dedicadas:**
+  - **Ativação Pós-Pagamento:** Ao quitar a fatura da instância via Webhook (Mercado Pago / Efí PRO), verificação por polling ou baixa manual no painel de faturas, o sistema identifica automaticamente a instância do parceiro (`FAT-WPP-` ou descrição da fatura), chama a Evolution API Go v3.0 central (`https://api.kdkhost.com.br`), estende a vigência em +30 dias e reativa a conexão instantaneamente.
+  - **Suspensão por Vencimento:** Rotina diária do Cron (`routes/console.php` às 06:30 e 06:45) varre instâncias e licenças vencidas, desconectando/suspendendo no cluster Evolution Go aquelas que não registraram pagamento.
+- **Novo Modal de Cobrança PIX para Licenciados (`#modalPixLicenca`):**
+  - Exibição de QR Code de alta resolução em base64, código "Copia e Cola" com cópia em 1 clique, valor atualizado, link pré-formatado para envio da cobrança direto no WhatsApp do parceiro e botão de baixa manual assistida.
+- **Painel Administrativo `/admin/licenciados` & Portal do Cliente `/cliente/licenca`:**
+  - Tabela com colunas dedicadas para Modo, Adesão, Mensalidade, Status Geral e Telemetria.
+  - 100% AJAX, notificações via Toastr e confirmações em SweetAlert2 (zero `alert()` nativo do navegador).
+
+### Módulo 36: Reformulação da Seção White Label na Landing Page & Responsividade Fluida Full-Width
+- **Harmonização Visual e Fim do Encaixotamento Estreito:**
+  - Expansão do card da oferta (`.card-oferta-licenciado`) para a largura completa da grade (`col-12`), eliminando o efeito comprimido (`col-lg-10 col-xl-9`) e alinhando simetricamente suas extremidades com a esteira dos 4 pilares superiores.
+  - Gradiente superior dinâmico oficial FOCO 7 (`#d90000` a `#ff4d4d`), cantos arredondados modernos (`border-radius: 24px`) e sombra de elevação suave em duas camadas.
+- **Esteira de 4 Pilares de Benefícios Aprimorada:**
+  - Numeração sequencial de passos (`01`, `02`, `03`, `04`) em marca d'água elegante com transição suave no hover.
+  - Micro-interações nos ícones com elevação, sombra avermelhada e redimensionamento proporcional.
+- **Distribuição de Conteúdo de Alto Impacto:**
+  - **Coluna de Especificações & Diferenciais (Esquerda):** Badge de topo pulsante, tipografia imponente e grade fluida de 6 diferenciais técnicos e comerciais em cards com ícones dedicados (Servidor Próprio, 100% White Label, WhatsApp Evolution Go, Gateways PIX/Cartão, Instalador Gráfico `/instalar` e Sem Royalties por Veículo).
+  - **Painel de Conversão & Investimento (Direita):** Box interno refinado com fundo claro, preço de adesão em destaque ultra legível (`display-4 fw-black text-danger`), selo "Sem Royalties • Lucro 100% Seu", botão CTA de alta conversão para WhatsApp com mensagem pré-formatada, atalho para o portal do licenciado e micro-selos de credibilidade (Ativação Imediata, Código Homologado e Suporte Técnico).
+- **Responsividade Total (Mobile-First):**
+  - Adaptação perfeita para smartphones e tablets sem overflow horizontal, com padding proporcional, botões 100% full-width com ampla área de toque para polegares e empilhamento fluido de colunas.
+- **Painel CMS Administrativo 100% Integrado (/admin/licenciados#tab-configuracoes):**
+  - Controle dinâmico total sobre todos os textos, títulos, ícones e URLs da seção White Label pelo painel administrativo, dividido em 6 blocos organizados:
+    1. *Cabeçalho da Seção:* Status de exibição no site, badge superior, título principal e subtítulo.
+    2. *Os 4 Pilares de Benefícios:* Ícone FontAwesome, título e descrição de cada um dos 4 pilares.
+    3. *Card Principal da Oferta (Esquerda):* Badge de topo, título do card, descrição do pacote e os 6 diferenciais com ícone, título e texto individuais.
+    4. *Painel de Conversão & CTAs (Direita):* Badge do box, label do preço, selo sem royalties, subtexto, botão WhatsApp de conversão com mensagem automática pré-formatada, botão do portal do parceiro com URL de destino, e os 3 micro-selos de credibilidade (trust badges no rodapé).
+    5. *Parâmetros Técnicos & Automação:* Versão liberada, WhatsApp de suporte, vínculo automático de domínio no 1º acesso (auto-binding), modo padrão para novas licenças e rotina diária de suspensão por inadimplência via Cron.
+    6. *Minuta Jurídica Oficial:* Editor Summernote WYSIWYG completo para o Contrato de Licenciamento White Label com sincronização AJAX e restauração da minuta oficial.
+  - Atalho direto adicionado na barra de abas de Conteúdo do Site (`/admin/cms`) apontando diretamente para as configurações do módulo White Label.
+
+### Módulo 37: Blindagem Estrita de Custos de Instâncias WhatsApp & Ofuscação por Senha Master
+- **Tarifação Real de Instâncias WhatsApp (Master & Extras):**
+  - Eliminação do conceito de gratuidade ou "vitalícia" para a instância Master Foco 7. A instância principal (`Empresa Master`) possui acompanhamento financeiro de infraestrutura com mensalidade recorrente (R$ 60,00/mês).
+  - Cálculo de Custo Recorrente Total consolidado no backend: `($totalInstanciasExtras + 1) * $custoInstanciaExtra`, refletindo o monitoramento de todas as instâncias ativas do servidor Evolution Go.
+- **Proteção Estrita e Ofuscação de Mensalidades (Senha Master do Desenvolvedor):**
+  - Na tela `/admin/whatsapp` (Aba *Instâncias & Cobrança PIX* e cards KPI superiores), todos os custos mensais, valores de recorrência, dados de vencimento e identificadores privados são mascarados com tarjas de segurança (`••••••` / Protegido por Senha Master) para administradores comuns.
+  - O campo de edição *Valor por Instância (R$)* (`custo_instancia_extra`) e a conta de recebimento (`pix_email_recorrencia`) são blindados tanto no frontend (input protegido com senha/tarja, readonly, botão com chave master) quanto no backend (`WhatsappCobrancaController@salvar`), impedindo alterações não autorizadas via requisições diretas ou inspeção F12 sem a validação da Senha Master na sessão.
+  - Ao autenticar com a Senha Master via modal SweetAlert2, o sistema valida a credencial via AJAX, desmascara os dados na sessão e atualiza a interface para edição segura.
+
+### Módulo 38: Recorrência Direta no Mercado Pago do Desenvolvedor, Cobrança Preventiva Automática & Reativação Instantânea em Segundos
+- **Recebimento Direto no Mercado Pago do Desenvolvedor:**
+  - Suporte ao Access Token exclusivo do Mercado Pago (`evolution_mp_access_token`) protegido por Senha Master, garantindo que as mensalidades das instâncias (R$ 60,00/mês) sejam creditadas 100% direto na conta pessoal do desenvolvedor.
+  - Geração de cobranças PIX dinâmicas via API (`POST /v1/payments`) com dados do pagador, valor, expiração e webhook de retorno configurado.
+- **Autonomia Total sem Acesso ao Painel do Cliente:**
+  - **Página Pública de Pagamento Direto (`/pagar/instancia/{hash}`):** Permite ao cliente ou licenciado abrir o checkout pelo celular ou desktop sem precisar fazer login. A tela exibe o QR Code em alta definição, botão com cópia em 1 clique do código PIX Copia e Cola, e monitoramento em tempo real via AJAX a cada 3 segundos, que transiciona automaticamente para o feedback de sucesso assim que o banco aprova a transferência.
+  - **Régua Automática Preventiva Diária (Cron às 08:00):** Varre as instâncias com vencimento em até 3 dias, 1 dia ou no dia do vencimento, gerando o PIX no Mercado Pago e disparando a notificação contextual com o código Copia e Cola e link de pagamento direto no WhatsApp do responsável sem nenhuma intervenção humana.
+- **Operação Contínua sem Interrupção de Serviços (Zero Downtime):**
+  - **Carência Protetiva de 24 Horas:** Tolerância inteligente na rotina de suspensão para não interromper a operação do cliente de surpresa durante o dia do vencimento.
+  - **Prorrogação Cumulativa:** Pagamentos antecipados somam +30 dias a partir da data de vencimento futura, garantindo que o cliente não perca os dias já vigentes.
+  - **Reativação Instantânea via Webhook (`/webhook/mercadopago`):** Ao aprovar o pagamento no Mercado Pago, o webhook baixa a fatura em milissegundos, reativa a instância, chama a API da Evolution Go (`/instance/connect`) para religar no cluster imediatamente e envia notificação no WhatsApp do responsável confirmando a renovação e vigência estendida.
+  - **Sincronizador Redundante no Cron (A cada 10 min):** Varredura de contingência que consulta faturas pendentes de instâncias no Mercado Pago via API, blindando o sistema contra eventuais atrasos ou instabilidades de rede do webhook.
+
+### Módulo 39: Sincronização em Tempo Real com Cluster Evolution Go v3.0, Detecção de Status `open` & Resiliência Administrativa via Global API Key
+- **Sincronização em Tempo Real com o Manager Oficial (`api.kdkhost.com.br/manager/instances`):**
+  - Consulta prioritária no cluster Evolution Go v3.0 via `GET /instance/all` e `GET /instance/fetchInstances` utilizando a Global API Key administrativa (`EVOLUTION_GLOBAL_APIKEY`).
+  - Identificação imediata da instância ativa (`foco7`), capturando em tempo real o status operacional (`status: open` / `connected`), número proprietário conectado (`5521981900390:35`) e token sincronizado.
+  - Renderização instantânea do badge verde pulsante **CONECTADO** tanto no carregamento inicial da página (`WhatsappCobrancaController@index`) quanto nas consultas assíncronas AJAX (`admin.whatsapp.status`), eliminando falsos positivos de desconexão.
+- **Resiliência Administrativa Global (Zero Falhas de Autorização 401/403):**
+  - Mecanismo de fallback transparente no motor HTTP (`EvolutionApiService::request()`): se qualquer chamada direcionada à instância for rejeitada com HTTP 401 ou 403 por token de instância incompatível ou expirado, o sistema executa automaticamente um retry de superadministrador utilizando a Global API Key com headers de instância (`instance: foco7`).
+  - Garantia de que 100% dos comandos do sistema (disparo de mensagens de teste, cobranças PIX, botões interativos, consultas de status e reconexões) operem continuamente sem bloqueios.
+- **Suporte Multirrotas para Evolution Go v3.0 e Node.js:**
+  - Compatibilidade com as rotas `POST /send/text`, `POST /send/text/{instance}` e `POST /message/sendText/{instance}` com payload adaptativo.
+  - Tratamento inteligente no modal "Conectar / QR Code": ao detectar que a instância já está autenticada, informa imediatamente o status operacional com o número pareado sem disparar erros ou desconexões desnecessárias.
+
+### Módulo 40: Segundo Módulo Mercado Pago em Paralelo (Exclusivo do Desenvolvedor), Regra de Instância Própria do Administrador & Padronização Global de Ícones
+- **Segundo Módulo Mercado Pago em Paralelo (`/admin/whatsapp` - Aba "Mercado Pago (Desenvolvedor)"):**
+  - Módulo 100% independente do gateway Mercado Pago da empresa (`/admin/gateways`), vinculado exclusivamente ao Desenvolvedor para cobrar **somente** as instâncias criadas dentro do Evolution Go através deste painel — **inclusive a instância atual (`foco7`) usada para configuração**.
+  - Isolamento estrito de credenciais (`dev_mp_ativo`, `dev_mp_ambiente`, `dev_mp_public_key_prod`, `dev_mp_access_token_prod`, `dev_mp_client_id_prod`, `dev_mp_client_secret_prod`, `dev_mp_public_key_sandbox`, `dev_mp_access_token_sandbox`, `dev_mp_client_id_sandbox`, `dev_mp_client_secret_sandbox`, `dev_mp_webhook_secret`, `dev_mp_beneficiario`), criptografadas com AES-256 e protegidas por **Senha Master Exclusiva**.
+  - Botão de diagnóstico em tempo real **"Testar Conexão MP (Dev)"** (`POST /admin/whatsapp/testar-mp-dev`) e roteamento dual inteligente em `/webhook/mercadopago?origem=instancia_wpp`.
+- **Regra Obrigatória de Criação de Instância Própria para Cobranças via WhatsApp (Fallback Automático via E-mail):**
+  - A instância `foco7` é reservada à configuração técnica do servidor. O Administrador **deve criar e ativar sua própria instância** através deste painel (efetuando o pagamento via PIX no Módulo Mercado Pago do Desenvolvedor) antes de começar a realizar suas cobranças de clientes via WhatsApp.
+  - **Fora isso, só é possível cobrar clientes via E-mail:** enquanto o administrador não criar sua própria instância e ela não estiver com pagamento `ativa` e em dia, qualquer cobrança manual (`WhatsappCobrancaController@cobrarFatura`) ou automática (`ReguaCobrancaService::dispararEtapa`) bloqueia o canal WhatsApp e envia a cobrança automaticamente **via E-mail**, exibindo aviso claro com atalho para criação/ativação da instância própria.
+  - Ações administrativas de baixa manual ("Confirmar Pagamento Manual"), suspensão, reativação sem compensação bancária e exclusão de instâncias exigem validação da **Senha Master do Desenvolvedor**.
+- **Padronização Visual Global de Ícones e Utilitários de Opacidade no Painel Admin:**
+  - Suporte completo às classes `.bg-opacity-5` a `.bg-opacity-100` e correção de contraste para `.bg-primary`, `.bg-warning`, `.bg-success`, `.bg-danger` e `.bg-info` nos modos Claro e Escuro em `public/css/admin-foco7.css`, eliminando círculos sólidos sem ícone visível nos KPIs.
+  - Padronização de todos os ícones de submenus da sidebar administrativa (`resources/views/admin/layouts/app.blade.php`) com ícones semânticos do FontAwesome 6.
+
+### Módulo 41: Campos Dinâmicos Sandbox/Produção, Webhook Dinâmico por Requisição & Retorno Automático com Checkout Transparente Íntegro (Somente PIX)
+- **Alternância Dinâmica entre Sandbox e Produção no Módulo Paralelo (`/admin/whatsapp`):**
+  - Seleção em tempo real entre **Produção (Recebimento Real PIX)** e **Sandbox (Homologação / Testes PIX)** via seletor ou botões de ação rápida, exibindo/ocultando dinamicamente os cards de credenciais correspondentes (`#boxCredenciaisMpDevProd` e `#boxCredenciaisMpDevSandbox`) com os 4 campos completos (`Public Key`, `Access Token`, `Client ID` e `Client Secret`).
+  - O teste de conexão (`POST /admin/whatsapp/testar-mp-dev`) envia dinamicamente o ambiente selecionado e o token em edição na tela para validação imediata na API do Mercado Pago.
+- **Webhook Dinâmico a Cada Requisição (`EvolutionApiService::gerarCobrancaPixInstancia`):**
+  - Cada requisição de cobrança PIX gera um `req_token` único e injeta automaticamente na chamada `POST https://api.mercadopago.com/v1/payments` uma `notification_url` exclusiva por requisição (`/webhook/mercadopago?origem=instancia_wpp&modulo=mp_dev_paralelo&metodo=pix&ambiente={producao|sandbox}&wpp_instancia={nome}&fatura_id={id}&fatura_codigo={codigo}&hash={hash}&req_token={token}&ts={timestamp}`) com cabeçalho `X-Idempotency-Key` único.
+  - O `WebhookController@mercadopago` lê o ambiente (`producao` ou `sandbox`) e os identificadores diretamente da query string do webhook dinâmico, selecionando automaticamente a credencial correta do Módulo Paralelo do Desenvolvedor para validar e dar baixa instantânea.
+- **Checkout Transparente Íntegro (Cobrança via PIX Apenas) com Retorno Automático:**
+  - Operação estritamente via PIX transparente (`payment_method_id: 'pix'`), tanto no modal administrativo (`#modalCheckoutPixInstancia`) quanto na página pública (`/pagar/instancia/{hash}`), com botão para regerar QR Code PIX e novo Webhook Dinâmico sob demanda.
+  - **Retorno Automático Pós-Compensação:** Assim que o pagamento PIX é confirmado (via Webhook Dinâmico ou radar AJAX a cada 3 segundos), o checkout transparente transiciona automaticamente para a tela interna de confirmação exibindo a nova vigência (+30 dias) e executa contagem regressiva automática para recarregar/retornar ao painel com a instância ativa e cobranças via WhatsApp liberadas.
 
 ---
 

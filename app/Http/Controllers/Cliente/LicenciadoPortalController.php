@@ -30,8 +30,8 @@ class LicenciadoPortalController extends Controller
         }
 
         $custoInstanciaExtra = EvolutionApiService::getCustoInstanciaExtra(); // R$ 60,00/mês
-        $evolutionBaseUrl = EvolutionApiService::getBaseUrl(); // https://whatsapp.km.site.nom.br
-        $evolutionDocsUrl = 'https://whatsapp.km.site.nom.br/api/docs';
+        $evolutionBaseUrl = EvolutionApiService::getBaseUrl(); // https://api.kdkhost.com.br
+        $evolutionDocsUrl = 'https://api.kdkhost.com.br/docs/llms.txt';
 
         return view('cliente.licenca.index', compact(
             'user',
@@ -299,6 +299,54 @@ class LicenciadoPortalController extends Controller
             'success' => true,
             'message' => 'Instância WhatsApp desconectada com sucesso.',
         ]);
+    }
+
+    /**
+     * Retorna os dados do checkout transparente PIX para pagamento da mensalidade de R$ 60,00 da instância
+     * Checkout 100% Whitelabel sem expor dados pessoais do recebedor
+     */
+    public function cobrancaWhatsapp($id)
+    {
+        $user = Auth::user();
+        $licenca = Licenca::where('user_id', $user->id)->findOrFail($id);
+
+        $dadosServidor = $licenca->dados_servidor ?? [];
+        $whatsapp = $dadosServidor['whatsapp'] ?? null;
+
+        if (empty($whatsapp['instancia'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nenhuma instância WhatsApp encontrada para esta licença.',
+            ], 404);
+        }
+
+        $res = EvolutionApiService::gerarCobrancaPixInstancia($whatsapp['instancia'], $user->id);
+
+        return response()->json($res);
+    }
+
+    /**
+     * Consulta em tempo real se o PIX da mensalidade da instância foi quitado pelo licenciado
+     */
+    public function verificarPagamentoWhatsapp($id)
+    {
+        $user = Auth::user();
+        $licenca = Licenca::where('user_id', $user->id)->findOrFail($id);
+
+        $dadosServidor = $licenca->dados_servidor ?? [];
+        $whatsapp = $dadosServidor['whatsapp'] ?? null;
+
+        if (empty($whatsapp['instancia'])) {
+            return response()->json([
+                'success' => false,
+                'pago' => false,
+                'message' => 'Instância não identificada.',
+            ], 404);
+        }
+
+        $res = EvolutionApiService::verificarPagamentoInstancia($whatsapp['instancia']);
+
+        return response()->json($res);
     }
 }
 
