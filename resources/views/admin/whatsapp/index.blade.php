@@ -819,10 +819,18 @@
                             <!-- TABELA DE INSTÂNCIAS REGISTRADAS -->
                             <div class="card border">
                                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <h6 class="fw-bold mb-0 text-body">
-                                        <i class="fas fa-list me-2 text-primary"></i> Instâncias Provisionadas &amp; Monitoramento de Vencimentos
-                                    </h6>
-                                    <span class="badge bg-secondary">Total: {{ ($totalInstanciasExtras ?? 0) + 1 }} instâncias monitoradas</span>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-body">
+                                            <i class="fas fa-list me-2 text-primary"></i> Instâncias Provisionadas deste Painel &amp; Monitoramento de Vencimentos
+                                        </h6>
+                                        <small class="text-secondary" style="font-size: 0.74rem;">
+                                            <i class="fas fa-shield-halved text-success me-1"></i> Isolamento Estrito Ativo: cada licenciado visualiza exclusivamente suas próprias instâncias criadas neste painel.
+                                        </small>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success-subtle text-success border border-success"><i class="fas fa-user-lock me-1"></i> Zero Vazamento entre Franqueados</span>
+                                        <span class="badge bg-secondary">Total: {{ ($totalInstanciasExtras ?? 0) + 1 }} instâncias deste painel</span>
+                                    </div>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
@@ -1747,9 +1755,10 @@
                 <!-- PAINEL DE INFORMAÇÕES DO FRANQUEADO NA CONEXÃO DA INSTÂNCIA -->
                 <div id="boxInfoFranqueadoModalQr" class="p-3 rounded-3 bg-light border text-start mb-3">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 pb-2 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="badge bg-primary" id="txtQrFranqueadoTipoBadge"><i class="fas fa-user-tie me-1"></i> Franqueado / Titular</span>
                             <strong class="text-body small" id="txtQrFranqueadoEmpresa">{{ $franqueadoAtivoInfo['empresa_franqueado'] ?? 'Foco 7 Rastreamento' }}</strong>
+                            <span class="badge bg-success-subtle text-success border border-success" style="font-size: 0.68rem;" title="Isolamento estrito ativo: nenhum outro licenciado tem acesso a esta instância"><i class="fas fa-shield-halved me-1"></i> Isolado neste Painel</span>
                         </div>
                         <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold" onclick="abrirModalEditarFranqueadoInstancia(instanciaModalAtual)">
                             <i class="fas fa-user-pen me-1"></i> Editar Franqueado
@@ -1943,28 +1952,34 @@
                     </div>
                 </div>
 
+                @if(isset($licenciados) && count($licenciados) > 0 && ($configs['dev_desbloqueado'] ?? false))
                 <div class="mb-3 p-2 rounded bg-light border">
                     <label class="form-label fw-bold small text-primary mb-1">
-                        <i class="fas fa-user-tie me-1"></i> Selecionar Franqueado / Licenciado Cadastrado (Opcional - Auto-preenche os dados)
+                        <i class="fas fa-user-tie me-1"></i> Selecionar Franqueado / Licenciado Cadastrado (Exclusivo Master)
                     </label>
                     <select id="modalInstanciaLicenciadoId" class="form-select form-select-sm" onchange="preencherCamposPorFranqueadoSelecionado(this, 'modalInstancia')">
                         <option value="">-- Preencher manualmente ou selecionar franqueado da lista --</option>
-                        @if(isset($licenciados) && count($licenciados) > 0)
-                            @foreach($licenciados as $lic)
-                                <option value="{{ $lic->id }}"
-                                    data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
-                                    data-empresa="{{ $lic->nome_empresa }}"
-                                    data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
-                                    data-tel="{{ $lic->user?->telefone ?? '' }}"
-                                    data-email="{{ $lic->user?->email ?? '' }}"
-                                    data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
-                                    data-chave="{{ $lic->chave_licenca }}">
-                                    #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
-                                </option>
-                            @endforeach
-                        @endif
+                        @foreach($licenciados as $lic)
+                            <option value="{{ $lic->id }}"
+                                data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
+                                data-empresa="{{ $lic->nome_empresa }}"
+                                data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
+                                data-tel="{{ $lic->user?->telefone ?? '' }}"
+                                data-email="{{ $lic->user?->email ?? '' }}"
+                                data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
+                                data-chave="{{ $lic->chave_licenca }}">
+                                #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+                @else
+                <input type="hidden" id="modalInstanciaLicenciadoId" value="{{ $contextoPainel['licenciado_id_usuario'] ?? '' }}">
+                <div class="mb-3 p-2 rounded bg-success bg-opacity-10 border border-success small text-body">
+                    <i class="fas fa-user-lock text-success me-1"></i>
+                    <strong>Isolamento por Painel Ativo:</strong> Esta instância pertencerá exclusivamente a este painel (<code class="fw-bold">{{ $contextoPainel['dominio'] ?? request()->getHost() }}</code>), sem compartilhamento com outros licenciados.
+                </div>
+                @endif
 
                 <div class="row g-2 mb-2">
                     <div class="col-md-6">
@@ -2033,28 +2048,34 @@
             <div class="modal-body p-4">
                 <input type="hidden" id="editFranqueadoInstanciaNome" value="">
 
+                @if(isset($licenciados) && count($licenciados) > 0 && ($configs['dev_desbloqueado'] ?? false))
                 <div class="mb-3 p-2 rounded bg-light border">
                     <label class="form-label fw-bold small text-primary mb-1">
-                        <i class="fas fa-id-badge me-1"></i> Vincular a um Franqueado / Licenciado Cadastrado
+                        <i class="fas fa-id-badge me-1"></i> Vincular a um Franqueado / Licenciado Cadastrado (Exclusivo Master)
                     </label>
                     <select id="editFranqueadoLicenciadoId" class="form-select form-select-sm" onchange="preencherCamposPorFranqueadoSelecionado(this, 'editFranqueado')">
                         <option value="">-- Manter preenchimento personalizado abaixo --</option>
-                        @if(isset($licenciados) && count($licenciados) > 0)
-                            @foreach($licenciados as $lic)
-                                <option value="{{ $lic->id }}"
-                                    data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
-                                    data-empresa="{{ $lic->nome_empresa }}"
-                                    data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
-                                    data-tel="{{ $lic->user?->telefone ?? '' }}"
-                                    data-email="{{ $lic->user?->email ?? '' }}"
-                                    data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
-                                    data-chave="{{ $lic->chave_licenca }}">
-                                    #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
-                                </option>
-                            @endforeach
-                        @endif
+                        @foreach($licenciados as $lic)
+                            <option value="{{ $lic->id }}"
+                                data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
+                                data-empresa="{{ $lic->nome_empresa }}"
+                                data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
+                                data-tel="{{ $lic->user?->telefone ?? '' }}"
+                                data-email="{{ $lic->user?->email ?? '' }}"
+                                data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
+                                data-chave="{{ $lic->chave_licenca }}">
+                                #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+                @else
+                <input type="hidden" id="editFranqueadoLicenciadoId" value="{{ $contextoPainel['licenciado_id_usuario'] ?? '' }}">
+                <div class="mb-3 p-2 rounded bg-success bg-opacity-10 border border-success small text-body">
+                    <i class="fas fa-shield-halved text-success me-1"></i>
+                    <strong>Dados Isolados deste Painel:</strong> As informações abaixo identificam o franqueado titular desta instância neste painel.
+                </div>
+                @endif
 
                 <div class="row g-2 mb-2">
                     <div class="col-md-6">

@@ -241,10 +241,134 @@ class EvolutionApiService
     }
 
     /**
-     * Retorna os dados de tarifação da instância atual usada para configuração (ex: foco7)
+     * Identifica de forma estrita o contexto do painel atual (Servidor Matriz vs Painel de Licenciado/Franqueado)
+     * garantindo isolamento total (Zero Vazamento de informações ou instâncias entre franqueados).
+     */
+    public static function obterContextoPainelLocal(): array
+    {
+        $host = strtolower(trim((string) (request()?->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'foco7.com.br')));
+        $hostSemWww = preg_replace('/^www\./', '', $host);
+
+        $hostsMatriz = ['foco7.com.br', 'localhost', '127.0.0.1', '15.235.57.3'];
+        $ehHostMatriz = in_array($hostSemWww, $hostsMatriz, true);
+
+        $chaveLicencaLocal = '';
+        $empresaLicencaLocal = '';
+        $dominioLicencaLocal = '';
+        $possuiArquivoLicenca = false;
+
+        try {
+            $arquivosCandidatos = [
+                base_path('license.key'),
+                storage_path('app/license.key'),
+            ];
+            foreach ($arquivosCandidatos as $arq) {
+                if (file_exists($arq)) {
+                    $licJson = json_decode((string) file_get_contents($arq), true);
+                    if (is_array($licJson)) {
+                        $chaveLicencaLocal = trim((string) ($licJson['chave_licenca'] ?? ($licJson['licenca'] ?? '')));
+                        $empresaLicencaLocal = trim((string) ($licJson['empresa'] ?? ''));
+                        $dominioLicencaLocal = strtolower(trim((string) ($licJson['dominio'] ?? '')));
+                        if (! empty($chaveLicencaLocal) && $chaveLicencaLocal !== 'MASTER-FOCO7-OFICIAL') {
+                            $possuiArquivoLicenca = true;
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+
+        // Verifica também se o usuário autenticado é um licenciado específico
+        $userId = null;
+        $userRole = null;
+        $licenciadoIdUsuario = null;
+        try {
+            if (auth()->check()) {
+                $u = auth()->user();
+                $userId = $u?->id;
+                $userRole = $u?->role;
+                if ($userRole === 'licenciado') {
+                    $licUser = Licenca::where('user_id', $userId)->latest()->first();
+                    if ($licUser) {
+                        $licenciadoIdUsuario = $licUser->id;
+                        $chaveLicencaLocal = $chaveLicencaLocal ?: (string) $licUser->chave_licenca;
+                        $empresaLicencaLocal = $empresaLicencaLocal ?: (string) $licUser->nome_empresa;
+                        $dominioLicencaLocal = $dominioLicencaLocal ?: strtolower((string) $licUser->dominio_autorizado);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+
+        $ehPainelLicenciado = $possuiArquivoLicenca || ! $ehHostMatriz || ($userRole === 'licenciado');
+
+        $sementePainel = $ehPainelLicenciado
+            ? ($chaveLicencaLocal ?: ($dominioLicencaLocal ?: $hostSemWww))
+            : 'matriz_foco7_oficial';
+
+        $painelId = substr(md5('foco7_tenant_'.strtolower($sementePainel)), 0, 12);
+
+        $slugFranqueado = preg_replace('/[^a-z0-9]/', '', strtolower($empresaLicencaLocal ?: $hostSemWww));
+        $slugFranqueado = substr($slugFranqueado ?: 'franqueado', 0, 12);
+        $instanciaPadrao = $ehPainelLicenciado
+            ? 'franqueado_'.$slugFranqueado.'_'.substr($painelId, 0, 4)
+            : 'foco7';
+
+        return [
+            'eh_painel_licenciado' => $ehPainelLicenciado,
+            'eh_matriz' => ! $ehPainelLicenciado,
+            'painel_id' => $painelId,
+            'host' => $hostSemWww,
+            'chave_licenca' => $chaveLicencaLocal ?: ($ehPainelLicenciado ? 'LIC-'.strtoupper(substr($painelId, 0, 8)) : 'MASTER-FOCO7-OFICIAL'),
+            'empresa' => $empresaLicencaLocal ?: (string) CmsSetting::get('empresa_nome', $ehPainelLicenciado ? 'Unidade Franqueada' : 'Foco 7 Rastreamento'),
+            'dominio' => $dominioLicencaLocal ?: $hostSemWww,
+            'licenciado_id_usuario' => $licenciadoIdUsuario,
+            'user_id' => $userId,
+            'instancia_padrao_painel' => $instanciaPadrao,
+        ];
+    }
+
+    /**
+     * Verifica estritamente se uma instância pertence ao painel / franqueado atual.
+     * Impede qualquer vazamento ou acesso cruzado entre franqueados (licenciados).
+     */
+    public static function instanciaPertenceAoPainelAtual(string $nomeInstancia): bool
+    {
+        $nomeLimpo = strtolower(trim($nomeInstancia));
+        if (empty($nomeLimpo)) {
+            return false;
+        }
+
+        $ctx = self::obterContextoPainelLocal();
+
+        // Se for um painel de licenciado/franqueado, a instância 'foco7' (da matriz) NUNCA pertence a ele
+        if ($ctx['eh_painel_licenciado'] && $nomeLimpo === 'foco7') {
+            return false;
+        }
+
+        // Verifica se é a instância principal legítima deste painel
+        $instPrincipal = strtolower(self::getInstanceName());
+        if ($nomeLimpo === $instPrincipal) {
+            return true;
+        }
+
+        // Verifica se está na lista de instâncias criadas exclusivamente neste painel
+        foreach (self::getInstanciasExtras() as $item) {
+            if (strtolower(trim((string) ($item['nome'] ?? ''))) === $nomeLimpo) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Retorna os dados de tarifação da instância atual usada para configuração neste painel
      */
     public static function getInstanciaConfiguracaoInfo(): array
     {
+        $ctx = self::obterContextoPainelLocal();
         $nome = self::getInstanceName();
         $custo = self::getCustoInstanciaExtra();
         $status = (string) CmsSetting::get('evolution_master_status_cobranca', 'ativa');
@@ -255,7 +379,7 @@ class EvolutionApiService
         }
         $hash = (string) CmsSetting::get('evolution_master_hash', '');
         if (empty($hash)) {
-            $hash = md5($nome.'_master_wpp_sec');
+            $hash = md5($nome.'_'.$ctx['painel_id'].'_master_wpp_sec');
             CmsSetting::set('evolution_master_hash', $hash, 'whatsapp');
         }
 
@@ -263,32 +387,32 @@ class EvolutionApiService
             $status = 'vencida';
         }
 
-        $nomeResp = (string) CmsSetting::get('evolution_master_nome_responsavel', CmsSetting::get('empresa_nome', 'Foco 7 Tecnologia'));
-        $empresaFranqueado = (string) CmsSetting::get('evolution_master_empresa_franqueado', CmsSetting::get('empresa_nome', 'Foco 7 Rastreamento'));
+        $padraoNome = $ctx['eh_painel_licenciado'] ? $ctx['empresa'] : 'Foco 7 Tecnologia';
+        $padraoEmpresa = $ctx['empresa'];
+
+        $nomeResp = (string) CmsSetting::get('evolution_master_nome_responsavel', CmsSetting::get('empresa_nome', $padraoNome));
+        $empresaFranqueado = (string) CmsSetting::get('evolution_master_empresa_franqueado', CmsSetting::get('empresa_nome', $padraoEmpresa));
         $docFranqueado = (string) CmsSetting::get('evolution_master_documento_franqueado', CmsSetting::get('empresa_cnpj', ''));
         $telFranqueado = (string) CmsSetting::get('evolution_master_telefone_franqueado', CmsSetting::get('whatsapp_suporte', CmsSetting::get('empresa_telefone', '')));
         $emailFranqueado = (string) CmsSetting::get('evolution_master_email_franqueado', CmsSetting::get('empresa_email', ''));
-        $dominioFranqueado = (string) CmsSetting::get('evolution_master_dominio_franqueado', request()?->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'foco7.com.br');
-        $chaveLicenca = (string) CmsSetting::get('evolution_master_chave_licenca', 'MASTER-FOCO7-OFICIAL');
+        $dominioFranqueado = (string) CmsSetting::get('evolution_master_dominio_franqueado', $ctx['dominio']);
+        $chaveLicenca = (string) CmsSetting::get('evolution_master_chave_licenca', $ctx['chave_licenca']);
 
-        // Se este servidor possuir um arquivo license.key (instalação de franqueado/licenciado), carrega os dados reais da licença local
-        try {
-            $licenseKeyFile = base_path('license.key');
-            if (file_exists($licenseKeyFile)) {
-                $licJson = json_decode((string) file_get_contents($licenseKeyFile), true);
-                if (is_array($licJson)) {
-                    $chaveLicenca = $licJson['chave_licenca'] ?? ($licJson['licenca'] ?? $chaveLicenca);
-                    $empresaFranqueado = $licJson['empresa'] ?? $empresaFranqueado;
-                    $dominioFranqueado = $licJson['dominio'] ?? $dominioFranqueado;
-                }
+        if ($ctx['eh_painel_licenciado']) {
+            if ($chaveLicenca === 'MASTER-FOCO7-OFICIAL') {
+                $chaveLicenca = $ctx['chave_licenca'];
             }
-        } catch (\Throwable $e) {
+            if ($dominioFranqueado === 'foco7.com.br' && $ctx['host'] !== 'foco7.com.br') {
+                $dominioFranqueado = $ctx['dominio'];
+            }
         }
 
         return [
             'nome' => $nome,
             'token' => self::getInstanceApiKey(),
             'tipo' => 'configuracao_master',
+            'painel_id' => $ctx['painel_id'],
+            'painel_host' => $ctx['host'],
             'status' => $status,
             'data_vencimento' => $vencimento,
             'valor_recorrente' => $custo,
@@ -462,9 +586,11 @@ class EvolutionApiService
     /**
      * Retorna a lista de instâncias criadas através deste painel com cobrança recorrente (R$ 60,00/mês)
      * e enriquecidas com as informações completas do Franqueado / Licenciado vinculado.
+     * Aplica isolamento estrito por painel/franqueado (Zero Vazamento entre licenciados).
      */
     public static function getInstanciasExtras(): array
     {
+        $ctx = self::obterContextoPainelLocal();
         $data = CmsSetting::get('evolution_instancias_extras', []);
         if (is_string($data)) {
             $decoded = json_decode($data, true);
@@ -494,6 +620,31 @@ class EvolutionApiService
                 continue;
             }
 
+            // ISOLAMENTO ESTRITO ENTRE FRANQUEADOS (LICENCIADOS):
+            // 1. Se este for o painel de um licenciado, jamais exibe a instância 'foco7' da matriz
+            if ($ctx['eh_painel_licenciado'] && $nomeLower === 'foco7') {
+                continue;
+            }
+
+            // 2. Se o registro da instância tiver painel_id ou painel_host gravado de outro painel/domínio
+            // (ex: banco copiado da matriz), oculta completamente para não vazar dados entre franqueados!
+            if ($ctx['eh_painel_licenciado']) {
+                if (! empty($item['painel_id']) && $item['painel_id'] !== $ctx['painel_id']) {
+                    continue;
+                }
+                if (! empty($item['painel_host']) && strtolower((string) $item['painel_host']) !== $ctx['host']) {
+                    continue;
+                }
+                if (! empty($ctx['licenciado_id_usuario']) && ! empty($item['licenciado_id']) && (int) $item['licenciado_id'] !== (int) $ctx['licenciado_id_usuario']) {
+                    continue;
+                }
+            } elseif (! empty($ctx['licenciado_id_usuario'])) {
+                // Se um usuário com role 'licenciado' estiver logado, só vê instâncias vinculadas à sua própria licença
+                if ((int) ($item['licenciado_id'] ?? 0) !== (int) $ctx['licenciado_id_usuario'] && (int) ($item['criado_por_user_id'] ?? 0) !== (int) $ctx['user_id']) {
+                    continue;
+                }
+            }
+
             if (empty($item['valor_recorrente'])) {
                 $item['valor_recorrente'] = self::getCustoInstanciaExtra();
             }
@@ -509,21 +660,32 @@ class EvolutionApiService
             }
 
             $item['criada_pelo_painel'] = true;
+            $item['painel_id'] = $item['painel_id'] ?? $ctx['painel_id'];
+            $item['painel_host'] = $item['painel_host'] ?? $ctx['host'];
 
-            // Vincula e enriquece todos os dados do Franqueado / Licenciado a partir da Licença ou Usuário
+            // Vincula e enriquece os dados do Franqueado respeitando o isolamento do painel atual
             try {
                 $licenca = null;
-                if (! empty($item['licenciado_id'])) {
-                    $licenca = Licenca::with('user')->find($item['licenciado_id']);
-                }
-                if (! $licenca) {
-                    $todasLicencas = Licenca::with('user')->get();
-                    foreach ($todasLicencas as $licCandidate) {
-                        $instLic = $licCandidate->dados_servidor['whatsapp']['instancia'] ?? '';
-                        if (! empty($instLic) && strtolower($instLic) === $nomeLower) {
-                            $licenca = $licCandidate;
-                            $item['licenciado_id'] = $licCandidate->id;
-                            break;
+                if ($ctx['eh_painel_licenciado']) {
+                    // Em painel de licenciado, consulta APENAS a própria licença local (nunca lista ou cruza outros licenciados)
+                    if (! empty($ctx['licenciado_id_usuario'])) {
+                        $licenca = Licenca::with('user')->find($ctx['licenciado_id_usuario']);
+                    } elseif (! empty($ctx['chave_licenca'])) {
+                        $licenca = Licenca::with('user')->where('chave_licenca', $ctx['chave_licenca'])->first();
+                    }
+                } else {
+                    if (! empty($item['licenciado_id'])) {
+                        $licenca = Licenca::with('user')->find($item['licenciado_id']);
+                    }
+                    if (! $licenca) {
+                        $todasLicencas = Licenca::with('user')->get();
+                        foreach ($todasLicencas as $licCandidate) {
+                            $instLic = $licCandidate->dados_servidor['whatsapp']['instancia'] ?? '';
+                            if (! empty($instLic) && strtolower($instLic) === $nomeLower) {
+                                $licenca = $licCandidate;
+                                $item['licenciado_id'] = $licCandidate->id;
+                                break;
+                            }
                         }
                     }
                 }
@@ -541,15 +703,18 @@ class EvolutionApiService
             } catch (\Throwable $e) {
             }
 
-            // Fallbacks para garantir que toda instância tenha informações completas do franqueado/titular
+            // Fallbacks para garantir que toda instância tenha informações completas do próprio franqueado/titular local
             if (empty($item['nome_responsavel'])) {
-                $item['nome_responsavel'] = (string) CmsSetting::get('empresa_nome', 'Administrador / Franqueado');
+                $item['nome_responsavel'] = (string) CmsSetting::get('empresa_nome', $ctx['empresa']);
             }
             if (empty($item['empresa_franqueado'])) {
                 $item['empresa_franqueado'] = $item['nome_responsavel'];
             }
             if (empty($item['dominio_franqueado'])) {
-                $item['dominio_franqueado'] = request()?->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'foco7.com.br';
+                $item['dominio_franqueado'] = $ctx['dominio'];
+            }
+            if (empty($item['chave_licenca']) && $ctx['eh_painel_licenciado']) {
+                $item['chave_licenca'] = $ctx['chave_licenca'];
             }
 
             if ($item['data_vencimento'] < $hoje && $item['status'] === 'ativa') {
@@ -563,11 +728,16 @@ class EvolutionApiService
     }
 
     /**
-     * Retorna o perfil estruturado do Franqueado / Titular vinculado a qualquer instância criada neste painel
+     * Retorna o perfil estruturado do Franqueado / Titular vinculado a qualquer instância criada neste painel.
+     * Aplica isolamento estrito: nunca retorna dados de instâncias de outros franqueados.
      */
     public static function obterInfoFranqueadoInstancia(?string $nomeInstancia = null): array
     {
+        $ctx = self::obterContextoPainelLocal();
         $nome = trim((string) ($nomeInstancia ?: self::getInstanceName()));
+        if (! self::instanciaPertenceAoPainelAtual($nome)) {
+            $nome = self::getInstanceName();
+        }
         $extras = self::getInstanciasExtras();
 
         foreach ($extras as $item) {
@@ -583,16 +753,19 @@ class EvolutionApiService
                 return [
                     'instancia' => $item['nome'],
                     'criada_pelo_painel' => true,
+                    'painel_id' => $item['painel_id'] ?? $ctx['painel_id'],
+                    'painel_host' => $item['painel_host'] ?? $ctx['host'],
+                    'isolamento_ativo' => true,
                     'tipo' => $tipo,
                     'tipo_label' => $tipoLabel,
                     'licenciado_id' => $item['licenciado_id'] ?? null,
-                    'chave_licenca' => $item['chave_licenca'] ?? '',
+                    'chave_licenca' => $item['chave_licenca'] ?? $ctx['chave_licenca'],
                     'nome_franqueado' => $item['nome_responsavel'] ?? 'Franqueado / Responsável',
                     'empresa_franqueado' => $item['empresa_franqueado'] ?? ($item['nome_responsavel'] ?? 'Unidade Franqueada'),
                     'documento_franqueado' => $item['documento_franqueado'] ?? '',
                     'telefone_franqueado' => $item['telefone_responsavel'] ?? '',
                     'email_franqueado' => $item['email_responsavel'] ?? '',
-                    'dominio_franqueado' => $item['dominio_franqueado'] ?? '',
+                    'dominio_franqueado' => $item['dominio_franqueado'] ?? $ctx['dominio'],
                     'ip_franqueado' => $item['ip_franqueado'] ?? '',
                     'status_assinatura' => $item['status'] ?? 'ativa',
                     'data_vencimento' => $item['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days')),
@@ -608,16 +781,19 @@ class EvolutionApiService
         return [
             'instancia' => $nome,
             'criada_pelo_painel' => true,
+            'painel_id' => $ctx['painel_id'],
+            'painel_host' => $ctx['host'],
+            'isolamento_ativo' => true,
             'tipo' => 'configuracao_master',
             'tipo_label' => 'Instância Principal / Franqueado Local',
-            'licenciado_id' => null,
-            'chave_licenca' => $configInfo['chave_licenca'] ?? 'MASTER-FOCO7-OFICIAL',
+            'licenciado_id' => $ctx['licenciado_id_usuario'],
+            'chave_licenca' => $configInfo['chave_licenca'] ?? $ctx['chave_licenca'],
             'nome_franqueado' => $configInfo['nome_responsavel'] ?? 'Administrador / Franqueado',
-            'empresa_franqueado' => $configInfo['empresa_franqueado'] ?? 'Foco 7 Rastreamento',
+            'empresa_franqueado' => $configInfo['empresa_franqueado'] ?? $ctx['empresa'],
             'documento_franqueado' => $configInfo['documento_franqueado'] ?? '',
             'telefone_franqueado' => $configInfo['telefone_responsavel'] ?? '',
             'email_franqueado' => $configInfo['email_responsavel'] ?? '',
-            'dominio_franqueado' => $configInfo['dominio_franqueado'] ?? 'foco7.com.br',
+            'dominio_franqueado' => $configInfo['dominio_franqueado'] ?? $ctx['dominio'],
             'ip_franqueado' => '',
             'status_assinatura' => $configInfo['status'] ?? 'ativa',
             'data_vencimento' => $configInfo['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days')),
@@ -628,14 +804,19 @@ class EvolutionApiService
     }
 
     /**
-     * Atualiza as informações do Franqueado / Titular vinculado a uma instância do painel
+     * Atualiza as informações do Franqueado / Titular vinculado a uma instância deste painel
      */
     public static function atualizarDadosFranqueadoInstancia(string $nomeInstancia, array $dados): array
     {
+        $ctx = self::obterContextoPainelLocal();
         $nome = trim($nomeInstancia);
+        if (! self::instanciaPertenceAoPainelAtual($nome)) {
+            return self::obterInfoFranqueadoInstancia(self::getInstanceName());
+        }
+
         $instPrincipal = self::getInstanceName();
 
-        if (strtolower($nome) === strtolower($instPrincipal) || strtolower($nome) === 'foco7') {
+        if (strtolower($nome) === strtolower($instPrincipal) || (! $ctx['eh_painel_licenciado'] && strtolower($nome) === 'foco7')) {
             if (isset($dados['nome_franqueado'])) {
                 CmsSetting::set('evolution_master_nome_responsavel', trim((string) $dados['nome_franqueado']), 'whatsapp');
             }
@@ -663,8 +844,12 @@ class EvolutionApiService
         $atualizouExtra = false;
         foreach ($extras as &$item) {
             if (strtolower((string) ($item['nome'] ?? '')) === strtolower($nome)) {
-                if (isset($dados['licenciado_id']) && $dados['licenciado_id'] !== '') {
+                $item['painel_id'] = $ctx['painel_id'];
+                $item['painel_host'] = $ctx['host'];
+                if (! $ctx['eh_painel_licenciado'] && isset($dados['licenciado_id']) && $dados['licenciado_id'] !== '') {
                     $item['licenciado_id'] = (int) $dados['licenciado_id'];
+                } elseif (! empty($ctx['licenciado_id_usuario'])) {
+                    $item['licenciado_id'] = (int) $ctx['licenciado_id_usuario'];
                 }
                 if (isset($dados['tipo']) && ! empty($dados['tipo'])) {
                     $item['tipo'] = trim((string) $dados['tipo']);
@@ -826,6 +1011,7 @@ class EvolutionApiService
         ?string $statusInicial = null,
         array $dadosFranqueado = []
     ): array {
+        $ctx = self::obterContextoPainelLocal();
         $extras = self::getInstanciasExtras();
         $custo = self::getCustoInstanciaExtra();
 
@@ -849,14 +1035,17 @@ class EvolutionApiService
             'nome' => $nome,
             'token' => $token,
             'tipo' => $tipo, // 'propria_admin', 'empresa' ou 'licenciado'
-            'licenciado_id' => $licenciadoId,
+            'painel_id' => $ctx['painel_id'],
+            'painel_host' => $ctx['host'],
+            'criado_por_user_id' => $ctx['user_id'],
+            'licenciado_id' => $licenciadoId ?: $ctx['licenciado_id_usuario'],
             'nome_responsavel' => $nomeResponsavel,
-            'empresa_franqueado' => $dadosFranqueado['empresa_franqueado'] ?? $nomeResponsavel,
+            'empresa_franqueado' => $dadosFranqueado['empresa_franqueado'] ?? ($nomeResponsavel ?: $ctx['empresa']),
             'documento_franqueado' => $dadosFranqueado['documento_franqueado'] ?? '',
             'telefone_responsavel' => $telefoneResponsavel,
             'email_responsavel' => $emailResponsavel,
-            'dominio_franqueado' => $dadosFranqueado['dominio_franqueado'] ?? '',
-            'chave_licenca' => $dadosFranqueado['chave_licenca'] ?? '',
+            'dominio_franqueado' => $dadosFranqueado['dominio_franqueado'] ?? $ctx['dominio'],
+            'chave_licenca' => $dadosFranqueado['chave_licenca'] ?? ($ctx['eh_painel_licenciado'] ? $ctx['chave_licenca'] : ''),
             'hash_pagamento' => $hash,
             'valor_recorrente' => $custo,
             'data_vencimento' => $vencimentoInicial,
@@ -1945,6 +2134,9 @@ class EvolutionApiService
      */
     public static function resetarInstanciaNoServidorMantendoToken(string $instName, ?string $token = null): string
     {
+        if (! self::instanciaPertenceAoPainelAtual($instName)) {
+            return (string) ($token ?: '');
+        }
         $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
 
         // 1. Tenta logout e disconnect padrão
@@ -1975,6 +2167,15 @@ class EvolutionApiService
      */
     public static function desconectarInstanciaEspecifica(string $instName, ?string $token = null): array
     {
+        if (! self::instanciaPertenceAoPainelAtual($instName)) {
+            return [
+                'success' => false,
+                'instancia' => $instName,
+                'limpo' => false,
+                'error' => "Acesso negado: a instância '{$instName}' não pertence a este painel.",
+                'message' => "Acesso negado: a instância '{$instName}' não pertence a este painel.",
+            ];
+        }
         $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
 
         // 1. Limpa sessão e remove eventual JID órfão mantendo o mesmo nome e token da instância no Evolution Go
@@ -2007,26 +2208,53 @@ class EvolutionApiService
     }
 
     /**
-     * Retorna o nome da instância configurada
+     * Retorna o nome da instância configurada (com isolamento estrito para painéis de franqueados/licenciados)
      */
     public static function getInstanceName(): string
     {
+        $ctx = self::obterContextoPainelLocal();
         $name = trim((string) CmsSetting::get('evolution_instance', ''));
         if (empty($name) || str_contains($name, '•')) {
-            return 'foco7';
+            return $ctx['instancia_padrao_painel'];
+        }
+
+        // Isolamento Estrito: Um licenciado em seu próprio painel JAMAIS pode herdar ou usar a instância 'foco7' da matriz
+        if ($ctx['eh_painel_licenciado'] && strtolower($name) === 'foco7') {
+            $novoNome = $ctx['instancia_padrao_painel'];
+            CmsSetting::set('evolution_instance', $novoNome, 'whatsapp');
+
+            return $novoNome;
         }
 
         return $name;
     }
 
     /**
-     * Retorna o Token / API Key específico da instância (sincronizado com Evolution Go v3.0)
+     * Retorna o Token / API Key específico da instância (sincronizado com Evolution Go v3.0 e isolado por painel)
      */
     public static function getInstanceApiKey(): string
     {
+        $ctx = self::obterContextoPainelLocal();
         $key = trim((string) CmsSetting::get('evolution_apikey', ''));
+        $tokenMatrizFoco7 = 'b9cd5808-3500-40dd-8835-81ee016fa97b';
+
         if (empty($key) || str_contains($key, '•') || $key === '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') {
-            return 'b9cd5808-3500-40dd-8835-81ee016fa97b';
+            if ($ctx['eh_painel_licenciado']) {
+                $novaKey = (string) Str::uuid();
+                CmsSetting::set('evolution_apikey', $novaKey, 'whatsapp');
+
+                return $novaKey;
+            }
+
+            return $tokenMatrizFoco7;
+        }
+
+        // Isolamento Estrito: Um licenciado em seu próprio painel jamais compartilha o token da matriz
+        if ($ctx['eh_painel_licenciado'] && $key === $tokenMatrizFoco7) {
+            $novaKey = (string) Str::uuid();
+            CmsSetting::set('evolution_apikey', $novaKey, 'whatsapp');
+
+            return $novaKey;
         }
 
         return $key;
@@ -2282,7 +2510,7 @@ class EvolutionApiService
     // =========================================================================
 
     /**
-     * Cria uma nova instância na Evolution API Go v3.0
+     * Cria uma nova instância na Evolution API Go v3.0 com proteção contra colisão entre franqueados
      * Endpoint oficial Swagger: POST /instance/create
      */
     public static function criarInstancia(?string $nome = null, ?string $token = null, array $advancedSettings = []): array
@@ -2297,11 +2525,22 @@ class EvolutionApiService
 
         $res = self::request('POST', 'instance/create', $payload, true);
 
-        // Se a instância já existir no servidor, recupera os dados reais dela e trata graciosamente como sucesso
+        // Se a instância já existir no servidor:
+        // ISOLAMENTO ESTRITO: Só reaproveita se a instância pertencer comprovadamente a ESTE painel!
+        // Se pertencer a outro franqueado/sistema no cluster, rejeita para impedir vazamento de sessão!
         if (! $res['success']) {
             $err = strtolower($res['error'] ?? '');
             if (str_contains($err, 'already exists') || str_contains($err, 'já existe') || str_contains($err, 'in use') || str_contains($err, 'duplicate')) {
-                Log::info("Evolution API: Instância '{$instance}' já existia no servidor.");
+                if (! self::instanciaPertenceAoPainelAtual($instance)) {
+                    return [
+                        'success' => false,
+                        'status' => 409,
+                        'error' => "O identificador de instância '{$instance}' já está reservado por outra unidade no servidor. Escolha um nome exclusivo para sua unidade franqueada.",
+                        'data' => null,
+                    ];
+                }
+
+                Log::info("Evolution API: Instância '{$instance}' deste painel já existia no servidor.");
                 $tokenReal = self::obterTokenParaInstancia($instance);
 
                 return [
@@ -2341,12 +2580,20 @@ class EvolutionApiService
     }
 
     /**
-     * Obtém informações detalhadas de uma instância
+     * Obtém informações detalhadas de uma instância (somente se pertencer ao painel atual)
      * Endpoint Swagger Evolution Go: GET /instance/info/{instanceId} (exige UUID)
      */
     public static function obterInfoInstancia(?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
+        if (! self::instanciaPertenceAoPainelAtual($inst)) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'error' => 'Acesso negado: esta instância não pertence ao seu painel.',
+                'data' => null,
+            ];
+        }
         $uuid = self::obterUuidInstancia($inst) ?: $inst;
 
         $res = self::request('GET', "instance/info/{$uuid}", [], true);
@@ -2358,12 +2605,20 @@ class EvolutionApiService
     }
 
     /**
-     * Deleta permanentemente uma instância da Evolution API
+     * Deleta permanentemente uma instância da Evolution API (somente se pertencer ao painel atual)
      * Endpoint Swagger Evolution Go: DELETE /instance/delete/{instanceId} (exige UUID)
      */
     public static function deletarInstancia(?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
+        if (! self::instanciaPertenceAoPainelAtual($inst)) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'error' => 'Acesso negado: você só pode excluir instâncias criadas no seu próprio painel.',
+                'data' => null,
+            ];
+        }
         $uuid = self::obterUuidInstancia($inst) ?: $inst;
 
         return self::request('DELETE', "instance/delete/{$uuid}", [], true);
@@ -2375,6 +2630,14 @@ class EvolutionApiService
     public static function forcarReconexao(?string $numero = null, ?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
+        if (! self::instanciaPertenceAoPainelAtual($inst)) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'error' => 'Acesso negado: esta instância não pertence ao seu painel.',
+                'data' => null,
+            ];
+        }
         $tok = self::obterTokenParaInstancia($inst);
         $payload = [
             'phone' => $numero ? self::formatarNumeroWhatsapp($numero) : '',
@@ -2391,14 +2654,15 @@ class EvolutionApiService
     // =========================================================================
 
     /**
-     * Sincroniza e recupera automaticamente o token correto da instância diretamente do servidor Evolution API via Global API Key
+     * Sincroniza e recupera automaticamente o token correto da instância diretamente do servidor Evolution API via Global API Key,
+     * respeitando estritamente a propriedade da instância pelo painel atual.
      */
     public static function sincronizarTokenInstancia(?string $instanceName = null): ?string
     {
         $instName = $instanceName ?: self::getInstanceName();
         $globalKey = self::getGlobalApiKey();
 
-        if (empty($globalKey) || empty($instName)) {
+        if (empty($globalKey) || empty($instName) || ! self::instanciaPertenceAoPainelAtual($instName)) {
             return null;
         }
 
@@ -2435,6 +2699,18 @@ class EvolutionApiService
     public static function conectar(?string $webhookUrl = null, array $subscribe = ['ALL'], bool $forcarNovoQr = false, ?string $telefone = null, ?string $instanceOverride = null): array
     {
         $instName = ! empty($instanceOverride) ? trim($instanceOverride) : self::getInstanceName();
+
+        // Isolamento Estrito: impede conectar qualquer instância que não pertença ao painel atual
+        if (! self::instanciaPertenceAoPainelAtual($instName)) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'conectado' => false,
+                'instancia' => $instName,
+                'error' => 'Acesso negado: esta instância não pertence ao seu painel.',
+                'message' => 'Acesso negado: você só pode conectar instâncias criadas no seu próprio painel.',
+            ];
+        }
 
         // Se o usuário selecionou conectar uma instância específica, sincroniza como ativa se for a principal
         $tokenReal = self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName);
@@ -2715,6 +2991,13 @@ class EvolutionApiService
     public static function obterQrCode(?string $instance = null, ?string $token = null): array
     {
         $instName = $instance ?: self::getInstanceName();
+        if (! self::instanciaPertenceAoPainelAtual($instName)) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'error' => "Acesso negado: a instância '{$instName}' não pertence a este painel.",
+            ];
+        }
         $tok = $token ?: self::obterTokenParaInstancia($instName);
 
         // 1. Tenta GET /instance/qr (padrão oficial Swagger Evolution Go v3.0)
@@ -2791,6 +3074,13 @@ class EvolutionApiService
         }
 
         $inst = $instance ?: self::getInstanceName();
+        if (! self::instanciaPertenceAoPainelAtual($inst)) {
+            return [
+                'success' => false,
+                'error' => "Acesso negado: a instância '{$inst}' não pertence a este painel.",
+                'message' => "Acesso negado: a instância '{$inst}' não pertence a este painel.",
+            ];
+        }
         $tok = $tokenOverride ?: (self::sincronizarTokenInstancia($inst) ?: self::obterTokenParaInstancia($inst));
         $eventos = ['MESSAGE', 'SEND_MESSAGE', 'CONNECTION', 'QRCODE'];
 

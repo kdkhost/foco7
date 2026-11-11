@@ -44,16 +44,15 @@ class WhatsappCobrancaController extends Controller
     public function index()
     {
         $devUnlocked = $this->isMasterUnlocked();
+        $contextoPainel = EvolutionApiService::obterContextoPainelLocal();
 
         $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
         $rawGlobalKey = (string) CmsSetting::get('evolution_global_apikey');
-        $rawInstance = (string) CmsSetting::get('evolution_instance');
-        $rawApiKey = (string) CmsSetting::get('evolution_apikey');
 
         $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://api.kdkhost.com.br';
         $realGlobalKey = (! empty($rawGlobalKey) && ! str_contains($rawGlobalKey, '•')) ? $rawGlobalKey : EvolutionApiService::getGlobalApiKey();
-        $realInstance = (! empty($rawInstance) && ! str_contains($rawInstance, '•')) ? $rawInstance : 'foco7';
-        $realApiKey = (! empty($rawApiKey) && ! str_contains($rawApiKey, '•') && $rawApiKey !== '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') ? $rawApiKey : 'b9cd5808-3500-40dd-8835-81ee016fa97b';
+        $realInstance = EvolutionApiService::getInstanceName();
+        $realApiKey = EvolutionApiService::getInstanceApiKey();
 
         // Garante que se ainda não foram persistidos no banco ou estavam com tarjas, sejam gravados com a URL oficial da Evolution Go
         if (empty($rawApiUrl) || $rawApiUrl === 'http://localhost:8080' || str_contains($rawApiUrl, '•')) {
@@ -61,12 +60,6 @@ class WhatsappCobrancaController extends Controller
         }
         if (empty($rawGlobalKey) || str_contains($rawGlobalKey, '•')) {
             CmsSetting::set('evolution_global_apikey', $realGlobalKey, 'whatsapp');
-        }
-        if (empty($rawInstance) || str_contains($rawInstance, '•')) {
-            CmsSetting::set('evolution_instance', $realInstance, 'whatsapp');
-        }
-        if (empty($rawApiKey) || str_contains($rawApiKey, '•') || $rawApiKey === '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') {
-            CmsSetting::set('evolution_apikey', $realApiKey, 'whatsapp');
         }
 
         $configs = [
@@ -117,7 +110,11 @@ class WhatsappCobrancaController extends Controller
             $statusCache = CmsSetting::get('evolution_status_cache', 'desconectado');
         }
 
-        $numeroConectado = CmsSetting::get('evolution_connected_number', '5521981900390:35');
+        $numeroConectado = (string) CmsSetting::get('evolution_connected_number', '');
+        if ($contextoPainel['eh_painel_licenciado'] && $numeroConectado === '5521981900390:35') {
+            $numeroConectado = '';
+            CmsSetting::set('evolution_connected_number', '', 'whatsapp');
+        }
         $ultimoEvento = CmsSetting::get('evolution_last_connection_event', null);
         $webhookUrl = url('/webhook/evolution');
 
@@ -181,9 +178,15 @@ class WhatsappCobrancaController extends Controller
         $configs['dev_mp_webhook_secret'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoWebhookSecret() : '••••••••••••••••••••••••••••••••';
         $configs['dev_mp_beneficiario'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoBeneficiario() : '••••••••••••••••••••••••';
 
+        // ISOLAMENTO ESTRITO: Apenas o painel matriz com Senha Master desbloqueada pode listar outras licenças;
+        // um licenciado (franqueado) NUNCA vê dados de outros franqueados.
         $licenciados = collect();
         try {
-            $licenciados = Licenca::with('user')->latest()->get();
+            if (! $contextoPainel['eh_painel_licenciado'] && $devUnlocked) {
+                $licenciados = Licenca::with('user')->latest()->get();
+            } elseif (! empty($contextoPainel['licenciado_id_usuario'])) {
+                $licenciados = Licenca::with('user')->where('id', (int) $contextoPainel['licenciado_id_usuario'])->get();
+            }
         } catch (\Throwable $e) {
         }
 
@@ -207,7 +210,8 @@ class WhatsappCobrancaController extends Controller
             'instanciasVencidas',
             'instanciasSuspensas',
             'licenciados',
-            'franqueadoAtivoInfo'
+            'franqueadoAtivoInfo',
+            'contextoPainel'
         ));
     }
 
@@ -228,9 +232,8 @@ class WhatsappCobrancaController extends Controller
             $rawApiUrl = (string) CmsSetting::get('evolution_api_url');
             $realApiUrl = (! empty($rawApiUrl) && $rawApiUrl !== 'http://localhost:8080' && ! str_contains($rawApiUrl, '•')) ? $rawApiUrl : 'https://api.kdkhost.com.br';
             $realGlobalKey = (! empty(CmsSetting::get('evolution_global_apikey')) && ! str_contains(CmsSetting::get('evolution_global_apikey'), '•')) ? CmsSetting::get('evolution_global_apikey') : EvolutionApiService::getGlobalApiKey();
-            $realInstance = (! empty(CmsSetting::get('evolution_instance')) && ! str_contains(CmsSetting::get('evolution_instance'), '•')) ? CmsSetting::get('evolution_instance') : 'foco7';
-            $rawKey = (string) CmsSetting::get('evolution_apikey');
-            $realApiKey = (! empty($rawKey) && ! str_contains($rawKey, '•') && $rawKey !== '8|dZL05XOD8uKOfBasILJhMfKQrexshwV1q63cZsU976d9eba7') ? $rawKey : 'b9cd5808-3500-40dd-8835-81ee016fa97b';
+            $realInstance = EvolutionApiService::getInstanceName();
+            $realApiKey = EvolutionApiService::getInstanceApiKey();
             $realPixEmail = EvolutionApiService::getPixEmailRecorrencia();
             $realMpToken = EvolutionApiService::getMercadoPagoAccessTokenParaInstancias();
 
@@ -496,6 +499,14 @@ class WhatsappCobrancaController extends Controller
         $telefone = trim((string) $request->input('telefone', ''));
         $instanciaReq = trim((string) $request->input('instancia', ''));
 
+        if (! empty($instanciaReq) && ! EvolutionApiService::instanciaPertenceAoPainelAtual($instanciaReq)) {
+            return response()->json([
+                'success' => false,
+                'conectado' => false,
+                'message' => "Acesso negado: a instância '{$instanciaReq}' não pertence a este painel.",
+            ], 403);
+        }
+
         $res = EvolutionApiService::conectar(
             url('/webhook/evolution'),
             ['ALL'],
@@ -757,8 +768,9 @@ class WhatsappCobrancaController extends Controller
             ], 422);
         }
 
-        $instanciaPrincipal = (string) CmsSetting::get('evolution_instance', 'foco7');
-        $isConfigInstance = (strtolower($nome) === strtolower($instanciaPrincipal) || strtolower($nome) === 'foco7');
+        $instanciaPrincipal = EvolutionApiService::getInstanceName();
+        $ctx = EvolutionApiService::obterContextoPainelLocal();
+        $isConfigInstance = (strtolower($nome) === strtolower($instanciaPrincipal) || (! $ctx['eh_painel_licenciado'] && strtolower($nome) === 'foco7'));
 
         $token = trim((string) $request->input('token', ''));
         if (empty($token) || str_contains($token, '•')) {
@@ -871,6 +883,14 @@ class WhatsappCobrancaController extends Controller
      */
     public function obterDadosFranqueadoInstancia(string $nome)
     {
+        $nome = trim($nome);
+        if (! EvolutionApiService::instanciaPertenceAoPainelAtual($nome)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Acesso negado: a instância '{$nome}' não pertence a este painel.",
+            ], 403);
+        }
+
         return response()->json([
             'success' => true,
             'instancia' => $nome,
@@ -889,6 +909,12 @@ class WhatsappCobrancaController extends Controller
                 'success' => false,
                 'message' => 'Informe o nome da instância para atualizar os dados do franqueado.',
             ], 422);
+        }
+        if (! EvolutionApiService::instanciaPertenceAoPainelAtual($nome)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Acesso negado: a instância '{$nome}' não pertence a este painel.",
+            ], 403);
         }
 
         $info = EvolutionApiService::atualizarDadosFranqueadoInstancia($nome, [
