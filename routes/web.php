@@ -240,6 +240,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/bloquear-seguranca', [WhatsappCobrancaController::class, 'bloquearSeguranca'])->name('admin.whatsapp.bloquear_seguranca');
         Route::get('/status', [WhatsappCobrancaController::class, 'status'])->name('admin.whatsapp.status');
         Route::post('/conectar', [WhatsappCobrancaController::class, 'conectar'])->name('admin.whatsapp.conectar');
+        Route::post('/parear-numero', [WhatsappCobrancaController::class, 'parearNumero'])->name('admin.whatsapp.parear_numero');
         Route::get('/qr', [WhatsappCobrancaController::class, 'obterQrCode'])->name('admin.whatsapp.qr');
         Route::post('/desconectar', [WhatsappCobrancaController::class, 'desconectar'])->name('admin.whatsapp.desconectar');
         Route::post('/reconectar', [WhatsappCobrancaController::class, 'reconectar'])->name('admin.whatsapp.reconectar');

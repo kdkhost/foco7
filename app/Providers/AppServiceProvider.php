@@ -22,9 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (app()->runningInConsole() && file_exists(base_path('test_api.php'))) {
-            include base_path('test_api.php');
-        }
         Paginator::useBootstrapFive();
         View::composer(['admin.*', 'cliente.*', 'site.*', 'errors.*'], function ($view) {
             $corPrimaria = CmsSetting::get('cor_primaria', '#d90000');

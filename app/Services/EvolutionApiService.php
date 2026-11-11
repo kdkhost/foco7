@@ -1539,17 +1539,65 @@ class EvolutionApiService
     }
 
     /**
-     * Desconecta uma instância específica
+     * Limpa completamente todos os dados locais em cache de uma instância (status, número conectado, QR code e sessão)
+     */
+    public static function limparDadosInstanciaLocal(?string $instName = null): void
+    {
+        $inst = $instName ?: self::getInstanceName();
+
+        if (strtolower($inst) === strtolower(self::getInstanceName())) {
+            CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+            CmsSetting::set('evolution_connected_number', '', 'whatsapp');
+            CmsSetting::set('evolution_last_qrcode', '', 'whatsapp');
+            CmsSetting::set('evolution_last_connection_event', '', 'whatsapp');
+        }
+
+        $extras = self::getInstanciasExtras();
+        $alterou = false;
+        foreach ($extras as &$item) {
+            if (strtolower((string) ($item['nome'] ?? '')) === strtolower($inst)) {
+                $item['conectado'] = false;
+                $item['status_conexao'] = 'desconectado';
+                $item['owner'] = '';
+                $item['jid'] = '';
+                $item['qrcode'] = '';
+                $alterou = true;
+            }
+        }
+        if ($alterou) {
+            CmsSetting::set('evolution_instancias_extras', $extras, 'whatsapp', 'json');
+        }
+    }
+
+    /**
+     * Desconecta e limpa toda a sessão de uma instância específica no servidor Evolution Go e no sistema local
      */
     public static function desconectarInstanciaEspecifica(string $instName, ?string $token = null): array
     {
-        $tok = $token ?: self::obterTokenParaInstancia($instName);
-        $res = self::request('POST', 'instance/disconnect', ['instance' => $instName], false, 10, $tok);
-        if (! $res['success']) {
-            return self::request('POST', "instance/disconnect/{$instName}", [], false, 10, $tok);
+        $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
+
+        // 1. Executa DELETE /instance/logout para apagar a sessão vinculada e limpar o JID no Evolution Go
+        $resLogout = self::request('DELETE', 'instance/logout', ['instance' => $instName], false, 12, $tok);
+        if (! $resLogout['success']) {
+            self::request('DELETE', "instance/logout/{$instName}", [], false, 10, $tok);
         }
 
-        return $res;
+        // 2. Executa POST /instance/disconnect para encerrar o socket ativo
+        $resDisc = self::request('POST', 'instance/disconnect', ['instance' => $instName], false, 12, $tok);
+        if (! $resDisc['success']) {
+            self::request('POST', "instance/disconnect/{$instName}", [], false, 10, $tok);
+        }
+
+        // 3. Limpa todos os dados locais da instância
+        self::limparDadosInstanciaLocal($instName);
+
+        return [
+            'success' => true,
+            'instancia' => $instName,
+            'limpo' => true,
+            'message' => "Instância '{$instName}' desconectada e todos os dados da sessão foram limpos com sucesso.",
+            'data' => $resLogout['data'] ?? ($resDisc['data'] ?? []),
+        ];
     }
 
     /**
@@ -1988,76 +2036,141 @@ class EvolutionApiService
     }
 
     /**
-     * Inicia a conexão da instância e configura o webhook se fornecido (com Auto-Recuperação e Criação Inteligente)
-     * Endpoint oficial Swagger Evolution Go: POST /instance/connect
+     * Inicia a conexão da instância, gera o QR Code imediatamente ou código de pareamento por número
+     * Endpoint oficial Swagger Evolution Go: POST /instance/connect + GET /instance/qr
      */
-    public static function conectar(?string $webhookUrl = null, array $subscribe = ['ALL']): array
+    public static function conectar(?string $webhookUrl = null, array $subscribe = ['ALL'], bool $forcarNovoQr = false, ?string $telefone = null, ?string $instanceOverride = null): array
     {
-        $instName = self::getInstanceName();
+        $instName = ! empty($instanceOverride) ? trim($instanceOverride) : self::getInstanceName();
 
-        // 0. Verifica em tempo real se a instância já está conectada no cluster Evolution Go
-        $statusAtual = self::obterStatus();
-        if ($statusAtual['success'] && ($statusAtual['conectado'] ?? false)) {
-            return [
-                'success' => true,
-                'conectado' => true,
-                'status' => 200,
-                'message' => "A instância '{$instName}' já está conectada e operando normalmente no cluster!",
-                'data' => $statusAtual['data'] ?? [],
-                'owner' => $statusAtual['owner'] ?? null,
-            ];
+        // Se o usuário selecionou conectar uma instância específica, sincroniza como ativa se for a principal
+        $tokenReal = self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName);
+
+        // Se foi solicitado forçar novo QR Code (ex: após desconectar ou clicar em Recarregar QR Code), limpa sessão antes
+        if ($forcarNovoQr) {
+            self::desconectarInstanciaEspecifica($instName, $tokenReal);
+            usleep(400000);
+        } else {
+            // Verifica em tempo real se a instância já está conectada no cluster Evolution Go
+            $statusAtual = (strtolower($instName) === strtolower(self::getInstanceName()))
+                ? self::obterStatus()
+                : self::obterStatusInstancia($instName, $tokenReal);
+
+            if ($statusAtual['success'] && ($statusAtual['conectado'] ?? false)) {
+                return [
+                    'success' => true,
+                    'conectado' => true,
+                    'status' => 200,
+                    'instancia' => $instName,
+                    'message' => "A instância '{$instName}' já está conectada e operando normalmente no cluster!",
+                    'data' => $statusAtual['data'] ?? [],
+                    'owner' => $statusAtual['owner'] ?? null,
+                ];
+            }
         }
-
-        // Garante que o token local está sincronizado com o cluster antes de conectar
-        $tokenReal = self::sincronizarTokenInstancia($instName) ?: self::getInstanceApiKey();
 
         $webhook = $webhookUrl ?: url('/webhook/evolution');
         $eventos = (! empty($subscribe) && $subscribe !== ['ALL'])
             ? $subscribe
             : ['MESSAGE', 'SEND_MESSAGE', 'READ_RECEIPT', 'PRESENCE', 'HISTORY_SYNC', 'CHAT_PRESENCE', 'CALL', 'CONNECTION', 'LABEL', 'CONTACT', 'GROUP', 'NEWSLETTER', 'QRCODE'];
 
+        $numFormatado = ! empty($telefone) ? self::formatarNumeroWhatsapp($telefone) : '';
+
         $payload = [
-            'phone' => '',
-            'immediate' => true,
+            'phone' => $numFormatado,
+            'immediate' => false,
             'webhookUrl' => $webhook,
             'subscribe' => $eventos,
         ];
 
         // 1. POST /instance/connect (Swagger Evolution Go v3.0)
-        $res = self::request('POST', 'instance/connect', $payload, false, 25, $tokenReal);
-        if ($res['success']) {
-            // Tenta buscar o QR Code imediatamente após iniciar a sessão
-            $qrRes = self::obterQrCode();
-            if ($qrRes['success'] && ! empty($qrRes['qrcode'])) {
-                $res['data']['qrcode'] = ['base64' => $qrRes['qrcode']];
-                $res['data']['base64'] = $qrRes['qrcode'];
-            }
+        $res = self::request('POST', 'instance/connect', $payload, false, 20, $tokenReal);
 
-            return $res;
-        }
-
-        // 2. Se a instância ainda não existe no servidor, cria-a via POST /instance/create
-        $createRes = self::criarInstancia($instName, $tokenReal);
-        if ($createRes['success']) {
-            $createData = $createRes['data'] ?? [];
-            $novoToken = $createData['token'] ?? ($createData['data']['token'] ?? ($createData['instance']['token'] ?? $tokenReal));
-            if (! empty($novoToken)) {
-                CmsSetting::set('evolution_apikey', $novoToken, 'whatsapp');
-            }
-
-            $retryConnect = self::request('POST', 'instance/connect', $payload, false, 25, $novoToken);
-            $qrRes = self::obterQrCode();
-            if ($qrRes['success'] && ! empty($qrRes['qrcode'])) {
-                $retryConnect['data']['qrcode'] = ['base64' => $qrRes['qrcode']];
-                $retryConnect['data']['base64'] = $qrRes['qrcode'];
-            }
-
-            if ($retryConnect['success']) {
-                return $retryConnect;
+        // 2. Se a instância ainda não existe no servidor, cria-a via POST /instance/create e conecta em seguida
+        if (! $res['success']) {
+            $createRes = self::criarInstancia($instName, $tokenReal);
+            if ($createRes['success']) {
+                $createData = $createRes['data'] ?? [];
+                $novoToken = $createData['token'] ?? ($createData['data']['token'] ?? ($createData['instance']['token'] ?? $tokenReal));
+                if (! empty($novoToken)) {
+                    $tokenReal = (string) $novoToken;
+                    if (strtolower($instName) === strtolower(self::getInstanceName())) {
+                        CmsSetting::set('evolution_apikey', $tokenReal, 'whatsapp');
+                    }
+                }
+                $res = self::request('POST', 'instance/connect', $payload, false, 20, $tokenReal);
             }
         }
+
+        // 3. Aguarda o whatsmeow gerar o QR Code e faz até 4 tentativas rápidas (650ms) em GET /instance/qr
+        $qrcode = self::obterQrCodeComRetry($instName, $tokenReal, 4, 650000);
+
+        // 4. Se ainda não gerou QR Code (ex: sessão anterior presa no whatsmeow), limpa com DELETE /instance/logout e reconecta!
+        if (empty($qrcode)) {
+            self::request('DELETE', 'instance/logout', [], false, 10, $tokenReal);
+            self::request('POST', 'instance/disconnect', [], false, 10, $tokenReal);
+            usleep(400000);
+            $res = self::request('POST', 'instance/connect', $payload, false, 20, $tokenReal);
+            $qrcode = self::obterQrCodeComRetry($instName, $tokenReal, 4, 700000);
+        }
+
+        // 5. Se o usuário informou número de telefone para conectar, solicita também o Pairing Code de 8 dígitos
+        $pairingCode = null;
+        if (! empty($numFormatado)) {
+            $pairRes = self::solicitarPairingCode($numFormatado, $instName, $tokenReal, false);
+            $pairingCode = $pairRes['pairing_code'] ?? null;
+        }
+
+        if (! is_array($res['data'] ?? null)) {
+            $res['data'] = [];
+        }
+
+        if (! empty($qrcode)) {
+            $res['success'] = true;
+            $res['qrcode'] = $qrcode;
+            $res['data']['qrcode'] = ['base64' => $qrcode];
+            $res['data']['base64'] = $qrcode;
+            CmsSetting::set('evolution_last_qrcode', $qrcode, 'whatsapp');
+        }
+
+        if (! empty($pairingCode)) {
+            $res['success'] = true;
+            $res['pairing_code'] = $pairingCode;
+            $res['data']['pairingCode'] = $pairingCode;
+        }
+
+        $res['instancia'] = $instName;
+        $res['token'] = $tokenReal;
 
         return $res;
+    }
+
+    /**
+     * Busca o QR Code com múltiplas tentativas rápidas após o /instance/connect (aguarda geração assíncrona do whatsmeow)
+     */
+    public static function obterQrCodeComRetry(?string $instName = null, ?string $token = null, int $tentativas = 4, int $sleepMicros = 650000): ?string
+    {
+        $inst = $instName ?: self::getInstanceName();
+        $tok = $token ?: self::obterTokenParaInstancia($inst);
+
+        for ($i = 0; $i < $tentativas; $i++) {
+            if ($i > 0 || $tentativas > 1) {
+                usleep($sleepMicros);
+            }
+
+            $qrRes = self::obterQrCode($inst, $tok);
+            $qr = $qrRes['qrcode']
+                ?? ($qrRes['data']['qrcode']['base64']
+                ?? ($qrRes['data']['base64']
+                ?? ($qrRes['data']['Qrcode']
+                ?? ($qrRes['data']['data']['Qrcode'] ?? null))));
+
+            if (is_string($qr) && ! empty($qr)) {
+                return $qr;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -2191,12 +2304,13 @@ class EvolutionApiService
      * Retorna o QR Code atual para autenticação
      * Endpoint oficial Swagger Evolution Go: GET /instance/qr
      */
-    public static function obterQrCode(): array
+    public static function obterQrCode(?string $instance = null, ?string $token = null): array
     {
-        $instName = self::getInstanceName();
+        $instName = $instance ?: self::getInstanceName();
+        $tok = $token ?: self::obterTokenParaInstancia($instName);
 
         // 1. Tenta GET /instance/qr (padrão oficial Swagger Evolution Go v3.0)
-        $res = self::request('GET', 'instance/qr', [], false, 15);
+        $res = self::request('GET', 'instance/qr', [], false, 15, $tok);
         if ($res['success']) {
             $d = $res['data']['data'] ?? ($res['data'] ?? []);
             $qr = $d['Qrcode'] ?? ($d['qrcode']['base64'] ?? ($d['qrcode'] ?? ($d['base64'] ?? null)));
@@ -2204,6 +2318,7 @@ class EvolutionApiService
                 $res['qrcode'] = $qr;
                 $res['data']['base64'] = $qr;
                 $res['data']['qrcode'] = ['base64' => $qr];
+                $res['code'] = $d['Code'] ?? ($d['code'] ?? null);
 
                 return $res;
             }
@@ -2245,48 +2360,92 @@ class EvolutionApiService
     }
 
     /**
-     * Solicita código de pareamento numérico (Pairing Code de 8 dígitos)
+     * Solicita código de pareamento numérico (Pairing Code de 8 dígitos) para conectar pelo número de telefone
      * Endpoint oficial Swagger Evolution Go: POST /instance/pair
      */
-    public static function solicitarPairingCode(string $telefone, ?string $instance = null): array
+    public static function solicitarPairingCode(string $telefone, ?string $instance = null, ?string $tokenOverride = null, bool $garantirConnect = true): array
     {
         $num = self::formatarNumeroWhatsapp($telefone);
-        if (empty($num)) {
-            return ['success' => false, 'error' => 'Número de telefone inválido para pareamento.'];
+        if (empty($num) || strlen($num) < 10) {
+            return [
+                'success' => false,
+                'error' => 'Número de telefone inválido. Digite o número com DDD (ex: 21981900390).',
+                'message' => 'Número de telefone inválido. Digite o número com DDD (ex: 21981900390).',
+            ];
         }
 
         $inst = $instance ?: self::getInstanceName();
-        $tok = self::obterTokenParaInstancia($inst);
+        $tok = $tokenOverride ?: (self::sincronizarTokenInstancia($inst) ?: self::obterTokenParaInstancia($inst));
+        $eventos = ['MESSAGE', 'SEND_MESSAGE', 'CONNECTION', 'QRCODE'];
+
+        // 1. Garante que o socket da instância está aberto para pareamento na Evolution Go
+        if ($garantirConnect) {
+            self::request('POST', 'instance/connect', [
+                'phone' => $num,
+                'immediate' => false,
+                'webhookUrl' => url('/webhook/evolution'),
+                'subscribe' => $eventos,
+            ], false, 15, $tok);
+            usleep(600000);
+        }
 
         $payload = [
             'phone' => $num,
-            'number' => $num,
-            'subscribe' => ['MESSAGE', 'SEND_MESSAGE', 'CONNECTION', 'QRCODE'],
+            'subscribe' => $eventos,
         ];
 
+        // 2. Chama POST /instance/pair
         $res = self::request('POST', 'instance/pair', $payload, false, 20, $tok);
-        if ($res['success'] && isset($res['data']['data']) && is_array($res['data']['data'])) {
-            $res['data'] = array_merge($res['data'], $res['data']['data']);
+
+        // Se falhou porque havia uma sessão antiga travada, limpa com logout, reconecta e pede o código novamente
+        if (! $res['success']) {
+            self::request('DELETE', 'instance/logout', [], false, 10, $tok);
+            self::request('POST', 'instance/disconnect', [], false, 10, $tok);
+            usleep(400000);
+            self::request('POST', 'instance/connect', [
+                'phone' => $num,
+                'immediate' => false,
+                'webhookUrl' => url('/webhook/evolution'),
+                'subscribe' => $eventos,
+            ], false, 15, $tok);
+            usleep(700000);
+            $res = self::request('POST', 'instance/pair', $payload, false, 20, $tok);
         }
 
-        return $res;
+        if ($res['success']) {
+            $d = $res['data']['data'] ?? ($res['data'] ?? []);
+            $code = $d['PairingCode'] ?? ($d['pairingCode'] ?? ($d['code'] ?? null));
+            if (! empty($code)) {
+                return [
+                    'success' => true,
+                    'pairing_code' => (string) $code,
+                    'telefone_formatado' => $num,
+                    'instancia' => $inst,
+                    'message' => "Código de pareamento gerado para {$num}: {$code}. Digite este código no seu WhatsApp em Aparelhos Conectados!",
+                    'data' => $d,
+                ];
+            }
+        }
+
+        return [
+            'success' => false,
+            'instancia' => $inst,
+            'telefone_formatado' => $num,
+            'error' => $res['error'] ?? 'Não foi possível gerar o código de pareamento para este número.',
+            'message' => $res['error'] ?? 'Não foi possível gerar o código de pareamento para este número.',
+            'data' => $res['data'] ?? null,
+        ];
     }
 
     /**
-     * Desconecta a instância temporariamente
-     * Endpoint oficial Swagger Evolution Go: POST /instance/disconnect
+     * Desconecta a instância e limpa todos os dados da sessão (Logout completo + Disconnect + Limpeza Local)
+     * Endpoint oficial Swagger Evolution Go: DELETE /instance/logout + POST /instance/disconnect
      */
     public static function desconectar(?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
-        $tok = self::obterTokenParaInstancia($inst);
 
-        $res = self::request('POST', 'instance/disconnect', [], false, 15, $tok);
-        if ($res['success']) {
-            return $res;
-        }
-
-        return self::request('DELETE', 'instance/logout', [], false, 15, $tok);
+        return self::desconectarInstanciaEspecifica($inst);
     }
 
     /**
@@ -2299,7 +2458,7 @@ class EvolutionApiService
         $tok = self::obterTokenParaInstancia($inst);
 
         $payload = [
-            'immediate' => true,
+            'immediate' => false,
             'webhookUrl' => url('/webhook/evolution'),
             'subscribe' => ['MESSAGE', 'SEND_MESSAGE', 'CONNECTION', 'QRCODE', 'READ_RECEIPT'],
         ];
@@ -2308,20 +2467,14 @@ class EvolutionApiService
     }
 
     /**
-     * Faz logout da instância (remove a sessão do WhatsApp)
+     * Faz logout da instância (remove a sessão do WhatsApp e limpa todos os dados locais)
      * Endpoint oficial Swagger Evolution Go: DELETE /instance/logout
      */
     public static function logout(?string $instance = null): array
     {
         $inst = $instance ?: self::getInstanceName();
-        $tok = self::obterTokenParaInstancia($inst);
 
-        $res = self::request('DELETE', 'instance/logout', [], false, 15, $tok);
-        if ($res['success']) {
-            return $res;
-        }
-
-        return self::request('POST', 'instance/disconnect', [], false, 15, $tok);
+        return self::desconectarInstanciaEspecifica($inst);
     }
 
     // =========================================================================

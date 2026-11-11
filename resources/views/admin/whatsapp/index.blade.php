@@ -829,9 +829,7 @@
                                                         <span class="{{ $statusCache === 'conectado' ? 'pulse-online' : 'pulse-offline' }} me-1" id="pulseStatusPrincipalTabela"></span>
                                                         <span id="txtStatusPrincipalTabela">{{ $statusCache === 'conectado' ? 'Conectado' : ucfirst($statusCache) }}</span>
                                                     </span>
-                                                    @if(!empty($numeroConectado))
-                                                        <small class="text-secondary d-block mt-1 font-monospace" id="txtOwnerPrincipalTabela">{{ $numeroConectado }}</small>
-                                                    @endif
+                                                    <small class="text-secondary d-block mt-1 font-monospace {{ empty($numeroConectado) ? 'd-none' : '' }}" id="txtOwnerPrincipalTabela">{{ $numeroConectado }}</small>
                                                 </td>
                                                 <td class="text-end">
                                                     <div class="btn-group btn-group-sm">
@@ -853,8 +851,11 @@
                                                                 <i class="fas fa-pause"></i>
                                                             </button>
                                                         @endif
-                                                        <button type="button" class="btn btn-outline-success fw-semibold" onclick="conectarEabrirQr()" title="Gerar ou visualizar QR Code">
-                                                            <i class="fas fa-qrcode me-1"></i> QR Code
+                                                        <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $nomeInstConfig }}')" title="Conectar via QR Code ou Número de Telefone">
+                                                            <i class="fas fa-qrcode me-1"></i> Conectar
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $nomeInstConfig }}')" title="Desconectar aparelho e limpar tudo desta instância">
+                                                            <i class="fas fa-power-off"></i>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -924,6 +925,9 @@
                                                         @else
                                                             <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Ativa &amp; Liberada</span>
                                                         @endif
+                                                        @if(!empty($extra['owner']))
+                                                            <small class="text-secondary d-block mt-1 font-monospace owner-extra-label" data-instancia="{{ $extra['nome'] }}">{{ $extra['owner'] }}</small>
+                                                        @endif
                                                     </td>
                                                     <td class="text-end">
                                                         <div class="btn-group btn-group-sm">
@@ -945,6 +949,12 @@
                                                                     <i class="fas fa-pause"></i>
                                                                 </button>
                                                             @endif
+                                                            <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $extra['nome'] }}')" title="Conectar via QR Code ou Número de Telefone">
+                                                                <i class="fas fa-qrcode me-1"></i> Conectar
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $extra['nome'] }}')" title="Desconectar aparelho e limpar tudo desta instância">
+                                                                <i class="fas fa-power-off"></i>
+                                                            </button>
                                                             <button type="button" class="btn btn-outline-secondary" onclick="selecionarInstanciaServidor('{{ $extra['nome'] }}', '{{ $extra['token'] ?? '' }}')" title="Usar esta instância no painel">
                                                                 <i class="fas fa-arrow-right"></i>
                                                             </button>
@@ -1629,37 +1639,107 @@
 </div>
 
 <!-- ===================================================================
-     MODAL 1: CONEXÃO & QR CODE
+     MODAL 1: CONEXÃO VIA QR CODE OU NÚMERO DE TELEFONE (PAIRING CODE)
      =================================================================== -->
 <div class="modal fade" id="modalQrCode" tabindex="-1" aria-labelledby="modalQrCodeLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-success text-white py-3">
-                <h5 class="modal-title fw-bold" id="modalQrCodeLabel"><i class="fab fa-whatsapp me-2"></i> Conectar Aparelho WhatsApp</h5>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fab fa-whatsapp fs-4"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="modalQrCodeLabel">Conectar Aparelho WhatsApp</h5>
+                        <small class="text-white text-opacity-75 d-block">Instância: <strong class="font-monospace" id="txtModalNomeInstanciaConexao">{{ $configs['instance'] ?? 'foco7' }}</strong></small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="pararPollingQr()"></button>
             </div>
             <div class="modal-body p-4 text-center">
 
                 <div id="qrLoadingBox" class="py-4">
                     <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-                    <h6 class="fw-bold text-body">Gerando QR Code na Evolution API...</h6>
-                    <p class="text-secondary small mb-0">Por favor, aguarde enquanto comunicamos com a instância.</p>
+                    <h6 class="fw-bold text-body" id="txtQrLoadingTitulo">Gerando QR Code na Evolution API Go...</h6>
+                    <p class="text-secondary small mb-0">Por favor, aguarde enquanto iniciamos a sessão da instância.</p>
                 </div>
 
                 <div id="qrCodeContentBox" style="display: none;">
-                    <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm border mb-3">
-                        <img id="imgQrCodeDisplay" src="" alt="QR Code WhatsApp" class="img-fluid" style="width: 260px; height: 260px; object-fit: contain;">
+                    <!-- Seletor de Modo: Ler QR Code ou Digitar Número -->
+                    <ul class="nav nav-pills nav-fill bg-light p-1 rounded-3 border mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link active fw-bold py-2" id="btnTabModoQr" onclick="alternarModoConexaoModal('qr')">
+                                <i class="fas fa-qrcode me-1"></i> Ler QR Code
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link fw-bold py-2" id="btnTabModoNumero" onclick="alternarModoConexaoModal('numero')">
+                                <i class="fas fa-mobile-screen-button me-1"></i> Conectar c/ Número
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- ABA 1: LEITURA DO QR CODE -->
+                    <div id="subPainelModoQr">
+                        <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm border mb-3">
+                            <img id="imgQrCodeDisplay" src="" alt="QR Code WhatsApp" class="img-fluid" style="width: 245px; height: 245px; object-fit: contain;">
+                        </div>
+                        <div class="alert alert-light border small text-start mb-3">
+                            <ol class="mb-0 ps-3">
+                                <li>Abra o <strong>WhatsApp</strong> no seu celular.</li>
+                                <li>Toque em <strong>Aparelhos conectados</strong> &rarr; <strong>Conectar um aparelho</strong>.</li>
+                                <li>Aponte a câmera para o QR Code acima ou clique na aba <strong>Conectar c/ Número</strong>.</li>
+                            </ol>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-success btn-sm fw-bold" onclick="recarregarQrCode(true)">
+                                <i class="fas fa-rotate me-1"></i> Gerar Novo QR Code
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm fw-bold" onclick="alternarModoConexaoModal('numero')">
+                                <i class="fas fa-keyboard me-1"></i> Digitar Número de Telefone
+                            </button>
+                        </div>
                     </div>
-                    <div class="alert alert-light border small text-start mb-3">
-                        <ol class="mb-0 ps-3">
-                            <li>Abra o <strong>WhatsApp</strong> no seu celular.</li>
-                            <li>Toque em <strong>Aparelhos conectados</strong> &rarr; <strong>Conectar um aparelho</strong>.</li>
-                            <li>Aponte a câmera do celular para este QR Code.</li>
-                        </ol>
+
+                    <!-- ABA 2: CONECTAR COM NÚMERO DE TELEFONE (PAIRING CODE 8 DÍGITOS) -->
+                    <div id="subPainelModoNumero" style="display: none;" class="text-start">
+                        <div class="p-3 rounded-3 bg-light border mb-3">
+                            <label class="form-label fw-bold small text-body mb-1">
+                                <i class="fab fa-whatsapp text-success me-1"></i> Número do WhatsApp (com DDI + DDD)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-phone text-secondary"></i></span>
+                                <input type="text" id="inputNumeroPareamento" class="form-control font-monospace fw-bold" placeholder="Ex: 5521999999999 ou (21) 99999-9999">
+                                <button type="button" class="btn btn-success fw-bold" id="btnGerarCodigoPareamento" onclick="solicitarCodigoPareamento()">
+                                    <i class="fas fa-key me-1"></i> Gerar Código
+                                </button>
+                            </div>
+                            <small class="text-muted d-block mt-1">Digite o número do celular que receberá o código de conexão no WhatsApp.</small>
+                        </div>
+
+                        <!-- Caixa com o Código de 8 Dígitos Gerado -->
+                        <div id="boxCodigoPareamentoGerado" style="display: none;" class="p-3 rounded-3 bg-success bg-opacity-10 border border-success text-center mb-3">
+                            <span class="badge bg-success mb-2"><i class="fas fa-lock-open me-1"></i> Código de Pareamento Gerado</span>
+                            <div class="my-2">
+                                <span id="txtCodigoPareamentoDisplay" class="font-monospace fw-bolder text-success bg-white px-3 py-2 rounded border border-success d-inline-block" style="font-size: 1.65rem; letter-spacing: 3px;">----</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success fw-bold mt-1" onclick="copiarCodigoPareamento()">
+                                <i class="fas fa-copy me-1"></i> Copiar Código
+                            </button>
+                            <div class="alert alert-white bg-white border small text-start mt-3 mb-0">
+                                <strong class="d-block text-dark mb-1"><i class="fas fa-mobile-screen me-1 text-success"></i> Como inserir no celular:</strong>
+                                <ol class="mb-0 ps-3 text-secondary">
+                                    <li>Toque na notificação do WhatsApp que chegou no celular ou vá em <strong>Aparelhos Conectados &rarr; Conectar um aparelho</strong>.</li>
+                                    <li>Toque em <strong>"Conectar com número de telefone"</strong> na parte inferior da tela.</li>
+                                    <li>Digite o código de 8 caracteres acima. A conexão será reconhecida automaticamente!</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" class="btn btn-link btn-sm text-decoration-none text-secondary" onclick="alternarModoConexaoModal('qr')">
+                                <i class="fas fa-qrcode me-1"></i> Voltar para leitura de QR Code
+                            </button>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="recarregarQrCode()">
-                        <i class="fas fa-rotate me-1"></i> Recarregar QR Code
-                    </button>
                 </div>
 
                 <div id="qrConectadoBox" style="display: none;" class="py-4">
@@ -1669,11 +1749,14 @@
                     <h5 class="fw-bold text-success mb-1">WhatsApp Conectado com Sucesso!</h5>
                     <p class="text-secondary small mb-2">Sua instância está 100% online e operando no cluster Evolution Go.</p>
                     <div class="badge bg-success-subtle text-success border border-success px-3 py-2 fs-6 mb-3 font-monospace" id="boxModalNumeroConectado">
-                        <i class="fab fa-whatsapp me-1"></i> <span id="txtModalNumeroConectado">{{ $numeroConectado ?? '5521981900390:35' }}</span>
+                        <i class="fab fa-whatsapp me-1"></i> <span id="txtModalNumeroConectado">{{ $numeroConectado ?: 'Aparelho Vinculado' }}</span>
                     </div>
-                    <div class="d-block">
+                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
                         <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">
                             <i class="fas fa-check me-1"></i> Pronto para Envios
+                        </button>
+                        <button type="button" class="btn btn-outline-danger fw-semibold" onclick="desconectarELimparParaNovoQr()">
+                            <i class="fas fa-power-off me-1"></i> Desconectar &amp; Trocar Aparelho
                         </button>
                     </div>
                 </div>
@@ -1682,16 +1765,16 @@
                     <div class="bg-danger bg-opacity-15 text-danger rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2" style="width: 60px; height: 60px;">
                         <i class="fas fa-triangle-exclamation fs-2"></i>
                     </div>
-                    <h6 class="fw-bold text-danger mb-1">Não foi possível obter o QR Code</h6>
-                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">A instância pode já estar conectada ou precisando de sincronização.</p>
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                        <button type="button" class="btn btn-success btn-sm fw-bold" onclick="verificarSeConectou()">
-                            <i class="fas fa-check-circle me-1"></i> Já Conectou?
+                    <h6 class="fw-bold text-danger mb-1">Não foi possível exibir o QR Code</h6>
+                    <p class="text-secondary small mb-3" id="txtMensagemErroQr">A instância pode precisar de reinicialização da sessão.</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
+                        <button type="button" class="btn btn-success btn-sm fw-bold" onclick="conectarEabrirQr(instanciaModalAtual, true)">
+                            <i class="fas fa-qrcode me-1"></i> Limpar Sessão &amp; Gerar Novo QR Code
                         </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" onclick="conectarEabrirQr()">
-                            <i class="fas fa-rotate me-1"></i> Tentar Novamente
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-bold" onclick="abrirAbaNumeroDiretoNoModal()">
+                            <i class="fas fa-mobile-screen-button me-1"></i> Conectar c/ Número
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="autoCriarOuSincronizarInstanciaModal()">
+                        <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold" onclick="autoCriarOuSincronizarInstanciaModal()">
                             <i class="fas fa-wand-magic-sparkles me-1"></i> Sincronizar Instância
                         </button>
                     </div>
@@ -2205,7 +2288,7 @@
                         var num = res.numero_conectado || res.owner;
                         $('#txtNumeroConectadoHero').text(num);
                         $('#badgeNumeroConectadoHero').removeClass('d-none');
-                        $('#txtOwnerPrincipalTabela').text(num);
+                        $('#txtOwnerPrincipalTabela').text(num).removeClass('d-none');
                     }
 
                     // Atualiza linha da tabela de instâncias
@@ -2221,6 +2304,7 @@
                     $('#badgeStatusPulse').removeClass('pulse-online pulse-offline').addClass('pulse-warning');
                     $('#badgeStatusTexto').text('Conectando...');
                     $('#badgeNumeroConectadoHero').addClass('d-none');
+                    $('#txtOwnerPrincipalTabela').text('').addClass('d-none');
 
                     $('#badgeStatusPrincipalTabela').removeClass('bg-secondary bg-success bg-danger').addClass('bg-warning text-dark');
                     $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-offline').addClass('pulse-warning');
@@ -2236,6 +2320,8 @@
                     $('#statusIconBox').css('background-color', 'rgba(108, 117, 125, 0.15)');
                     $('#statusIcon').removeClass('text-success text-danger text-warning').addClass('text-secondary');
                     $('#badgeNumeroConectadoHero').addClass('d-none');
+                    $('#txtNumeroConectadoHero').text('');
+                    $('#txtOwnerPrincipalTabela').text('').addClass('d-none');
 
                     $('#badgeStatusPrincipalTabela').removeClass('bg-success bg-warning').addClass('bg-secondary');
                     $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
@@ -2267,29 +2353,97 @@
         });
     }
 
-    // Conectar e abrir modal com QR Code
-    function conectarEabrirQr() {
-        var modal = new bootstrap.Modal(document.getElementById('modalQrCode'));
+    var instanciaModalAtual = '';
+
+    function limparDadosVisuaisInstanciaLocal(nomeInstancia) {
+        $('#imgQrCodeDisplay').attr('src', '');
+        $('#txtCodigoPareamentoDisplay').text('----');
+        $('#boxCodigoPareamentoGerado').hide();
+        $('#inputNumeroPareamento').val('');
+        $('#txtModalNumeroConectado').text('');
+
+        var instPrincipal = ($('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}').toLowerCase();
+        if (!nomeInstancia || String(nomeInstancia).toLowerCase() === instPrincipal) {
+            $('#badgeStatusGeral').removeClass('bg-success bg-warning bg-danger').addClass('bg-secondary');
+            $('#badgeStatusPulse').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
+            $('#badgeStatusTexto').text('Desconectado');
+            $('#statusIconBox').css('background-color', 'rgba(108, 117, 125, 0.15)');
+            $('#statusIcon').removeClass('text-success text-danger text-warning').addClass('text-secondary');
+            $('#badgeNumeroConectadoHero').addClass('d-none');
+            $('#txtNumeroConectadoHero').text('');
+
+            $('#badgeStatusPrincipalTabela').removeClass('bg-success bg-warning bg-danger').addClass('bg-secondary');
+            $('#pulseStatusPrincipalTabela').removeClass('pulse-online pulse-warning').addClass('pulse-offline');
+            $('#txtStatusPrincipalTabela').text('Desconectado');
+            $('#txtOwnerPrincipalTabela').text('').addClass('d-none');
+        }
+
+        if (nomeInstancia) {
+            $('.owner-extra-label[data-instancia="' + nomeInstancia + '"]').text('').addClass('d-none');
+        }
+    }
+
+    function alternarModoConexaoModal(modo) {
+        if (modo === 'numero') {
+            $('#btnTabModoQr').removeClass('active');
+            $('#btnTabModoNumero').addClass('active');
+            $('#subPainelModoQr').hide();
+            $('#subPainelModoNumero').fadeIn(150);
+            setTimeout(function () {
+                $('#inputNumeroPareamento').trigger('focus');
+            }, 180);
+        } else {
+            $('#btnTabModoNumero').removeClass('active');
+            $('#btnTabModoQr').addClass('active');
+            $('#subPainelModoNumero').hide();
+            $('#subPainelModoQr').fadeIn(150);
+        }
+    }
+
+    function abrirAbaNumeroDiretoNoModal() {
+        $('#qrErroBox').hide();
+        $('#qrLoadingBox').hide();
+        $('#qrConectadoBox').hide();
+        $('#qrCodeContentBox').show();
+        alternarModoConexaoModal('numero');
+        iniciarPollingStatusQr();
+    }
+
+    // Conectar e abrir modal com QR Code e opção de Pareamento por Número
+    function conectarEabrirQr(instanciaOpcional, forcarQr) {
+        instanciaModalAtual = instanciaOpcional || $('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}';
+        $('#txtModalNomeInstanciaConexao').text(instanciaModalAtual);
+
+        var modalEl = document.getElementById('modalQrCode');
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         modal.show();
 
+        $('#txtQrLoadingTitulo').text(forcarQr ? 'Limpando sessão anterior e gerando novo QR Code...' : 'Gerando QR Code na Evolution API Go...');
         $('#qrLoadingBox').show();
         $('#qrCodeContentBox').hide();
         $('#qrConectadoBox').hide();
         $('#qrErroBox').hide();
+        $('#boxCodigoPareamentoGerado').hide();
+        alternarModoConexaoModal('qr');
 
         $.ajax({
             url: '{{ route("admin.whatsapp.conectar") }}',
             type: 'POST',
-            data: { _token: '{{ csrf_token() }}' },
+            data: {
+                _token: '{{ csrf_token() }}',
+                instancia: instanciaModalAtual,
+                forcar_qr: forcarQr ? 1 : 0
+            },
             dataType: 'json',
             success: function (res) {
                 if (res.token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
                     $('#inputApiKey').val(res.token);
                 }
                 if (res.instancia) {
-                    $('#txtInstanciaNome').text(res.instancia);
+                    instanciaModalAtual = res.instancia;
+                    $('#txtModalNomeInstanciaConexao').text(res.instancia);
                 }
-                if (res.conectado) {
+                if (res.conectado && !forcarQr) {
                     $('#qrLoadingBox').hide();
                     $('#qrCodeContentBox').hide();
                     $('#qrErroBox').hide();
@@ -2309,7 +2463,7 @@
                 }
             },
             error: function (xhr) {
-                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro ao conectar';
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro ao iniciar sessão de conexão.';
                 $('#qrLoadingBox').hide();
                 $('#txtMensagemErroQr').text(msg);
                 $('#qrErroBox').show();
@@ -2324,20 +2478,31 @@
         }
         $('#imgQrCodeDisplay').attr('src', src);
         $('#qrLoadingBox').hide();
+        $('#qrErroBox').hide();
+        $('#qrConectadoBox').hide();
         $('#qrCodeContentBox').show();
     }
 
-    function recarregarQrCode() {
+    function recarregarQrCode(forcarNovo) {
+        if (forcarNovo) {
+            conectarEabrirQr(instanciaModalAtual, true);
+            return;
+        }
         $('#qrCodeContentBox').hide();
         $('#qrLoadingBox').show();
 
         $.ajax({
             url: '{{ route("admin.whatsapp.qr") }}',
             type: 'GET',
+            data: {
+                instancia: instanciaModalAtual,
+                forcar_qr: 1
+            },
             dataType: 'json',
             success: function (res) {
                 if (res.qrcode) {
                     exibirQrCode(res.qrcode);
+                    iniciarPollingStatusQr();
                 } else {
                     verificarSeConectou();
                 }
@@ -2345,6 +2510,55 @@
             error: function () {
                 verificarSeConectou();
             }
+        });
+    }
+
+    function solicitarCodigoPareamento() {
+        var telefone = ($('#inputNumeroPareamento').val() || '').trim();
+        if (telefone.replace(/\D/g, '').length < 10) {
+            window.foco7Notify.warning('Informe o número do WhatsApp com DDD (ex: 5521999999999).');
+            $('#inputNumeroPareamento').trigger('focus');
+            return;
+        }
+
+        var $btn = $('#btnGerarCodigoPareamento');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Gerando...');
+        $('#boxCodigoPareamentoGerado').hide();
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.parear_numero") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                telefone: telefone,
+                instancia: instanciaModalAtual
+            },
+            dataType: 'json',
+            success: function (res) {
+                if (res.success && res.pairing_code) {
+                    $('#txtCodigoPareamentoDisplay').text(res.pairing_code);
+                    $('#boxCodigoPareamentoGerado').fadeIn(200);
+                    iniciarPollingStatusQr();
+                    window.foco7Notify.success(res.message || 'Código gerado! Digite no seu WhatsApp.');
+                } else {
+                    window.foco7Notify.error(res.message || 'Não foi possível gerar o código de pareamento.');
+                }
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao solicitar código de pareamento para o número informado.';
+                window.foco7Notify.error(msg);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html('<i class="fas fa-key me-1"></i> Gerar Código');
+            }
+        });
+    }
+
+    function copiarCodigoPareamento() {
+        var codigo = ($('#txtCodigoPareamentoDisplay').text() || '').trim();
+        if (!codigo || codigo === '----') return;
+        navigator.clipboard.writeText(codigo).then(function () {
+            window.foco7Notify.success('Código "' + codigo + '" copiado para a área de transferência!');
         });
     }
 
@@ -2361,9 +2575,12 @@
                         $('#qrLoadingBox').hide();
                         $('#qrCodeContentBox').hide();
                         $('#qrErroBox').hide();
+                        if (res.numero_conectado || res.owner) {
+                            $('#txtModalNumeroConectado').text(res.numero_conectado || res.owner);
+                        }
                         $('#qrConectadoBox').show();
                         verificarStatusApi(false);
-                        window.foco7Notify.success('WhatsApp pareado com sucesso!');
+                        window.foco7Notify.success('WhatsApp pareado e conectado com sucesso!');
                     }
                 }
             });
@@ -2385,19 +2602,43 @@
             success: function (res) {
                 $('#qrLoadingBox').hide();
                 if (res.conectado) {
+                    if (res.numero_conectado || res.owner) {
+                        $('#txtModalNumeroConectado').text(res.numero_conectado || res.owner);
+                    }
                     $('#qrConectadoBox').show();
                     verificarStatusApi(false);
                 } else if (res.qrcode) {
                     exibirQrCode(res.qrcode);
                     iniciarPollingStatusQr();
                 } else {
-                    $('#txtMensagemErroQr').text('Nenhum QR Code retornado. A instância pode já estar conectada ou precisando de reinicialização.');
+                    $('#txtMensagemErroQr').text('Nenhum QR Code ativo no momento. Clique em "Limpar Sessão & Gerar Novo QR Code" ou conecte com seu número.');
                     $('#qrErroBox').show();
                 }
             },
             error: function () {
                 $('#qrLoadingBox').hide();
                 $('#qrErroBox').show();
+            }
+        });
+    }
+
+    function desconectarELimparParaNovoQr() {
+        var alvo = instanciaModalAtual || $('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}';
+        $('#qrConectadoBox').hide();
+        $('#txtQrLoadingTitulo').text('Desconectando e limpando todos os dados da instância...');
+        $('#qrLoadingBox').show();
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.desconectar") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                instancia: alvo
+            },
+            dataType: 'json',
+            complete: function () {
+                limparDadosVisuaisInstanciaLocal(alvo);
+                conectarEabrirQr(alvo, true);
             }
         });
     }
@@ -2553,27 +2794,49 @@
         window.foco7Notify.success('Instância "' + nome + '" selecionada! Salve as configurações ou clique em Conectar / QR Code.');
     }
 
-    function desconectarInstancia() {
+    function desconectarInstancia(instanciaOpcional) {
+        var nomeAlvo = instanciaOpcional || $('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}';
         window.confirmarAcao(
-            'Desconectar WhatsApp?',
-            'A instância será desconectada e não enviará notificações até ser reconectada.',
+            'Desconectar e Limpar Instância?',
+            'Toda a sessão do aparelho vinculado, QR Code anterior e cache da instância "' + nomeAlvo + '" serão limpos no servidor Evolution Go e no painel.',
             'warning',
             function () {
+                Swal.fire({
+                    title: 'Desconectando e Limpando...',
+                    html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-danger mb-2"></i><p class="small text-secondary mb-0">Encerrando sessão do aparelho e limpando dados da instância...</p></div>',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+
                 $.ajax({
                     url: '{{ route("admin.whatsapp.desconectar") }}',
                     type: 'POST',
-                    data: { _token: '{{ csrf_token() }}' },
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        instancia: nomeAlvo
+                    },
                     dataType: 'json',
                     success: function (res) {
-                        if (res.success) {
-                            window.foco7Notify.success(res.message);
-                            verificarStatusApi(false);
-                        } else {
-                            window.foco7Notify.error(res.message);
-                        }
+                        limparDadosVisuaisInstanciaLocal(nomeAlvo);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Instância Desconectada e Limpa!',
+                            text: res.message || 'Todos os dados de sessão da instância foram limpos. Agora você pode conectar lendo um novo QR Code ou digitando o número do WhatsApp.',
+                            showCancelButton: true,
+                            confirmButtonColor: '#198754',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: '<i class="fas fa-qrcode me-1"></i> Conectar Agora (QR / Número)',
+                            cancelButtonText: 'Fechar'
+                        }).then(function (result) {
+                            if (result.isConfirmed) {
+                                conectarEabrirQr(nomeAlvo, true);
+                            }
+                        });
                     },
                     error: function () {
-                        window.foco7Notify.error('Falha ao desconectar instância.');
+                        limparDadosVisuaisInstanciaLocal(nomeAlvo);
+                        Swal.close();
+                        window.foco7Notify.error('Sessão local limpa, mas houve falha ao comunicar com o servidor.');
                     }
                 });
             }

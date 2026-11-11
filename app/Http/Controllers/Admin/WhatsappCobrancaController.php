@@ -473,27 +473,42 @@ class WhatsappCobrancaController extends Controller
     }
 
     /**
-     * Inicia a conexão da instância e gera o QR Code para pareamento
+     * Inicia a conexão da instância e gera o QR Code ou Código de Pareamento por número
      */
-    public function conectar()
+    public function conectar(Request $request)
     {
-        $res = EvolutionApiService::conectar(url('/webhook/evolution'));
+        $forcarQr = $request->boolean('forcar_qr', false);
+        $telefone = trim((string) $request->input('telefone', ''));
+        $instanciaReq = trim((string) $request->input('instancia', ''));
 
-        $qrcode = null;
+        $res = EvolutionApiService::conectar(
+            url('/webhook/evolution'),
+            ['ALL'],
+            $forcarQr,
+            ! empty($telefone) ? $telefone : null,
+            ! empty($instanciaReq) ? $instanciaReq : null
+        );
+
+        $instanciaNome = $res['instancia'] ?? ($instanciaReq ?: EvolutionApiService::getInstanceName());
+        $qrcode = $res['qrcode'] ?? null;
+        $pairingCode = $res['pairing_code'] ?? null;
+
         if ($res['success']) {
             $data = $res['data'] ?? [];
 
-            // Verifica se a instância já está conectada no servidor
+            // Verifica se a instância já está conectada no servidor (apenas se não forçou novo QR)
             $stateRaw = $data['instance']['state']
                 ?? ($data['state']
                 ?? ($data['status']
                 ?? ($data['instance']['status'] ?? '')));
 
-            $alreadyConnected = in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
+            $alreadyConnected = ! $forcarQr && (
+                in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
                 || ($data['connected'] ?? false) === true
                 || ($data['instance']['connected'] ?? false) === true
                 || (($data['instance']['state'] ?? '') === 'open')
-                || ! empty($res['conectado']);
+                || ! empty($res['conectado'])
+            );
 
             if ($alreadyConnected) {
                 CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
@@ -503,32 +518,34 @@ class WhatsappCobrancaController extends Controller
                     'conectado' => true,
                     'message' => 'Esta instância já está conectada e autenticada no WhatsApp!',
                     'qrcode' => null,
+                    'pairing_code' => null,
                     'data' => $data,
                     'owner' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
                     'numero_conectado' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
-                    'instancia' => EvolutionApiService::getInstanceName(),
-                    'token' => CmsSetting::get('evolution_apikey'),
+                    'instancia' => $instanciaNome,
+                    'token' => $res['token'] ?? CmsSetting::get('evolution_apikey'),
                 ]);
             }
 
-            $qrcode = $data['qrcode']['base64'] ?? ($data['base64'] ?? null);
-
-            // Se não veio no body do connect, busca via /instance/qr
             if (! $qrcode) {
-                $qrRes = EvolutionApiService::obterQrCode();
-                if ($qrRes['success']) {
-                    $qrcode = $qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null);
-                }
+                $qrcode = $data['qrcode']['base64'] ?? ($data['base64'] ?? ($data['Qrcode'] ?? null));
+            }
+
+            if (! $qrcode) {
+                $qrcode = EvolutionApiService::obterQrCodeComRetry($instanciaNome, $res['token'] ?? null, 3, 600000);
             }
 
             return response()->json([
                 'success' => true,
                 'conectado' => false,
-                'message' => 'Instância iniciada com sucesso. Escaneie o QR Code abaixo.',
+                'message' => $pairingCode
+                    ? "Código de pareamento gerado: {$pairingCode}. Digite no seu WhatsApp ou escaneie o QR Code."
+                    : 'Instância pronta para pareamento! Escaneie o QR Code ou digite seu número de WhatsApp abaixo.',
                 'qrcode' => $qrcode,
+                'pairing_code' => $pairingCode,
                 'data' => $data,
-                'instancia' => EvolutionApiService::getInstanceName(),
-                'token' => CmsSetting::get('evolution_apikey'),
+                'instancia' => $instanciaNome,
+                'token' => $res['token'] ?? CmsSetting::get('evolution_apikey'),
             ]);
         }
 
@@ -537,8 +554,31 @@ class WhatsappCobrancaController extends Controller
             'conectado' => false,
             'message' => 'Falha ao conectar instância: '.($res['error'] ?? 'Verifique credenciais.'),
             'detalhes' => $res,
-            'instancia' => EvolutionApiService::getInstanceName(),
+            'instancia' => $instanciaNome,
         ], 400);
+    }
+
+    /**
+     * Gera o Código de Pareamento de 8 dígitos para conectar colocando o número do WhatsApp
+     */
+    public function parearNumero(Request $request)
+    {
+        $telefone = trim((string) $request->input('telefone', ''));
+        $instancia = trim((string) $request->input('instancia', ''));
+
+        if (empty($telefone)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe o número do WhatsApp com DDD para gerar o código de conexão.',
+            ], 422);
+        }
+
+        $res = EvolutionApiService::solicitarPairingCode(
+            $telefone,
+            ! empty($instancia) ? $instancia : null
+        );
+
+        return response()->json($res, $res['success'] ? 200 : 400);
     }
 
     /**
@@ -645,47 +685,83 @@ class WhatsappCobrancaController extends Controller
     }
 
     /**
-     * Busca o QR Code atual para exibição na interface
+     * Busca o QR Code atual para exibição na interface (iniciando sessão se necessário)
      */
-    public function obterQrCode()
+    public function obterQrCode(Request $request)
     {
-        $qrRes = EvolutionApiService::obterQrCode();
-        if ($qrRes['success']) {
-            $qrcode = $qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? null);
+        $instancia = trim((string) $request->input('instancia', ''));
+        $forcarNovo = $request->boolean('forcar_novo', false);
 
+        if ($forcarNovo) {
+            $connRes = EvolutionApiService::conectar(url('/webhook/evolution'), ['ALL'], true, null, ! empty($instancia) ? $instancia : null);
+            $qr = $connRes['qrcode'] ?? null;
+            if ($qr) {
+                return response()->json([
+                    'success' => true,
+                    'qrcode' => $qr,
+                    'instancia' => $connRes['instancia'] ?? ($instancia ?: EvolutionApiService::getInstanceName()),
+                    'data' => $connRes['data'] ?? [],
+                ]);
+            }
+        }
+
+        $qrRes = EvolutionApiService::obterQrCode(! empty($instancia) ? $instancia : null);
+        $qrcode = $qrRes['qrcode'] ?? ($qrRes['data']['qrcode']['base64'] ?? ($qrRes['data']['base64'] ?? ($qrRes['data']['Qrcode'] ?? null)));
+
+        if (! $qrcode && empty($qrRes['conectado'])) {
+            $connRes = EvolutionApiService::conectar(url('/webhook/evolution'), ['ALL'], false, null, ! empty($instancia) ? $instancia : null);
+            $qrcode = $connRes['qrcode'] ?? null;
+            if (! empty($connRes['conectado'])) {
+                return response()->json([
+                    'success' => true,
+                    'conectado' => true,
+                    'qrcode' => null,
+                    'data' => $connRes['data'] ?? [],
+                ]);
+            }
+        }
+
+        if ($qrcode || ! empty($qrRes['conectado'])) {
             return response()->json([
                 'success' => true,
+                'conectado' => ! empty($qrRes['conectado']),
                 'qrcode' => $qrcode,
-                'data' => $qrRes['data'],
+                'data' => $qrRes['data'] ?? [],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Não foi possível obter o QR Code: '.($qrRes['error'] ?? 'A instância já pode estar conectada.'),
+            'message' => 'Não foi possível obter o QR Code: '.($qrRes['error'] ?? 'Tente clicar em Recarregar QR Code.'),
         ], 400);
     }
 
     /**
-     * Desconecta temporariamente a instância
+     * Desconecta a instância e limpa todos os dados da sessão (Logout + Disconnect + Limpeza de Cache Local)
      */
-    public function desconectar()
+    public function desconectar(Request $request)
     {
-        $res = EvolutionApiService::desconectar();
-        CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+        $instancia = trim((string) $request->input('instancia', ''));
+        $nomeAlvo = ! empty($instancia) ? $instancia : EvolutionApiService::getInstanceName();
+
+        $res = EvolutionApiService::desconectar($nomeAlvo);
 
         return response()->json([
-            'success' => $res['success'],
-            'message' => $res['success'] ? 'Instância desconectada com sucesso.' : ($res['error'] ?? 'Erro ao desconectar.'),
+            'success' => true,
+            'limpo' => true,
+            'instancia' => $nomeAlvo,
+            'message' => "Instância '{$nomeAlvo}' desconectada e todos os dados da sessão foram limpos com sucesso! Clique em Conectar para ler o QR Code ou informar o número.",
+            'data' => $res['data'] ?? null,
         ]);
     }
 
     /**
      * Reconecta a instância
      */
-    public function reconectar()
+    public function reconectar(Request $request)
     {
-        $res = EvolutionApiService::reconectar();
+        $instancia = trim((string) $request->input('instancia', ''));
+        $res = EvolutionApiService::reconectar(! empty($instancia) ? $instancia : null);
 
         return response()->json([
             'success' => $res['success'],
@@ -694,16 +770,21 @@ class WhatsappCobrancaController extends Controller
     }
 
     /**
-     * Encerra a sessão da instância (Logout)
+     * Encerra a sessão da instância (Logout completo e limpeza de dados)
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        $res = EvolutionApiService::logout();
-        CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+        $instancia = trim((string) $request->input('instancia', ''));
+        $nomeAlvo = ! empty($instancia) ? $instancia : EvolutionApiService::getInstanceName();
+
+        $res = EvolutionApiService::logout($nomeAlvo);
 
         return response()->json([
-            'success' => $res['success'],
-            'message' => $res['success'] ? 'Sessão do WhatsApp encerrada com sucesso.' : ($res['error'] ?? 'Erro ao efetuar logout.'),
+            'success' => true,
+            'limpo' => true,
+            'instancia' => $nomeAlvo,
+            'message' => "Sessão da instância '{$nomeAlvo}' encerrada e todos os dados foram limpos com sucesso.",
+            'data' => $res['data'] ?? null,
         ]);
     }
 
