@@ -19,6 +19,12 @@
     </div>
 
     <div class="card-body p-0">
+        @if(isset($erroCarregamento))
+            <div class="alert alert-warning border-0 m-3 d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <div>{{ $erroCarregamento }}</div>
+            </div>
+        @endif
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
@@ -38,7 +44,7 @@
                             <span class="fw-bold text-body">{{ $fat->codigo_fatura }}</span>
                             @if($fat->isCarne())
                                 <br><span class="badge bg-success-subtle text-success border border-success-subtle small mt-1">
-                                    <i class="fas fa-book me-1"></i> Carnê {{ $fat->numero_parcela }}/{{ $fat->total_parcelas }}
+                                    <i class="fas fa-book me-1"></i> Carnê {{ $fat->numero_parcela ?: 1 }}/{{ $fat->total_parcelas ?: 1 }}
                                 </span>
                             @endif
                         </td>
@@ -52,14 +58,14 @@
                         <td>
                             <div class="fw-bold text-success">{{ $fat->valor_formatado }}</div>
                             @if($fat->taxa_repassada > 0 && $fat->valor_original)
-                                <small class="text-muted text-decoration-line-through">Original: {{ $fat->valor_original_formatada }}</small>
+                                <small class="text-muted text-decoration-line-through">Original: {{ $fat->valor_original_formatado }}</small>
                             @endif
                         </td>
                         <td>{!! $fat->status_badge !!}</td>
                         <td>
                             <div class="d-flex align-items-center gap-1">
-                                @if($fat->isCarne())
-                                    <a href="{{ route('faturas.carne.pdf', $fat->codigo_carne) }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold" title="Baixar Carnê Completo em PDF (A4)">
+                                @if($fat->isCarne() && !empty($fat->pdf_carne_url))
+                                    <a href="{{ $fat->pdf_carne_url }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold" title="Baixar Carnê Completo em PDF (A4)">
                                         <i class="fas fa-file-pdf me-1"></i> Carnê PDF
                                     </a>
                                 @endif

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Fatura;
 use App\Services\EfiPaymentService;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 class ClienteFaturasController extends Controller
 {
@@ -14,14 +15,26 @@ class ClienteFaturasController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        try {
+            $user = auth()->user();
 
-        $faturas = Fatura::with('plano')
-            ->where('user_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->paginate(10);
+            $faturas = Fatura::with('plano')
+                ->where('user_id', $user->id)
+                ->orderBy('id', 'desc')
+                ->paginate(10);
 
-        return view('cliente.faturas', compact('faturas'));
+            return view('cliente.faturas', compact('faturas'));
+        } catch (\Throwable $e) {
+            Log::error('Erro ao listar faturas do cliente: '.$e->getMessage(), [
+                'user_id' => auth()->id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return view('cliente.faturas', [
+                'faturas' => new LengthAwarePaginator([], 0, 10),
+                'erroCarregamento' => 'Não foi possível carregar o histórico de faturas no momento. Por favor, tente novamente.',
+            ]);
+        }
     }
 
     /**
@@ -39,7 +52,7 @@ class ClienteFaturasController extends Controller
             $chavePix = EfiPaymentService::getChavePix();
             $valorCobranca = $fatura->valor_total_com_encargos > 0 ? (float) $fatura->valor_total_com_encargos : (float) $fatura->valor;
             $fatura->qr_code_pix = EfiPaymentService::gerarPayloadPixBacen($chavePix, $valorCobranca, "Foco 7 - {$fatura->codigo_fatura}", $fatura->codigo_fatura);
-            $fatura->qr_code_pix_url = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . urlencode($fatura->qr_code_pix);
+            $fatura->qr_code_pix_url = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='.urlencode($fatura->qr_code_pix);
             $fatura->save();
         }
 
@@ -51,7 +64,7 @@ class ClienteFaturasController extends Controller
                 'valor' => (float) $fatura->valor,
                 'valor_formatado' => $fatura->valor_formatado,
                 'valor_total_com_encargos' => (float) $fatura->valor_total_com_encargos,
-                'valor_total_formatado' => 'R$ ' . number_format($fatura->valor_total_com_encargos, 2, ',', '.'),
+                'valor_total_formatado' => 'R$ '.number_format($fatura->valor_total_com_encargos, 2, ',', '.'),
                 'valor_multa' => (float) ($fatura->valor_multa ?? 0),
                 'multa_formatada' => $fatura->multa_formatada,
                 'valor_juros' => (float) ($fatura->valor_juros ?? 0),
@@ -66,12 +79,12 @@ class ClienteFaturasController extends Controller
                 'url_boleto' => $fatura->url_boleto,
                 'is_carne' => $fatura->isCarne(),
                 'codigo_carne' => $fatura->codigo_carne,
-                'numero_parcela' => $fatura->numero_parcela,
-                'total_parcelas' => $fatura->total_parcelas,
-                'pdf_carne_url' => $fatura->isCarne() ? route('faturas.carne.pdf', $fatura->codigo_carne) : null,
+                'numero_parcela' => $fatura->numero_parcela ?: 1,
+                'total_parcelas' => $fatura->total_parcelas ?: 1,
+                'pdf_carne_url' => $fatura->pdf_carne_url,
                 'taxa_repassada' => (float) $fatura->taxa_repassada,
                 'taxa_repassada_formatada' => $fatura->taxa_repassada_formatada,
-                'valor_original_formatado' => $fatura->valor_original_formatada,
+                'valor_original_formatado' => $fatura->valor_original_formatado,
                 'ultimo_lembrete_enviado' => $fatura->ultimo_lembrete_enviado,
             ],
         ]);

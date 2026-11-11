@@ -301,6 +301,54 @@ class Fatura extends Model
         ];
     }
 
+    public function getCodigoCarneAttribute($value): ?string
+    {
+        if (! empty($value)) {
+            return (string) $value;
+        }
+
+        if (! empty($this->attributes['efi_carnet_id'])) {
+            return (string) $this->attributes['efi_carnet_id'];
+        }
+
+        $codFatura = $this->attributes['codigo_fatura'] ?? null;
+        if (! empty($codFatura)) {
+            if (str_starts_with($codFatura, 'CARNE-') || str_contains($codFatura, '-')) {
+                $base = preg_replace('/-\\d+$/', '', $codFatura);
+                if (! empty($base) && $base !== $codFatura) {
+                    return (string) $base;
+                }
+
+                return (string) $codFatura;
+            }
+        }
+
+        return null;
+    }
+
+    public function getPdfCarneUrlAttribute(): ?string
+    {
+        if (! $this->isCarne()) {
+            return null;
+        }
+
+        $codigo = $this->codigo_carne;
+        if (! empty($codigo)) {
+            try {
+                return route('faturas.carne.pdf', ['codigo' => $codigo]);
+            } catch (\Throwable $e) {
+                // Silenciosamente captura falhas de rota para evitar Erro 500
+            }
+        }
+
+        return ! empty($this->link_pdf_carne) ? $this->link_pdf_carne : null;
+    }
+
+    public function getValorOriginalFormatadaAttribute(): string
+    {
+        return $this->valor_original_formatado;
+    }
+
     public function getTaxaRepassadaFormatadaAttribute(): string
     {
         return 'R$ '.number_format($this->taxa_repassada ?? 0, 2, ',', '.');
