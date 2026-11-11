@@ -262,6 +262,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/instancias/cobranca-preventiva', [WhatsappCobrancaController::class, 'executarCobrancaPreventiva'])->name('admin.whatsapp.instancias.cobranca_preventiva');
         Route::post('/instancias/sincronizar-mp', [WhatsappCobrancaController::class, 'sincronizarPagamentosMp'])->name('admin.whatsapp.instancias.sincronizar_mp');
         Route::post('/instancias/excluir', [WhatsappCobrancaController::class, 'excluirInstancia'])->name('admin.whatsapp.instancias.excluir');
+        Route::get('/instancias/franqueado/{nome}', [WhatsappCobrancaController::class, 'obterDadosFranqueadoInstancia'])->name('admin.whatsapp.instancias.obter_franqueado');
+        Route::post('/instancias/salvar-franqueado', [WhatsappCobrancaController::class, 'salvarDadosFranqueadoInstancia'])->name('admin.whatsapp.instancias.salvar_franqueado');
     });
 
     // Licenciados FOCO 7 & Gestão de Servidores / White Label

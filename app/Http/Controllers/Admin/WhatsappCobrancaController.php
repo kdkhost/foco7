@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsSetting;
 use App\Models\Fatura;
+use App\Models\Licenca;
 use App\Services\EmailTemplateService;
 use App\Services\EvolutionApiService;
 use App\Services\ReguaCobrancaService;
@@ -180,6 +181,14 @@ class WhatsappCobrancaController extends Controller
         $configs['dev_mp_webhook_secret'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoWebhookSecret() : '••••••••••••••••••••••••••••••••';
         $configs['dev_mp_beneficiario'] = $devUnlocked ? EvolutionApiService::getDevMercadoPagoBeneficiario() : '••••••••••••••••••••••••';
 
+        $licenciados = collect();
+        try {
+            $licenciados = Licenca::with('user')->latest()->get();
+        } catch (\Throwable $e) {
+        }
+
+        $franqueadoAtivoInfo = EvolutionApiService::obterInfoFranqueadoInstancia($realInstance);
+
         return view('admin.whatsapp.index', compact(
             'configs',
             'statusCache',
@@ -196,7 +205,9 @@ class WhatsappCobrancaController extends Controller
             'custoTotalRecorrente',
             'instanciasAtivas',
             'instanciasVencidas',
-            'instanciasSuspensas'
+            'instanciasSuspensas',
+            'licenciados',
+            'franqueadoAtivoInfo'
         ));
     }
 
@@ -458,6 +469,8 @@ class WhatsappCobrancaController extends Controller
             $estado = 'erro_conexao';
         }
 
+        $instNameAtual = EvolutionApiService::getInstanceName();
+
         return response()->json([
             'success' => true,
             'conectado' => $conectado,
@@ -466,7 +479,8 @@ class WhatsappCobrancaController extends Controller
             'numero_conectado' => $owner,
             'status_raw' => $statusRes['data'] ?? null,
             'qrcode' => $qrcodeBase64,
-            'instancia' => EvolutionApiService::getInstanceName(),
+            'instancia' => $instNameAtual,
+            'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia($instNameAtual),
             'api_url' => EvolutionApiService::getBaseUrl(),
             'erro' => $statusRes['error'] ?? null,
         ]);
@@ -492,6 +506,7 @@ class WhatsappCobrancaController extends Controller
         $instanciaNome = $res['instancia'] ?? ($instanciaReq ?: EvolutionApiService::getInstanceName());
         $qrcode = $res['qrcode'] ?? null;
         $pairingCode = $res['pairing_code'] ?? null;
+        $franqueadoInfo = EvolutionApiService::obterInfoFranqueadoInstancia($instanciaNome);
 
         if ($res['success']) {
             $data = $res['data'] ?? [];
@@ -523,6 +538,7 @@ class WhatsappCobrancaController extends Controller
                     'owner' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
                     'numero_conectado' => $res['owner'] ?? CmsSetting::get('evolution_connected_number', ''),
                     'instancia' => $instanciaNome,
+                    'franqueado' => $franqueadoInfo,
                     'token' => $res['token'] ?? CmsSetting::get('evolution_apikey'),
                 ]);
             }
@@ -545,6 +561,7 @@ class WhatsappCobrancaController extends Controller
                 'pairing_code' => $pairingCode,
                 'data' => $data,
                 'instancia' => $instanciaNome,
+                'franqueado' => $franqueadoInfo,
                 'token' => $res['token'] ?? CmsSetting::get('evolution_apikey'),
             ]);
         }
@@ -555,6 +572,7 @@ class WhatsappCobrancaController extends Controller
             'message' => 'Falha ao conectar instância: '.($res['error'] ?? 'Verifique credenciais.'),
             'detalhes' => $res,
             'instancia' => $instanciaNome,
+            'franqueado' => $franqueadoInfo,
         ], 400);
     }
 
@@ -577,111 +595,38 @@ class WhatsappCobrancaController extends Controller
             $telefone,
             ! empty($instancia) ? $instancia : null
         );
+        $res['franqueado'] = EvolutionApiService::obterInfoFranqueadoInstancia(! empty($instancia) ? $instancia : null);
 
         return response()->json($res, $res['success'] ? 200 : 400);
     }
 
     /**
-     * Sincroniza e lista todas as instâncias existentes no servidor Evolution API
-     * Possui fallback inteligente para a instância ativa usando o token da própria instância
+     * Sincroniza e lista EXCLUSIVAMENTE as instâncias criadas através deste painel,
+     * enriquecendo cada instância com os dados do Franqueado / Licenciado vinculado na conexão.
      */
     public function sincronizarInstancias()
     {
-        $res = EvolutionApiService::listarInstancias();
+        $instanciasDoPainel = EvolutionApiService::listarInstanciasCriadasNoPainel();
+        $instName = EvolutionApiService::getInstanceName();
 
-        if ($res['success']) {
-            $listaBruta = EvolutionApiService::extrairListaInstancias($res['data'] ?? []);
-            $instancias = [];
-
-            // Tenta encontrar a instância ativa e atualizar o token e status
-            $instName = EvolutionApiService::getInstanceName();
-            $tokenAtualizado = false;
-
-            foreach ($listaBruta as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
-                $nome = $item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? null));
-                $token = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
-                $jidRaw = (string) ($item['jid'] ?? ($item['owner'] ?? ($item['instance']['owner'] ?? '')));
-                $owner = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
-                $statusRaw = strtolower((string) ($item['status'] ?? ($item['state'] ?? '')));
-                $isConnected = (($item['connected'] ?? false) === true)
-                    || (($item['Connected'] ?? false) === true)
-                    || in_array($statusRaw, ['open', 'connected', 'conectado']);
-
-                $item['name'] = $nome;
-                $item['token'] = $token;
-                $item['connected'] = $isConnected;
-                $item['status'] = $isConnected ? 'open' : ($statusRaw ?: 'close');
-                $item['owner'] = $owner;
-                $instancias[] = $item;
-
-                if (strtolower((string) $nome) === strtolower($instName)) {
-                    if (! empty($token)) {
-                        CmsSetting::set('evolution_apikey', $token, 'whatsapp');
-                        $tokenAtualizado = true;
-                    }
-                    CmsSetting::set('evolution_status_cache', $isConnected ? 'conectado' : 'desconectado', 'whatsapp');
-                    if ($isConnected && ! empty($owner)) {
-                        CmsSetting::set('evolution_connected_number', $owner, 'whatsapp');
-                    }
-                }
+        $conectadoAtiva = false;
+        foreach ($instanciasDoPainel as $inst) {
+            if (strtolower((string) ($inst['name'] ?? '')) === strtolower($instName)) {
+                $conectadoAtiva = ! empty($inst['connected']);
+                break;
             }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Instâncias consultadas diretamente do servidor Evolution API com sucesso!',
-                'instancias' => $instancias,
-                'token_atualizado' => $tokenAtualizado,
-                'instancia_ativa' => $instName,
-                'token_ativo' => CmsSetting::get('evolution_apikey'),
-            ]);
-        }
-
-        // Fallback: se listarInstancias falhar (ex: por falta da Global API Key),
-        // consulta diretamente a instância ativa usando a chave da própria instância
-        $statusRes = EvolutionApiService::obterStatus();
-        if ($statusRes['success']) {
-            $data = $statusRes['data'] ?? [];
-            $stateRaw = $data['instance']['state']
-                ?? ($data['state']
-                ?? ($data['status']
-                ?? ($data['instance']['status'] ?? '')));
-
-            $conectado = in_array(strtolower((string) $stateRaw), ['open', 'connected', 'conectado'])
-                || ($data['connected'] ?? false) === true
-                || ($data['instance']['connected'] ?? false) === true
-                || (($data['instance']['state'] ?? '') === 'open');
-
-            if ($conectado) {
-                CmsSetting::set('evolution_status_cache', 'conectado', 'whatsapp');
-            }
-
-            $instName = EvolutionApiService::getInstanceName();
-
-            return response()->json([
-                'success' => true,
-                'conectado' => $conectado,
-                'message' => $conectado
-                    ? 'Instância ativa sincronizada com sucesso! O WhatsApp já está conectado e pronto para envios.'
-                    : 'Instância sincronizada com sucesso no servidor.',
-                'instancia_ativa' => $instName,
-                'token_ativo' => CmsSetting::get('evolution_apikey'),
-                'instancias' => [
-                    [
-                        'name' => $instName,
-                        'state' => $stateRaw ?: ($conectado ? 'open' : 'close'),
-                        'status' => $conectado ? 'connected' : 'disconnected',
-                    ],
-                ],
-            ]);
         }
 
         return response()->json([
-            'success' => false,
-            'message' => 'Falha ao consultar servidor Evolution API: '.($res['error'] ?? ($statusRes['error'] ?? 'Verifique a URL e o Token da Instância.')),
-        ], 400);
+            'success' => true,
+            'conectado' => $conectadoAtiva,
+            'message' => 'Instâncias criadas neste painel sincronizadas com sucesso!',
+            'instancias' => $instanciasDoPainel,
+            'token_atualizado' => true,
+            'instancia_ativa' => $instName,
+            'franqueado_ativo' => EvolutionApiService::obterInfoFranqueadoInstancia($instName),
+            'token_ativo' => CmsSetting::get('evolution_apikey'),
+        ]);
     }
 
     /**
@@ -816,11 +761,27 @@ class WhatsappCobrancaController extends Controller
             $custo = EvolutionApiService::getCustoInstanciaExtra();
             $novaInst = null;
 
+            $dadosFranqueado = [
+                'empresa_franqueado' => trim((string) $request->input('empresa_franqueado', '')),
+                'documento_franqueado' => trim((string) $request->input('documento_franqueado', '')),
+                'dominio_franqueado' => trim((string) $request->input('dominio_franqueado', '')),
+                'chave_licenca' => trim((string) $request->input('chave_licenca', '')),
+            ];
+
             if ($isConfigInstance) {
                 CmsSetting::set('evolution_instance', $nome, 'whatsapp');
                 if (! empty($token)) {
                     CmsSetting::set('evolution_apikey', $token, 'whatsapp');
                 }
+                EvolutionApiService::atualizarDadosFranqueadoInstancia($nome, [
+                    'nome_franqueado' => $request->input('nome_responsavel'),
+                    'empresa_franqueado' => $dadosFranqueado['empresa_franqueado'],
+                    'documento_franqueado' => $dadosFranqueado['documento_franqueado'],
+                    'telefone_franqueado' => $request->input('telefone_responsavel'),
+                    'email_franqueado' => $request->input('email_responsavel'),
+                    'dominio_franqueado' => $dadosFranqueado['dominio_franqueado'],
+                    'chave_licenca' => $dadosFranqueado['chave_licenca'],
+                ]);
             } else {
                 $tipo = $request->input('tipo', 'propria_admin');
                 $licenciadoId = $request->filled('licenciado_id') ? (int) $request->input('licenciado_id') : null;
@@ -840,7 +801,8 @@ class WhatsappCobrancaController extends Controller
                     $telResp,
                     $nomeResp,
                     $emailResp,
-                    $statusInicial
+                    $statusInicial,
+                    $dadosFranqueado
                 );
 
                 // Se já nasceu ativa (com Senha Master) e for própria do admin, já define como instância ativa para cobranças
@@ -878,6 +840,7 @@ class WhatsappCobrancaController extends Controller
                 'qrcode' => $qrcode,
                 'data' => $res['data'],
                 'instancia' => $nome,
+                'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia($nome),
                 'token' => $token,
                 'is_extra' => ! $isConfigInstance,
                 'custo_recorrente' => $custo,
@@ -891,6 +854,50 @@ class WhatsappCobrancaController extends Controller
             'message' => 'Falha ao criar instância: '.($res['error'] ?? 'Verifique a Global API Key e URL.'),
             'detalhes' => $res,
         ], 400);
+    }
+
+    /**
+     * Retorna os dados detalhados do Franqueado / Licenciado vinculado a uma instância
+     */
+    public function obterDadosFranqueadoInstancia(string $nome)
+    {
+        return response()->json([
+            'success' => true,
+            'instancia' => $nome,
+            'franqueado' => EvolutionApiService::obterInfoFranqueadoInstancia($nome),
+        ]);
+    }
+
+    /**
+     * Salva / Atualiza os dados do Franqueado / Licenciado vinculado à conexão de uma instância
+     */
+    public function salvarDadosFranqueadoInstancia(Request $request)
+    {
+        $nome = trim((string) $request->input('instancia', ''));
+        if (empty($nome)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe o nome da instância para atualizar os dados do franqueado.',
+            ], 422);
+        }
+
+        $info = EvolutionApiService::atualizarDadosFranqueadoInstancia($nome, [
+            'licenciado_id' => $request->input('licenciado_id'),
+            'tipo' => $request->input('tipo'),
+            'nome_franqueado' => $request->input('nome_franqueado'),
+            'empresa_franqueado' => $request->input('empresa_franqueado'),
+            'documento_franqueado' => $request->input('documento_franqueado'),
+            'telefone_franqueado' => $request->input('telefone_franqueado'),
+            'email_franqueado' => $request->input('email_franqueado'),
+            'dominio_franqueado' => $request->input('dominio_franqueado'),
+            'chave_licenca' => $request->input('chave_licenca'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Informações do franqueado na instância '{$nome}' salvas com sucesso!",
+            'franqueado' => $info,
+        ]);
     }
 
     /**

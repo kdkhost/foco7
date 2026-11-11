@@ -263,6 +263,28 @@ class EvolutionApiService
             $status = 'vencida';
         }
 
+        $nomeResp = (string) CmsSetting::get('evolution_master_nome_responsavel', CmsSetting::get('empresa_nome', 'Foco 7 Tecnologia'));
+        $empresaFranqueado = (string) CmsSetting::get('evolution_master_empresa_franqueado', CmsSetting::get('empresa_nome', 'Foco 7 Rastreamento'));
+        $docFranqueado = (string) CmsSetting::get('evolution_master_documento_franqueado', CmsSetting::get('empresa_cnpj', ''));
+        $telFranqueado = (string) CmsSetting::get('evolution_master_telefone_franqueado', CmsSetting::get('whatsapp_suporte', CmsSetting::get('empresa_telefone', '')));
+        $emailFranqueado = (string) CmsSetting::get('evolution_master_email_franqueado', CmsSetting::get('empresa_email', ''));
+        $dominioFranqueado = (string) CmsSetting::get('evolution_master_dominio_franqueado', request()?->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'foco7.com.br');
+        $chaveLicenca = (string) CmsSetting::get('evolution_master_chave_licenca', 'MASTER-FOCO7-OFICIAL');
+
+        // Se este servidor possuir um arquivo license.key (instalação de franqueado/licenciado), carrega os dados reais da licença local
+        try {
+            $licenseKeyFile = base_path('license.key');
+            if (file_exists($licenseKeyFile)) {
+                $licJson = json_decode((string) file_get_contents($licenseKeyFile), true);
+                if (is_array($licJson)) {
+                    $chaveLicenca = $licJson['chave_licenca'] ?? ($licJson['licenca'] ?? $chaveLicenca);
+                    $empresaFranqueado = $licJson['empresa'] ?? $empresaFranqueado;
+                    $dominioFranqueado = $licJson['dominio'] ?? $dominioFranqueado;
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+
         return [
             'nome' => $nome,
             'token' => self::getInstanceApiKey(),
@@ -271,6 +293,15 @@ class EvolutionApiService
             'data_vencimento' => $vencimento,
             'valor_recorrente' => $custo,
             'hash_pagamento' => $hash,
+            'criada_pelo_painel' => true,
+            'nome_responsavel' => $nomeResp,
+            'empresa_franqueado' => $empresaFranqueado,
+            'documento_franqueado' => $docFranqueado,
+            'telefone_responsavel' => $telFranqueado,
+            'email_responsavel' => $emailFranqueado,
+            'dominio_franqueado' => $dominioFranqueado,
+            'chave_licenca' => $chaveLicenca,
+            'owner' => (string) CmsSetting::get('evolution_connected_number', ''),
         ];
     }
 
@@ -429,7 +460,8 @@ class EvolutionApiService
     }
 
     /**
-     * Retorna a lista de instâncias extras cadastradas com cobrança recorrente (R$ 60,00/mês)
+     * Retorna a lista de instâncias criadas através deste painel com cobrança recorrente (R$ 60,00/mês)
+     * e enriquecidas com as informações completas do Franqueado / Licenciado vinculado.
      */
     public static function getInstanciasExtras(): array
     {
@@ -441,9 +473,27 @@ class EvolutionApiService
             $extras = is_array($data) ? $data : [];
         }
 
-        // Normaliza campos de cada instância para garantir que tenham status e data_vencimento
+        // Instâncias externas conhecidas de outros sistemas no mesmo cluster que JAMAIS pertencem a este painel
+        $instanciasExternasBloqueadas = [
+            'cw-solutions',
+            'carlos_americo_cavalcante_silva_8_1',
+            'wilton_m_mendes_jr_3_1',
+            'robson-braz',
+        ];
+
         $hoje = date('Y-m-d');
-        foreach ($extras as &$item) {
+        $filtradas = [];
+
+        foreach ($extras as $item) {
+            if (! is_array($item) || empty($item['nome'])) {
+                continue;
+            }
+
+            $nomeLower = strtolower(trim((string) $item['nome']));
+            if (in_array($nomeLower, $instanciasExternasBloqueadas, true)) {
+                continue;
+            }
+
             if (empty($item['valor_recorrente'])) {
                 $item['valor_recorrente'] = self::getCustoInstanciaExtra();
             }
@@ -454,36 +504,316 @@ class EvolutionApiService
                 $criadoEm = ! empty($item['criado_em']) ? strtotime($item['criado_em']) : time();
                 $item['data_vencimento'] = date('Y-m-d', strtotime('+30 days', $criadoEm));
             }
-
-            // Gera hash único de pagamento direto caso não exista
             if (empty($item['hash_pagamento'])) {
                 $item['hash_pagamento'] = md5(($item['nome'] ?? '').($item['criado_em'] ?? 'foco7').'wpp_sec');
             }
 
-            // Vincula dados do responsável a partir da licença se for do tipo licenciado
-            if (! empty($item['licenciado_id']) && (empty($item['telefone_responsavel']) || empty($item['nome_responsavel']))) {
-                try {
-                    $licenca = Licenca::find($item['licenciado_id']);
-                    if ($licenca && $licenca->user) {
-                        $item['nome_responsavel'] = $item['nome_responsavel'] ?: $licenca->user->name;
-                        $item['telefone_responsavel'] = $item['telefone_responsavel'] ?: $licenca->user->telefone;
-                        $item['email_responsavel'] = $item['email_responsavel'] ?: $licenca->user->email;
-                    }
-                } catch (\Throwable $e) {
+            $item['criada_pelo_painel'] = true;
+
+            // Vincula e enriquece todos os dados do Franqueado / Licenciado a partir da Licença ou Usuário
+            try {
+                $licenca = null;
+                if (! empty($item['licenciado_id'])) {
+                    $licenca = Licenca::with('user')->find($item['licenciado_id']);
                 }
+                if (! $licenca) {
+                    $todasLicencas = Licenca::with('user')->get();
+                    foreach ($todasLicencas as $licCandidate) {
+                        $instLic = $licCandidate->dados_servidor['whatsapp']['instancia'] ?? '';
+                        if (! empty($instLic) && strtolower($instLic) === $nomeLower) {
+                            $licenca = $licCandidate;
+                            $item['licenciado_id'] = $licCandidate->id;
+                            break;
+                        }
+                    }
+                }
+
+                if ($licenca) {
+                    $item['nome_responsavel'] = ! empty($item['nome_responsavel']) ? $item['nome_responsavel'] : ($licenca->user?->name ?: $licenca->nome_empresa);
+                    $item['empresa_franqueado'] = ! empty($item['empresa_franqueado']) ? $item['empresa_franqueado'] : ($licenca->nome_empresa ?: ($licenca->user?->name ?? 'Franqueado Foco 7'));
+                    $item['documento_franqueado'] = ! empty($item['documento_franqueado']) ? $item['documento_franqueado'] : ($licenca->user?->cpf_cnpj ?? '');
+                    $item['telefone_responsavel'] = ! empty($item['telefone_responsavel']) ? $item['telefone_responsavel'] : ($licenca->user?->telefone ?? '');
+                    $item['email_responsavel'] = ! empty($item['email_responsavel']) ? $item['email_responsavel'] : ($licenca->user?->email ?? '');
+                    $item['dominio_franqueado'] = ! empty($item['dominio_franqueado']) ? $item['dominio_franqueado'] : ($licenca->dominio_autorizado ?? '');
+                    $item['ip_franqueado'] = ! empty($item['ip_franqueado']) ? $item['ip_franqueado'] : ($licenca->ip_autorizado ?? '');
+                    $item['chave_licenca'] = ! empty($item['chave_licenca']) ? $item['chave_licenca'] : ($licenca->chave_licenca ?? '');
+                }
+            } catch (\Throwable $e) {
             }
 
-            // Checa automaticamente se está vencida (com carência de 24 horas para suspensão)
+            // Fallbacks para garantir que toda instância tenha informações completas do franqueado/titular
+            if (empty($item['nome_responsavel'])) {
+                $item['nome_responsavel'] = (string) CmsSetting::get('empresa_nome', 'Administrador / Franqueado');
+            }
+            if (empty($item['empresa_franqueado'])) {
+                $item['empresa_franqueado'] = $item['nome_responsavel'];
+            }
+            if (empty($item['dominio_franqueado'])) {
+                $item['dominio_franqueado'] = request()?->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'foco7.com.br';
+            }
+
             if ($item['data_vencimento'] < $hoje && $item['status'] === 'ativa') {
                 $item['status'] = 'vencida';
             }
+
+            $filtradas[] = $item;
         }
 
-        return $extras;
+        return $filtradas;
     }
 
     /**
-     * Registra ou atualiza uma instância com tarifação recorrente de R$ 60,00/mês no Módulo Mercado Pago do Desenvolvedor
+     * Retorna o perfil estruturado do Franqueado / Titular vinculado a qualquer instância criada neste painel
+     */
+    public static function obterInfoFranqueadoInstancia(?string $nomeInstancia = null): array
+    {
+        $nome = trim((string) ($nomeInstancia ?: self::getInstanceName()));
+        $extras = self::getInstanciasExtras();
+
+        foreach ($extras as $item) {
+            if (strtolower((string) ($item['nome'] ?? '')) === strtolower($nome)) {
+                $tipo = $item['tipo'] ?? 'licenciado';
+                $tipoLabel = match ($tipo) {
+                    'licenciado' => 'Franqueado / Licenciado',
+                    'propria_admin' => 'Franqueado / Admin deste Painel',
+                    'empresa' => 'Unidade / Filial Franqueada',
+                    default => 'Franqueado / Parceiro',
+                };
+
+                return [
+                    'instancia' => $item['nome'],
+                    'criada_pelo_painel' => true,
+                    'tipo' => $tipo,
+                    'tipo_label' => $tipoLabel,
+                    'licenciado_id' => $item['licenciado_id'] ?? null,
+                    'chave_licenca' => $item['chave_licenca'] ?? '',
+                    'nome_franqueado' => $item['nome_responsavel'] ?? 'Franqueado / Responsável',
+                    'empresa_franqueado' => $item['empresa_franqueado'] ?? ($item['nome_responsavel'] ?? 'Unidade Franqueada'),
+                    'documento_franqueado' => $item['documento_franqueado'] ?? '',
+                    'telefone_franqueado' => $item['telefone_responsavel'] ?? '',
+                    'email_franqueado' => $item['email_responsavel'] ?? '',
+                    'dominio_franqueado' => $item['dominio_franqueado'] ?? '',
+                    'ip_franqueado' => $item['ip_franqueado'] ?? '',
+                    'status_assinatura' => $item['status'] ?? 'ativa',
+                    'data_vencimento' => $item['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days')),
+                    'data_vencimento_fmt' => ! empty($item['data_vencimento']) ? date('d/m/Y', strtotime($item['data_vencimento'])) : date('d/m/Y', strtotime('+30 days')),
+                    'valor_recorrente' => (float) ($item['valor_recorrente'] ?? self::getCustoInstanciaExtra()),
+                    'numero_conectado' => $item['owner'] ?? '',
+                ];
+            }
+        }
+
+        $configInfo = self::getInstanciaConfiguracaoInfo();
+
+        return [
+            'instancia' => $nome,
+            'criada_pelo_painel' => true,
+            'tipo' => 'configuracao_master',
+            'tipo_label' => 'Instância Principal / Franqueado Local',
+            'licenciado_id' => null,
+            'chave_licenca' => $configInfo['chave_licenca'] ?? 'MASTER-FOCO7-OFICIAL',
+            'nome_franqueado' => $configInfo['nome_responsavel'] ?? 'Administrador / Franqueado',
+            'empresa_franqueado' => $configInfo['empresa_franqueado'] ?? 'Foco 7 Rastreamento',
+            'documento_franqueado' => $configInfo['documento_franqueado'] ?? '',
+            'telefone_franqueado' => $configInfo['telefone_responsavel'] ?? '',
+            'email_franqueado' => $configInfo['email_responsavel'] ?? '',
+            'dominio_franqueado' => $configInfo['dominio_franqueado'] ?? 'foco7.com.br',
+            'ip_franqueado' => '',
+            'status_assinatura' => $configInfo['status'] ?? 'ativa',
+            'data_vencimento' => $configInfo['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days')),
+            'data_vencimento_fmt' => ! empty($configInfo['data_vencimento']) ? date('d/m/Y', strtotime($configInfo['data_vencimento'])) : date('d/m/Y', strtotime('+30 days')),
+            'valor_recorrente' => (float) ($configInfo['valor_recorrente'] ?? self::getCustoInstanciaExtra()),
+            'numero_conectado' => $configInfo['owner'] ?? (string) CmsSetting::get('evolution_connected_number', ''),
+        ];
+    }
+
+    /**
+     * Atualiza as informações do Franqueado / Titular vinculado a uma instância do painel
+     */
+    public static function atualizarDadosFranqueadoInstancia(string $nomeInstancia, array $dados): array
+    {
+        $nome = trim($nomeInstancia);
+        $instPrincipal = self::getInstanceName();
+
+        if (strtolower($nome) === strtolower($instPrincipal) || strtolower($nome) === 'foco7') {
+            if (isset($dados['nome_franqueado'])) {
+                CmsSetting::set('evolution_master_nome_responsavel', trim((string) $dados['nome_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['empresa_franqueado'])) {
+                CmsSetting::set('evolution_master_empresa_franqueado', trim((string) $dados['empresa_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['documento_franqueado'])) {
+                CmsSetting::set('evolution_master_documento_franqueado', trim((string) $dados['documento_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['telefone_franqueado'])) {
+                CmsSetting::set('evolution_master_telefone_franqueado', trim((string) $dados['telefone_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['email_franqueado'])) {
+                CmsSetting::set('evolution_master_email_franqueado', trim((string) $dados['email_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['dominio_franqueado'])) {
+                CmsSetting::set('evolution_master_dominio_franqueado', trim((string) $dados['dominio_franqueado']), 'whatsapp');
+            }
+            if (isset($dados['chave_licenca'])) {
+                CmsSetting::set('evolution_master_chave_licenca', trim((string) $dados['chave_licenca']), 'whatsapp');
+            }
+        }
+
+        $extras = self::getInstanciasExtras();
+        $atualizouExtra = false;
+        foreach ($extras as &$item) {
+            if (strtolower((string) ($item['nome'] ?? '')) === strtolower($nome)) {
+                if (isset($dados['licenciado_id']) && $dados['licenciado_id'] !== '') {
+                    $item['licenciado_id'] = (int) $dados['licenciado_id'];
+                }
+                if (isset($dados['tipo']) && ! empty($dados['tipo'])) {
+                    $item['tipo'] = trim((string) $dados['tipo']);
+                }
+                if (isset($dados['nome_franqueado'])) {
+                    $item['nome_responsavel'] = trim((string) $dados['nome_franqueado']);
+                }
+                if (isset($dados['empresa_franqueado'])) {
+                    $item['empresa_franqueado'] = trim((string) $dados['empresa_franqueado']);
+                }
+                if (isset($dados['documento_franqueado'])) {
+                    $item['documento_franqueado'] = trim((string) $dados['documento_franqueado']);
+                }
+                if (isset($dados['telefone_franqueado'])) {
+                    $item['telefone_responsavel'] = trim((string) $dados['telefone_franqueado']);
+                }
+                if (isset($dados['email_franqueado'])) {
+                    $item['email_responsavel'] = trim((string) $dados['email_franqueado']);
+                }
+                if (isset($dados['dominio_franqueado'])) {
+                    $item['dominio_franqueado'] = trim((string) $dados['dominio_franqueado']);
+                }
+                if (isset($dados['chave_licenca'])) {
+                    $item['chave_licenca'] = trim((string) $dados['chave_licenca']);
+                }
+                $atualizouExtra = true;
+                break;
+            }
+        }
+
+        if ($atualizouExtra) {
+            CmsSetting::set('evolution_instancias_extras', $extras, 'whatsapp', 'json');
+        }
+
+        return self::obterInfoFranqueadoInstancia($nome);
+    }
+
+    /**
+     * Lista EXCLUSIVAMENTE as instâncias criadas através deste painel (nunca lista instâncias de terceiros do servidor Evolution Go)
+     * e cruza em tempo real o status de conexão e informações do Franqueado / Licenciado de cada uma.
+     */
+    public static function listarInstanciasCriadasNoPainel(): array
+    {
+        $extras = self::getInstanciasExtras();
+        $configInst = self::getInstanciaConfiguracaoInfo();
+        $instAtivaNome = self::getInstanceName();
+
+        // 1. Monta mapa restrito APENAS com as instâncias que pertencem a este painel
+        $mapaPainel = [];
+
+        $nomePrincipalKey = strtolower(trim((string) ($configInst['nome'] ?? $instAtivaNome)));
+        if (! empty($nomePrincipalKey)) {
+            $mapaPainel[$nomePrincipalKey] = [
+                'name' => $configInst['nome'] ?? $instAtivaNome,
+                'token' => $configInst['token'] ?? self::getInstanceApiKey(),
+                'status' => CmsSetting::get('evolution_status_cache', 'desconectado') === 'conectado' ? 'open' : 'close',
+                'connected' => CmsSetting::get('evolution_status_cache', 'desconectado') === 'conectado',
+                'owner' => (string) CmsSetting::get('evolution_connected_number', ''),
+                'criada_pelo_painel' => true,
+                'franqueado' => self::obterInfoFranqueadoInstancia($configInst['nome'] ?? $instAtivaNome),
+            ];
+        }
+
+        foreach ($extras as $ext) {
+            $n = trim((string) ($ext['nome'] ?? ''));
+            if (empty($n)) {
+                continue;
+            }
+            $k = strtolower($n);
+            $isConn = ! empty($ext['conectado']) || (($ext['status_conexao'] ?? '') === 'conectado');
+            $mapaPainel[$k] = [
+                'name' => $n,
+                'token' => $ext['token'] ?? '',
+                'status' => $isConn ? 'open' : 'close',
+                'connected' => $isConn,
+                'owner' => (string) ($ext['owner'] ?? ''),
+                'criada_pelo_painel' => true,
+                'franqueado' => self::obterInfoFranqueadoInstancia($n),
+            ];
+        }
+
+        // 2. Consulta o servidor Evolution Go APENAS para enriquecer status/owner/token das instâncias deste painel
+        $resServidor = self::listarInstancias();
+        $alterouExtras = false;
+
+        if ($resServidor['success'] && ! empty($resServidor['data'])) {
+            $listaBruta = self::extrairListaInstancias($resServidor['data']);
+            foreach ($listaBruta as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+                $nomeSrv = trim((string) ($item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? ''))));
+                $chaveSrv = strtolower($nomeSrv);
+
+                // FILTRO ESTRITO: Se a instância do servidor Evolution Go NÃO foi criada por este painel, IGNORA!
+                if (empty($chaveSrv) || ! isset($mapaPainel[$chaveSrv])) {
+                    continue;
+                }
+
+                $tokenSrv = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
+                $jidRaw = (string) ($item['jid'] ?? ($item['owner'] ?? ($item['instance']['owner'] ?? '')));
+                $ownerSrv = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
+                $statusRaw = strtolower((string) ($item['status'] ?? ($item['state'] ?? '')));
+                $isConnected = (($item['connected'] ?? false) === true)
+                    || (($item['Connected'] ?? false) === true)
+                    || in_array($statusRaw, ['open', 'connected', 'conectado'], true);
+
+                $mapaPainel[$chaveSrv]['connected'] = $isConnected;
+                $mapaPainel[$chaveSrv]['status'] = $isConnected ? 'open' : 'close';
+                $mapaPainel[$chaveSrv]['owner'] = $isConnected ? $ownerSrv : '';
+                if (! empty($tokenSrv)) {
+                    $mapaPainel[$chaveSrv]['token'] = $tokenSrv;
+                }
+                $mapaPainel[$chaveSrv]['franqueado']['numero_conectado'] = $isConnected ? $ownerSrv : '';
+
+                // Sincroniza cache local se for a instância principal
+                if ($chaveSrv === strtolower($instAtivaNome)) {
+                    if (! empty($tokenSrv)) {
+                        CmsSetting::set('evolution_apikey', $tokenSrv, 'whatsapp');
+                    }
+                    CmsSetting::set('evolution_status_cache', $isConnected ? 'conectado' : 'desconectado', 'whatsapp');
+                    CmsSetting::set('evolution_connected_number', $isConnected ? $ownerSrv : '', 'whatsapp');
+                }
+
+                // Sincroniza status_conexao e owner nas instâncias extras do painel
+                foreach ($extras as &$extItem) {
+                    if (strtolower((string) ($extItem['nome'] ?? '')) === $chaveSrv) {
+                        $extItem['conectado'] = $isConnected;
+                        $extItem['status_conexao'] = $isConnected ? 'conectado' : 'desconectado';
+                        $extItem['owner'] = $isConnected ? $ownerSrv : '';
+                        if (! empty($tokenSrv)) {
+                            $extItem['token'] = $tokenSrv;
+                        }
+                        $alterouExtras = true;
+                    }
+                }
+            }
+        }
+
+        if ($alterouExtras) {
+            CmsSetting::set('evolution_instancias_extras', $extras, 'whatsapp', 'json');
+        }
+
+        return array_values($mapaPainel);
+    }
+
+    /**
+     * Registra ou atualiza uma instância criada por este painel com tarifação recorrente de R$ 60,00/mês
+     * e vincula todos os dados do Franqueado / Licenciado na conexão da instância.
      */
     public static function registrarInstanciaExtra(
         string $nome,
@@ -493,7 +823,8 @@ class EvolutionApiService
         ?string $telefoneResponsavel = null,
         ?string $nomeResponsavel = null,
         ?string $emailResponsavel = null,
-        ?string $statusInicial = null
+        ?string $statusInicial = null,
+        array $dadosFranqueado = []
     ): array {
         $extras = self::getInstanciasExtras();
         $custo = self::getCustoInstanciaExtra();
@@ -520,24 +851,46 @@ class EvolutionApiService
             'tipo' => $tipo, // 'propria_admin', 'empresa' ou 'licenciado'
             'licenciado_id' => $licenciadoId,
             'nome_responsavel' => $nomeResponsavel,
+            'empresa_franqueado' => $dadosFranqueado['empresa_franqueado'] ?? $nomeResponsavel,
+            'documento_franqueado' => $dadosFranqueado['documento_franqueado'] ?? '',
             'telefone_responsavel' => $telefoneResponsavel,
             'email_responsavel' => $emailResponsavel,
+            'dominio_franqueado' => $dadosFranqueado['dominio_franqueado'] ?? '',
+            'chave_licenca' => $dadosFranqueado['chave_licenca'] ?? '',
             'hash_pagamento' => $hash,
             'valor_recorrente' => $custo,
             'data_vencimento' => $vencimentoInicial,
             'ultimo_pagamento' => ($statusInicial === 'ativa') ? now()->format('Y-m-d H:i:s') : null,
             'criado_em' => now()->format('Y-m-d H:i:s'),
             'status' => $statusInicial,
+            'criada_pelo_painel' => true,
         ];
 
-        // Se for licenciado e não veio contato, tenta carregar da licença
-        if (! empty($licenciadoId) && (empty($telefoneResponsavel) || empty($nomeResponsavel))) {
+        // Se for vinculada a um franqueado/licenciado, carrega e sincroniza também na tabela licencas
+        if (! empty($licenciadoId)) {
             try {
-                $lic = Licenca::find($licenciadoId);
-                if ($lic && $lic->user) {
-                    $nova['nome_responsavel'] = $nova['nome_responsavel'] ?: $lic->user->name;
-                    $nova['telefone_responsavel'] = $nova['telefone_responsavel'] ?: $lic->user->telefone;
-                    $nova['email_responsavel'] = $nova['email_responsavel'] ?: $lic->user->email;
+                $lic = Licenca::with('user')->find($licenciadoId);
+                if ($lic) {
+                    $nova['nome_responsavel'] = $nova['nome_responsavel'] ?: ($lic->user?->name ?: $lic->nome_empresa);
+                    $nova['empresa_franqueado'] = ! empty($dadosFranqueado['empresa_franqueado']) ? $dadosFranqueado['empresa_franqueado'] : ($lic->nome_empresa ?: $nova['nome_responsavel']);
+                    $nova['documento_franqueado'] = ! empty($dadosFranqueado['documento_franqueado']) ? $dadosFranqueado['documento_franqueado'] : ($lic->user?->cpf_cnpj ?? '');
+                    $nova['telefone_responsavel'] = $nova['telefone_responsavel'] ?: ($lic->user?->telefone ?? '');
+                    $nova['email_responsavel'] = $nova['email_responsavel'] ?: ($lic->user?->email ?? '');
+                    $nova['dominio_franqueado'] = ! empty($dadosFranqueado['dominio_franqueado']) ? $dadosFranqueado['dominio_franqueado'] : ($lic->dominio_autorizado ?? '');
+                    $nova['chave_licenca'] = ! empty($dadosFranqueado['chave_licenca']) ? $dadosFranqueado['chave_licenca'] : ($lic->chave_licenca ?? '');
+
+                    $dadosSrv = $lic->dados_servidor ?? [];
+                    $dadosSrv['whatsapp'] = array_merge($dadosSrv['whatsapp'] ?? [], [
+                        'instancia' => $nome,
+                        'token' => $token,
+                        'status_cobranca' => $statusInicial,
+                        'data_vencimento' => $vencimentoInicial,
+                        'nome_franqueado' => $nova['nome_responsavel'],
+                        'empresa_franqueado' => $nova['empresa_franqueado'],
+                        'telefone_franqueado' => $nova['telefone_responsavel'],
+                        'email_franqueado' => $nova['email_responsavel'],
+                    ]);
+                    $lic->update(['dados_servidor' => $dadosSrv]);
                 }
             } catch (\Throwable $e) {
             }

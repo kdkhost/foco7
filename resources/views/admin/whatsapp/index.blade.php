@@ -642,6 +642,59 @@
                                     </div>
                                     <div class="form-text small">Necessário para criar, listar e gerenciar instâncias de licenciados automaticamente.</div>
                                 </div>
+
+                                <!-- BLOCO DE INFORMAÇÕES DO FRANQUEADO NA CONEXÃO DA INSTÂNCIA ATIVA -->
+                                <div class="col-12 mt-4">
+                                    <div class="card border-primary border-opacity-25 bg-primary bg-opacity-10 shadow-none">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 pb-2 border-bottom border-primary border-opacity-25">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="badge bg-primary"><i class="fas fa-user-tie me-1"></i> Identificação do Franqueado na Conexão</span>
+                                                    <strong class="text-body" id="txtCardFranqueadoAtivoTitulo">
+                                                        {{ $franqueadoAtivoInfo['empresa_franqueado'] ?? 'Foco 7 Rastreamento' }}
+                                                    </strong>
+                                                    <span class="badge bg-secondary-subtle text-secondary font-monospace" id="txtCardFranqueadoAtivoInstancia">
+                                                        Instância: {{ $franqueadoAtivoInfo['instancia'] ?? ($instanciaConfiguracao['nome'] ?? 'foco7') }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="abrirModalEditarFranqueadoInstancia('{{ $franqueadoAtivoInfo['instancia'] ?? ($instanciaConfiguracao['nome'] ?? 'foco7') }}')">
+                                                        <i class="fas fa-user-pen me-1"></i> Editar Dados do Franqueado
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="listarInstanciasServidor()">
+                                                        <i class="fas fa-layer-group me-1"></i> Ver Instâncias Criadas neste Painel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="row g-2 small">
+                                                <div class="col-md-3">
+                                                    <span class="text-secondary d-block">Franqueado / Responsável:</span>
+                                                    <strong class="text-body" id="txtCardFranqueadoAtivoNome">{{ $franqueadoAtivoInfo['nome_franqueado'] ?? 'Administrador / Franqueado' }}</strong>
+                                                    @if(!empty($franqueadoAtivoInfo['documento_franqueado']))
+                                                        <span class="text-muted font-monospace d-block">{{ $franqueadoAtivoInfo['documento_franqueado'] }}</span>
+                                                    @endif
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span class="text-secondary d-block">Chave de Licença / Vínculo:</span>
+                                                    <strong class="font-monospace text-primary" id="txtCardFranqueadoAtivoChave">{{ $franqueadoAtivoInfo['chave_licenca'] ?: ($franqueadoAtivoInfo['tipo_label'] ?? 'Franqueado Local') }}</strong>
+                                                    <span class="text-muted d-block" id="txtCardFranqueadoAtivoDominio"><i class="fas fa-globe me-1"></i> {{ $franqueadoAtivoInfo['dominio_franqueado'] ?: 'foco7.com.br' }}</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span class="text-secondary d-block">Contato do Franqueado:</span>
+                                                    <strong class="text-body font-monospace" id="txtCardFranqueadoAtivoTel"><i class="fab fa-whatsapp text-success me-1"></i> {{ $franqueadoAtivoInfo['telefone_franqueado'] ?: 'Não informado' }}</strong>
+                                                    <span class="text-muted d-block text-truncate" id="txtCardFranqueadoAtivoEmail"><i class="fas fa-envelope me-1"></i> {{ $franqueadoAtivoInfo['email_franqueado'] ?: 'Não informado' }}</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span class="text-secondary d-block">Aparelho Conectado &amp; Vigência:</span>
+                                                    <strong class="font-monospace text-success" id="txtCardFranqueadoAtivoOwner">
+                                                        <i class="fas fa-mobile-screen-button me-1"></i> {{ !empty($numeroConectado) ? $numeroConectado : 'Aguardando leitura QR/Número' }}
+                                                    </strong>
+                                                    <span class="text-muted d-block">Vencimento: <strong>{{ $franqueadoAtivoInfo['data_vencimento_fmt'] ?? date('d/m/Y', strtotime('+30 days')) }}</strong></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -804,7 +857,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="badge bg-dark"><i class="fas fa-crown text-warning me-1"></i> Desenvolvedor / Config</span>
+                                                    <span class="badge bg-dark mb-1"><i class="fas fa-crown text-warning me-1"></i> {{ $instanciaConfiguracao['empresa_franqueado'] ?? 'Desenvolvedor / Config' }}</span>
+                                                    <div class="small text-secondary">
+                                                        <div><i class="fas fa-user-tie me-1 text-primary"></i> <strong>{{ $instanciaConfiguracao['nome_responsavel'] ?? 'Foco 7 Tecnologia' }}</strong></div>
+                                                        @if(!empty($instanciaConfiguracao['dominio_franqueado']))
+                                                            <div class="font-monospace text-muted" style="font-size: 0.72rem;"><i class="fas fa-globe me-1"></i>{{ $instanciaConfiguracao['dominio_franqueado'] }}</div>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     @if($configs['dev_desbloqueado'])
@@ -851,6 +910,9 @@
                                                                 <i class="fas fa-pause"></i>
                                                             </button>
                                                         @endif
+                                                        <button type="button" class="btn btn-outline-primary" onclick="abrirModalEditarFranqueadoInstancia('{{ $nomeInstConfig }}')" title="Ver / Editar informações do Franqueado na conexão desta instância">
+                                                            <i class="fas fa-user-tie"></i>
+                                                        </button>
                                                         <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $nomeInstConfig }}')" title="Conectar via QR Code ou Número de Telefone">
                                                             <i class="fas fa-qrcode me-1"></i> Conectar
                                                         </button>
@@ -882,12 +944,35 @@
                                                     </td>
                                                     <td>
                                                         @if(($extra['tipo'] ?? '') === 'licenciado')
-                                                            <span class="badge bg-primary"><i class="fas fa-id-badge me-1"></i> Licenciado #{{ $extra['licenciado_id'] ?? '' }}</span>
+                                                            <span class="badge bg-primary mb-1"><i class="fas fa-id-badge me-1"></i> Franqueado / Licenciado {{ !empty($extra['licenciado_id']) ? '#'.$extra['licenciado_id'] : '' }}</span>
                                                         @elseif(($extra['tipo'] ?? '') === 'propria_admin')
-                                                            <span class="badge bg-success"><i class="fas fa-user-check me-1"></i> Própria do Admin</span>
+                                                            <span class="badge bg-success mb-1"><i class="fas fa-user-check me-1"></i> Própria do Admin / Franqueado</span>
                                                         @else
-                                                            <span class="badge bg-secondary"><i class="fas fa-building me-1"></i> Instância Admin / Empresa</span>
+                                                            <span class="badge bg-secondary mb-1"><i class="fas fa-building me-1"></i> Unidade / Empresa Franqueada</span>
                                                         @endif
+                                                        <div class="small text-secondary">
+                                                            <div><i class="fas fa-user-tie me-1 text-primary"></i> <strong>{{ $extra['nome_responsavel'] ?? 'Franqueado' }}</strong> {{ !empty($extra['empresa_franqueado']) && $extra['empresa_franqueado'] !== ($extra['nome_responsavel'] ?? '') ? '• '.$extra['empresa_franqueado'] : '' }}</div>
+                                                            @if(!empty($extra['telefone_responsavel']) || !empty($extra['email_responsavel']))
+                                                                <div class="text-muted" style="font-size: 0.73rem;">
+                                                                    @if(!empty($extra['telefone_responsavel']))
+                                                                        <span class="me-2"><i class="fab fa-whatsapp text-success me-1"></i>{{ $extra['telefone_responsavel'] }}</span>
+                                                                    @endif
+                                                                    @if(!empty($extra['email_responsavel']))
+                                                                        <span><i class="fas fa-envelope me-1"></i>{{ $extra['email_responsavel'] }}</span>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
+                                                            @if(!empty($extra['chave_licenca']) || !empty($extra['dominio_franqueado']))
+                                                                <div class="font-monospace text-muted" style="font-size: 0.72rem;">
+                                                                    @if(!empty($extra['chave_licenca']))
+                                                                        <span class="me-2"><i class="fas fa-key text-warning me-1"></i>{{ $extra['chave_licenca'] }}</span>
+                                                                    @endif
+                                                                    @if(!empty($extra['dominio_franqueado']))
+                                                                        <span><i class="fas fa-globe me-1"></i>{{ $extra['dominio_franqueado'] }}</span>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <div>
@@ -949,6 +1034,9 @@
                                                                     <i class="fas fa-pause"></i>
                                                                 </button>
                                                             @endif
+                                                            <button type="button" class="btn btn-outline-primary" onclick="abrirModalEditarFranqueadoInstancia('{{ $extra['nome'] }}')" title="Ver / Editar informações do Franqueado na conexão desta instância">
+                                                                <i class="fas fa-user-tie"></i>
+                                                            </button>
                                                             <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $extra['nome'] }}')" title="Conectar via QR Code ou Número de Telefone">
                                                                 <i class="fas fa-qrcode me-1"></i> Conectar
                                                             </button>
@@ -1656,6 +1744,29 @@
             </div>
             <div class="modal-body p-4 text-center">
 
+                <!-- PAINEL DE INFORMAÇÕES DO FRANQUEADO NA CONEXÃO DA INSTÂNCIA -->
+                <div id="boxInfoFranqueadoModalQr" class="p-3 rounded-3 bg-light border text-start mb-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary" id="txtQrFranqueadoTipoBadge"><i class="fas fa-user-tie me-1"></i> Franqueado / Titular</span>
+                            <strong class="text-body small" id="txtQrFranqueadoEmpresa">{{ $franqueadoAtivoInfo['empresa_franqueado'] ?? 'Foco 7 Rastreamento' }}</strong>
+                        </div>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold" onclick="abrirModalEditarFranqueadoInstancia(instanciaModalAtual)">
+                            <i class="fas fa-user-pen me-1"></i> Editar Franqueado
+                        </button>
+                    </div>
+                    <div class="row g-2 small" style="font-size: 0.78rem;">
+                        <div class="col-sm-6">
+                            <div class="text-secondary"><i class="fas fa-user me-1 text-primary"></i> <strong>Responsável:</strong> <span class="text-body fw-semibold" id="txtQrFranqueadoNome">{{ $franqueadoAtivoInfo['nome_franqueado'] ?? 'Administrador' }}</span></div>
+                            <div class="text-secondary"><i class="fas fa-globe me-1 text-info"></i> <strong>Domínio/Licença:</strong> <span class="font-monospace text-body" id="txtQrFranqueadoDominio">{{ $franqueadoAtivoInfo['dominio_franqueado'] ?: ($franqueadoAtivoInfo['chave_licenca'] ?? 'foco7.com.br') }}</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-secondary"><i class="fab fa-whatsapp me-1 text-success"></i> <strong>Contato:</strong> <span class="font-monospace text-body" id="txtQrFranqueadoTelefone">{{ $franqueadoAtivoInfo['telefone_franqueado'] ?: 'Não informado' }}</span></div>
+                            <div class="text-secondary"><i class="fas fa-calendar-check me-1 text-warning"></i> <strong>Vencimento:</strong> <span class="fw-semibold text-body" id="txtQrFranqueadoVencimento">{{ $franqueadoAtivoInfo['data_vencimento_fmt'] ?? date('d/m/Y', strtotime('+30 days')) }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="qrLoadingBox" class="py-4">
                     <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                     <h6 class="fw-bold text-body" id="txtQrLoadingTitulo">Gerando QR Code na Evolution API Go...</h6>
@@ -1816,47 +1927,177 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Nome da Sua Instância <span class="text-danger">*</span></label>
-                    <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="minha_empresa_{{ rand(100, 999) }}" placeholder="Ex: minha_empresa_wpp ou filial_belem">
-                    <div class="form-text small">Identificador único no servidor <code>https://api.kdkhost.com.br</code></div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nome da Sua Instância <span class="text-danger">*</span></label>
+                        <input type="text" id="modalInstanciaNome" class="form-control font-monospace" value="minha_empresa_{{ rand(100, 999) }}" placeholder="Ex: minha_empresa_wpp ou filial_belem">
+                        <div class="form-text small">Identificador único neste painel</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Finalidade / Tipo da Instância</label>
+                        <select id="modalInstanciaTipo" class="form-select" onchange="aoMudarTipoModalInstancia()">
+                            <option value="propria_admin" selected>Minha Própria Instância Admin / Franqueado</option>
+                            <option value="licenciado">Instância Dedicada de Franqueado / Licenciado</option>
+                            <option value="empresa">Instância Adicional da Empresa / Filial</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Finalidade / Tipo da Instância</label>
-                    <select id="modalInstanciaTipo" class="form-select">
-                        <option value="propria_admin" selected>Minha Própria Instância Admin (Para Cobrar Clientes via WhatsApp)</option>
-                        <option value="empresa">Instância Adicional da Empresa / Filial</option>
-                        <option value="licenciado">Instância Dedicada de Licenciado</option>
+                <div class="mb-3 p-2 rounded bg-light border">
+                    <label class="form-label fw-bold small text-primary mb-1">
+                        <i class="fas fa-user-tie me-1"></i> Selecionar Franqueado / Licenciado Cadastrado (Opcional - Auto-preenche os dados)
+                    </label>
+                    <select id="modalInstanciaLicenciadoId" class="form-select form-select-sm" onchange="preencherCamposPorFranqueadoSelecionado(this, 'modalInstancia')">
+                        <option value="">-- Preencher manualmente ou selecionar franqueado da lista --</option>
+                        @if(isset($licenciados) && count($licenciados) > 0)
+                            @foreach($licenciados as $lic)
+                                <option value="{{ $lic->id }}"
+                                    data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
+                                    data-empresa="{{ $lic->nome_empresa }}"
+                                    data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
+                                    data-tel="{{ $lic->user?->telefone ?? '' }}"
+                                    data-email="{{ $lic->user?->email ?? '' }}"
+                                    data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
+                                    data-chave="{{ $lic->chave_licenca }}">
+                                    #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
-                <div class="row g-2 mb-3">
+                <div class="row g-2 mb-2">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Nome do Responsável / Cliente</label>
-                        <input type="text" id="modalInstanciaNomeResp" class="form-control" placeholder="Ex: João da Silva ou Empresa XPTO">
+                        <label class="form-label fw-semibold small mb-1">Nome do Franqueado / Responsável <span class="text-danger">*</span></label>
+                        <input type="text" id="modalInstanciaNomeResp" class="form-control form-control-sm" value="{{ $franqueadoAtivoInfo['nome_franqueado'] ?? (auth()->user()?->name ?? '') }}" placeholder="Ex: João da Silva">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">WhatsApp para Cobrança Automática</label>
-                        <input type="text" id="modalInstanciaTelResp" class="form-control mascara-telefone" placeholder="(99) 99999-9999">
+                        <label class="form-label fw-semibold small mb-1">Empresa / Unidade do Franqueado <span class="text-danger">*</span></label>
+                        <input type="text" id="modalInstanciaEmpresaFranqueado" class="form-control form-control-sm" value="{{ $franqueadoAtivoInfo['empresa_franqueado'] ?? '' }}" placeholder="Ex: Rastreamento Norte Ltda">
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">E-mail do Responsável (Opcional)</label>
-                    <input type="email" id="modalInstanciaEmailResp" class="form-control" placeholder="cliente@email.com">
-                    <div class="form-text small">Usado para identificação do pagador no Mercado Pago.</div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">WhatsApp do Franqueado (p/ Avisos PIX)</label>
+                        <input type="text" id="modalInstanciaTelResp" class="form-control form-control-sm mascara-telefone" value="{{ $franqueadoAtivoInfo['telefone_franqueado'] ?? '' }}" placeholder="(99) 99999-9999">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">E-mail do Franqueado</label>
+                        <input type="email" id="modalInstanciaEmailResp" class="form-control form-control-sm" value="{{ $franqueadoAtivoInfo['email_franqueado'] ?? (auth()->user()?->email ?? '') }}" placeholder="franqueado@empresa.com.br">
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Token da Instância (Opcional - Gerado automaticamente se vazio)</label>
-                    <input type="text" id="modalInstanciaToken" class="form-control font-monospace" placeholder="Deixe em branco para auto-geração">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small mb-1">CPF / CNPJ do Franqueado</label>
+                        <input type="text" id="modalInstanciaDocFranqueado" class="form-control form-control-sm font-monospace" value="{{ $franqueadoAtivoInfo['documento_franqueado'] ?? '' }}" placeholder="00.000.000/0001-00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small mb-1">Domínio / Servidor do Franqueado</label>
+                        <input type="text" id="modalInstanciaDominioFranqueado" class="form-control form-control-sm font-monospace" value="{{ $franqueadoAtivoInfo['dominio_franqueado'] ?? '' }}" placeholder="painel.franqueado.com.br">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small mb-1">Chave de Licença (Opcional)</label>
+                        <input type="text" id="modalInstanciaChaveLicenca" class="form-control form-control-sm font-monospace" value="{{ $franqueadoAtivoInfo['chave_licenca'] ?? '' }}" placeholder="FOCO7-XXXX-XXXX">
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold small mb-1">Token da Instância (Opcional - Gerado automaticamente se vazio)</label>
+                    <input type="text" id="modalInstanciaToken" class="form-control form-control-sm font-monospace" placeholder="Deixe em branco para auto-geração">
                 </div>
             </div>
             <div class="modal-footer bg-body-tertiary">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary fw-bold" id="btnConfirmarCriarInstancia" onclick="executarCriacaoInstancia()">
                     <i class="fas fa-check me-1"></i> Confirmar &amp; Criar Instância
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================
+     MODAL EXTRA: EDITAR DADOS DO FRANQUEADO NA CONEXÃO DA INSTÂNCIA
+     =================================================================== -->
+<div class="modal fade" id="modalEditarFranqueadoInstancia" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white py-3">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-user-tie me-2"></i> Dados do Franqueado na Instância <code class="text-white bg-dark bg-opacity-25 px-2 py-1 rounded" id="txtEditFranqueadoInstanciaLabel">foco7</code>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="editFranqueadoInstanciaNome" value="">
+
+                <div class="mb-3 p-2 rounded bg-light border">
+                    <label class="form-label fw-bold small text-primary mb-1">
+                        <i class="fas fa-id-badge me-1"></i> Vincular a um Franqueado / Licenciado Cadastrado
+                    </label>
+                    <select id="editFranqueadoLicenciadoId" class="form-select form-select-sm" onchange="preencherCamposPorFranqueadoSelecionado(this, 'editFranqueado')">
+                        <option value="">-- Manter preenchimento personalizado abaixo --</option>
+                        @if(isset($licenciados) && count($licenciados) > 0)
+                            @foreach($licenciados as $lic)
+                                <option value="{{ $lic->id }}"
+                                    data-nome="{{ $lic->user?->name ?? $lic->nome_empresa }}"
+                                    data-empresa="{{ $lic->nome_empresa }}"
+                                    data-doc="{{ $lic->user?->cpf_cnpj ?? '' }}"
+                                    data-tel="{{ $lic->user?->telefone ?? '' }}"
+                                    data-email="{{ $lic->user?->email ?? '' }}"
+                                    data-dominio="{{ $lic->dominio_autorizado ?? '' }}"
+                                    data-chave="{{ $lic->chave_licenca }}">
+                                    #{{ $lic->id }} - {{ $lic->nome_empresa }} ({{ $lic->user?->name ?? 'Franqueado' }}) • {{ $lic->chave_licenca }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Nome do Franqueado / Responsável</label>
+                        <input type="text" id="editFranqueadoNome" class="form-control form-control-sm" placeholder="Nome completo do responsável">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Empresa / Unidade Franqueada</label>
+                        <input type="text" id="editFranqueadoEmpresa" class="form-control form-control-sm" placeholder="Nome da empresa ou franquia">
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">WhatsApp do Franqueado</label>
+                        <input type="text" id="editFranqueadoTelefone" class="form-control form-control-sm mascara-telefone" placeholder="(99) 99999-9999">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">E-mail do Franqueado</label>
+                        <input type="email" id="editFranqueadoEmail" class="form-control form-control-sm" placeholder="contato@franqueado.com.br">
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">CPF / CNPJ do Franqueado</label>
+                        <input type="text" id="editFranqueadoDocumento" class="form-control form-control-sm font-monospace" placeholder="00.000.000/0001-00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Domínio / Servidor do Franqueado</label>
+                        <input type="text" id="editFranqueadoDominio" class="form-control form-control-sm font-monospace" placeholder="rastreamento.franqueado.com.br">
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold small mb-1">Chave de Licença Vinculada</label>
+                    <input type="text" id="editFranqueadoChave" class="form-control form-control-sm font-monospace" placeholder="FOCO7-XXXX-XXXX-XXXX">
+                </div>
+            </div>
+            <div class="modal-footer bg-body-tertiary">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary btn-sm fw-bold" id="btnSalvarDadosFranqueado" onclick="salvarDadosFranqueadoModal()">
+                    <i class="fas fa-save me-1"></i> Salvar Informações do Franqueado
                 </button>
             </div>
         </div>
@@ -2277,6 +2518,10 @@
             type: 'GET',
             dataType: 'json',
             success: function (res) {
+                if (res.franqueado) {
+                    atualizarCardFranqueadoAtivoUI(res.franqueado);
+                }
+
                 if (res.conectado) {
                     $('#badgeStatusGeral').removeClass('bg-secondary bg-danger bg-warning').addClass('bg-success');
                     $('#badgeStatusPulse').removeClass('pulse-offline pulse-warning').addClass('pulse-online');
@@ -2443,6 +2688,11 @@
                     instanciaModalAtual = res.instancia;
                     $('#txtModalNomeInstanciaConexao').text(res.instancia);
                 }
+                if (res.franqueado) {
+                    preencherDadosFranqueadoModalQr(res.franqueado);
+                } else {
+                    carregarDadosFranqueadoModalQrRemoto(instanciaModalAtual);
+                }
                 if (res.conectado && !forcarQr) {
                     $('#qrLoadingBox').hide();
                     $('#qrCodeContentBox').hide();
@@ -2570,7 +2820,11 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (res) {
-                    if (res.conectado) {
+                    if (res.franqueado) {
+                    atualizarCardFranqueadoAtivoUI(res.franqueado);
+                }
+
+                if (res.conectado) {
                         pararPollingQr();
                         $('#qrLoadingBox').hide();
                         $('#qrCodeContentBox').hide();
@@ -2601,6 +2855,10 @@
             dataType: 'json',
             success: function (res) {
                 $('#qrLoadingBox').hide();
+                if (res.franqueado) {
+                    atualizarCardFranqueadoAtivoUI(res.franqueado);
+                }
+
                 if (res.conectado) {
                     if (res.numero_conectado || res.owner) {
                         $('#txtModalNumeroConectado').text(res.numero_conectado || res.owner);
@@ -2655,6 +2913,10 @@
             dataType: 'json',
             success: function (res) {
                 $('#qrLoadingBox').hide();
+                if (res.franqueado) {
+                    atualizarCardFranqueadoAtivoUI(res.franqueado);
+                }
+
                 if (res.conectado) {
                     $('#qrConectadoBox').show();
                     verificarStatusApi(false);
@@ -2699,8 +2961,8 @@
 
     function listarInstanciasServidor() {
         Swal.fire({
-            title: 'Consultando Servidor...',
-            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i><p class="text-secondary small mb-0">Buscando instâncias cadastradas na Evolution API...</p></div>',
+            title: 'Consultando Instâncias do Painel...',
+            html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i><p class="text-secondary small mb-0">Buscando exclusivamente as instâncias criadas neste painel e os dados dos franqueados...</p></div>',
             showConfirmButton: false,
             allowOutsideClick: false
         });
@@ -2715,7 +2977,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Nenhuma Instância',
-                        text: res.message || 'Nenhuma instância retornada pelo servidor.',
+                        text: res.message || 'Nenhuma instância criada por este painel.',
                         confirmButtonColor: '#d90000'
                     });
                     return;
@@ -2729,14 +2991,20 @@
                 if (lista.length === 0) {
                     Swal.fire({
                         icon: 'info',
-                        title: 'Nenhuma Instância Encontrada',
-                        text: 'O servidor Evolution API está online, mas nenhuma instância foi criada ainda.',
+                        title: 'Nenhuma Instância neste Painel',
+                        text: 'Nenhuma instância foi provisionada por este painel ainda.',
                         confirmButtonColor: '#d90000'
                     });
                     return;
                 }
 
-                var htmlInst = '<div class="list-group text-start my-2" style="max-height: 300px; overflow-y: auto;">';
+                var htmlInst = `
+                    <div class="alert alert-info py-2 px-3 mb-2 text-start small border-0" style="background: rgba(13, 110, 253, 0.08);">
+                        <i class="fas fa-shield-alt text-primary me-1"></i>
+                        Exibindo <strong>exclusivamente as instâncias criadas por este painel</strong> (${lista.length}) com identificação do franqueado.
+                    </div>
+                    <div class="list-group text-start my-2" style="max-height: 380px; overflow-y: auto;">
+                `;
                 lista.forEach(function (inst) {
                     if (!inst || typeof inst !== 'object') return;
                     var nome = inst.name || (inst.instance && inst.instance.name) || (inst.instanceName) || 'Sem Nome';
@@ -2744,20 +3012,58 @@
                     var token = inst.token || (inst.instance && inst.instance.token) || (inst.apikey) || '';
                     var owner = String(inst.owner || inst.jid || '').replace('@s.whatsapp.net', '').replace('@c.us', '');
                     var isConnected = (inst.connected === true || inst.Connected === true || status === 'open' || status === 'connected' || status === 'conectado');
+                    var f = inst.franqueado || {};
+
                     var statusBadge = isConnected 
                         ? '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Conectado (open)</span>' 
                         : '<span class="badge bg-danger">Desconectado (close)</span>';
                     var ownerBadge = owner ? `<span class="badge bg-dark-subtle text-body font-monospace ms-1"><i class="fab fa-whatsapp text-success me-1"></i>${owner}</span>` : '';
+                    var tipoBadge = `<span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1">${f.tipo_label || (inst.eh_principal_painel ? 'Admin / Painel' : 'Franqueado')}</span>`;
+
+                    var nomeFranq = f.nome_franqueado || 'Administrador do Painel';
+                    var empFranq = f.empresa_franqueado && f.empresa_franqueado !== nomeFranq ? ` &bull; <span class="text-secondary">${f.empresa_franqueado}</span>` : '';
+                    var telFranq = f.telefone_franqueado ? `<span class="me-2"><i class="fab fa-whatsapp text-success me-1"></i>${f.telefone_franqueado}</span>` : '';
+                    var emailFranq = f.email_franqueado ? `<span class="me-2"><i class="fas fa-envelope text-muted me-1"></i>${f.email_franqueado}</span>` : '';
+                    var domLic = '';
+                    if (f.chave_licenca) {
+                        domLic += `<span class="badge bg-secondary-subtle text-body font-monospace me-1" style="font-size: 0.65rem;"><i class="fas fa-key text-warning me-1"></i>${f.chave_licenca}</span>`;
+                    }
+                    if (f.dominio_franqueado) {
+                        domLic += `<span class="badge bg-secondary-subtle text-body me-1" style="font-size: 0.65rem;"><i class="fas fa-globe text-info me-1"></i>${f.dominio_franqueado}</span>`;
+                    }
+                    if (f.data_vencimento_fmt) {
+                        domLic += `<span class="badge bg-light text-dark border" style="font-size: 0.65rem;"><i class="fas fa-calendar-alt text-danger me-1"></i>Vence: ${f.data_vencimento_fmt}</span>`;
+                    }
 
                     htmlInst += `
-                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2 mb-1 border rounded">
-                            <div>
-                                <strong class="d-block text-body font-monospace">${nome}</strong>
-                                <div class="mt-1">${statusBadge}${ownerBadge}</div>
+                        <div class="list-group-item list-group-item-action p-3 mb-2 border rounded shadow-xs">
+                            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                                <div>
+                                    <div class="d-flex align-items-center flex-wrap gap-1">
+                                        <strong class="text-body font-monospace fs-6">${nome}</strong>
+                                        ${tipoBadge}
+                                    </div>
+                                    <div class="mt-1">${statusBadge}${ownerBadge}</div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-xs btn-outline-primary fw-semibold" onclick="Swal.close(); abrirModalEditarFranqueadoInstancia('${nome}')" title="Ver / Editar Informações do Franqueado">
+                                        <i class="fas fa-user-tie me-1"></i> Franqueado
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-outline-dark fw-semibold" onclick="Swal.close(); conectarEabrirQr('${nome}')" title="Conectar QR Code ou Número">
+                                        <i class="fas fa-qrcode me-1"></i> Conectar
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-success fw-bold" onclick="selecionarInstanciaServidor('${nome}', '${token}')">
+                                        <i class="fas fa-check me-1"></i> Selecionar
+                                    </button>
+                                </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="selecionarInstanciaServidor('${nome}', '${token}')">
-                                <i class="fas fa-check me-1"></i> Selecionar
-                            </button>
+                            <div class="mt-2 pt-2 border-top small">
+                                <div class="fw-semibold text-body">
+                                    <i class="fas fa-id-badge text-primary me-1"></i> ${nomeFranq}${empFranq}
+                                </div>
+                                ${(telFranq || emailFranq) ? `<div class="text-secondary mt-1" style="font-size: 0.75rem;">${telFranq}${emailFranq}</div>` : ''}
+                                ${domLic ? `<div class="mt-1">${domLic}</div>` : ''}
+                            </div>
                         </div>
                     `;
                 });
@@ -2766,14 +3072,15 @@
                 verificarStatusApi(false);
 
                 Swal.fire({
-                    title: 'Instâncias no Servidor Evolution Go',
+                    title: 'Instâncias Criadas neste Painel',
                     html: htmlInst,
+                    width: 640,
                     showCloseButton: true,
                     showConfirmButton: false
                 });
             },
             error: function (xhr) {
-                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao consultar servidor.';
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Falha ao consultar instâncias do painel.';
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro de Comunicação',
@@ -2791,7 +3098,178 @@
         if (token && !$('#inputApiKey').hasClass('tarja-dev-bloqueado')) {
             $('#inputApiKey').val(token);
         }
-        window.foco7Notify.success('Instância "' + nome + '" selecionada! Salve as configurações ou clique em Conectar / QR Code.');
+        carregarDadosFranqueadoModalQrRemoto(nome, true);
+        window.foco7Notify.success('Instância "' + nome + '" selecionada! Os dados do franqueado foram carregados na conexão.');
+    }
+
+    function carregarDadosFranqueadoModalQrRemoto(nomeInstancia, atualizarCardPrincipal) {
+        if (!nomeInstancia) return;
+        var urlBase = '{{ url("admin/whatsapp/instancias/franqueado") }}/' + encodeURIComponent(nomeInstancia);
+        $.ajax({
+            url: urlBase,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res && res.franqueado) {
+                    preencherDadosFranqueadoModalQr(res.franqueado);
+                    if (atualizarCardPrincipal) {
+                        atualizarCardFranqueadoAtivoUI(res.franqueado);
+                    }
+                }
+            }
+        });
+    }
+
+    function preencherDadosFranqueadoModalQr(f) {
+        if (!f || typeof f !== 'object') return;
+        $('#txtModalQrFranqueadoNome').text(f.nome_franqueado || 'Administrador / Operação Local');
+        $('#txtModalQrFranqueadoEmpresa').text(f.empresa_franqueado || f.tipo_label || 'Sistema FOCO 7');
+        $('#badgeModalQrFranqueadoTipo').text(f.tipo_label || 'Franqueado');
+        $('#txtModalQrFranqueadoTelefone').text(f.telefone_franqueado || 'Não informado');
+        $('#txtModalQrFranqueadoEmail').text(f.email_franqueado || 'Não informado');
+        $('#txtModalQrFranqueadoLicenca').text(f.chave_licenca || f.dominio_franqueado || 'Painel Principal');
+        $('#boxInfoFranqueadoModalQr').show();
+    }
+
+    function atualizarCardFranqueadoAtivoUI(f) {
+        if (!f || typeof f !== 'object') return;
+        $('#txtFranqueadoAtivoNome').text(f.nome_franqueado || 'Não informado');
+        $('#txtFranqueadoAtivoEmpresa').text(f.empresa_franqueado || 'Operação Direta');
+        if (f.documento_franqueado) {
+            $('#txtFranqueadoAtivoDoc').text('Doc: ' + f.documento_franqueado);
+        }
+        $('#txtFranqueadoAtivoTelefone').text(f.telefone_franqueado || 'Sem telefone');
+        $('#txtFranqueadoAtivoEmail').text(f.email_franqueado || 'Sem e-mail');
+        $('#txtFranqueadoAtivoDominio').text(f.dominio_franqueado || 'Domínio local');
+        $('#txtFranqueadoAtivoLicenca').text(f.chave_licenca ? 'Licença: ' + f.chave_licenca : 'Instância Direta do Painel');
+    }
+
+    function preencherCamposPorFranqueadoSelecionado(selectEl, prefixo) {
+        var $opt = $(selectEl).find('option:selected');
+        if (!$opt.length || !$opt.val()) return;
+
+        var nome = $opt.data('nome') || '';
+        var empresa = $opt.data('empresa') || '';
+        var doc = $opt.data('documento') || '';
+        var tel = $opt.data('telefone') || '';
+        var email = $opt.data('email') || '';
+        var dom = $opt.data('dominio') || '';
+        var chave = $opt.data('chave') || '';
+
+        if (prefixo === 'criar') {
+            $('#modalInstanciaNomeResp').val(nome);
+            $('#modalInstanciaEmpresaFranqueado').val(empresa);
+            $('#modalInstanciaDocFranqueado').val(doc);
+            $('#modalInstanciaTelResp').val(tel);
+            $('#modalInstanciaEmailResp').val(email);
+            $('#modalInstanciaDominioFranqueado').val(dom);
+            $('#modalInstanciaChaveLicenca').val(chave);
+            $('#modalInstanciaTipo').val('franqueado');
+
+            if (!$('#modalInstanciaNome').val()) {
+                var slugSugerido = String(empresa || nome)
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+                if (slugSugerido) {
+                    $('#modalInstanciaNome').val(slugSugerido);
+                }
+            }
+        } else if (prefixo === 'editar') {
+            $('#editFranqueadoNome').val(nome);
+            $('#editFranqueadoEmpresa').val(empresa);
+            $('#editFranqueadoDoc').val(doc);
+            $('#editFranqueadoTelefone').val(tel);
+            $('#editFranqueadoEmail').val(email);
+            $('#editFranqueadoDominio').val(dom);
+            $('#editFranqueadoChave').val(chave);
+            $('#editFranqueadoTipo').val('franqueado');
+        }
+    }
+
+    function aoMudarTipoModalInstancia() {
+        var tipo = $('#modalInstanciaTipo').val();
+        if (tipo === 'propria_admin') {
+            $('#modalInstanciaLicenciadoId').val('');
+        }
+    }
+
+    function abrirModalEditarFranqueadoInstancia(nomeInstancia) {
+        var alvo = nomeInstancia || $('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}';
+        $('#editFranqueadoInstanciaNome').val(alvo);
+        $('#txtEditFranqueadoInstanciaLabel').text(alvo);
+
+        var modalEl = document.getElementById('modalEditarFranqueadoInstancia');
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+
+        var urlBase = '{{ url("admin/whatsapp/instancias/franqueado") }}/' + encodeURIComponent(alvo);
+        $.ajax({
+            url: urlBase,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                var f = (res && res.franqueado) ? res.franqueado : {};
+                $('#editFranqueadoLicenciadoId').val(f.licenciado_id || '');
+                $('#editFranqueadoTipo').val(f.tipo || 'franqueado');
+                $('#editFranqueadoNome').val(f.nome_franqueado || '');
+                $('#editFranqueadoEmpresa').val(f.empresa_franqueado || '');
+                $('#editFranqueadoDoc').val(f.documento_franqueado || '');
+                $('#editFranqueadoTelefone').val(f.telefone_franqueado || '');
+                $('#editFranqueadoEmail').val(f.email_franqueado || '');
+                $('#editFranqueadoDominio').val(f.dominio_franqueado || '');
+                $('#editFranqueadoChave').val(f.chave_licenca || '');
+            },
+            error: function () {
+                window.foco7Notify.warning('Não foi possível carregar dados prévios do franqueado. Preencha os campos manualmente.');
+            }
+        });
+    }
+
+    function salvarDadosFranqueadoModal() {
+        var $btn = $('#btnSalvarDadosFranqueadoInstancia');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando...');
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.instancias.salvar_franqueado") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                instancia: $('#editFranqueadoInstanciaNome').val(),
+                licenciado_id: $('#editFranqueadoLicenciadoId').val(),
+                tipo: $('#editFranqueadoTipo').val(),
+                nome_franqueado: $('#editFranqueadoNome').val(),
+                empresa_franqueado: $('#editFranqueadoEmpresa').val(),
+                documento_franqueado: $('#editFranqueadoDoc').val(),
+                telefone_franqueado: $('#editFranqueadoTelefone').val(),
+                email_franqueado: $('#editFranqueadoEmail').val(),
+                dominio_franqueado: $('#editFranqueadoDominio').val(),
+                chave_licenca: $('#editFranqueadoChave').val()
+            },
+            dataType: 'json',
+            success: function (res) {
+                $('#modalEditarFranqueadoInstancia').modal('hide');
+                window.foco7Notify.success(res.message || 'Dados do franqueado vinculados à instância com sucesso!');
+                if (res.franqueado) {
+                    var instAtiva = ($('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}').toLowerCase();
+                    if (String(res.franqueado.instancia || '').toLowerCase() === instAtiva) {
+                        atualizarCardFranqueadoAtivoUI(res.franqueado);
+                    }
+                    preencherDadosFranqueadoModalQr(res.franqueado);
+                }
+                setTimeout(function () {
+                    location.reload();
+                }, 900);
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro ao salvar dados do franqueado.';
+                window.foco7Notify.error(msg);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Dados do Franqueado');
+            }
+        });
     }
 
     function desconectarInstancia(instanciaOpcional) {
@@ -2847,9 +3325,14 @@
         var nome = $('#modalInstanciaNome').val();
         var token = $('#modalInstanciaToken').val();
         var tipo = $('#modalInstanciaTipo').val();
+        var licenciadoId = $('#modalInstanciaLicenciadoId').val();
         var nomeResp = $('#modalInstanciaNomeResp').val();
+        var empresaFranqueado = $('#modalInstanciaEmpresaFranqueado').val();
+        var docFranqueado = $('#modalInstanciaDocFranqueado').val();
         var telResp = $('#modalInstanciaTelResp').val();
         var emailResp = $('#modalInstanciaEmailResp').val();
+        var dominioFranqueado = $('#modalInstanciaDominioFranqueado').val();
+        var chaveLicenca = $('#modalInstanciaChaveLicenca').val();
 
         var $btn = $('#btnConfirmarCriarInstancia');
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Criando...');
@@ -2862,9 +3345,14 @@
                 nome: nome,
                 token: token,
                 tipo: tipo,
+                licenciado_id: licenciadoId,
                 nome_responsavel: nomeResp,
+                empresa_franqueado: empresaFranqueado,
+                documento_franqueado: docFranqueado,
                 telefone_responsavel: telResp,
-                email_responsavel: emailResp
+                email_responsavel: emailResp,
+                dominio_franqueado: dominioFranqueado,
+                chave_licenca: chaveLicenca
             },
             dataType: 'json',
             success: function (res) {
