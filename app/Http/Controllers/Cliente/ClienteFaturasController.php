@@ -56,6 +56,12 @@ class ClienteFaturasController extends Controller
             $fatura->save();
         }
 
+        if (empty($fatura->linha_digitavel_boleto) && ($fatura->isCarne() || $fatura->metodo_pagamento === 'carne')) {
+            $venc = $fatura->data_vencimento ?: now()->addDays(30);
+            $fatura->linha_digitavel_boleto = EfiPaymentService::gerarLinhaDigitavelBoleto((float) $fatura->valor, $venc, $fatura->codigo_fatura);
+            $fatura->save();
+        }
+
         return response()->json([
             'success' => true,
             'fatura' => [

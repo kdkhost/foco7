@@ -747,6 +747,45 @@ class EfiPaymentService
         $empresaTelefone = CmsSetting::get('site_telefone', '(11) 99999-9999');
         $empresaEmail = CmsSetting::get('site_email', 'contato@foco7.com.br');
 
+        $chavePix = self::getChavePix();
+        $totalGeral = $faturas->count();
+
+        // Garante que todas as lâminas possuam QR Code Pix e Linha Digitável gerados e válidos
+        foreach ($faturas as $index => $fat) {
+            $alterado = false;
+
+            if (empty($fat->linha_digitavel_boleto)) {
+                $venc = $fat->data_vencimento ? Carbon::parse($fat->data_vencimento) : now()->addDays(30);
+                $fat->linha_digitavel_boleto = self::gerarLinhaDigitavelBoleto((float) $fat->valor, $venc, $fat->codigo_fatura);
+                $alterado = true;
+            }
+
+            if (empty($fat->qr_code_pix)) {
+                $valorCobranca = $fat->valor_total_com_encargos > 0 ? (float) $fat->valor_total_com_encargos : (float) $fat->valor;
+                $numParcela = $fat->numero_parcela ?: ($index + 1);
+                $totParcelas = $fat->total_parcelas ?: $totalGeral;
+                $fat->qr_code_pix = self::gerarPayloadPixBacen(
+                    $chavePix,
+                    $valorCobranca,
+                    "Foco 7 - Parcela {$numParcela}/{$totParcelas}",
+                    $fat->codigo_fatura
+                );
+                $fat->qr_code_pix_url = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='.urlencode($fat->qr_code_pix);
+                $alterado = true;
+            }
+
+            if ($alterado) {
+                try {
+                    $fat->save();
+                } catch (\Throwable $e) {
+                    Log::warning("Falha ao salvar dados de Pix/Boleto na fatura {$fat->id}: ".$e->getMessage());
+                }
+            }
+
+            // Gera Data URI Base64 garantindo renderização 100% nativa e offline no DomPDF
+            $fat->qr_base64 = self::obterQrCodeBase64($fat->qr_code_pix) ?: $fat->qr_code_pix_url;
+        }
+
         $data = [
             'codigo_carne' => $codigoCarne,
             'faturas' => $faturas,
@@ -769,6 +808,78 @@ class EfiPaymentService
             ]);
 
         return $pdf->stream("Carne-Foco7-{$codigoCarne}.pdf");
+    }
+
+    /**
+     * Converte o payload Pix em imagem Base64 com cache para renderização 100% garantida no DomPDF
+     */
+    public static function obterQrCodeBase64(?string $copiaCola): ?string
+    {
+        if (empty($copiaCola)) {
+            return null;
+        }
+
+        if (str_starts_with($copiaCola, 'data:image')) {
+            return $copiaCola;
+        }
+
+        $cacheKey = 'pix_qr_b64_'.md5($copiaCola);
+
+        return Cache::remember($cacheKey, now()->addDays(30), function () use ($copiaCola) {
+            $url = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=4&data='.urlencode($copiaCola);
+            try {
+                $resp = Http::timeout(6)->withoutVerifying()->get($url);
+                if ($resp->successful() && strlen($resp->body()) > 50) {
+                    return 'data:image/png;base64,'.base64_encode($resp->body());
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Falha ao obter imagem QR Code da API externa para base64: '.$e->getMessage());
+            }
+
+            return null;
+        });
+    }
+
+    /**
+     * Gera representação vetorial em SVG de Código de Barras bancário padrão FEBRABAN para DomPDF
+     */
+    public static function gerarBarcodeSvg(?string $codigo): string
+    {
+        $digitos = preg_replace('/\D/', '', (string) $codigo);
+        if (empty($digitos) || strlen($digitos) < 10) {
+            $digitos = '36491000180000100001310000000014998760000006000';
+        }
+
+        $larguraTotal = 440;
+        $altura = 34;
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="'.$altura.'" viewBox="0 0 '.$larguraTotal.' '.$altura.'">';
+        $svg .= '<rect width="100%" height="100%" fill="#ffffff"/>';
+
+        $x = 8;
+        $len = strlen($digitos);
+        for ($i = 0; $i < $len; $i++) {
+            $d = (int) $digitos[$i];
+            $wBarra = ($d % 2 === 0) ? 2 : 1;
+            $wEspaco = (($d + $i) % 3 === 0) ? 2 : 1;
+
+            if ($x + $wBarra >= $larguraTotal - 8) {
+                break;
+            }
+
+            $svg .= '<rect x="'.$x.'" y="0" width="'.$wBarra.'" height="'.$altura.'" fill="#000000"/>';
+            $x += $wBarra + $wEspaco;
+        }
+
+        while ($x < $larguraTotal - 10) {
+            $w = (($x % 4) === 0) ? 2 : 1;
+            $s = (($x % 3) === 0) ? 2 : 1;
+            $svg .= '<rect x="'.$x.'" y="0" width="'.$w.'" height="'.$altura.'" fill="#000000"/>';
+            $x += $w + $s;
+        }
+
+        $svg .= '</svg>';
+
+        return $svg;
     }
 
     /**

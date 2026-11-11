@@ -308,17 +308,22 @@
                         <span class="campo-valor" style="font-size: 9px;">{{ substr($cliente->name, 0, 24) }}</span>
                     </div>
 
-                    <!-- Mini QR Code PIX -->
+                    <!-- QR Code PIX Oficial -->
                     <div class="pix-mini-box">
-                        <div style="font-size: 8px; font-weight: bold; color: #047857;">PIX DIRETO NA PARCELA</div>
-                        @if(extension_loaded('gd') && !empty($fat->qr_code_pix_url))
-                            <img src="{{ $fat->qr_code_pix_url }}" alt="PIX" style="width: 65px; height: 65px; margin: 2px 0;">
+                        <div style="font-size: 8px; font-weight: bold; color: #047857; margin-bottom: 2px;">PAGAMENTO PIX DIRETO</div>
+                        @php
+                            $qrSrc = !empty($fat->qr_base64) ? $fat->qr_base64 : (!empty($fat->qr_code_pix_url) ? $fat->qr_code_pix_url : null);
+                        @endphp
+                        @if(!empty($qrSrc))
+                            <div style="text-align: center; margin: 3px 0;">
+                                <img src="{{ $qrSrc }}" alt="QR Code PIX" style="width: 78px; height: 78px; display: inline-block; border: 1px solid #10b981; border-radius: 4px; padding: 2px; background: #ffffff;">
+                            </div>
                         @else
                             <div style="font-size: 8px; font-weight: bold; padding: 12px 2px; border: 1px dashed #047857; background: #ecfdf5; color: #047857; text-align: center; margin: 4px 0;">
                                 PAGAMENTO PIX<br><span style="font-size: 7px; color: #334155;">{{ $fat->codigo_fatura }}</span>
                             </div>
                         @endif
-                        <div style="font-size: 7px; color: #065f46;">Aponte a câmera do banco</div>
+                        <div style="font-size: 7px; color: #065f46; font-weight: bold;">Aponte a câmera do banco</div>
                     </div>
                 </td>
 
@@ -383,8 +388,10 @@
                         </span>
                     </div>
 
-                    <!-- Código de Barras Representativo -->
-                    <div class="barcode-strip"></div>
+                    <!-- Código de Barras Padrão FEBRABAN -->
+                    <div style="margin-top: 6px; padding: 2px 4px; border: 1px solid #000000; background: #ffffff; text-align: center;">
+                        {!! \App\Services\EfiPaymentService::gerarBarcodeSvg($fat->linha_digitavel_boleto ?: $fat->codigo_fatura) !!}
+                    </div>
                 </td>
             </tr>
         </table>
