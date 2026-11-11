@@ -888,8 +888,30 @@ class EvolutionApiService
     }
 
     /**
-     * Lista EXCLUSIVAMENTE as instâncias criadas através deste painel (nunca lista instâncias de terceiros do servidor Evolution Go)
-     * e cruza em tempo real o status de conexão e informações do Franqueado / Licenciado de cada uma.
+     * Retorna mapa indexado por nome (minúsculo) de todas as instâncias que efetivamente existem no servidor Evolution Go
+     */
+    public static function obterInstanciasDoServidorExistentes(): array
+    {
+        $res = self::listarInstancias();
+        $mapa = [];
+        if ($res['success'] && ! empty($res['data'])) {
+            foreach (self::extrairListaInstancias($res['data']) as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+                $nomeSrv = trim((string) ($item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? ''))));
+                if (! empty($nomeSrv)) {
+                    $mapa[strtolower($nomeSrv)] = $item;
+                }
+            }
+        }
+
+        return $mapa;
+    }
+
+    /**
+     * Lista EXCLUSIVAMENTE as instâncias criadas através deste painel que EFETIVAMENTE EXISTEM no servidor Evolution Go.
+     * Regra estrita: se a instância não existir no servidor Evolution Go, NÃO é exibida na listagem do painel.
      */
     public static function listarInstanciasCriadasNoPainel(): array
     {
@@ -897,96 +919,83 @@ class EvolutionApiService
         $configInst = self::getInstanciaConfiguracaoInfo();
         $instAtivaNome = self::getInstanceName();
 
-        // 1. Monta mapa restrito APENAS com as instâncias que pertencem a este painel
+        // 1. Consulta o servidor Evolution Go para obter apenas as instâncias que realmente existem
+        $instanciasServidorMap = self::obterInstanciasDoServidorExistentes();
+
+        // 2. Monta mapa restrito APENAS com as instâncias criadas por este painel que existem no servidor
         $mapaPainel = [];
+        $alterouExtras = false;
 
         $nomePrincipalKey = strtolower(trim((string) ($configInst['nome'] ?? $instAtivaNome)));
-        if (! empty($nomePrincipalKey)) {
+        // SÓ ADICIONA A INSTÂNCIA PRINCIPAL SE ELA EXISTIR NO SERVIDOR EVOLUTION GO!
+        if (! empty($nomePrincipalKey) && isset($instanciasServidorMap[$nomePrincipalKey])) {
+            $itemSrv = $instanciasServidorMap[$nomePrincipalKey];
+            $tokenSrv = $itemSrv['token'] ?? ($itemSrv['instance']['token'] ?? ($itemSrv['apikey'] ?? ($configInst['token'] ?? self::getInstanceApiKey())));
+            $jidRaw = (string) ($itemSrv['jid'] ?? ($itemSrv['owner'] ?? ($itemSrv['instance']['owner'] ?? '')));
+            $ownerSrv = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
+            $statusRaw = strtolower((string) ($itemSrv['status'] ?? ($itemSrv['state'] ?? '')));
+            $isConnected = (($itemSrv['connected'] ?? false) === true)
+                || (($itemSrv['Connected'] ?? false) === true)
+                || in_array($statusRaw, ['open', 'connected', 'conectado'], true);
+
             $mapaPainel[$nomePrincipalKey] = [
                 'name' => $configInst['nome'] ?? $instAtivaNome,
-                'token' => $configInst['token'] ?? self::getInstanceApiKey(),
-                'status' => CmsSetting::get('evolution_status_cache', 'desconectado') === 'conectado' ? 'open' : 'close',
-                'connected' => CmsSetting::get('evolution_status_cache', 'desconectado') === 'conectado',
-                'owner' => (string) CmsSetting::get('evolution_connected_number', ''),
+                'token' => $tokenSrv,
+                'status' => $isConnected ? 'open' : 'close',
+                'connected' => $isConnected,
+                'owner' => $isConnected ? $ownerSrv : '',
                 'criada_pelo_painel' => true,
+                'eh_principal_painel' => true,
                 'franqueado' => self::obterInfoFranqueadoInstancia($configInst['nome'] ?? $instAtivaNome),
             ];
+
+            if (! empty($tokenSrv)) {
+                CmsSetting::set('evolution_apikey', $tokenSrv, 'whatsapp');
+            }
+            CmsSetting::set('evolution_status_cache', $isConnected ? 'conectado' : 'desconectado', 'whatsapp');
+            CmsSetting::set('evolution_connected_number', $isConnected ? $ownerSrv : '', 'whatsapp');
         }
 
-        foreach ($extras as $ext) {
+        // SÓ ADICIONA AS INSTÂNCIAS EXTRAS SE ELAS EXISTIREM NO SERVIDOR EVOLUTION GO!
+        foreach ($extras as &$ext) {
             $n = trim((string) ($ext['nome'] ?? ''));
             if (empty($n)) {
                 continue;
             }
             $k = strtolower($n);
-            $isConn = ! empty($ext['conectado']) || (($ext['status_conexao'] ?? '') === 'conectado');
+
+            // Se não existir no servidor Evolution Go, NÃO EXIBA!
+            if (! isset($instanciasServidorMap[$k])) {
+                continue;
+            }
+
+            $itemSrv = $instanciasServidorMap[$k];
+            $tokenSrv = $itemSrv['token'] ?? ($itemSrv['instance']['token'] ?? ($itemSrv['apikey'] ?? ($ext['token'] ?? '')));
+            $jidRaw = (string) ($itemSrv['jid'] ?? ($itemSrv['owner'] ?? ($itemSrv['instance']['owner'] ?? '')));
+            $ownerSrv = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
+            $statusRaw = strtolower((string) ($itemSrv['status'] ?? ($itemSrv['state'] ?? '')));
+            $isConnected = (($itemSrv['connected'] ?? false) === true)
+                || (($itemSrv['Connected'] ?? false) === true)
+                || in_array($statusRaw, ['open', 'connected', 'conectado'], true);
+
+            $ext['conectado'] = $isConnected;
+            $ext['status_conexao'] = $isConnected ? 'conectado' : 'desconectado';
+            $ext['owner'] = $isConnected ? $ownerSrv : '';
+            if (! empty($tokenSrv)) {
+                $ext['token'] = $tokenSrv;
+            }
+            $alterouExtras = true;
+
             $mapaPainel[$k] = [
                 'name' => $n,
-                'token' => $ext['token'] ?? '',
-                'status' => $isConn ? 'open' : 'close',
-                'connected' => $isConn,
-                'owner' => (string) ($ext['owner'] ?? ''),
+                'token' => $tokenSrv,
+                'status' => $isConnected ? 'open' : 'close',
+                'connected' => $isConnected,
+                'owner' => $isConnected ? $ownerSrv : '',
                 'criada_pelo_painel' => true,
+                'eh_principal_painel' => false,
                 'franqueado' => self::obterInfoFranqueadoInstancia($n),
             ];
-        }
-
-        // 2. Consulta o servidor Evolution Go APENAS para enriquecer status/owner/token das instâncias deste painel
-        $resServidor = self::listarInstancias();
-        $alterouExtras = false;
-
-        if ($resServidor['success'] && ! empty($resServidor['data'])) {
-            $listaBruta = self::extrairListaInstancias($resServidor['data']);
-            foreach ($listaBruta as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
-                $nomeSrv = trim((string) ($item['name'] ?? ($item['instance']['name'] ?? ($item['instanceName'] ?? ''))));
-                $chaveSrv = strtolower($nomeSrv);
-
-                // FILTRO ESTRITO: Se a instância do servidor Evolution Go NÃO foi criada por este painel, IGNORA!
-                if (empty($chaveSrv) || ! isset($mapaPainel[$chaveSrv])) {
-                    continue;
-                }
-
-                $tokenSrv = $item['token'] ?? ($item['instance']['token'] ?? ($item['apikey'] ?? null));
-                $jidRaw = (string) ($item['jid'] ?? ($item['owner'] ?? ($item['instance']['owner'] ?? '')));
-                $ownerSrv = str_replace(['@s.whatsapp.net', '@c.us'], '', $jidRaw);
-                $statusRaw = strtolower((string) ($item['status'] ?? ($item['state'] ?? '')));
-                $isConnected = (($item['connected'] ?? false) === true)
-                    || (($item['Connected'] ?? false) === true)
-                    || in_array($statusRaw, ['open', 'connected', 'conectado'], true);
-
-                $mapaPainel[$chaveSrv]['connected'] = $isConnected;
-                $mapaPainel[$chaveSrv]['status'] = $isConnected ? 'open' : 'close';
-                $mapaPainel[$chaveSrv]['owner'] = $isConnected ? $ownerSrv : '';
-                if (! empty($tokenSrv)) {
-                    $mapaPainel[$chaveSrv]['token'] = $tokenSrv;
-                }
-                $mapaPainel[$chaveSrv]['franqueado']['numero_conectado'] = $isConnected ? $ownerSrv : '';
-
-                // Sincroniza cache local se for a instância principal
-                if ($chaveSrv === strtolower($instAtivaNome)) {
-                    if (! empty($tokenSrv)) {
-                        CmsSetting::set('evolution_apikey', $tokenSrv, 'whatsapp');
-                    }
-                    CmsSetting::set('evolution_status_cache', $isConnected ? 'conectado' : 'desconectado', 'whatsapp');
-                    CmsSetting::set('evolution_connected_number', $isConnected ? $ownerSrv : '', 'whatsapp');
-                }
-
-                // Sincroniza status_conexao e owner nas instâncias extras do painel
-                foreach ($extras as &$extItem) {
-                    if (strtolower((string) ($extItem['nome'] ?? '')) === $chaveSrv) {
-                        $extItem['conectado'] = $isConnected;
-                        $extItem['status_conexao'] = $isConnected ? 'conectado' : 'desconectado';
-                        $extItem['owner'] = $isConnected ? $ownerSrv : '';
-                        if (! empty($tokenSrv)) {
-                            $extItem['token'] = $tokenSrv;
-                        }
-                        $alterouExtras = true;
-                    }
-                }
-            }
         }
 
         if ($alterouExtras) {
@@ -2163,7 +2172,8 @@ class EvolutionApiService
     }
 
     /**
-     * Desconecta e limpa toda a sessão de uma instância específica no servidor Evolution Go e no sistema local
+     * Desconecta e encerra de imediato a sessão de uma instância no servidor Evolution Go e no sistema local.
+     * Envia disconnect + logout ao servidor e limpa os estados locais instantaneamente.
      */
     public static function desconectarInstanciaEspecifica(string $instName, ?string $token = null): array
     {
@@ -2178,19 +2188,46 @@ class EvolutionApiService
         }
         $tok = $token ?: (self::sincronizarTokenInstancia($instName) ?: self::obterTokenParaInstancia($instName));
 
-        // 1. Limpa sessão e remove eventual JID órfão mantendo o mesmo nome e token da instância no Evolution Go
-        $tok = self::resetarInstanciaNoServidorMantendoToken($instName, $tok);
+        // 1. Desconecta de imediato no servidor Evolution Go (fecha o socket e desloga a sessão do WhatsApp)
+        self::request('POST', 'instance/disconnect', [], false, 5, $tok);
+        self::request('DELETE', 'instance/logout', [], false, 5, $tok);
 
-        // 2. Limpa todos os dados locais da instância
+        // 2. Limpa todos os dados locais e cache da instância
         self::limparDadosInstanciaLocal($instName);
+
+        // 3. Atualiza cache da instância principal se for o caso
+        if (strtolower($instName) === strtolower(self::getInstanceName())) {
+            CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+            CmsSetting::set('evolution_connected_number', '', 'whatsapp');
+        }
+
+        // 4. Atualiza estado em instâncias extras locais
+        $extras = self::getInstanciasExtras();
+        $alterou = false;
+        foreach ($extras as &$item) {
+            if (strtolower((string) ($item['nome'] ?? '')) === strtolower($instName)) {
+                $item['conectado'] = false;
+                $item['status_conexao'] = 'desconectado';
+                $item['owner'] = '';
+                $alterou = true;
+                break;
+            }
+        }
+        if ($alterou) {
+            CmsSetting::set('evolution_instancias_extras', $extras, 'whatsapp', 'json');
+        }
 
         return [
             'success' => true,
             'instancia' => $instName,
             'token' => $tok,
             'limpo' => true,
-            'message' => "Instância '{$instName}' desconectada e todos os dados da sessão foram limpos com sucesso.",
-            'data' => [],
+            'message' => "Instância '{$instName}' desconectada de imediato no servidor Evolution Go e sessão local limpa com sucesso.",
+            'data' => [
+                'state' => 'close',
+                'status' => 'close',
+                'connected' => false,
+            ],
         ];
     }
 

@@ -845,7 +845,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- INSTÂNCIA ATUAL DE CONFIGURAÇÃO (TAMBÉM COBRADA PELO MÓDULO MERCADO PAGO DO DESENVOLVEDOR) -->
+                                            <!-- INSTÂNCIA ATUAL DE CONFIGURAÇÃO (SOMENTE SE EXISTIR NO SERVIDOR EVOLUTION GO) -->
+                                            @if(!empty($instanciaConfigExisteNoServidor))
                                             @php
                                                 $nomeInstConfig = $instanciaConfiguracao['nome'] ?? 'foco7';
                                                 $vencInstConfig = $instanciaConfiguracao['data_vencimento'] ?? date('Y-m-d', strtotime('+30 days'));
@@ -924,14 +925,20 @@
                                                         <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $nomeInstConfig }}')" title="Conectar via QR Code ou Número de Telefone">
                                                             <i class="fas fa-qrcode me-1"></i> Conectar
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $nomeInstConfig }}')" title="Desconectar aparelho e limpar tudo desta instância">
+                                                        <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $nomeInstConfig }}')" title="Desconectar aparelho de imediato no servidor Evolution Go">
                                                             <i class="fas fa-power-off"></i>
                                                         </button>
+                                                        @if(($contextoPainel['eh_painel_licenciado'] ?? false) || ($configs['dev_desbloqueado'] ?? false))
+                                                        <button type="button" class="btn btn-outline-danger" onclick="excluirInstanciaPainel('{{ $nomeInstConfig }}')" title="Excluir permanentemente do servidor Evolution Go e do painel">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
+                                            @endif
 
-                                            <!-- INSTÂNCIAS CRIADAS ATRAVÉS DESTE PAINEL (PRÓPRIA DO ADMIN, EMPRESA E LICENCIADOS) -->
+                                            <!-- INSTÂNCIAS CRIADAS ATRAVÉS DESTE PAINEL (SOMENTE SE EXISTIREM NO SERVIDOR EVOLUTION GO) -->
                                             @if(!empty($instanciasExtras) && is_array($instanciasExtras))
                                                 @foreach($instanciasExtras as $extra)
                                                 @php
@@ -1048,19 +1055,34 @@
                                                             <button type="button" class="btn btn-success fw-semibold" onclick="conectarEabrirQr('{{ $extra['nome'] }}')" title="Conectar via QR Code ou Número de Telefone">
                                                                 <i class="fas fa-qrcode me-1"></i> Conectar
                                                             </button>
-                                                            <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $extra['nome'] }}')" title="Desconectar aparelho e limpar tudo desta instância">
+                                                            <button type="button" class="btn btn-outline-danger" onclick="desconectarInstancia('{{ $extra['nome'] }}')" title="Desconectar aparelho de imediato no servidor Evolution Go">
                                                                 <i class="fas fa-power-off"></i>
                                                             </button>
                                                             <button type="button" class="btn btn-outline-secondary" onclick="selecionarInstanciaServidor('{{ $extra['nome'] }}', '{{ $extra['token'] ?? '' }}')" title="Usar esta instância no painel">
                                                                 <i class="fas fa-arrow-right"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-outline-danger" onclick="excluirInstanciaExtra('{{ $extra['nome'] }}')" title="Excluir monitoramento (Restrito Senha Master)">
+                                                            <button type="button" class="btn btn-outline-danger" onclick="excluirInstanciaPainel('{{ $extra['nome'] }}')" title="Excluir permanentemente do servidor Evolution Go e do painel">
                                                                 <i class="fas fa-trash-alt"></i>
                                                             </button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                                 @endforeach
+                                            @endif
+
+                                            @if(empty($instanciaConfigExisteNoServidor) && empty($instanciasExtras))
+                                            <tr>
+                                                <td colspan="6" class="text-center py-5 text-secondary">
+                                                    <i class="fas fa-inbox fa-3x mb-3 text-muted opacity-50 d-block"></i>
+                                                    <h6 class="fw-bold text-body mb-1">Nenhuma Instância Ativa Encontrada no Servidor Evolution Go</h6>
+                                                    <p class="small text-secondary mb-3">
+                                                        Instâncias que não existem ou foram removidas do servidor Evolution Go não são exibidas na listagem deste painel.
+                                                    </p>
+                                                    <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="$('#modalCriarInstancia').modal('show')">
+                                                        <i class="fas fa-plus me-1"></i> Criar / Provisionar Minha Instância
+                                                    </button>
+                                                </td>
+                                            </tr>
                                             @endif
                                         </tbody>
                                     </table>
@@ -3315,14 +3337,20 @@
 
     function desconectarInstancia(instanciaOpcional) {
         var nomeAlvo = instanciaOpcional || $('#inputInstance').val() || '{{ $configs["instance"] ?? "foco7" }}';
-        window.confirmarAcao(
-            'Desconectar e Limpar Instância?',
-            'Toda a sessão do aparelho vinculado, QR Code anterior e cache da instância "' + nomeAlvo + '" serão limpos no servidor Evolution Go e no painel.',
-            'warning',
-            function () {
+        Swal.fire({
+            title: 'Desconectar WhatsApp?',
+            html: 'Deseja desconectar de imediato a instância <strong class="font-monospace text-primary">' + nomeAlvo + '</strong> no servidor Evolution Go?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-power-off me-1"></i> Desconectar de Imediato',
+            cancelButtonText: 'Cancelar'
+        }).then(function (result) {
+            if (result.isConfirmed) {
                 Swal.fire({
-                    title: 'Desconectando e Limpando...',
-                    html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-danger mb-2"></i><p class="small text-secondary mb-0">Encerrando sessão do aparelho e limpando dados da instância...</p></div>',
+                    title: 'Desconectando no Servidor...',
+                    html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-danger mb-2"></i><p class="small text-secondary mb-0">Desconectando e encerrando a sessão no servidor Evolution Go...</p></div>',
                     showConfirmButton: false,
                     allowOutsideClick: false
                 });
@@ -3337,17 +3365,18 @@
                     dataType: 'json',
                     success: function (res) {
                         limparDadosVisuaisInstanciaLocal(nomeAlvo);
+                        window.foco7Notify.success(res.message || 'Instância desconectada de imediato no servidor Evolution Go!');
                         Swal.fire({
                             icon: 'success',
-                            title: 'Instância Desconectada e Limpa!',
-                            text: res.message || 'Todos os dados de sessão da instância foram limpos. Agora você pode conectar lendo um novo QR Code ou digitando o número do WhatsApp.',
+                            title: 'Instância Desconectada!',
+                            text: res.message || 'Sua instância foi desconectada de imediato no servidor Evolution Go.',
                             showCancelButton: true,
                             confirmButtonColor: '#198754',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: '<i class="fas fa-qrcode me-1"></i> Conectar Agora (QR / Número)',
                             cancelButtonText: 'Fechar'
-                        }).then(function (result) {
-                            if (result.isConfirmed) {
+                        }).then(function (resSwal) {
+                            if (resSwal.isConfirmed) {
                                 conectarEabrirQr(nomeAlvo, true);
                             }
                         });
@@ -3355,11 +3384,62 @@
                     error: function () {
                         limparDadosVisuaisInstanciaLocal(nomeAlvo);
                         Swal.close();
-                        window.foco7Notify.error('Sessão local limpa, mas houve falha ao comunicar com o servidor.');
+                        window.foco7Notify.error('Falha ao comunicar desconexão com o servidor Evolution Go.');
                     }
                 });
             }
-        );
+        });
+    }
+
+    function excluirInstanciaPainel(nome) {
+        if (!nome) return;
+        Swal.fire({
+            title: 'Excluir Instância?',
+            html: 'Tem certeza que deseja excluir permanentemente a instância <strong class="font-monospace text-danger">' + nome + '</strong>?<br><br><span class="text-danger small"><i class="fas fa-triangle-exclamation me-1"></i> A instância será apagada de imediato no servidor Evolution Go e removida deste painel.</span>',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sim, Excluir de Imediato',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Excluindo Instância...',
+                    html: '<div class="py-3"><i class="fas fa-spinner fa-spin fa-2x text-danger mb-2"></i><p class="small text-secondary mb-0">Deletando permanentemente no servidor Evolution Go e limpando painel...</p></div>',
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.instancias.excluir") }}',
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    data: { nome: nome },
+                    dataType: 'json',
+                    success: function (res) {
+                        window.foco7Notify.success(res.message);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Instância Excluída!',
+                            text: res.message,
+                            confirmButtonColor: '#198754'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function (xhr) {
+                        var msg = xhr.responseJSON?.message || 'Falha ao excluir instância do servidor e do painel.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro ao Excluir',
+                            text: msg,
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                });
+            }
+        });
     }
 
     function executarCriacaoInstancia() {

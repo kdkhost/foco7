@@ -130,20 +130,35 @@ class WhatsappCobrancaController extends Controller
             }
         }
 
-        // Gestão de Tarifação de Instâncias (R$ 60,00/mês cada, incluindo a atual de configuração e extras)
+        // Gestão de Tarifação de Instâncias (R$ 60,00/mês cada)
         $custoInstanciaExtra = EvolutionApiService::getCustoInstanciaExtra(); // 60.00
         $instanciaConfiguracao = EvolutionApiService::getInstanciaConfiguracaoInfo();
         $permissaoWhatsapp = EvolutionApiService::verificarPermissaoCobrancaWhatsapp();
         $webhookUrlMpDev = url('/webhook/mercadopago?origem=instancia_wpp');
 
-        $instanciasExtras = EvolutionApiService::getInstanciasExtras();
-        $totalInstanciasExtras = count($instanciasExtras);
-        $custoTotalRecorrente = ($totalInstanciasExtras + 1) * $custoInstanciaExtra;
+        // Sincroniza em tempo real com o cluster Evolution Go: se a instância NÃO existir no servidor, NÃO é exibida no painel!
+        $instanciasServidorMap = EvolutionApiService::obterInstanciasDoServidorExistentes();
 
-        // Métricas de Instâncias (incluindo a instância de configuração)
-        $instanciasAtivas = ($instanciaConfiguracao['status'] ?? 'ativa') === 'ativa' ? 1 : 0;
-        $instanciasVencidas = ($instanciaConfiguracao['status'] ?? 'ativa') === 'vencida' ? 1 : 0;
-        $instanciasSuspensas = in_array($instanciaConfiguracao['status'] ?? 'ativa', ['suspensa', 'pendente_pagamento']) ? 1 : 0;
+        $nomeInstConfig = strtolower(trim((string) ($instanciaConfiguracao['nome'] ?? 'foco7')));
+        $instanciaConfigExisteNoServidor = isset($instanciasServidorMap[$nomeInstConfig]);
+
+        $todasExtras = EvolutionApiService::getInstanciasExtras();
+        $instanciasExtras = [];
+        foreach ($todasExtras as $extraItem) {
+            $nomeExtra = strtolower(trim((string) ($extraItem['nome'] ?? '')));
+            if (! empty($nomeExtra) && isset($instanciasServidorMap[$nomeExtra])) {
+                $instanciasExtras[] = $extraItem;
+            }
+        }
+
+        $totalInstanciasExtras = count($instanciasExtras);
+        $totalInstanciasAtivasNoPainel = ($instanciaConfigExisteNoServidor ? 1 : 0) + $totalInstanciasExtras;
+        $custoTotalRecorrente = $totalInstanciasAtivasNoPainel * $custoInstanciaExtra;
+
+        // Métricas de Instâncias
+        $instanciasAtivas = ($instanciaConfigExisteNoServidor && ($instanciaConfiguracao['status'] ?? 'ativa') === 'ativa') ? 1 : 0;
+        $instanciasVencidas = ($instanciaConfigExisteNoServidor && ($instanciaConfiguracao['status'] ?? 'ativa') === 'vencida') ? 1 : 0;
+        $instanciasSuspensas = ($instanciaConfigExisteNoServidor && in_array($instanciaConfiguracao['status'] ?? 'ativa', ['suspensa', 'pendente_pagamento'])) ? 1 : 0;
 
         foreach ($instanciasExtras as $inst) {
             $st = $inst['status'] ?? 'ativa';
@@ -211,7 +226,8 @@ class WhatsappCobrancaController extends Controller
             'instanciasSuspensas',
             'licenciados',
             'franqueadoAtivoInfo',
-            'contextoPainel'
+            'contextoPainel',
+            'instanciaConfigExisteNoServidor'
         ));
     }
 
@@ -1240,28 +1256,50 @@ class WhatsappCobrancaController extends Controller
     }
 
     /**
-     * Remove uma instância extra do monitoramento (Exige Senha Master do Desenvolvedor)
+     * Remove / Exclui uma instância permanentemente do servidor Evolution Go e do painel
      */
     public function excluirInstancia(Request $request)
     {
-        if (! $this->isMasterUnlocked($request)) {
-            return response()->json([
-                'success' => false,
-                'requer_senha_master' => true,
-                'message' => 'Apenas o Desenvolvedor Master possui permissão para remover instâncias do monitoramento de cobrança.',
-            ], 403);
-        }
-
         $nome = trim((string) $request->input('nome', ''));
         if (empty($nome)) {
             return response()->json(['success' => false, 'message' => 'Nome da instância não informado.'], 422);
         }
 
+        // Validação estrita de isolamento: só pode excluir instâncias deste painel
+        if (! EvolutionApiService::instanciaPertenceAoPainelAtual($nome)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Acesso negado: a instância '{$nome}' não pertence a este painel.",
+            ], 403);
+        }
+
+        // 1. Deleta a instância permanentemente no servidor Evolution Go via API (DELETE /instance/delete/{uuid})
+        $delServidor = EvolutionApiService::deletarInstancia($nome);
+
+        // 2. Remove do monitoramento local de instâncias extras do painel
         EvolutionApiService::removerInstanciaExtra($nome);
+
+        // 3. Se for a instância ativa no painel, limpa status e sessão
+        $instPrincipal = EvolutionApiService::getInstanceName();
+        if (strtolower($nome) === strtolower($instPrincipal)) {
+            CmsSetting::set('evolution_status_cache', 'desconectado', 'whatsapp');
+            CmsSetting::set('evolution_connected_number', '', 'whatsapp');
+            CmsSetting::set('evolution_admin_instancia_propria', '', 'whatsapp');
+        }
+
+        // 4. Limpa faturas pendentes da instância se houver
+        try {
+            Fatura::where('descricao', 'like', "%{$nome}%")
+                ->where('status', 'pendente')
+                ->delete();
+        } catch (\Throwable $e) {
+        }
 
         return response()->json([
             'success' => true,
-            'message' => "Instância '{$nome}' removida com sucesso do monitoramento de cobrança.",
+            'instancia' => $nome,
+            'message' => "Instância '{$nome}' excluída de imediato no servidor Evolution Go e removida deste painel com sucesso!",
+            'servidor' => $delServidor,
         ]);
     }
 
